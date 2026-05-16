@@ -1,7 +1,10 @@
 package exp.ftxt;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -17,6 +20,7 @@ public class FloatingService extends Service {
     private WindowManager windowManager;
     private TextView floatingText;
     private WindowManager.LayoutParams params;
+    private BroadcastReceiver textUpdateReceiver;
 
     @Override
     public void onCreate() {
@@ -95,6 +99,24 @@ public class FloatingService extends Service {
 
             windowManager.addView(floatingText, params);
 
+            // Register broadcast receiver untuk update teks
+            textUpdateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String newText = intent.getStringExtra("text");
+                    if (newText != null && floatingText != null) {
+                        floatingText.setText(newText);
+                    }
+                }
+            };
+
+            IntentFilter filter = new IntentFilter("exp.ftxt.UPDATE_TEXT");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(textUpdateReceiver, filter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(textUpdateReceiver, filter);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             stopSelf();
@@ -107,6 +129,10 @@ public class FloatingService extends Service {
         super.onDestroy();
 
         try {
+
+            if (textUpdateReceiver != null) {
+                unregisterReceiver(textUpdateReceiver);
+            }
 
             if (floatingText != null) {
                 windowManager.removeView(floatingText);

@@ -30,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
 
             currentText = editText.getText().toString();
 
+            Intent updateIntent = new Intent("exp.ftxt.UPDATE_TEXT");
+            updateIntent.putExtra("text", currentText);
+            sendBroadcast(updateIntent);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
                 if (!Settings.canDrawOverlays(this)) {
