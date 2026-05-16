@@ -99,6 +99,7 @@ public class FloatingService extends Service {
 
             windowManager.addView(floatingText, params);
 
+<<<<<<< HEAD
             // Register broadcast receiver untuk update teks, ukuran, dan warna
             textUpdateReceiver = new BroadcastReceiver() {
                 @Override
@@ -118,14 +119,27 @@ public class FloatingService extends Service {
                         if (floatingText != null) {
                             floatingText.setTextColor(newColor);
                         }
+=======
+            // Register broadcast receiver untuk update teks
+            textUpdateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String newText = intent.getStringExtra("text");
+                    if (newText != null && floatingText != null) {
+                        floatingText.setText(newText);
+>>>>>>> fab6f5a45800e5238d9a275bec08adc6ce506f7a
                     }
                 }
             };
 
+<<<<<<< HEAD
             IntentFilter filter = new IntentFilter();
             filter.addAction("exp.ftxt.UPDATE_TEXT");
             filter.addAction("exp.ftxt.UPDATE_TEXT_SIZE");
             filter.addAction("exp.ftxt.UPDATE_TEXT_COLOR");
+=======
+            IntentFilter filter = new IntentFilter("exp.ftxt.UPDATE_TEXT");
+>>>>>>> fab6f5a45800e5238d9a275bec08adc6ce506f7a
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(textUpdateReceiver, filter, Context.RECEIVER_EXPORTED);
             } else {

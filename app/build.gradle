@@ -14,9 +14,15 @@ android {
 
         targetSdkVersion 35
 
+<<<<<<< HEAD
         versionCode 5
 
         versionName "1.5"
+=======
+        versionCode 4
+
+        versionName "1.4"
+>>>>>>> fab6f5a45800e5238d9a275bec08adc6ce506f7a
 
         testInstrumentationRunner
                 "androidx.test.runner.AndroidJUnitRunner"
