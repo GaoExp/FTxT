@@ -1,7 +1,10 @@
 package exp.ftxt;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -17,6 +20,7 @@ public class FloatingService extends Service {
     private WindowManager windowManager;
     private TextView floatingText;
     private WindowManager.LayoutParams params;
+    private BroadcastReceiver textUpdateReceiver;
 
     @Override
     public void onCreate() {
@@ -29,7 +33,7 @@ public class FloatingService extends Service {
             floatingText = new TextView(this);
 
             floatingText.setText(MainActivity.currentText);
-            floatingText.setTextSize(20f);
+            floatingText.setTextSize(MainActivity.currentTextSize);
             floatingText.setTextColor(Color.WHITE);
             floatingText.setBackgroundColor(Color.BLACK);
 
@@ -95,6 +99,33 @@ public class FloatingService extends Service {
 
             windowManager.addView(floatingText, params);
 
+            // Register broadcast receiver untuk update teks dan ukuran
+            textUpdateReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction().equals("exp.ftxt.UPDATE_TEXT")) {
+                        String newText = intent.getStringExtra("text");
+                        if (newText != null && floatingText != null) {
+                            floatingText.setText(newText);
+                        }
+                    } else if (intent.getAction().equals("exp.ftxt.UPDATE_TEXT_SIZE")) {
+                        float newSize = intent.getFloatExtra("size", 20f);
+                        if (floatingText != null) {
+                            floatingText.setTextSize(newSize);
+                        }
+                    }
+                }
+            };
+
+            IntentFilter filter = new IntentFilter();
+            filter.addAction("exp.ftxt.UPDATE_TEXT");
+            filter.addAction("exp.ftxt.UPDATE_TEXT_SIZE");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                registerReceiver(textUpdateReceiver, filter, Context.RECEIVER_EXPORTED);
+            } else {
+                registerReceiver(textUpdateReceiver, filter);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             stopSelf();
@@ -107,6 +138,10 @@ public class FloatingService extends Service {
         super.onDestroy();
 
         try {
+
+            if (textUpdateReceiver != null) {
+                unregisterReceiver(textUpdateReceiver);
+            }
 
             if (floatingText != null) {
                 windowManager.removeView(floatingText);
