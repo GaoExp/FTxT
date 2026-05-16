@@ -15,82 +15,90 @@ import android.widget.TextView;
 public class FloatingService extends Service {
 
     private WindowManager windowManager;
-    private TextView textView;
+    private TextView floatingText;
+    private WindowManager.LayoutParams params;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        try {
 
-        textView = new TextView(this);
+            windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        textView.setText("FTxT AKTIF");
-        textView.setTextSize(18f);
-        textView.setTextColor(Color.WHITE);
-        textView.setBackgroundColor(Color.BLACK);
+            floatingText = new TextView(this);
 
-        int type;
+            floatingText.setText(MainActivity.currentText);
+            floatingText.setTextSize(20f);
+            floatingText.setTextColor(Color.WHITE);
+            floatingText.setBackgroundColor(Color.BLACK);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            type = WindowManager.LayoutParams.TYPE_PHONE;
-        }
+            int layoutType;
 
-        final WindowManager.LayoutParams params =
-                new WindowManager.LayoutParams(
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        type,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                        PixelFormat.TRANSLUCENT
-                );
-
-        params.gravity = Gravity.TOP | Gravity.START;
-        params.x = 100;
-        params.y = 300;
-
-        textView.setOnTouchListener(new View.OnTouchListener() {
-
-            private int initialX;
-            private int initialY;
-            private float initialTouchX;
-            private float initialTouchY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-
-                    case MotionEvent.ACTION_DOWN:
-
-                        initialX = params.x;
-                        initialY = params.y;
-
-                        initialTouchX = event.getRawX();
-                        initialTouchY = event.getRawY();
-
-                        return true;
-
-                    case MotionEvent.ACTION_MOVE:
-
-                        params.x = initialX +
-                                (int) (event.getRawX() - initialTouchX);
-
-                        params.y = initialY +
-                                (int) (event.getRawY() - initialTouchY);
-
-                        windowManager.updateViewLayout(textView, params);
-
-                        return true;
-                }
-
-                return false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                layoutType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            } else {
+                layoutType = WindowManager.LayoutParams.TYPE_PHONE;
             }
-        });
 
-        windowManager.addView(textView, params);
+            params = new WindowManager.LayoutParams(
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT,
+                    layoutType,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT
+            );
+
+            params.gravity = Gravity.TOP | Gravity.START;
+            params.x = 100;
+            params.y = 300;
+
+            floatingText.setOnTouchListener(new View.OnTouchListener() {
+
+                private int initialX;
+                private int initialY;
+
+                private float initialTouchX;
+                private float initialTouchY;
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+                    switch (event.getAction()) {
+
+                        case MotionEvent.ACTION_DOWN:
+
+                            initialX = params.x;
+                            initialY = params.y;
+
+                            initialTouchX = event.getRawX();
+                            initialTouchY = event.getRawY();
+
+                            return true;
+
+                        case MotionEvent.ACTION_MOVE:
+
+                            params.x = initialX +
+                                    (int) (event.getRawX() - initialTouchX);
+
+                            params.y = initialY +
+                                    (int) (event.getRawY() - initialTouchY);
+
+                            windowManager.updateViewLayout(floatingText, params);
+
+                            return true;
+                    }
+
+                    return false;
+                }
+            });
+
+            windowManager.addView(floatingText, params);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            stopSelf();
+        }
     }
 
     @Override
@@ -98,8 +106,14 @@ public class FloatingService extends Service {
 
         super.onDestroy();
 
-        if (textView != null) {
-            windowManager.removeView(textView);
+        try {
+
+            if (floatingText != null) {
+                windowManager.removeView(floatingText);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

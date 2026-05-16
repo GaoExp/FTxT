@@ -5,43 +5,51 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String currentText = "FTxT AKTIF";
+
+    EditText editText;
+    Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        setContentView(R.layout.activity_main);
 
-            if (!Settings.canDrawOverlays(this)) {
+        editText = findViewById(R.id.editText);
+        button = findViewById(R.id.button);
 
-                Intent intent = new Intent(
-                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                        Uri.parse("package:" + getPackageName())
-                );
+        button.setOnClickListener(v -> {
 
-                startActivity(intent);
+            currentText = editText.getText().toString();
 
-                Toast.makeText(this,
-                        "Aktifkan izin overlay lalu buka lagi aplikasi",
-                        Toast.LENGTH_LONG).show();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (!Settings.canDrawOverlays(this)) {
+
+                    Intent intent = new Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getPackageName())
+                    );
+
+                    startActivity(intent);
+
+                } else {
+
+                    startService(new Intent(this, FloatingService.class));
+                }
 
             } else {
 
                 startService(new Intent(this, FloatingService.class));
-
             }
-
-        } else {
-
-            startService(new Intent(this, FloatingService.class));
-
-        }
-
-        finish();
+        });
     }
 }
