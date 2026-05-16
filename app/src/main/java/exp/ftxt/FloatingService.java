@@ -34,7 +34,7 @@ public class FloatingService extends Service {
 
             floatingText.setText(MainActivity.currentText);
             floatingText.setTextSize(MainActivity.currentTextSize);
-            floatingText.setTextColor(Color.WHITE);
+            floatingText.setTextColor(MainActivity.currentTextColor);
             floatingText.setBackgroundColor(Color.BLACK);
 
             int layoutType;
@@ -99,7 +99,7 @@ public class FloatingService extends Service {
 
             windowManager.addView(floatingText, params);
 
-            // Register broadcast receiver untuk update teks dan ukuran
+            // Register broadcast receiver untuk update teks, ukuran, dan warna
             textUpdateReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -113,6 +113,11 @@ public class FloatingService extends Service {
                         if (floatingText != null) {
                             floatingText.setTextSize(newSize);
                         }
+                    } else if (intent.getAction().equals("exp.ftxt.UPDATE_TEXT_COLOR")) {
+                        int newColor = intent.getIntExtra("color", Color.WHITE);
+                        if (floatingText != null) {
+                            floatingText.setTextColor(newColor);
+                        }
                     }
                 }
             };
@@ -120,6 +125,7 @@ public class FloatingService extends Service {
             IntentFilter filter = new IntentFilter();
             filter.addAction("exp.ftxt.UPDATE_TEXT");
             filter.addAction("exp.ftxt.UPDATE_TEXT_SIZE");
+            filter.addAction("exp.ftxt.UPDATE_TEXT_COLOR");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(textUpdateReceiver, filter, Context.RECEIVER_EXPORTED);
             } else {

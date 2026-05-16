@@ -1,6 +1,8 @@
 package exp.ftxt;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,16 +13,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 public class MainActivity extends AppCompatActivity {
 
     public static String currentText = "FTxT AKTIF";
     public static float currentTextSize = 20f;
+    public static int currentTextColor = Color.WHITE;
 
     EditText editText;
     Button button;
     SeekBar textSizeSeekBar;
     TextView textSizeValue;
+    Button colorPickerButton;
+    TextView colorValueText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,14 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.button);
         textSizeSeekBar = findViewById(R.id.textSizeSeekBar);
         textSizeValue = findViewById(R.id.textSizeValue);
+        colorPickerButton = findViewById(R.id.colorPickerButton);
+        colorValueText = findViewById(R.id.colorValueText);
+
+        // Update color button background dengan warna awal
+        updateColorButtonBackground(currentTextColor);
+
+        // Color picker button listener
+        colorPickerButton.setOnClickListener(v -> showColorPicker());
 
         // SeekBar listener untuk update ukuran teks
         textSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -82,5 +96,44 @@ public class MainActivity extends AppCompatActivity {
                 startService(new Intent(this, FloatingService.class));
             }
         });
+    }
+
+    private void showColorPicker() {
+        // Predefined colors untuk dipilih
+        String[] colorNames = {"Putih", "Merah", "Hijau", "Biru", "Kuning", "Magenta", "Cyan", "Hitam"};
+        int[] colors = {
+            Color.WHITE,
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.YELLOW,
+            Color.MAGENTA,
+            Color.CYAN,
+            Color.BLACK
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pilih Warna Teks");
+        builder.setItems(colorNames, (dialog, which) -> {
+            currentTextColor = colors[which];
+            updateColorButtonBackground(currentTextColor);
+            colorValueText.setText(String.format("#%06X", (0xFFFFFF & currentTextColor)));
+            colorValueText.setTextColor(currentTextColor);
+
+            // Kirim broadcast update warna teks
+            Intent updateColorIntent = new Intent("exp.ftxt.UPDATE_TEXT_COLOR");
+            updateColorIntent.putExtra("color", currentTextColor);
+            sendBroadcast(updateColorIntent);
+        });
+        builder.show();
+    }
+
+    private void updateColorButtonBackground(int color) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setShape(GradientDrawable.RECTANGLE);
+        drawable.setColor(color);
+        drawable.setStroke(3, Color.BLACK);
+        drawable.setCornerRadius(5f);
+        colorPickerButton.setBackground(drawable);
     }
 }
