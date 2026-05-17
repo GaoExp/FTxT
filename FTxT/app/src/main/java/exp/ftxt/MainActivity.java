@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -113,49 +114,7 @@ extends AppCompatActivity {
         colorButton
         .setOnClickListener(v -> {
 
-            String[] names = {
-
-                "White",
-                "Red",
-                "Green",
-                "Blue",
-                "Yellow",
-                "Magenta",
-                "Cyan"
-
-            };
-
-            int[] colors = {
-
-                Color.WHITE,
-                Color.RED,
-                Color.GREEN,
-                Color.BLUE,
-                Color.YELLOW,
-                Color.MAGENTA,
-                Color.CYAN
-
-            };
-
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(
-                            this
-                    );
-
-            builder.setTitle(
-                    "Pilih Warna"
-            );
-
-            builder.setItems(
-                    names,
-                    (d,which)->{
-
-                currentColor =
-                        colors[which];
-
-            });
-
-            builder.show();
+            showHSVColorPickerDialog();
 
         });
 
@@ -254,6 +213,9 @@ extends AppCompatActivity {
 
             isTouchPassthrough = isChecked;
 
+            FloatingService
+            .updateTouchFlagsStatic();
+
             if(isChecked){
 
                 touchPassthroughSwitch
@@ -274,4 +236,235 @@ extends AppCompatActivity {
 
     }
 
+    private void showHSVColorPickerDialog(){
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(
+                        this
+                );
+
+        View dialogView = getLayoutInflater()
+        .inflate(
+                R.layout
+                .dialog_hsv_color_picker,
+                null
+        );
+
+        HSVColorPickerView colorPicker =
+                dialogView.findViewById(
+                R.id.colorPickerView
+        );
+
+        SeekBar brightnessSeekBar =
+                dialogView.findViewById(
+                R.id.brightnessSeekBar
+        );
+
+        SeekBar alphaSeekBar =
+                dialogView.findViewById(
+                R.id.alphaSeekBar
+        );
+
+        View colorPreview =
+                dialogView.findViewById(
+                R.id.colorPreview
+        );
+
+        Button okButton =
+                dialogView.findViewById(
+                R.id.okButton
+        );
+
+        Button cancelButton =
+                dialogView.findViewById(
+                R.id.cancelButton
+        );
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(
+                currentColor,
+                hsv
+        );
+
+        colorPicker.setColor(currentColor);
+
+        int currentAlpha =
+                Color.alpha(currentColor);
+
+        alphaSeekBar.setProgress(
+                currentAlpha
+        );
+
+        brightnessSeekBar.setProgress(
+                (int)(hsv[2] * 100)
+        );
+
+        updateColorPreview(
+                colorPreview,
+                colorPicker,
+                brightnessSeekBar,
+                alphaSeekBar
+        );
+
+        colorPicker
+        .setOnColorChangeListener(
+                color -> {
+
+            updateColorPreview(
+                    colorPreview,
+                    colorPicker,
+                    brightnessSeekBar,
+                    alphaSeekBar
+            );
+
+        });
+
+        brightnessSeekBar
+        .setOnSeekBarChangeListener(
+                new SeekBar
+                .OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(
+                    SeekBar seekBar,
+                    int progress,
+                    boolean fromUser){
+
+                updateColorPreview(
+                        colorPreview,
+                        colorPicker,
+                        brightnessSeekBar,
+                        alphaSeekBar
+                );
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(
+                    SeekBar seekBar){}
+
+            @Override
+            public void onStopTrackingTouch(
+                    SeekBar seekBar){}
+
+        });
+
+        alphaSeekBar
+        .setOnSeekBarChangeListener(
+                new SeekBar
+                .OnSeekBarChangeListener(){
+
+            @Override
+            public void onProgressChanged(
+                    SeekBar seekBar,
+                    int progress,
+                    boolean fromUser){
+
+                updateColorPreview(
+                        colorPreview,
+                        colorPicker,
+                        brightnessSeekBar,
+                        alphaSeekBar
+                );
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(
+                    SeekBar seekBar){}
+
+            @Override
+            public void onStopTrackingTouch(
+                    SeekBar seekBar){}
+
+        });
+
+        builder.setTitle("Pilih Warna");
+        builder.setView(dialogView);
+
+        AlertDialog dialog =
+                builder.create();
+
+        okButton.setOnClickListener(v -> {
+
+            currentColor =
+                    getColorWithAlpha(
+                    colorPicker,
+                    brightnessSeekBar,
+                    alphaSeekBar
+            );
+
+            FloatingService
+            .updateTextColorStatic();
+
+            dialog.dismiss();
+
+        });
+
+        cancelButton.setOnClickListener(v -> {
+
+            dialog.dismiss();
+
+        });
+
+        dialog.show();
+
+    }
+
+    private void updateColorPreview(
+            View preview,
+            HSVColorPickerView colorPicker,
+            SeekBar brightnessSeekBar,
+            SeekBar alphaSeekBar){
+
+        int color = getColorWithAlpha(
+                colorPicker,
+                brightnessSeekBar,
+                alphaSeekBar
+        );
+
+        preview.setBackgroundColor(color);
+
+    }
+
+    private int getColorWithAlpha(
+            HSVColorPickerView colorPicker,
+            SeekBar brightnessSeekBar,
+            SeekBar alphaSeekBar){
+
+        int baseColor =
+                colorPicker.getCurrentColor();
+
+        float brightness =
+                brightnessSeekBar.getProgress()
+                / 100f;
+
+        int alpha = alphaSeekBar
+        .getProgress();
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(baseColor, hsv);
+
+        hsv[2] = hsv[2] * brightness;
+
+        int colorWithBrightness =
+                Color.HSVToColor(hsv);
+
+        int r = Color.red(
+                colorWithBrightness);
+
+        int g = Color.green(
+                colorWithBrightness);
+
+        int b = Color.blue(
+                colorWithBrightness);
+
+        return Color.argb(
+                alpha,
+                r,
+                g,
+                b
+        );
+
+    }
 }

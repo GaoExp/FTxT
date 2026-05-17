@@ -2,10 +2,12 @@ package exp.ftxt;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +21,10 @@ public class FloatingService extends Service {
     private TextView floatingView;
 
     private WindowManager.LayoutParams params;
+
+    private SharedPreferences prefs;
+
+    public static FloatingService instance;
 
     private void updateTouchFlags(){
 
@@ -65,6 +71,81 @@ public class FloatingService extends Service {
             }
 
         }
+
+    }
+
+    public static void updateTextColorStatic(){
+
+        if(instance != null
+                && instance.floatingView != null){
+
+            instance.floatingView
+            .setTextColor(
+                    MainActivity.currentColor
+            );
+
+        }
+
+    }
+
+    public static void updateTextStatic(){
+
+        if(instance != null
+                && instance.floatingView != null){
+
+            instance.floatingView
+            .setText(
+                    MainActivity.currentText
+            );
+
+        }
+
+    }
+
+    public static void updateTextSizeStatic(){
+
+        if(instance != null
+                && instance.floatingView != null){
+
+            instance.floatingView
+            .setTextSize(
+                    MainActivity.currentSize
+            );
+
+        }
+
+    }
+
+    public static void updateTouchFlagsStatic(){
+
+        if(instance != null){
+
+            instance.updateTouchFlags();
+
+        }
+
+    }
+
+    private void savePosition(){
+
+        prefs.edit()
+        .putInt("text_x", params.x)
+        .putInt("text_y", params.y)
+        .apply();
+
+    }
+
+    private void loadPosition(){
+
+        params.x = prefs.getInt(
+                "text_x",
+                100
+        );
+
+        params.y = prefs.getInt(
+                "text_y",
+                300
+        );
 
     }
 
@@ -130,6 +211,13 @@ public class FloatingService extends Service {
                     );
 
                     return true;
+
+                case MotionEvent
+                        .ACTION_UP:
+
+                    savePosition();
+
+                    return true;
             }
 
             return false;
@@ -140,6 +228,13 @@ public class FloatingService extends Service {
     public void onCreate() {
 
         super.onCreate();
+
+        instance = this;
+
+        prefs = PreferenceManager
+                .getDefaultSharedPreferences(
+                        this
+                );
 
         try {
 
@@ -215,8 +310,7 @@ public class FloatingService extends Service {
                     Gravity.TOP
                     | Gravity.START;
 
-            params.x = 100;
-            params.y = 300;
+            loadPosition();
 
             updateTouchFlags();
 
@@ -241,6 +335,10 @@ public class FloatingService extends Service {
     public void onDestroy(){
 
         super.onDestroy();
+
+        savePosition();
+
+        instance = null;
 
         try{
 
