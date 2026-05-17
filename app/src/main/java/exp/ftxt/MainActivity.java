@@ -2,138 +2,242 @@ package exp.ftxt;
 
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.TextView;
+import android.widget.Switch;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity
+extends AppCompatActivity {
 
-    public static String currentText = "FTxT AKTIF";
-    public static float currentTextSize = 20f;
-    public static int currentTextColor = Color.WHITE;
+    public static String currentText =
+            "FTxT AKTIF";
+
+    public static float currentSize =
+            20f;
+
+    public static int currentColor =
+            Color.WHITE;
 
     EditText editText;
-    Button button;
-    SeekBar textSizeSeekBar;
-    TextView textSizeValue;
-    Button colorPickerButton;
-    TextView colorValueText;
+
+    SeekBar seekBar;
+
+    Button colorButton;
+
+    Switch overlaySwitch;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(
+            Bundle savedInstanceState){
 
-        setContentView(R.layout.activity_main);
+        super.onCreate(
+                savedInstanceState
+        );
 
-        editText = findViewById(R.id.editText);
-        button = findViewById(R.id.button);
-        textSizeSeekBar = findViewById(R.id.textSizeSeekBar);
-        textSizeValue = findViewById(R.id.textSizeValue);
-        colorPickerButton = findViewById(R.id.colorPickerButton);
-        colorValueText = findViewById(R.id.colorValueText);
+        setContentView(
+                R.layout.activity_main
+        );
 
-        // Update color button background dengan warna awal
-        updateColorButtonBackground(currentTextColor);
+        editText =
+                findViewById(
+                        R.id.editText
+                );
 
-        // Color picker button listener
-        colorPickerButton.setOnClickListener(v -> showColorPicker());
+        seekBar =
+                findViewById(
+                        R.id.textSizeSeekBar
+                );
 
-        // SeekBar listener untuk update ukuran teks
-        textSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        colorButton =
+                findViewById(
+                        R.id.colorButton
+                );
+
+        overlaySwitch =
+                findViewById(
+                        R.id.overlaySwitch
+                );
+
+        seekBar.setProgress(20);
+
+        seekBar
+        .setOnSeekBarChangeListener(
+                new SeekBar
+                .OnSeekBarChangeListener(){
+
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                currentTextSize = progress;
-                textSizeValue.setText(String.valueOf(progress));
+            public void onProgressChanged(
+                    SeekBar seekBar,
+                    int progress,
+                    boolean fromUser){
 
-                // Kirim broadcast update ukuran teks
-                Intent updateSizeIntent = new Intent("exp.ftxt.UPDATE_TEXT_SIZE");
-                updateSizeIntent.putExtra("size", currentTextSize);
-                sendBroadcast(updateSizeIntent);
-            }
+                if(progress < 10){
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
+                    progress = 10;
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        button.setOnClickListener(v -> {
-
-            currentText = editText.getText().toString();
-
-            Intent updateIntent = new Intent("exp.ftxt.UPDATE_TEXT");
-            updateIntent.putExtra("text", currentText);
-            sendBroadcast(updateIntent);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                if (!Settings.canDrawOverlays(this)) {
-
-                    Intent intent = new Intent(
-                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:" + getPackageName())
-                    );
-
-                    startActivity(intent);
-
-                } else {
-
-                    startService(new Intent(this, FloatingService.class));
                 }
 
-            } else {
+                currentSize = progress;
 
-                startService(new Intent(this, FloatingService.class));
             }
+
+            @Override
+            public void onStartTrackingTouch(
+                    SeekBar seekBar){}
+
+            @Override
+            public void onStopTrackingTouch(
+                    SeekBar seekBar){}
+
         });
-    }
 
-    private void showColorPicker() {
-        // Predefined colors untuk dipilih
-        String[] colorNames = {"Putih", "Merah", "Hijau", "Biru", "Kuning", "Magenta", "Cyan", "Hitam"};
-        int[] colors = {
-            Color.WHITE,
-            Color.RED,
-            Color.GREEN,
-            Color.BLUE,
-            Color.YELLOW,
-            Color.MAGENTA,
-            Color.CYAN,
-            Color.BLACK
-        };
+        colorButton
+        .setOnClickListener(v -> {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pilih Warna Teks");
-        builder.setItems(colorNames, (dialog, which) -> {
-            currentTextColor = colors[which];
-            updateColorButtonBackground(currentTextColor);
-            colorValueText.setText(String.format("#%06X", (0xFFFFFF & currentTextColor)));
-            colorValueText.setTextColor(currentTextColor);
+            String[] names = {
 
-            // Kirim broadcast update warna teks
-            Intent updateColorIntent = new Intent("exp.ftxt.UPDATE_TEXT_COLOR");
-            updateColorIntent.putExtra("color", currentTextColor);
-            sendBroadcast(updateColorIntent);
+                "White",
+                "Red",
+                "Green",
+                "Blue",
+                "Yellow",
+                "Magenta",
+                "Cyan"
+
+            };
+
+            int[] colors = {
+
+                Color.WHITE,
+                Color.RED,
+                Color.GREEN,
+                Color.BLUE,
+                Color.YELLOW,
+                Color.MAGENTA,
+                Color.CYAN
+
+            };
+
+            AlertDialog.Builder builder =
+                    new AlertDialog.Builder(
+                            this
+                    );
+
+            builder.setTitle(
+                    "Pilih Warna"
+            );
+
+            builder.setItems(
+                    names,
+                    (d,which)->{
+
+                currentColor =
+                        colors[which];
+
+            });
+
+            builder.show();
+
         });
-        builder.show();
+
+        overlaySwitch
+        .setOnCheckedChangeListener(
+                (buttonView,isChecked)->{
+
+            if(isChecked){
+
+                overlaySwitch
+                .setText(
+                        "Overlay ON"
+                );
+
+                currentText =
+                        editText
+                        .getText()
+                        .toString()
+                        .trim();
+
+                if(currentText
+                        .isEmpty()){
+
+                    currentText =
+                            "MTxT AKTIF";
+
+                }
+
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.M){
+
+                    if(!Settings
+                            .canDrawOverlays(
+                                    this
+                            )){
+
+                        Intent intent =
+                                new Intent(
+
+                                        Settings
+                                        .ACTION_MANAGE_OVERLAY_PERMISSION,
+
+                                        Uri.parse(
+                                                "package:"
+                                                + getPackageName()
+                                        )
+                                );
+
+                        startActivity(
+                                intent
+                        );
+
+                        overlaySwitch
+                        .setChecked(
+                                false
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+                startService(
+                        new Intent(
+                                this,
+                                FloatingService
+                                .class
+                        )
+                );
+
+            }
+
+            else{
+
+                overlaySwitch
+                .setText(
+                        "Overlay OFF"
+                );
+
+                stopService(
+                        new Intent(
+                                this,
+                                FloatingService
+                                .class
+                        )
+                );
+
+            }
+
+        });
+
     }
 
-    private void updateColorButtonBackground(int color) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-        drawable.setColor(color);
-        drawable.setStroke(3, Color.BLACK);
-        drawable.setCornerRadius(5f);
-        colorPickerButton.setBackground(drawable);
-    }
 }
