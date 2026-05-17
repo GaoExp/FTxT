@@ -1,5 +1,60 @@
 # Changelog - FTxT (Floating Text)
 
+## [9.2] - 2026-05-17
+
+### 🔧 Perbaikan
+- **Hapus Transparency Slider**: Slider transparansi dihapus karena sudah ada kontrol alpha di HSV Color Picker
+- **Layout Ulang**: Switch Overlay dan Lock dipindahkan ke baris horizontal di atas kolom teks
+- **Rename Switch**: "Overlay ON/OFF" → "Overlay" (static), "Teks Terkunci" → "Lock"
+
+### 📝 File yang Diubah
+
+#### ✅ activity_main.xml (UPDATED)
+- Hapus `TextView` "Transparansi" dan `SeekBar` transparansi
+- Pindahkan switch Overlay dan Lock ke `LinearLayout` horizontal di atas `EditText`
+- Set teks switch: "Overlay" (static), "Teks Bergerak" (default)
+
+#### ✅ MainActivity.java (UPDATED)
+- Hapus `currentAlpha` variable
+- Hapus `transparencySeekBar` field, `findViewById()`, dan listener
+- Hapus `setText("Overlay ON/OFF")` — teks switch static "Overlay"
+- Ganti `setText("Teks Terkunci")` → `setText("Lock")`
+
+#### ✅ FloatingService.java (UPDATED)
+- Hapus method `updateTextAlphaStatic()`
+- Hapus `setAlpha()` dari `onCreate()`
+
+#### ✅ app/build.gradle (UPDATED)
+- versionCode: 30 → 31
+- versionName: 9.1 → 9.2
+
+### 📊 Version Numbering
+- **9** = Fitur baru (Transparency di 9.1 → dihapus di 9.2)
+- **2** = Perbaikan layout dan UI
+
+---
+
+## [8.3] - 2026-05-17
+
+### 🐛 Bug Fixes
+- **Text Size Real-Time Update**: Ukuran teks sekarang langsung berubah saat slider digeser, tanpa perlu toggle overlay
+  - Tambah `FloatingService.updateTextSizeStatic()` di `SeekBar.onProgressChanged()`
+
+### 📝 File yang Diubah
+
+#### ✅ MainActivity.java (UPDATED)
+- Tambah `FloatingService.updateTextSizeStatic()` di `onProgressChanged()`
+
+#### ✅ app/build.gradle (UPDATED)
+- versionCode: 28 → 29
+- versionName: 8.2 → 8.3
+
+### 📊 Version Numbering
+- **8** = Generasi fitur HSV Color Picker
+- **3** = Perbaikan bug ke-3 (real-time text size update)
+
+---
+
 ## [8.2] - 2026-05-17
 
 ### ✨ Fitur Baru

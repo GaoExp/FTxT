@@ -7,9 +7,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <Switch
+            android:id="@+id/overlaySwitch"
+            android:showText="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="Overlay"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <Switch
+            android:id="@+id/touchPassthroughSwitch"
+            android:showText="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:text="Kunci Posisi"
+            android:layout_marginStart="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
     <EditText
         android:id="@+id/editText"
         android:hint="Masukkan teks overlay"
+        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -31,20 +73,6 @@
         android:text="Pilih Warna"
         android:layout_marginTop="12dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <Switch
-        android:id="@+id/overlaySwitch"
-        android:text="Overlay OFF"
-        android:layout_marginTop="18dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-
-    <Switch
-        android:id="@+id/touchPassthroughSwitch"
-        android:text="Teks Bergerak"
-        android:layout_marginTop="12dp"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
 </LinearLayout>

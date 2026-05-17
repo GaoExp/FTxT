@@ -24,7 +24,7 @@ Tampilkan teks custom di layar utama yang overlay ke atas semua aplikasi lain.
 
 ### 2. **Customizable Text Size** 📏
 Atur ukuran teks dengan slider yang mudah digunakan.
-- Range: 10 - 60 sp
+- **Ukuran**: Range 10 - 60 sp
 - Real-time preview
 - Instant apply tanpa restart overlay
 
@@ -53,7 +53,7 @@ Kontrol apakah sentuhan melewati teks overlay atau tertangkap oleh teks.
 
 **Mode:**
 - **Teks Bergerak (OFF)**: Teks dapat disentuh dan dipindahkan
-- **Teks Terkunci (ON)**: Sentuhan melewati teks ke aplikasi di belakang
+- **Lock (ON)**: Sentuhan melewati teks ke aplikasi di belakang
 
 **Keuntungan:**
 - Saat diaktifkan: Teks tidak menutupi sentuhan, Anda bisa gunakan app di belakang normally
@@ -62,7 +62,7 @@ Kontrol apakah sentuhan melewati teks overlay atau tertangkap oleh teks.
 ### 5. **Overlay Toggle** 🔘
 Nyalakan/matikan overlay dengan satu switch.
 - **Overlay ON**: Teks floating ditampilkan
-- **Overlay OFF**: Teks tersembunyi (tapi tetap dalam memori)
+- **Overlay OFF**: Teks tersembunyi
 - Perlu permission "Display over other apps" di Android 6.0+
 
 ---
@@ -132,8 +132,7 @@ cd /path/to/FTxT
 - Ketik teks yang ingin ditampilkan
 
 ### 3. Atur Ukuran Teks
-- Gunakan **SeekBar "Ukuran Teks"** untuk mengubah ukuran
-- Range 10-60 sp (smaller to larger)
+- Gunakan **SeekBar "Ukuran Teks"** untuk mengubah ukuran (10-60 sp)
 - Perubahan langsung ditampilkan jika overlay sedang aktif
 
 ### 4. Pilih Warna
@@ -146,18 +145,12 @@ cd /path/to/FTxT
 - Klik **OK** untuk apply, **Cancel** untuk batal
 
 ### 5. Aktifkan Overlay
-- Switch **"Overlay OFF"** untuk aktifkan
-- Akan berubah menjadi **"Overlay ON"**
+- Switch **"Overlay"** untuk aktifkan overlay
 - Teks akan muncul di layar (jika permission sudah diberikan)
 - Teks akan tersimpan di posisi terakhir digerakkan
 
-### 6. Atur Mode Sentuhan
-- Gunakan switch **"Teks Bergerak/Teks Terkunci"**
-- **Teks Bergerak (OFF)**: Drag teks ke posisi baru
-- **Teks Terkunci (ON)**: Sentuhan melewati ke app di belakang
-
 ### 7. Deaktifkan Overlay
-- Switch **"Overlay ON"** kembali untuk nonaktifkan
+- Switch **"Overlay"** kembali untuk nonaktifkan
 - Teks akan hilang dari layar (tapi tetap tersimpan)
 
 ---
@@ -195,10 +188,10 @@ Alpha (0-255)      = Transparansi (transparent ← → opaque)
 Semua perubahan (warna, ukuran, teks, touch mode) langsung diterapkan ke floating text tanpa perlu restart overlay:
 
 ```
-Color Change    → updateTextColorStatic()
-Text Change     → updateTextStatic()
-Size Change     → updateTextSizeStatic()
-Touch Mode      → updateTouchFlagsStatic()
+Color Change     → updateTextColorStatic()
+Text Change      → updateTextStatic()
+Size Change      → updateTextSizeStatic()
+Touch Mode       → updateTouchFlagsStatic()
 ```
 
 ### Position Persistence
@@ -260,18 +253,19 @@ FTxT/
 
 Lihat file [CHANGELOG.md](./CHANGELOG.md) untuk riwayat lengkap perubahan.
 
-### Current Version: 8.2
+### Current Version: 9.2
 
-**Latest Changes (v8.2)**
-- ✨ Fitur baru: Adaptive Launcher Icon, Real-Time Text Update, Foreground Service
-- 🔧 Perbaikan: Launcher icon path, dependencies update, deprecated API cleanup
-- 🐛 Bug fix: Service crash di API 26+, foreground service type compatibility
+**Latest Changes (v9.2)**
+- 🔧 Hapus slider transparansi (duplikat dengan alpha di color picker)
+- 🔧 Layout ulang: Overlay & Lock switch satu baris di atas teks
+- 🔧 Rename: "Teks Terkunci" → "Lock"
 
 **Previous Versions**
+- v9.1: Transparency slider (dihapus di 9.2)
+- v8.3: Bug fix text size real-time update
+- v8.2: Foreground service, launcher icon, dependencies update
+- v8.1: Circular HSV Color Picker dengan brightness & alpha control
 - v7.4: Position persistence & touch responsiveness fixes
-- v7.3: Touch passthrough implementation fixes
-- v7.2: Code optimization (remove redundant lock position feature)
-- v7.1: Fitur touch passthrough & position lock (awal)
 
 ---
 
@@ -336,4 +330,4 @@ Untuk bug reports atau feature requests, silakan buat issue atau hubungi develop
 
 ---
 
-**Last Updated**: May 17, 2026 (v8.2)
+**Last Updated**: May 17, 2026 (v9.2)

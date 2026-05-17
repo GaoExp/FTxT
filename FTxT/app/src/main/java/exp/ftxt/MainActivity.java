@@ -3,6 +3,7 @@ package exp.ftxt;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -139,6 +140,9 @@ extends AppCompatActivity {
 
                 currentSize = progress;
 
+                FloatingService
+                .updateTextSizeStatic();
+
             }
 
             @Override
@@ -162,12 +166,12 @@ extends AppCompatActivity {
         .setOnCheckedChangeListener(
                 (buttonView,isChecked)->{
 
-            if(isChecked){
+            applySwitchTint(
+                    overlaySwitch,
+                    isChecked
+            );
 
-                overlaySwitch
-                .setText(
-                        "Overlay ON"
-                );
+            if(isChecked){
 
                 currentText =
                         editText
@@ -268,11 +272,6 @@ extends AppCompatActivity {
 
             else{
 
-                overlaySwitch
-                .setText(
-                        "Overlay OFF"
-                );
-
                 stopService(
                         new Intent(
                                 this,
@@ -289,28 +288,27 @@ extends AppCompatActivity {
         .setOnCheckedChangeListener(
                 (buttonView,isChecked)->{
 
+            applySwitchTint(
+                    touchPassthroughSwitch,
+                    isChecked
+            );
+
             isTouchPassthrough = isChecked;
 
             FloatingService
             .updateTouchFlagsStatic();
 
-            if(isChecked){
-
-                touchPassthroughSwitch
-                .setText(
-                        "Teks Terkunci"
-                );
-
-            }else{
-
-                touchPassthroughSwitch
-                .setText(
-                        "Teks Bergerak"
-                );
-
-            }
-
         });
+
+        applySwitchTint(
+                overlaySwitch,
+                overlaySwitch.isChecked()
+        );
+
+        applySwitchTint(
+                touchPassthroughSwitch,
+                touchPassthroughSwitch.isChecked()
+        );
 
     }
 
@@ -338,6 +336,50 @@ extends AppCompatActivity {
                 ).show();
             }
         }
+    }
+
+    private void applySwitchTint(
+            Switch sw,
+            boolean isChecked){
+
+        if(isChecked){
+
+            sw.setThumbTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#2196F3"
+                            )
+                    )
+            );
+
+            sw.setTrackTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#90CAF9"
+                            )
+                    )
+            );
+
+        }else{
+
+            sw.setThumbTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#E53935"
+                            )
+                    )
+            );
+
+            sw.setTrackTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#EF9A9A"
+                            )
+                    )
+            );
+
+        }
+
     }
 
     private void showHSVColorPickerDialog(){
