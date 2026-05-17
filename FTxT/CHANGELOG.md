@@ -1,5 +1,65 @@
 # Changelog - FTxT (Floating Text)
 
+## [8.2] - 2026-05-17
+
+### ✨ Fitur Baru
+- **Adaptive Launcher Icon**: Ikon aplikasi menggunakan adaptive icon dengan foreground custom PNG
+- **Real-Time Text Update**: Teks overlay langsung berubah saat diketik, tanpa perlu toggle overlay
+- **Foreground Service**: Service berjalan sebagai foreground service dengan notification (tidak di-kill sistem)
+
+### 🔧 Perbaikan
+- **Launcher Icon**: Pindah PNG langsung ke `app/src/main/res/drawable/`, hapus Gradle copy task yang kompleks
+- **AndroidManifest**: Hapus `package` attribute (AGP 8+ sudah pakai `namespace` di build.gradle)
+- **Dependencies**: Update `appcompat:1.2.0` → `1.7.1`, `constraintlayout:2.0.4` → `2.2.1`
+- **Deprecated API**: Ganti `PreferenceManager` dari `android.preference` → `getSharedPreferences()`
+- **Permission Feedback**: Tambah Toast saat izin overlay diperlukan
+- **POST_NOTIFICATIONS**: Tambah runtime permission request untuk Android 13+ (API 33+)
+
+### 🐛 Bug Fixes
+- **Service Crash di API 26+**: Ganti `startService()` → `startForegroundService()` + notification
+- **Foreground Service Type**: Set `foregroundServiceType="dataSync"` untuk kompatibilitas API 35
+- **startForeground() Sebelum addView()**: Cegah crash saat overlay gagal ditambahkan
+
+### 📝 File yang Dibuat & Diubah
+
+#### ✅ app/build.gradle (UPDATED)
+- Hapus blok copy task launcher icon
+- versionCode: 27 → 28
+- versionName: 8.1 → 8.2
+- Update dependency versi
+
+#### ✅ AndroidManifest.xml (UPDATED)
+- Hapus `package="exp.ftxt"`
+- Tambah `FOREGROUND_SERVICE` dan `POST_NOTIFICATIONS` permission
+- Tambah `android:foregroundServiceType="dataSync"` ke service
+
+#### ✅ FloatingService.java (UPDATED)
+- Tambah foreground service: `startForeground()` + notification channel
+- Ganti `PreferenceManager` → `getSharedPreferences()` langsung
+- Hapus if-else overlay type (langsung `TYPE_APPLICATION_OVERLAY`)
+- Panggil `startForeground()` sebelum `addView()`
+- Wrapping `startForeground()` dalam try-catch
+
+#### ✅ MainActivity.java (UPDATED)
+- Tambah `TextWatcher` untuk real-time text update
+- Tambah Toast feedback saat izin overlay diminta
+- Ganti `startService()` → `startForegroundService()`
+- Tambah runtime permission request `POST_NOTIFICATIONS` (API 33+)
+- Tambah `onRequestPermissionsResult()` handler
+
+#### ✅ ic_launcher_foreground.png (MOVED)
+- Dari: root project `/ic_launcher_foreground.png`
+- Ke: `app/src/main/res/drawable/ic_launcher_foreground.png`
+
+#### ✅ ic_launcher_foreground.png (DELETED)
+- Hapus file dari root project
+
+### 📊 Version Numbering
+- **8** = Fitur utama (HSV Color Picker di 8.1, Foreground Service di 8.2)
+- **2** = Versi kedua dari iterasi ini
+
+---
+
 ## [8.1] - 2026-05-17
 
 ### ✨ Fitur Baru
@@ -47,6 +107,10 @@
 #### ✅ app/build.gradle (UPDATED)
 - versionCode: 26 → 27
 - versionName: 7.4 → 8.1
+
+### 🔔 Launcher Icon (implementation detail)
+- The Gradle task now copies `ic_launcher_foreground.png` into `build/generated/res/launcher/<variant>/` instead of directly into `app/src/main/res/drawable`.
+- The generated folder is registered with the Android Gradle plugin using `variant.registerGeneratedResFolders(...)` and the copy task is set as the builder (`builtBy`). This avoids implicit dependency errors reported by Gradle and guarantees the correct task ordering.
 
 ### 📊 Version Numbering
 - **8** = Fitur baru (HSV Color Picker)
@@ -193,4 +257,3 @@
 - Color selection for text
 - Text edit capability
 - Overlay enable/disable toggle
-

@@ -1,16 +1,24 @@
 package exp.ftxt;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.Toast;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -57,6 +65,38 @@ extends AppCompatActivity {
                 findViewById(
                         R.id.editText
                 );
+
+        editText.addTextChangedListener(
+                new TextWatcher(){
+
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after){}
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s,
+                    int start,
+                    int before,
+                    int count){
+                currentText =
+                        s.toString().trim();
+                if(currentText.isEmpty()){
+                    currentText =
+                            "FTxT AKTIF";
+                }
+                FloatingService
+                .updateTextStatic();
+            }
+
+            @Override
+            public void afterTextChanged(
+                    Editable s){}
+
+        });
 
         seekBar =
                 findViewById(
@@ -151,6 +191,12 @@ extends AppCompatActivity {
                                     this
                             )){
 
+                        Toast.makeText(
+                                this,
+                                "Izinkan overlay di pengaturan",
+                                Toast.LENGTH_LONG
+                        ).show();
+
                         Intent intent =
                                 new Intent(
 
@@ -178,7 +224,39 @@ extends AppCompatActivity {
 
                 }
 
-                startService(
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.TIRAMISU){
+
+                    if(ContextCompat
+                            .checkSelfPermission(
+                                    this,
+                                    Manifest.permission
+                                    .POST_NOTIFICATIONS
+                            ) != PackageManager
+                            .PERMISSION_GRANTED){
+
+                        ActivityCompat
+                        .requestPermissions(
+                                this,
+                                new String[]{
+                                    Manifest.permission
+                                    .POST_NOTIFICATIONS
+                                },
+                                100
+                        );
+
+                        overlaySwitch
+                        .setChecked(
+                                false
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+                startForegroundService(
                         new Intent(
                                 this,
                                 FloatingService
@@ -234,6 +312,32 @@ extends AppCompatActivity {
 
         });
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String[] permissions,
+            int[] grantResults){
+
+        if(requestCode == 100){
+            if(grantResults.length > 0
+                    && grantResults[0]
+                    == PackageManager
+                    .PERMISSION_GRANTED){
+                Toast.makeText(
+                        this,
+                        "Izin notifikasi diberikan",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }else{
+                Toast.makeText(
+                        this,
+                        "Izin notifikasi diperlukan",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        }
     }
 
     private void showHSVColorPickerDialog(){

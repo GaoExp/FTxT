@@ -77,7 +77,11 @@ Nyalakan/matikan overlay dengan satu switch.
 ### Required Permissions
 ```xml
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 ```
+
+> **Catatan**: `POST_NOTIFICATIONS` diminta saat runtime di Android 13+ (API 33+) saat overlay diaktifkan pertama kali.
 
 ---
 
@@ -158,6 +162,21 @@ cd /path/to/FTxT
 
 ---
 
+## 🖼️ Launcher Icon
+
+FTxT menggunakan adaptive icon (Android 8.0+) dengan foreground custom PNG.
+
+- **Foreground**: `app/src/main/res/drawable/ic_launcher_foreground.png`
+- **Background**: `app/src/main/res/drawable/ic_launcher_background.xml` (solid `@color/colorPrimary`)
+- **Adaptive Icon XML**: `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
+
+Untuk mengganti icon, cukup replace file `ic_launcher_foreground.png` di `app/src/main/res/drawable/`.
+
+Untuk hasil terbaik pada semua ukuran layar, gunakan Android Studio: `File > New > Image Asset` dan pilih gambar sebagai foreground.
+
+
+---
+
 ## 🎯 Dokumentasi Fitur
 
 ### HSV Color Model
@@ -209,9 +228,14 @@ FTxT/
 │   │       │   ├── FloatingService.java       (Overlay Service & Logic)
 │   │       │   └── HSVColorPickerView.java    (Custom Color Picker View)
 │   │       ├── res/
+│   │       │   ├── drawable/
+│   │       │   │   ├── ic_launcher_background.xml
+│   │       │   │   └── ic_launcher_foreground.png
 │   │       │   ├── layout/
 │   │       │   │   ├── activity_main.xml      (Main Activity Layout)
 │   │       │   │   └── dialog_hsv_color_picker.xml  (Color Picker Dialog)
+│   │       │   ├── mipmap-anydpi-v26/
+│   │       │   │   └── ic_launcher.xml
 │   │       │   └── values/
 │   │       └── AndroidManifest.xml
 │   └── build.gradle                          (App Build Config)
@@ -236,11 +260,12 @@ FTxT/
 
 Lihat file [CHANGELOG.md](./CHANGELOG.md) untuk riwayat lengkap perubahan.
 
-### Current Version: 8.1
+### Current Version: 8.2
 
-**Latest Changes (v8.1)**
-- ✨ Fitur baru: Circular HSV Color Picker dengan brightness & alpha control
-- 🐛 Bug fix: Color selection sekarang real-time (langsung diterapkan)
+**Latest Changes (v8.2)**
+- ✨ Fitur baru: Adaptive Launcher Icon, Real-Time Text Update, Foreground Service
+- 🔧 Perbaikan: Launcher icon path, dependencies update, deprecated API cleanup
+- 🐛 Bug fix: Service crash di API 26+, foreground service type compatibility
 
 **Previous Versions**
 - v7.4: Position persistence & touch responsiveness fixes
@@ -311,4 +336,4 @@ Untuk bug reports atau feature requests, silakan buat issue atau hubungi develop
 
 ---
 
-**Last Updated**: May 17, 2026 (v8.1)
+**Last Updated**: May 17, 2026 (v8.2)
