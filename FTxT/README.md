@@ -64,6 +64,8 @@ Nyalakan/matikan overlay dengan satu switch.
 - **Overlay ON**: Teks floating ditampilkan
 - **Overlay OFF**: Teks tersembunyi
 - Perlu permission "Display over other apps" di Android 6.0+
+- Otomatis minta pengecualian optimasi baterai saat diaktifkan
+- WakeLock aktif selama overlay berjalan (CPU tidak tidur)
 
 ---
 
@@ -79,9 +81,13 @@ Nyalakan/matikan overlay dengan satu switch.
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+<uses-permission android:name="android.permission.WAKE_LOCK"/>
+<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 ```
 
-> **Catatan**: `POST_NOTIFICATIONS` diminta saat runtime di Android 13+ (API 33+) saat overlay diaktifkan pertama kali.
+> **Catatan**:
+> - `POST_NOTIFICATIONS` diminta saat runtime di Android 13+ (API 33+) saat overlay diaktifkan pertama kali
+> - `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` membuka pengaturan baterai saat overlay diaktifkan (jika belum dikecualikan)
 
 ---
 
@@ -253,14 +259,14 @@ FTxT/
 
 Lihat file [CHANGELOG.md](./CHANGELOG.md) untuk riwayat lengkap perubahan.
 
-### Current Version: 9.2
+### Current Version: 9.4
 
-**Latest Changes (v9.2)**
-- 🔧 Hapus slider transparansi (duplikat dengan alpha di color picker)
-- 🔧 Layout ulang: Overlay & Lock switch satu baris di atas teks
-- 🔧 Rename: "Teks Terkunci" → "Lock"
+**Latest Changes (v9.4)**
+- ✨ Bayangan teks: Toggle shadow untuk meningkatkan readability
 
 **Previous Versions**
+- v9.3: WakeLock & battery optimization
+- v9.2: UI refinements, transparency slider removal
 - v9.1: Transparency slider (dihapus di 9.2)
 - v8.3: Bug fix text size real-time update
 - v8.2: Foreground service, launcher icon, dependencies update
@@ -330,4 +336,4 @@ Untuk bug reports atau feature requests, silakan buat issue atau hubungi develop
 
 ---
 
-**Last Updated**: May 17, 2026 (v9.2)
+**Last Updated**: May 18, 2026 (v9.4)

@@ -1,36 +1,103 @@
 # Changelog - FTxT (Floating Text)
 
-## [9.2] - 2026-05-17
+## [9.4] - 2026-05-18
+
+### ✨ Fitur Baru
+- **Text Shadow (Bayangan Teks)**: Tambahkan bayangan pada teks overlay untuk meningkatkan readability
+  - Toggle switch untuk enable/disable shadow
+  - Shadow layer: 5px blur, offset 2x2, warna hitam
+  - Real-time apply tanpa restart overlay
+
+### 📝 File yang Diubah
+
+#### ✅ MainActivity.java (UPDATED)
+- Tambah variabel static `isShadowEnabled = true`
+- Tambah widget `shadowSwitch` di findViewById
+- Tambah listener untuk shadow switch
+- Tambah call `applySwitchTint(shadowSwitch, ...)` untuk styling
+
+#### ✅ activity_main.xml (UPDATED)
+- Tambah LinearLayout dengan shadow switch
+- Switch `shadowSwitch` dengan status `android:checked="true"`
+- Label "Bayangan"
+
+#### ✅ FloatingService.java (UPDATED)
+- Tambah method `updateShadowStatic()` - wrapper untuk static access
+- Tambah method `applyShadow()` - apply shadow layer ke textview
+  - Saat enable: `setShadowLayer(5f, 2f, 2f, BLACK)`
+  - Saat disable: `setShadowLayer(0f, 0f, 0f, TRANSPARENT)`
+- Call `applyShadow()` di `onCreate()` setelah setup textview
+
+#### ✅ app/build.gradle (UPDATED)
+- versionCode: 32 → 33
+- versionName: 9.3 → 9.4
+
+### 📊 Version Numbering
+- **9** = Fitur utama (sejak 9.1)
+- **4** = Perbaikan & fitur minor ke-4
+
+---
+
+## [9.3] - 2026-05-17
 
 ### 🔧 Perbaikan
+- **WakeLock**: CPU tidak tidur saat overlay aktif — service tetap jalan
+- **Battery Optimization**: Saat overlay diaktifkan, aplikasi minta dikecualikan dari optimasi baterai
+
+### 📝 File yang Diubah
+
+#### ✅ AndroidManifest.xml (UPDATED)
+- Tambah `WAKE_LOCK` permission
+- Tambah `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission
+
+#### ✅ FloatingService.java (UPDATED)
+- Import `android.os.PowerManager`
+- Tambah field `wakeLock`
+- `onCreate()`: acquire `PARTIAL_WAKE_LOCK`
+- `onDestroy()`: release wake lock
+
+#### ✅ MainActivity.java (UPDATED)
+- Import `android.os.PowerManager`
+- Saat overlay ON, cek `isIgnoringBatteryOptimizations()`
+- Jika tidak, kirim intent `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`
+
+#### ✅ app/build.gradle (UPDATED)
+- versionCode: 31 → 32
+- versionName: 9.2 → 9.3
+
+### 📊 Version Numbering
+- **9** = Fitur baru (sejak 9.1)
+- **3** = Perbaikan ke-3 (WakeLock + Battery Optimization)
+
+---
+
+## [9.2] - 2026-05-17
+
+### 🔧 Perbaikan dan Perubahan UI
 - **Hapus Transparency Slider**: Slider transparansi dihapus karena sudah ada kontrol alpha di HSV Color Picker
-- **Layout Ulang**: Switch Overlay dan Lock dipindahkan ke baris horizontal di atas kolom teks
-- **Rename Switch**: "Overlay ON/OFF" → "Overlay" (static), "Teks Terkunci" → "Lock"
+- **Layout Ulang**: Switch Overlay dan Lock dipindahkan ke baris terpisah di atas kolom teks
+- **Posisi Switch**: Switch di kiri, label teks di kanan
+- **Warna Switch**: Biru saat aktif, merah pudar saat mati
+- **Rename Label**: "Teks Terkunci" → "Kunci Posisi"
 
 ### 📝 File yang Diubah
 
 #### ✅ activity_main.xml (UPDATED)
 - Hapus `TextView` "Transparansi" dan `SeekBar` transparansi
-- Pindahkan switch Overlay dan Lock ke `LinearLayout` horizontal di atas `EditText`
-- Set teks switch: "Overlay" (static), "Teks Bergerak" (default)
+- Setiap switch dibungkus `LinearLayout` horizontal: `[Switch] [TextView label]`
 
 #### ✅ MainActivity.java (UPDATED)
-- Hapus `currentAlpha` variable
-- Hapus `transparencySeekBar` field, `findViewById()`, dan listener
-- Hapus `setText("Overlay ON/OFF")` — teks switch static "Overlay"
-- Ganti `setText("Teks Terkunci")` → `setText("Lock")`
-
-#### ✅ FloatingService.java (UPDATED)
-- Hapus method `updateTextAlphaStatic()`
-- Hapus `setAlpha()` dari `onCreate()`
+- Hapus `currentAlpha` variable dan `transparencySeekBar`
+- Tambah `import android.content.res.ColorStateList`
+- Tambah method `applySwitchTint()` untuk warna biru/merah
 
 #### ✅ app/build.gradle (UPDATED)
 - versionCode: 30 → 31
 - versionName: 9.1 → 9.2
 
 ### 📊 Version Numbering
-- **9** = Fitur baru (Transparency di 9.1 → dihapus di 9.2)
-- **2** = Perbaikan layout dan UI
+- **9** = Periode fitur (sejak 9.1)
+- **2** = Perbaikan UI dan penghapusan fitur redundan
 
 ---
 

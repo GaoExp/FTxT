@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.PowerManager;
 
 import androidx.core.app.NotificationCompat;
 
@@ -27,6 +28,8 @@ public class FloatingService extends Service {
     private WindowManager.LayoutParams params;
 
     private SharedPreferences prefs;
+
+    private PowerManager.WakeLock wakeLock;
 
     public static FloatingService instance;
 
@@ -125,6 +128,41 @@ public class FloatingService extends Service {
         if(instance != null){
 
             instance.updateTouchFlags();
+
+        }
+
+    }
+
+    public static void updateShadowStatic(){
+
+        if(instance != null
+                && instance.floatingView != null){
+
+            instance.applyShadow();
+
+        }
+
+    }
+
+    private void applyShadow(){
+
+        if(MainActivity.isShadowEnabled){
+
+            floatingView.setShadowLayer(
+                    5f,
+                    2f,
+                    2f,
+                    android.graphics.Color.BLACK
+            );
+
+        }else{
+
+            floatingView.setShadowLayer(
+                    0f,
+                    0f,
+                    0f,
+                    android.graphics.Color.TRANSPARENT
+            );
 
         }
 
@@ -296,6 +334,8 @@ public class FloatingService extends Service {
                     20
             );
 
+            applyShadow();
+
             params =
                     new WindowManager
                     .LayoutParams(
@@ -332,6 +372,20 @@ public class FloatingService extends Service {
                     floatingView,
                     params
             );
+
+            PowerManager pm =
+                    (PowerManager)
+                    getSystemService(
+                            POWER_SERVICE
+                    );
+
+            wakeLock = pm.newWakeLock(
+                    PowerManager
+                    .PARTIAL_WAKE_LOCK,
+                    "FTxT:OverlayWakeLock"
+            );
+
+            wakeLock.acquire();
 
         }
 
@@ -373,6 +427,13 @@ public class FloatingService extends Service {
     public void onDestroy(){
 
         super.onDestroy();
+
+        if(wakeLock != null
+                && wakeLock.isHeld()){
+
+            wakeLock.release();
+
+        }
 
         savePosition();
 

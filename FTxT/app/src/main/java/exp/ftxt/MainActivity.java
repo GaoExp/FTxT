@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 
 import androidx.core.app.ActivityCompat;
@@ -40,6 +41,9 @@ extends AppCompatActivity {
     public static boolean isTouchPassthrough =
             false;
 
+    public static boolean isShadowEnabled =
+            true;
+
     EditText editText;
 
     SeekBar seekBar;
@@ -49,6 +53,8 @@ extends AppCompatActivity {
     Switch overlaySwitch;
 
     Switch touchPassthroughSwitch;
+
+    Switch shadowSwitch;
 
     @Override
     protected void onCreate(
@@ -117,6 +123,11 @@ extends AppCompatActivity {
         touchPassthroughSwitch =
                 findViewById(
                         R.id.touchPassthroughSwitch
+                );
+
+        shadowSwitch =
+                findViewById(
+                        R.id.shadowSwitch
                 );
 
         seekBar.setProgress(20);
@@ -260,6 +271,90 @@ extends AppCompatActivity {
 
                 }
 
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.M){
+
+                    if(!Settings
+                            .canDrawOverlays(
+                                    this
+                            )){
+
+                        Toast.makeText(
+                                this,
+                                "Izinkan overlay di pengaturan",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        Intent intent =
+                                new Intent(
+
+                                        Settings
+                                        .ACTION_MANAGE_OVERLAY_PERMISSION,
+
+                                        Uri.parse(
+                                                "package:"
+                                                + getPackageName()
+                                        )
+                                );
+
+                        startActivity(
+                                intent
+                        );
+
+                        overlaySwitch
+                        .setChecked(
+                                false
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.M){
+
+                    String packageName =
+                            getPackageName();
+
+                    PowerManager pm =
+                            (PowerManager)
+                            getSystemService(
+                                    POWER_SERVICE
+                            );
+
+                    if(!pm
+                            .isIgnoringBatteryOptimizations(
+                                    packageName
+                            )){
+
+                        Toast.makeText(
+                                this,
+                                "Nonaktifkan optimasi baterai",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        Intent intent =
+                                new Intent(
+
+                                        Settings
+                                        .ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+
+                                        Uri.parse(
+                                                "package:"
+                                                + packageName
+                                        )
+                                );
+
+                        startActivity(
+                                intent
+                        );
+
+                    }
+
+                }
+
                 startForegroundService(
                         new Intent(
                                 this,
@@ -300,6 +395,22 @@ extends AppCompatActivity {
 
         });
 
+        shadowSwitch
+        .setOnCheckedChangeListener(
+                (buttonView,isChecked)->{
+
+            applySwitchTint(
+                    shadowSwitch,
+                    isChecked
+            );
+
+            isShadowEnabled = isChecked;
+
+            FloatingService
+            .updateShadowStatic();
+
+        });
+
         applySwitchTint(
                 overlaySwitch,
                 overlaySwitch.isChecked()
@@ -308,6 +419,11 @@ extends AppCompatActivity {
         applySwitchTint(
                 touchPassthroughSwitch,
                 touchPassthroughSwitch.isChecked()
+        );
+
+        applySwitchTint(
+                shadowSwitch,
+                shadowSwitch.isChecked()
         );
 
     }
