@@ -40,4 +40,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <Switch
+        android:id="@+id/touchPassthroughSwitch"
+        android:text="Teks Bergerak"
+        android:layout_marginTop="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </LinearLayout>
