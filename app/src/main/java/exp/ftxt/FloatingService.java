@@ -1,13 +1,18 @@
 package exp.ftxt;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
+import android.os.PowerManager;
+
+import androidx.core.app.NotificationCompat;
+
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +28,8 @@ public class FloatingService extends Service {
     private WindowManager.LayoutParams params;
 
     private SharedPreferences prefs;
+
+    private PowerManager.WakeLock wakeLock;
 
     public static FloatingService instance;
 
@@ -231,10 +238,36 @@ public class FloatingService extends Service {
 
         instance = this;
 
-        prefs = PreferenceManager
-                .getDefaultSharedPreferences(
-                        this
-                );
+        prefs = getSharedPreferences(
+                "ftxt_prefs",
+                MODE_PRIVATE
+        );
+
+        createNotificationChannel();
+        Notification notification =
+                new NotificationCompat
+                .Builder(
+                        this,
+                        "ftxt_overlay"
+                )
+                .setContentTitle(
+                        "FTxT"
+                )
+                .setContentText(
+                        "Overlay sedang aktif"
+                )
+                .setSmallIcon(
+                        android.R.drawable
+                        .ic_dialog_info
+                )
+                .setOngoing(true)
+                .build();
+
+        try{
+            startForeground(1, notification);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
         try {
 
@@ -266,24 +299,6 @@ public class FloatingService extends Service {
                     20
             );
 
-            int overlayType;
-
-            if(Build.VERSION.SDK_INT
-                    >= Build.VERSION_CODES.O){
-
-                overlayType =
-                        WindowManager
-                        .LayoutParams
-                        .TYPE_APPLICATION_OVERLAY;
-
-            }else{
-
-                overlayType =
-                        WindowManager
-                        .LayoutParams
-                        .TYPE_PHONE;
-            }
-
             params =
                     new WindowManager
                     .LayoutParams(
@@ -296,7 +311,9 @@ public class FloatingService extends Service {
                     .LayoutParams
                     .WRAP_CONTENT,
 
-                    overlayType,
+                    WindowManager
+                    .LayoutParams
+                    .TYPE_APPLICATION_OVERLAY,
 
                     WindowManager
                     .LayoutParams
@@ -319,6 +336,20 @@ public class FloatingService extends Service {
                     params
             );
 
+            PowerManager pm =
+                    (PowerManager)
+                    getSystemService(
+                            POWER_SERVICE
+                    );
+
+            wakeLock = pm.newWakeLock(
+                    PowerManager
+                    .PARTIAL_WAKE_LOCK,
+                    "FTxT:OverlayWakeLock"
+            );
+
+            wakeLock.acquire();
+
         }
 
         catch(Exception e){
@@ -331,10 +362,41 @@ public class FloatingService extends Service {
 
     }
 
+    private void createNotificationChannel(){
+        if(Build.VERSION.SDK_INT
+                >= Build.VERSION_CODES.O){
+            NotificationChannel channel =
+                    new NotificationChannel(
+                    "ftxt_overlay",
+                    "FTxT Overlay",
+                    NotificationManager
+                    .IMPORTANCE_LOW
+            );
+            channel
+            .setDescription(
+                    "Notifikasi overlay FTxT"
+            );
+            NotificationManager manager =
+                    getSystemService(
+                    NotificationManager.class
+            );
+            manager.createNotificationChannel(
+                    channel
+            );
+        }
+    }
+
     @Override
     public void onDestroy(){
 
         super.onDestroy();
+
+        if(wakeLock != null
+                && wakeLock.isHeld()){
+
+            wakeLock.release();
+
+        }
 
         savePosition();
 

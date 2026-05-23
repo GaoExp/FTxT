@@ -1,16 +1,26 @@
 package exp.ftxt;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.Toast;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
@@ -58,6 +68,38 @@ extends AppCompatActivity {
                         R.id.editText
                 );
 
+        editText.addTextChangedListener(
+                new TextWatcher(){
+
+            @Override
+            public void beforeTextChanged(
+                    CharSequence s,
+                    int start,
+                    int count,
+                    int after){}
+
+            @Override
+            public void onTextChanged(
+                    CharSequence s,
+                    int start,
+                    int before,
+                    int count){
+                currentText =
+                        s.toString().trim();
+                if(currentText.isEmpty()){
+                    currentText =
+                            "FTxT AKTIF";
+                }
+                FloatingService
+                .updateTextStatic();
+            }
+
+            @Override
+            public void afterTextChanged(
+                    Editable s){}
+
+        });
+
         seekBar =
                 findViewById(
                         R.id.textSizeSeekBar
@@ -99,6 +141,9 @@ extends AppCompatActivity {
 
                 currentSize = progress;
 
+                FloatingService
+                .updateTextSizeStatic();
+
             }
 
             @Override
@@ -122,12 +167,12 @@ extends AppCompatActivity {
         .setOnCheckedChangeListener(
                 (buttonView,isChecked)->{
 
-            if(isChecked){
+            applySwitchTint(
+                    overlaySwitch,
+                    isChecked
+            );
 
-                overlaySwitch
-                .setText(
-                        "Overlay ON"
-                );
+            if(isChecked){
 
                 currentText =
                         editText
@@ -150,6 +195,12 @@ extends AppCompatActivity {
                             .canDrawOverlays(
                                     this
                             )){
+
+                        Toast.makeText(
+                                this,
+                                "Izinkan overlay di pengaturan",
+                                Toast.LENGTH_LONG
+                        ).show();
 
                         Intent intent =
                                 new Intent(
@@ -178,7 +229,123 @@ extends AppCompatActivity {
 
                 }
 
-                startService(
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.TIRAMISU){
+
+                    if(ContextCompat
+                            .checkSelfPermission(
+                                    this,
+                                    Manifest.permission
+                                    .POST_NOTIFICATIONS
+                            ) != PackageManager
+                            .PERMISSION_GRANTED){
+
+                        ActivityCompat
+                        .requestPermissions(
+                                this,
+                                new String[]{
+                                    Manifest.permission
+                                    .POST_NOTIFICATIONS
+                                },
+                                100
+                        );
+
+                        overlaySwitch
+                        .setChecked(
+                                false
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.M){
+
+                    if(!Settings
+                            .canDrawOverlays(
+                                    this
+                            )){
+
+                        Toast.makeText(
+                                this,
+                                "Izinkan overlay di pengaturan",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        Intent intent =
+                                new Intent(
+
+                                        Settings
+                                        .ACTION_MANAGE_OVERLAY_PERMISSION,
+
+                                        Uri.parse(
+                                                "package:"
+                                                + getPackageName()
+                                        )
+                                );
+
+                        startActivity(
+                                intent
+                        );
+
+                        overlaySwitch
+                        .setChecked(
+                                false
+                        );
+
+                        return;
+
+                    }
+
+                }
+
+                if(Build.VERSION.SDK_INT
+                        >= Build.VERSION_CODES.M){
+
+                    String packageName =
+                            getPackageName();
+
+                    PowerManager pm =
+                            (PowerManager)
+                            getSystemService(
+                                    POWER_SERVICE
+                            );
+
+                    if(!pm
+                            .isIgnoringBatteryOptimizations(
+                                    packageName
+                            )){
+
+                        Toast.makeText(
+                                this,
+                                "Nonaktifkan optimasi baterai",
+                                Toast.LENGTH_LONG
+                        ).show();
+
+                        Intent intent =
+                                new Intent(
+
+                                        Settings
+                                        .ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+
+                                        Uri.parse(
+                                                "package:"
+                                                + packageName
+                                        )
+                                );
+
+                        startActivity(
+                                intent
+                        );
+
+                    }
+
+                }
+
+                startForegroundService(
                         new Intent(
                                 this,
                                 FloatingService
@@ -189,11 +356,6 @@ extends AppCompatActivity {
             }
 
             else{
-
-                overlaySwitch
-                .setText(
-                        "Overlay OFF"
-                );
 
                 stopService(
                         new Intent(
@@ -211,28 +373,97 @@ extends AppCompatActivity {
         .setOnCheckedChangeListener(
                 (buttonView,isChecked)->{
 
+            applySwitchTint(
+                    touchPassthroughSwitch,
+                    isChecked
+            );
+
             isTouchPassthrough = isChecked;
 
             FloatingService
             .updateTouchFlagsStatic();
 
-            if(isChecked){
-
-                touchPassthroughSwitch
-                .setText(
-                        "Teks Terkunci"
-                );
-
-            }else{
-
-                touchPassthroughSwitch
-                .setText(
-                        "Teks Bergerak"
-                );
-
-            }
-
         });
+
+        applySwitchTint(
+                overlaySwitch,
+                overlaySwitch.isChecked()
+        );
+
+        applySwitchTint(
+                touchPassthroughSwitch,
+                touchPassthroughSwitch.isChecked()
+        );
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            String[] permissions,
+            int[] grantResults){
+
+        if(requestCode == 100){
+            if(grantResults.length > 0
+                    && grantResults[0]
+                    == PackageManager
+                    .PERMISSION_GRANTED){
+                Toast.makeText(
+                        this,
+                        "Izin notifikasi diberikan",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }else{
+                Toast.makeText(
+                        this,
+                        "Izin notifikasi diperlukan",
+                        Toast.LENGTH_LONG
+                ).show();
+            }
+        }
+    }
+
+    private void applySwitchTint(
+            Switch sw,
+            boolean isChecked){
+
+        if(isChecked){
+
+            sw.setThumbTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#2196F3"
+                            )
+                    )
+            );
+
+            sw.setTrackTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#90CAF9"
+                            )
+                    )
+            );
+
+        }else{
+
+            sw.setThumbTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#E53935"
+                            )
+                    )
+            );
+
+            sw.setTrackTintList(
+                    ColorStateList.valueOf(
+                            Color.parseColor(
+                                    "#EF9A9A"
+                            )
+                    )
+            );
+
+        }
 
     }
 
