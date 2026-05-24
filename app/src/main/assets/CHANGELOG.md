@@ -3,36 +3,34 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
-## [2.3.1.14.0] - 2026-05-24
-
-### ✨ Fitur Baru
-
-- **FPS Display Module**: Overlay FPS counter real-time di pojok kiri atas.
-  - Toggle overlay, ukuran teks, warna (HSV picker), shadow.
-  - Menggunakan Choreographer untuk frame counting akurat.
-- Sidebar modul Floating Text dan FPS Display sudah bisa diakses dan berfungsi.
-- Panel konfigurasi berganti sesuai modul yang dipilih di sidebar.
+## [2.3.1.15.0] - 2026-05-24
 
 ### ♻️ Lifecycle Changes
 
-- FloatingService: tambah FPS overlay (fpsView + Choreographer) terpisah dari text overlay.
-- MainActivity: panel_text dan panel_fps toggle visibility berdasarkan sidebar.
+- **Refactor modular**: Semua modul dipisah ke package sendiri.
+  - `modules/text/` → TextConfig + TextModule
+  - `modules/fps/` → FpsConfig + FpsModule
+  - `shared/ui/` → ColorPickerDialog (HSV picker reusable)
+  - `core/` → FloatingService didelegasikan ke module
+  - `shared/color/` → HSVColorPickerView tetap
+- FloatingService pindah ke `core/`, update AndroidManifest.
+- HSVColorPickerView di root dihapus (duplikat).
 
-### 📝 File Changed
+### 🐛 Bug Fixes
 
-- app/build.gradle (versionCode: 38 → 39, versionName: 2.3.1.13.0 → 2.3.1.14.0)
-- app/src/main/java/exp/ftxt/MainActivity.java
-- app/src/main/java/exp/ftxt/FloatingService.java
-- app/src/main/res/layout/activity_main.xml
+- **FPS tidak tampil**: Service kini bisa start tanpa text overlay (FPS standalone).
+- **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
 
 ### 🔢 Version
 
-- versionCode: 38 → 39
-- versionName: 2.3.1.13.0 → 2.3.1.14.0
+- versionCode: 39 → 40
+- versionName: 2.3.1.14.0 → 2.3.1.15.0
 
 ---
 
-## [2.3.1.13.0] - 2026-05-24
+## [2.3.1.14.0] - 2026-05-24
+
+### ✨ Fitur Baru
 
 ### 🐛 Perubahan Sidebar
 

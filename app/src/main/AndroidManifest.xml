@@ -35,7 +35,7 @@
             android:exported="false"/>
 
         <service
-            android:name=".FloatingService"
+            android:name=".core.FloatingService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync"/>
