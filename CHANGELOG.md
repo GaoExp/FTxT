@@ -3,6 +3,25 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.9.6] - 2026-05-24
+
+### 🔧 Perbaikan
+
+- Perbaiki typo default teks overlay ("MTxT AKTIF" ↔ "FTxT AKTIF").
+- Pastikan SeekBar ukuran teks memiliki batas minimum 10 dan sinkronisasi UI saat progress di-bawah batas.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 33 → 34, versionName: 2.3.1.9.5 → 2.3.1.9.6)
+- app/src/main/java/exp/ftxt/MainActivity.java
+
+### 🔢 Version
+
+- versionCode: 33 → 34
+- versionName: 2.3.1.9.5 → 2.3.1.9.6
+
+---
+
 ## [2.3.1.9.5] - 2026-05-24
 
 ### 🔄 Optimasi

@@ -7,6 +7,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#222222"
+        android:title="FTxT"/>
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -48,7 +55,6 @@
 
     </LinearLayout>
 
-    <!-- Shadow switch -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="4dp"

@@ -1,5 +1,8 @@
 package exp.ftxt;
 
+import androidx.appcompat.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -63,6 +66,14 @@ extends AppCompatActivity {
 
         setContentView(
                 R.layout.activity_main
+        );
+		Toolbar toolbar =
+            findViewById(
+                R.id.toolbar
+        );
+
+        setSupportActionBar(
+        toolbar
         );
 
         editText =
@@ -143,6 +154,8 @@ extends AppCompatActivity {
                 if(progress < 10){
 
                     progress = 10;
+                    // pastikan UI seekbar mencerminkan batas minimal
+                    seekBar.setProgress(progress);
 
                 }
 
@@ -191,7 +204,7 @@ extends AppCompatActivity {
                         .isEmpty()){
 
                     currentText =
-                            "MTxT AKTIF";
+                            "FTxT AKTIF";
 
                 }
 
@@ -453,7 +466,43 @@ extends AppCompatActivity {
             }
         }
     }
+     @Override
+     public boolean onCreateOptionsMenu(
+        Menu menu){
 
+    getMenuInflater()
+    .inflate(
+            R.menu.main_menu,
+            menu
+    );
+
+    return true;
+
+}
+
+@Override
+public boolean onOptionsItemSelected(
+        MenuItem item){
+
+    if(item.getItemId()
+            == R.id.action_settings){
+
+        Toast.makeText(
+                this,
+                "Settings clicked",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        return true;
+
+    }
+
+    return super
+            .onOptionsItemSelected(
+                    item
+            );
+
+}
     private void applySwitchTint(
             Switch sw,
             boolean isChecked){
