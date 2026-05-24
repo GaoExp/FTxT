@@ -5,23 +5,35 @@
 
         <item
             android:id="@+id/nav_floating_text"
-            android:title="Floating Text"/>
+            android:title="@string/nav_floating_text"/>
 
         <item
             android:id="@+id/nav_fps"
-            android:title="FPS Display"/>
+            android:title="@string/nav_fps"/>
 
         <item
             android:id="@+id/nav_network"
-            android:title="Network Stats"/>
+            android:title="@string/nav_network"/>
 
         <item
             android:id="@+id/nav_battery"
-            android:title="Battery Monitor"/>
+            android:title="@string/nav_battery"/>
 
         <item
             android:id="@+id/nav_clock"
-            android:title="Clock Module"/>
+            android:title="@string/nav_clock"/>
+
+        <item
+            android:id="@+id/nav_cpu"
+            android:title="@string/nav_cpu"/>
+
+        <item
+            android:id="@+id/nav_temp"
+            android:title="@string/nav_temp"/>
+
+        <item
+            android:id="@+id/nav_logo"
+            android:title="@string/nav_logo"/>
 
     </group>
 

@@ -3,6 +3,34 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.17.0] - 2026-05-24
+
+### ✨ Fitur Baru
+
+- **Dynamic Title Bar**: Toolbar title berubah sesuai modul yang dipilih di drawer.
+- **Modul Baru**: CPU Monitor, Temperature, dan Logo Display ditambahkan ke drawer (Coming Soon).
+- **String Resource**: Semua nama modul dipindah ke strings.xml.
+
+### 🔧 Perbaikan
+
+- Floating Text: Shadow switch dipindah ke bawah tombol Pilih Warna.
+- FPS Display: Kunci Posisi switch dipindah ke atas SeekBar ukuran.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 42 → 43, versionName: 2.3.1.16.1 → 2.3.1.17.0)
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/menu/drawer_menu.xml
+- app/src/main/res/values/strings.xml
+
+### 🔢 Version
+
+- versionCode: 42 → 43
+- versionName: 2.3.1.16.1 → 2.3.1.17.0
+
+---
+
 ## [2.3.1.16.1] - 2026-05-24
 
 ### 🔧 Perbaikan
