@@ -1,0 +1,371 @@
+# Changelog - FTxT (Floating Text)
+Dokumen ini mencatat riwayat perubahan project FTxT.
+
+---
+
+## [2.3.1.10.0] - 2026-05-24
+
+### Fitur Baru
+
+- Tambah menu pengaturan dengan opsi untuk melihat CHANGELOG dan README dalam dialog scrollable.
+- SettingsActivity baru untuk menampilkan dokumentasi in-app.
+
+### File Changed
+
+- app/build.gradle (versionCode: 34 -> 35, versionName: 2.3.1.9.6 -> 2.3.1.10.0)
+- app/src/main/AndroidManifest.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+
+### File Added
+
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- app/src/main/res/raw/changelog.txt
+- app/src/main/res/raw/readme.txt
+
+### Version
+
+- versionCode: 34 -> 35
+- versionName: 2.3.1.9.6 -> 2.3.1.10.0
+
+---
+
+## [2.3.1.9.6] - 2026-05-24
+
+### Perbaikan
+
+- Perbaiki typo default teks overlay ("MTxT AKTIF" <-> "FTxT AKTIF").
+- Pastikan SeekBar ukuran teks memiliki batas minimum 10 dan sinkronisasi UI saat progress di-bawah batas.
+
+### File Changed
+
+- app/build.gradle (versionCode: 33 -> 34, versionName: 2.3.1.9.5 -> 2.3.1.9.6)
+- app/src/main/java/exp/ftxt/MainActivity.java
+
+### Version
+
+- versionCode: 33 -> 34
+- versionName: 2.3.1.9.5 -> 2.3.1.9.6
+
+---
+
+## [2.3.1.9.5] - 2026-05-24
+
+### Optimasi
+
+- Persiapan struktur modular untuk module overlay.
+- HSVColorPickerView dipindah ke shared component.
+
+### Perbaikan
+
+- Update import package setelah refactor namespace.
+
+### File Changed
+
+- app/src/main/java/exp/ftxt/HSVColorPickerView.java
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+
+### File Added
+
+- app/src/main/java/exp/ftxt/modules/clock/
+- app/src/main/java/exp/ftxt/modules/cpu/
+- app/src/main/java/exp/ftxt/modules/fps/
+- app/src/main/java/exp/ftxt/modules/logo/
+- app/src/main/java/exp/ftxt/modules/temp/
+- app/src/main/java/exp/ftxt/modules/text/
+- app/src/main/java/exp/ftxt/shared/color/
+
+### Version
+
+- versionCode: 33 -> 34
+- versionName: 2.3.1.9.4 -> 2.3.1.9.5
+
+---
+
+## [2.3.1.9.4] - 2026-05-23
+
+### Fitur Baru
+
+- Shadow Toggle: Tambah switch "Shadow" untuk menyalakan / mematikan latar semi-transparent di belakang teks overlay.
+
+### Perbaikan
+
+- Version bump & maintenance.
+- Smoke build verification.
+
+### File yang Diubah
+
+- app/build.gradle (versionCode: 32 -> 33, versionName: 9.3 -> 2.3.1.9.4)
+- app/src/main/res/layout/activity_main.xml (Tambah `shadowSwitch`)
+- app/src/main/java/exp/ftxt/MainActivity.java (Tambah handler `shadowSwitch`)
+- app/src/main/java/exp/ftxt/FloatingService.java (Tambah state `shadowEnabled`)
+
+---
+
+## [9.3] - 2026-05-17
+
+### Perbaikan
+
+- WakeLock: CPU tidak tidur saat overlay aktif — service tetap jalan
+- Battery Optimization: Saat overlay diaktifkan, aplikasi minta dikecualikan dari optimasi baterai
+
+### File yang Diubah
+
+- AndroidManifest.xml (Tambah WAKE_LOCK dan REQUEST_IGNORE_BATTERY_OPTIMIZATIONS permission)
+- FloatingService.java (Import PowerManager, acquire PARTIAL_WAKE_LOCK)
+- MainActivity.java (Import PowerManager, cek isIgnoringBatteryOptimizations)
+- app/build.gradle (versionCode: 31 -> 32, versionName: 9.2 -> 9.3)
+
+---
+
+## [9.2] - 2026-05-17
+
+### Perbaikan dan Perubahan UI
+
+- Hapus Transparency Slider
+- Layout Ulang: Switch dipindahkan ke baris terpisah
+- Posisi Switch: Switch di kiri, label teks di kanan
+- Warna Switch: Biru saat aktif, merah pudar saat mati
+
+### File yang Diubah
+
+- activity_main.xml (Hapus slider transparansi)
+- MainActivity.java (Hapus currentAlpha, tambah applySwitchTint())
+- app/build.gradle (versionCode: 30 -> 31, versionName: 9.1 -> 9.2)
+
+---
+
+## [8.3] - 2026-05-17
+
+### Bug Fixes
+
+- Text Size Real-Time Update: Ukuran teks sekarang langsung berubah saat slider digeser
+- Tambah FloatingService.updateTextSizeStatic() di SeekBar.onProgressChanged()
+
+### File yang Diubah
+
+- MainActivity.java (Tambah updateTextSizeStatic call)
+- app/build.gradle (versionCode: 28 -> 29, versionName: 8.2 -> 8.3)
+
+---
+
+## [8.2] - 2026-05-17
+
+### Fitur Baru
+
+- Adaptive Launcher Icon
+- Real-Time Text Update
+- Foreground Service
+
+### Perbaikan
+
+- Launcher Icon: Pindah PNG ke drawable
+- AndroidManifest: Hapus package attribute
+- Dependencies update
+- Deprecated API: PreferenceManager -> getSharedPreferences
+- Permission Feedback
+- POST_NOTIFICATIONS runtime permission
+
+### Bug Fixes
+
+- Service Crash di API 26+: startService -> startForegroundService
+- Foreground Service Type untuk API 35
+- startForeground sebelum addView
+
+### File yang Dibuat & Diubah
+
+- app/build.gradle
+- AndroidManifest.xml
+- FloatingService.java
+- MainActivity.java
+- ic_launcher_foreground.png
+
+---
+
+## [8.1] - 2026-05-17
+
+### Fitur Baru
+
+- Circular HSV Color Picker Wheel
+- Pilih Hue dengan memutar di sekeliling lingkaran
+- Pilih Saturation dengan menggeser ke arah pusat
+- Kontrol brightness dengan slider 0-100%
+- Kontrol transparency/alpha dengan slider 0-255
+- Live preview warna real-time
+
+### Bug Fixes
+
+- Color Selection Real-Time: Warna langsung diterapkan tanpa on/off overlay
+- Tambah method static updateTextColorStatic()
+
+### File yang Dibuat & Diubah
+
+- HSVColorPickerView.java (NEW)
+- dialog_hsv_color_picker.xml (NEW)
+- MainActivity.java (UPDATED)
+- FloatingService.java (UPDATED)
+- app/build.gradle (versionCode: 26 -> 27, versionName: 7.4 -> 8.1)
+
+---
+
+## [7.4] - 2026-05-17
+
+### Bug Fixes
+
+- Touch Passthrough Real-Time: Penguncian sentuhan langsung berfungsi
+- Tambah method static wrapper updateTouchFlagsStatic()
+- Instant apply FLAG_NOT_TOUCHABLE saat switch diubah
+
+### File yang Diubah
+
+- FloatingService.java (Tambah prefs, instance, updateTouchFlagsStatic, savePosition, loadPosition)
+- MainActivity.java (Update touch passthrough switch listener)
+- app/build.gradle (versionCode: 25 -> 26, versionName: 7.3 -> 7.4)
+
+---
+
+## [7.3] - 2026-05-16
+
+### Bug Fixes
+
+- Touch Passthrough Implementation: Sentuhan benar-benar melewati teks overlay
+- Implementasi FLAG_NOT_TOUCHABLE yang proper
+- Refactor touch listener untuk dynamic assignment
+
+### File yang Diubah
+
+- FloatingService.java (Refactor updateTouchFlags, ubah touch listener jadi property)
+- MainActivity.java (Update label clarity)
+- app/build.gradle (versionCode: 24 -> 25, versionName: 7.2 -> 7.3)
+
+---
+
+## [7.2] - 2026-05-16
+
+### Lifecycle Changes
+
+- Fitur Redundan Dihapus: Penguncian posisi manual dihapus
+- Hapus variabel isPositionLocked
+- Hapus Switch lockPositionSwitch
+- Simplifikasi logic fokus pada touch passthrough
+
+### File yang Diubah
+
+- MainActivity.java (Hapus isPositionLocked, lockPositionSwitch)
+- FloatingService.java (Hapus isPositionLocked check)
+- activity_main.xml (Hapus lockPositionSwitch)
+- app/build.gradle (versionCode: 23 -> 24, versionName: 7.1 -> 7.2)
+
+---
+
+## [7.1] - 2026-05-16
+
+### Fitur Baru
+
+- Touch Passthrough (Sentuhan Lewati): Sentuhan melewati teks overlay ke aplikasi belakang
+- ON: Teks tidak dapat disentuh
+- OFF: Teks dapat disentuh dan dipindahkan
+
+### File yang Dibuat & Diubah
+
+- MainActivity.java (Tambah isTouchPassthrough, touchPassthroughSwitch)
+- FloatingService.java (Tambah updateTouchFlags method)
+- activity_main.xml (Tambah 2 Switch elements)
+- app/build.gradle (versionCode: 22 -> 23, versionName: 7.0 -> 7.1)
+
+---
+
+## [7.0] - Previous Release
+
+### Features
+
+- Overlay floating text display
+- Customizable text size with SeekBar
+- Color selection for text
+- Text edit capability
+- Overlay enable/disable toggle
+
+## [2.3.1.9.6] - 2026-05-24
+
+### 🔧 Perbaikan
+
+- Perbaiki typo default teks overlay ("MTxT AKTIF" ↔ "FTxT AKTIF").
+- Pastikan SeekBar ukuran teks memiliki batas minimum 10 dan sinkronisasi UI saat progress di-bawah batas.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 33 → 34, versionName: 2.3.1.9.5 → 2.3.1.9.6)
+- app/src/main/java/exp/ftxt/MainActivity.java
+
+### 🔢 Version
+
+- versionCode: 33 → 34
+- versionName: 2.3.1.9.5 → 2.3.1.9.6
+
+---
+
+## [2.3.1.9.5] - 2026-05-24
+
+### 🔄 Optimasi
+
+- Persiapan struktur modular untuk module overlay.
+- HSVColorPickerView dipindah ke shared component.
+
+### 🔧 Perbaikan
+
+- Update import package setelah refactor namespace.
+
+### 📝 File Changed
+
+- app/src/main/java/exp/ftxt/HSVColorPickerView.java
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+
+### 📝 File Added
+
+- app/src/main/java/exp/ftxt/modules/clock/
+- app/src/main/java/exp/ftxt/modules/cpu/
+- app/src/main/java/exp/ftxt/modules/fps/
+- app/src/main/java/exp/ftxt/modules/logo/
+- app/src/main/java/exp/ftxt/modules/temp/
+- app/src/main/java/exp/ftxt/modules/text/
+- app/src/main/java/exp/ftxt/shared/color/
+
+### 🔢 Version
+
+- versionCode: 33 → 34
+- versionName: 2.3.1.9.4 → 2.3.1.9.5
+
+---
+
+## [9.3] - 2026-05-17
+
+### 🔧 Perbaikan
+- **WakeLock**: CPU tidak tidur saat overlay aktif — service tetap jalan
+- **Battery Optimization**: Saat overlay diaktifkan, aplikasi minta dikecualikan dari optimasi baterai
+
+### 📝 File yang Diubah
+
+#### ✅ AndroidManifest.xml (UPDATED)
+- Tambah `WAKE_LOCK` permission
+- Tambah `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` permission
+
+#### ✅ FloatingService.java (UPDATED)
+- Import `android.os.PowerManager`
+- Tambah field `wakeLock`
+- `onCreate()`: acquire `PARTIAL_WAKE_LOCK`
+- `onDestroy()`: release wake lock
+
+#### ✅ MainActivity.java (UPDATED)
+- Import `android.os.PowerManager`
+- Saat overlay ON, cek `isIgnoringBatteryOptimizations()`
+- Jika tidak, kirim intent `ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`
+
+#### 🔢 app/build.gradle (UPDATED)
+- versionCode: 31 → 32
+- versionName: 9.2 → 9.3
+
+### 📊 Version Numbering
+- **9** = Fitur baru (sejak 9.1)
+- **3** = Perbaikan ke-3 (WakeLock + Battery Optimization)

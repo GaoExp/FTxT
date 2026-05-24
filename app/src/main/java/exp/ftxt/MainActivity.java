@@ -1,8 +1,6 @@
 package exp.ftxt;
 
 import androidx.appcompat.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,6 +26,9 @@ import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity
 extends AppCompatActivity {
@@ -75,6 +76,55 @@ extends AppCompatActivity {
         setSupportActionBar(
         toolbar
         );
+
+        DrawerLayout drawerLayout =
+            findViewById(
+                R.id.drawerLayout
+        );
+
+        ActionBarDrawerToggle toggle =
+            new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.nav_open,
+                R.string.nav_close
+        );
+
+        drawerLayout.addDrawerListener(
+            toggle
+        );
+
+        toggle.syncState();
+
+        NavigationView navView =
+            findViewById(
+                R.id.navView
+        );
+
+        navView
+        .setNavigationItemSelectedListener(
+            item -> {
+
+                if(item.getItemId()
+                    == R.id.nav_settings){
+
+                    startActivity(
+                        new Intent(
+                            this,
+                            SettingsActivity.class
+                        )
+                    );
+
+                    drawerLayout.closeDrawers();
+
+                    return true;
+
+                }
+
+                return false;
+
+        });
 
         editText =
                 findViewById(
@@ -466,43 +516,7 @@ extends AppCompatActivity {
             }
         }
     }
-     @Override
-     public boolean onCreateOptionsMenu(
-        Menu menu){
 
-    getMenuInflater()
-    .inflate(
-            R.menu.main_menu,
-            menu
-    );
-
-    return true;
-
-}
-
-@Override
-public boolean onOptionsItemSelected(
-        MenuItem item){
-
-    if(item.getItemId()
-            == R.id.action_settings){
-
-        Toast.makeText(
-                this,
-                "Settings clicked",
-                Toast.LENGTH_SHORT
-        ).show();
-
-        return true;
-
-    }
-
-    return super
-            .onOptionsItemSelected(
-                    item
-            );
-
-}
     private void applySwitchTint(
             Switch sw,
             boolean isChecked){

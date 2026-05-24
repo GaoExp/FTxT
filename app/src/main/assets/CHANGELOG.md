@@ -3,6 +3,73 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.11.0] - 2026-05-24
+
+### 🔧 Perbaikan
+
+- Ubah toolbar atas menjadi navigation drawer (sidebar kiri) dengan hamburger menu.
+- Menu Pengaturan dipindah dari toolbar icon ke NavigationView di drawer.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 35 → 36, versionName: 2.3.1.10.0 → 2.3.1.11.0)
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/values/strings.xml
+
+### 📝 File Added
+
+- app/src/main/res/menu/drawer_menu.xml
+
+### 📝 File Removed
+
+- app/src/main/res/menu/main_menu.xml
+
+### 🔢 Version
+
+- versionCode: 35 → 36
+- versionName: 2.3.1.10.0 → 2.3.1.11.0
+
+---
+
+## [2.3.1.10.0] - 2026-05-24
+
+### ✨ Fitur Baru
+
+- Tambah menu pengaturan dengan opsi untuk melihat CHANGELOG dan README dalam dialog scrollable.
+- SettingsActivity membaca langsung dari file assets (single source of truth).
+- Hapus duplikasi file: CHANGELOG.md, README.md, dan AGENTS.md hanya ada di assets folder.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 34 → 35, versionName: 2.3.1.9.6 → 2.3.1.10.0)
+- app/src/main/AndroidManifest.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+
+### 📝 File Added
+
+- app/src/main/assets/CHANGELOG.md
+- app/src/main/assets/README.md
+- app/src/main/assets/AGENTS.md
+- app/src/main/res/layout/activity_settings.xml
+
+### 📝 File Removed (Duplikasi)
+
+- app/src/main/res/raw/changelog.txt
+- app/src/main/res/raw/readme.txt
+
+### 🔢 Version
+
+- versionCode: 34 → 35
+- versionName: 2.3.1.9.6 → 2.3.1.10.0
+
+### 📌 Catatan
+
+Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di folder assets. Update hanya dilakukan di assets, tidak ada duplikasi file lagi.
+
+---
+
 ## [2.3.1.9.6] - 2026-05-24
 
 ### 🔧 Perbaikan
@@ -318,10 +385,6 @@ Tidak wajib dimigrasikan retroaktif.
 #### ✅ app/build.gradle (UPDATED)
 - versionCode: 26 → 27
 - versionName: 7.4 → 8.1
-
-### 🔔 Launcher Icon (implementation detail)
-- The Gradle task now copies `ic_launcher_foreground.png` into `build/generated/res/launcher/<variant>/` instead of directly into `app/src/main/res/drawable`.
-- The generated folder is registered with the Android Gradle plugin using `variant.registerGeneratedResFolders(...)` and the copy task is set as the builder (`builtBy`). This avoids implicit dependency errors reported by Gradle and guarantees the correct task ordering.
 
 ### 📊 Version Numbering
 - **8** = Fitur baru (HSV Color Picker)
