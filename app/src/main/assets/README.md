@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.15.0`        
+**Current Release:** `2.3.1.16.0`        
 **Last Updated:** `2026-05-24`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -23,7 +23,7 @@ Fitur:
 ### Customizable Text Size 📏
 Atur ukuran teks secara langsung tanpa restart overlay.
 
-- Range ukuran: **10–60 sp**
+- Range ukuran: **5–120 sp**
 - Real-time preview
 - Instant apply
 
@@ -57,6 +57,13 @@ Toggle tema gelap atau terang dari toolbar.
 - Tema tersimpan otomatis
 - Berlaku untuk seluruh app
 - NavigationView ikut menyesuaikan tema
+
+### FPS Display Overlay 📊
+Tampilkan FPS counter sebagai overlay yang bisa digeser.
+
+- FPS overlay draggable (bebas dipindah)
+- Posisi bisa dikunci
+- Range FPS limit: 5–120 FPS
 
 ### Overlay Toggle 🔘
 Aktifkan atau nonaktifkan overlay dengan satu switch.
@@ -102,7 +109,7 @@ Isi field:
 ### 3. Atur Ukuran Teks
 Gunakan **SeekBar Ukuran Teks**.
 Range:
-`10–60 sp`
+`5–120 sp`
 Perubahan langsung diterapkan jika overlay aktif.
 
 ### 4. Pilih Warna
@@ -196,30 +203,55 @@ FTxT/
 │   │   │   │
 │   │   │   ├── modules/
 │   │   │   │   ├── text/
+│   │   │   │   │   ├── TextConfig.java
+│   │   │   │   │   └── TextModule.java
 │   │   │   │   ├── fps/
-│   │   │   │   ├── cpu/
-│   │   │   │   ├── clock/
-│   │   │   │   ├── temp/
-│   │   │   │   └── logo/
+│   │   │   │   │   ├── FpsConfig.java
+│   │   │   │   │   └── FpsModule.java
+│   │   │   │   ├── cpu/       (empty)
+│   │   │   │   ├── clock/     (empty)
+│   │   │   │   ├── temp/      (empty)
+│   │   │   │   └── logo/      (empty)
 │   │   │   │
 │   │   │   ├── shared/
-│   │   │   │   └── color/
-│   │   │   │       └── HSVColorPickerView.java
+│   │   │   │   ├── color/
+│   │   │   │   │   └── HSVColorPickerView.java
+│   │   │   │   └── ui/
+│   │   │   │       └── ColorPickerDialog.java
 │   │   │   │
 │   │   │   ├── MainActivity.java
 │   │   │   └── SettingsActivity.java
 │   │   │
 │   │   ├── assets/
+│   │   │   ├── AGENTS.md 
 │   │   │   ├── CHANGELOG.md
 │   │   │   └── README.md
 │   │   │
 │   │   ├── res/
+│   │   │   ├── layout/
+│   │   │   │   ├── activity_main.xml
+│   │   │   │   ├── activity_settings.xml
+│   │   │   │   ├── dialog_hsv_color_picker.xml
+│   │   │   │   └── nav_header.xml
+│   │   │   ├── drawable/
+│   │   │   │   ├── ic_launcher_background.xml
+│   │   │   │   ├── ic_launcher_foreground.png
+│   │   │   │   ├── ic_settings.xml
+│   │   │   │   └── ic_theme.xml
+│   │   │   ├── menu/
+│   │   │   │   ├── drawer_menu.xml
+│   │   │   │   └── main_menu.xml
+│   │   │   ├── mipmap-anydpi-v26/
+│   │   │   │   └── ic_launcher.xml
+│   │   │   └── values/
+│   │   │       ├── colors.xml
+│   │   │       ├── strings.xml
+│   │   │       └── styles.xml
+│   │   │
 │   │   └── AndroidManifest.xml
 │   │
 │   └── build.gradle
 │
-├── CHANGELOG.md
-├── README.md
 └── build.gradle
 ```
 
@@ -230,11 +262,16 @@ FTxT/
 | MainActivity.java | Activity utama & kontrol UI |
 | SettingsActivity.java | Settings dengan dokumentasi in-app |
 | core/FloatingService.java | Overlay service, touch handling, persistence |
+| modules/text/TextConfig.java | Konfigurasi teks overlay |
+| modules/text/TextModule.java | Module logic teks overlay |
+| modules/fps/FpsConfig.java | Konfigurasi FPS overlay |
+| modules/fps/FpsModule.java | Module logic FPS overlay |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
-| modules/ | Struktur awal module overlay |
+| shared/ui/ColorPickerDialog.java | Dialog wrapper HSV picker |
 | activity_main.xml | Layout utama |
-| dialog_hsv_color_picker.xml | Layout dialog picker |
 | activity_settings.xml | Layout settings menu |
+| dialog_hsv_color_picker.xml | Layout dialog picker |
+| nav_header.xml | Header navigation drawer |
 
 ---
 
@@ -249,7 +286,7 @@ major.removed.restored.minor.patch
 Contoh:
 
 ```txt
-2.3.1.10.0
+2.3.1.16.0
 ```
 
 - major = milestone besar / generasi project

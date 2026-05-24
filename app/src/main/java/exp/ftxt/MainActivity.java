@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     SeekBar fpsSizeSeekBar;
     Button fpsColorButton;
     Switch fpsShadowSwitch;
+    Switch fpsLockSwitch;
 
     // panels
     View panelText;
@@ -122,6 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 .getInt("fps_color", Color.WHITE);
         FpsConfig.shadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("fps_shadow", false);
+        FpsConfig.touchPassthrough = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("fps_lock", false);
 
         // === Bind text views ===
         editText = findViewById(R.id.editText);
@@ -136,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
         fpsSizeSeekBar = findViewById(R.id.fpsSizeSeekBar);
         fpsColorButton = findViewById(R.id.fpsColorButton);
         fpsShadowSwitch = findViewById(R.id.fpsShadowSwitch);
+        fpsLockSwitch = findViewById(R.id.fpsLockSwitch);
 
         // === Text controls ===
 
@@ -153,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                if (progress < 10) { progress = 10; sb.setProgress(progress); }
+                if (progress < 5) { progress = 5; sb.setProgress(progress); }
                 TextConfig.size = progress;
                 FloatingService.updateTextSizeStatic();
             }
@@ -273,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
 
         fpsSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                if (progress < 10) { progress = 10; sb.setProgress(progress); }
+                if (progress < 5) { progress = 5; sb.setProgress(progress); }
                 FpsConfig.size = progress;
                 FloatingService.updateFpsSizeStatic();
             }
@@ -299,6 +303,17 @@ public class MainActivity extends AppCompatActivity {
             getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                     .edit().putBoolean("fps_shadow", isChecked).apply();
             FloatingService.updateFpsShadowStatic();
+        });
+
+        fpsLockSwitch.setChecked(FpsConfig.touchPassthrough);
+        applySwitchTint(fpsLockSwitch, FpsConfig.touchPassthrough);
+
+        fpsLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FpsConfig.touchPassthrough = isChecked;
+            applySwitchTint(fpsLockSwitch, isChecked);
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit().putBoolean("fps_lock", isChecked).apply();
+            FloatingService.updateFpsTouchFlagsStatic();
         });
     }
 

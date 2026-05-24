@@ -3,6 +3,47 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.16.1] - 2026-05-24
+
+### 🔧 Perbaikan
+
+- Sinkronisasi struktur project & deskripsi file di README.md dengan filesystem aktual.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 41 → 42, versionName: 2.3.1.16.0 → 2.3.1.16.1)
+- app/src/main/assets/README.md
+
+### 🔢 Version
+
+- versionCode: 41 → 42
+- versionName: 2.3.1.16.0 → 2.3.1.16.1
+
+---
+
+## [2.3.1.16.0] - 2026-05-24
+
+### ✨ Fitur Baru
+
+- **FPS Draggable**: FPS overlay bisa digeser (drag) dan dikunci posisinya.
+- Limit SeekBar: min 5 → max 120 (sebelumnya min 10 → max 60).
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 40 → 41, versionName: 2.3.1.15.0 → 2.3.1.16.0)
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+
+### 🔢 Version
+
+- versionCode: 40 → 41
+- versionName: 2.3.1.15.0 → 2.3.1.16.0
+
+---
+
 ## [2.3.1.15.0] - 2026-05-24
 
 ### ♻️ Lifecycle Changes

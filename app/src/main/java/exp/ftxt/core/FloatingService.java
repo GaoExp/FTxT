@@ -58,8 +58,9 @@ public class FloatingService extends Service {
         try {
             windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-            // Init text module
+            // Init modules
             textModule.init(windowManager, this, prefs);
+            fpsModule.init(prefs);
 
             // Create text overlay only if text module is active
             if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
@@ -158,6 +159,12 @@ public class FloatingService extends Service {
     public static void updateFpsShadowStatic() {
         if (instance != null && instance.fpsModule != null) {
             instance.fpsModule.updateShadow(FpsConfig.shadow);
+        }
+    }
+
+    public static void updateFpsTouchFlagsStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.updateTouchFlags();
         }
     }
 
