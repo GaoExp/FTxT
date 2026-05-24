@@ -3,6 +3,30 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.17.1] - 2026-05-24
+
+### 🔧 Perbaikan
+
+- Toolbar color diubah menjadi biru muda (#2196F3).
+- Icon tema sekarang dinamis: bulan (mode gelap) / matahari (mode terang).
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 43 → 44, versionName: 2.3.1.17.0 → 2.3.1.17.1)
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+
+### 📝 File Added
+
+- app/src/main/res/drawable/ic_sun.xml
+
+### 🔢 Version
+
+- versionCode: 43 → 44
+- versionName: 2.3.1.17.0 → 2.3.1.17.1
+
+---
+
 ## [2.3.1.17.0] - 2026-05-24
 
 ### ✨ Fitur Baru

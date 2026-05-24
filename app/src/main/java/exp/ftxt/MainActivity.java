@@ -324,6 +324,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("theme_dark", false);
+        MenuItem themeItem = menu.findItem(R.id.action_theme);
+        themeItem.setIcon(isDark ? R.drawable.ic_theme : R.drawable.ic_sun);
         return true;
     }
 
