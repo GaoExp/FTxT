@@ -22,12 +22,15 @@ import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.Toast;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatDelegate;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity
@@ -45,21 +48,43 @@ extends AppCompatActivity {
     public static boolean isTouchPassthrough =
             false;
 
+    // FPS state
+    public static boolean fpsEnabled = false;
+    public static float fpsSize = 14f;
+    public static int fpsColor = Color.WHITE;
+    public static boolean fpsShadow = false;
+
     EditText editText;
-
     SeekBar seekBar;
-
     Button colorButton;
-
     Switch overlaySwitch;
-
     Switch touchPassthroughSwitch;
-
     Switch shadowSwitch;
+
+    // FPS views
+    Switch fpsSwitch;
+    SeekBar fpsSizeSeekBar;
+    Button fpsColorButton;
+    Switch fpsShadowSwitch;
+
+    // panels
+    View panelText;
+    View panelFps;
 
     @Override
     protected void onCreate(
             Bundle savedInstanceState){
+
+        boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("theme_dark", false);
+
+        if(isDark){
+            AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES);
+        }else{
+            AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO);
+        }
 
         super.onCreate(
                 savedInstanceState
@@ -102,22 +127,41 @@ extends AppCompatActivity {
                 R.id.navView
         );
 
+        navView.setCheckedItem(
+            R.id.nav_floating_text
+        );
+
         navView
         .setNavigationItemSelectedListener(
             item -> {
 
-                if(item.getItemId()
-                    == R.id.nav_settings){
+                int id = item.getItemId();
 
-                    startActivity(
-                        new Intent(
-                            this,
-                            SettingsActivity.class
-                        )
-                    );
+                if(id == R.id.nav_floating_text){
+                    panelText.setVisibility(View.VISIBLE);
+                    panelFps.setVisibility(View.GONE);
+                    drawerLayout.closeDrawers();
+                    return true;
+                }
+
+                if(id == R.id.nav_fps){
+                    panelText.setVisibility(View.GONE);
+                    panelFps.setVisibility(View.VISIBLE);
+                    drawerLayout.closeDrawers();
+                    return true;
+                }
+
+                if(id == R.id.nav_network
+                    || id == R.id.nav_battery
+                    || id == R.id.nav_clock){
+
+                    Toast.makeText(
+                        this,
+                        "Coming Soon",
+                        Toast.LENGTH_SHORT
+                    ).show();
 
                     drawerLayout.closeDrawers();
-
                     return true;
 
                 }
@@ -125,6 +169,9 @@ extends AppCompatActivity {
                 return false;
 
         });
+
+        panelText = findViewById(R.id.panel_text);
+        panelFps = findViewById(R.id.panel_fps);
 
         editText =
                 findViewById(
@@ -188,6 +235,24 @@ extends AppCompatActivity {
                         R.id.shadowSwitch
                 );
 
+        // === FPS views ===
+        fpsSwitch = findViewById(R.id.fpsSwitch);
+        fpsSizeSeekBar = findViewById(R.id.fpsSizeSeekBar);
+        fpsColorButton = findViewById(R.id.fpsColorButton);
+        fpsShadowSwitch = findViewById(R.id.fpsShadowSwitch);
+
+        // === Load saved FPS state ===
+        fpsEnabled = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("fps_enabled", false);
+        fpsSize = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getFloat("fps_size", 14f);
+        fpsColor = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getInt("fps_color", Color.WHITE);
+        fpsShadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("fps_shadow", false);
+
+        // === TEXT controls ===
+
         seekBar.setProgress(20);
 
         seekBar
@@ -204,7 +269,6 @@ extends AppCompatActivity {
                 if(progress < 10){
 
                     progress = 10;
-                    // pastikan UI seekbar mencerminkan batas minimal
                     seekBar.setProgress(progress);
 
                 }
@@ -455,7 +519,6 @@ extends AppCompatActivity {
 
         });
 
-        // Load saved shadow preference and apply
         boolean isShadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("shadow_enabled", false);
 
@@ -489,6 +552,106 @@ extends AppCompatActivity {
                 shadowSwitch.isChecked()
         );
 
+        // === FPS controls ===
+
+        fpsSwitch.setChecked(fpsEnabled);
+        applySwitchTint(fpsSwitch, fpsEnabled);
+
+        fpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+
+            fpsEnabled = isChecked;
+            applySwitchTint(fpsSwitch, isChecked);
+
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("fps_enabled", isChecked)
+                    .apply();
+
+            if(isChecked && FloatingService.instance != null){
+                FloatingService.startFpsStatic();
+            }
+
+            if(!isChecked && FloatingService.instance != null){
+                FloatingService.stopFpsStatic();
+            }
+
+        });
+
+        fpsSizeSeekBar.setProgress((int) fpsSize);
+
+        fpsSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            @Override
+            public void onProgressChanged(SeekBar sb, int progress, boolean fromUser){
+                if(progress < 10){
+                    progress = 10;
+                    sb.setProgress(progress);
+                }
+                fpsSize = progress;
+                FloatingService.updateFpsSizeStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb){}
+            @Override public void onStopTrackingTouch(SeekBar sb){}
+        });
+
+        fpsColorButton.setOnClickListener(v -> {
+            showFpsColorPickerDialog();
+        });
+
+        fpsShadowSwitch.setChecked(fpsShadow);
+        applySwitchTint(fpsShadowSwitch, fpsShadow);
+
+        fpsShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            fpsShadow = isChecked;
+            applySwitchTint(fpsShadowSwitch, isChecked);
+
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("fps_shadow", isChecked)
+                    .apply();
+
+            FloatingService.updateFpsShadowStatic();
+        });
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int id = item.getItemId();
+
+        if(id == R.id.action_settings){
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+
+        if(id == R.id.action_theme){
+            boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .getBoolean("theme_dark", false);
+            boolean newDark = !isDark;
+
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("theme_dark", newDark)
+                    .apply();
+
+            if(newDark){
+                AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_YES);
+            }else{
+                AppCompatDelegate.setDefaultNightMode(
+                        AppCompatDelegate.MODE_NIGHT_NO);
+            }
+
+            recreate();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -560,6 +723,8 @@ extends AppCompatActivity {
         }
 
     }
+
+    // === Text Color Picker ===
 
     private void showHSVColorPickerDialog(){
 
@@ -734,6 +899,90 @@ extends AppCompatActivity {
 
         dialog.show();
 
+    }
+
+    // === FPS Color Picker ===
+
+    private void showFpsColorPickerDialog(){
+
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+
+        View dialogView = getLayoutInflater()
+                .inflate(R.layout.dialog_hsv_color_picker, null);
+
+        HSVColorPickerView colorPicker =
+                dialogView.findViewById(R.id.colorPickerView);
+
+        SeekBar brightnessSeekBar =
+                dialogView.findViewById(R.id.brightnessSeekBar);
+
+        SeekBar alphaSeekBar =
+                dialogView.findViewById(R.id.alphaSeekBar);
+
+        View colorPreview =
+                dialogView.findViewById(R.id.colorPreview);
+
+        Button okButton =
+                dialogView.findViewById(R.id.okButton);
+
+        Button cancelButton =
+                dialogView.findViewById(R.id.cancelButton);
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(fpsColor, hsv);
+
+        colorPicker.setColor(fpsColor);
+
+        int currentAlpha = Color.alpha(fpsColor);
+
+        alphaSeekBar.setProgress(currentAlpha);
+        brightnessSeekBar.setProgress((int)(hsv[2] * 100));
+
+        updateColorPreview(colorPreview, colorPicker, brightnessSeekBar, alphaSeekBar);
+
+        colorPicker.setOnColorChangeListener(color -> {
+            updateColorPreview(colorPreview, colorPicker, brightnessSeekBar, alphaSeekBar);
+        });
+
+        brightnessSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            @Override public void onProgressChanged(SeekBar sb, int p, boolean f){
+                updateColorPreview(colorPreview, colorPicker, brightnessSeekBar, alphaSeekBar);
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb){}
+            @Override public void onStopTrackingTouch(SeekBar sb){}
+        });
+
+        alphaSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            @Override public void onProgressChanged(SeekBar sb, int p, boolean f){
+                updateColorPreview(colorPreview, colorPicker, brightnessSeekBar, alphaSeekBar);
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb){}
+            @Override public void onStopTrackingTouch(SeekBar sb){}
+        });
+
+        builder.setTitle("Pilih Warna FPS");
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+
+        okButton.setOnClickListener(v -> {
+            fpsColor = getColorWithAlpha(colorPicker, brightnessSeekBar, alphaSeekBar);
+            FloatingService.updateFpsColorStatic();
+
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit()
+                    .putInt("fps_color", fpsColor)
+                    .apply();
+
+            dialog.dismiss();
+        });
+
+        cancelButton.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void updateColorPreview(

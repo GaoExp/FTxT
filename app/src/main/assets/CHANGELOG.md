@@ -3,6 +3,92 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.14.0] - 2026-05-24
+
+### ✨ Fitur Baru
+
+- **FPS Display Module**: Overlay FPS counter real-time di pojok kiri atas.
+  - Toggle overlay, ukuran teks, warna (HSV picker), shadow.
+  - Menggunakan Choreographer untuk frame counting akurat.
+- Sidebar modul Floating Text dan FPS Display sudah bisa diakses dan berfungsi.
+- Panel konfigurasi berganti sesuai modul yang dipilih di sidebar.
+
+### ♻️ Lifecycle Changes
+
+- FloatingService: tambah FPS overlay (fpsView + Choreographer) terpisah dari text overlay.
+- MainActivity: panel_text dan panel_fps toggle visibility berdasarkan sidebar.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 38 → 39, versionName: 2.3.1.13.0 → 2.3.1.14.0)
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/FloatingService.java
+- app/src/main/res/layout/activity_main.xml
+
+### 🔢 Version
+
+- versionCode: 38 → 39
+- versionName: 2.3.1.13.0 → 2.3.1.14.0
+
+---
+
+## [2.3.1.13.0] - 2026-05-24
+
+### 🐛 Perubahan Sidebar
+
+- Header sidebar: ikon & teks "Pengaturan" diganti dengan header "FTxT" (sejajar toolbar).
+- Daftar modul: Floating Text, FPS Display, Network Stats, Battery Monitor, Clock Module.
+- Klik item sidebar → toast "Coming Soon" (modul belum diimplementasi).
+- Default selection ke "Floating Text".
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 37 → 38, versionName: 2.3.1.12.0 → 2.3.1.13.0)
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/menu/drawer_menu.xml
+
+### 📝 File Added
+
+- app/src/main/res/layout/nav_header.xml
+
+### 🔢 Version
+
+- versionCode: 37 → 38
+- versionName: 2.3.1.12.0 → 2.3.1.13.0
+
+---
+
+## [2.3.1.12.0] - 2026-05-24
+
+### ✨ Fitur Baru
+
+- Toggle tema (gelap/terang) via ikon bulan di toolbar kanan.
+- Tema tersimpan dan bertahan setelah app ditutup.
+
+### 🔧 Perbaikan
+
+- Kembalikan ikon Pengaturan ke toolbar kanan.
+- NavigationView tidak pakai hardcoded color agar otomatis ikut tema.
+
+### 📝 File Changed
+
+- app/build.gradle (versionCode: 36 → 37, versionName: 2.3.1.11.0 → 2.3.1.12.0)
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/menu/main_menu.xml
+
+### 📝 File Added
+
+- app/src/main/res/drawable/ic_theme.xml
+
+### 🔢 Version
+
+- versionCode: 36 → 37
+- versionName: 2.3.1.11.0 → 2.3.1.12.0
+
+---
+
 ## [2.3.1.11.0] - 2026-05-24
 
 ### 🔧 Perbaikan

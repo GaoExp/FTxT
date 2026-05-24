@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.11.0`        
+**Current Release:** `2.3.1.14.0`        
 **Last Updated:** `2026-05-24`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -51,6 +51,12 @@ Kontrol perilaku sentuhan overlay.
 - Sentuhan diteruskan ke aplikasi belakang
 - Overlay tidak mengganggu interaksi aplikasi lain
 
+
+### Dark/Light Theme Toggle 🌙
+Toggle tema gelap atau terang dari toolbar.
+- Tema tersimpan otomatis
+- Berlaku untuk seluruh app
+- NavigationView ikut menyesuaikan tema
 
 ### Overlay Toggle 🔘
 Aktifkan atau nonaktifkan overlay dengan satu switch.
@@ -122,8 +128,13 @@ Matikan switch:
 `Overlay OFF`
 Overlay hilang, konfigurasi tetap tersimpan.
 
-### 7. Akses Settings Menu
-Tap ikon hamburger (☰) di toolbar, lalu pilih "Pengaturan" untuk membuka dokumentasi in-app.
+### 7. Toolbar Icons
+Ikon di pojok kanan toolbar:
+- Gear ⚙️ → Buka Pengaturan (dokumentasi in-app)
+- Bulan 🌙 → Toggle tema gelap/terang
+
+### 8. Navigation Drawer
+Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
 
 ---
 
