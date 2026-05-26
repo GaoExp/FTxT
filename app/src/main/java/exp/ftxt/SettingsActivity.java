@@ -32,12 +32,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void showChangelogDialog() {
-        String content = readAssetFile("CHANGELOG.md");
+        String content = readAssetFile("CHANGELOG.txt");
         showContentDialog("CHANGELOG", content);
     }
 
     private void showReadmeDialog() {
-        String content = readAssetFile("README.md");
+        String content = readAssetFile("README.txt");
         showContentDialog("README", content);
     }
 

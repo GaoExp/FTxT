@@ -13,8 +13,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 44
-        versionName "2.3.1.17.1"
+        versionCode 45
+        versionName "2.3.1.17.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -38,6 +38,15 @@ android {
     }
 
 }
+
+task syncDocs(type: Copy) {
+    from rootProject.file('README.md')
+    from rootProject.file('CHANGELOG.md')
+    into file('src/main/assets')
+    rename { name -> name.replace('.md', '.txt') }
+}
+
+preBuild.dependsOn syncDocs
 
 dependencies {
 

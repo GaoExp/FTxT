@@ -1,4 +1,4 @@
-# AGENTS.md — Pedoman AI Project FTxT
+# AGENTS.txt — Pedoman AI Project FTxT
 
 Dokumen ini adalah aturan kerja untuk AI agent yang memodifikasi project.
 
@@ -150,7 +150,7 @@ major +1
 
 ---
 
-## 2. CHANGELOG.md
+## 2. CHANGELOG.txt
 
 CHANGELOG adalah riwayat perubahan release.
 
@@ -199,7 +199,7 @@ Ringkas, faktual, langsung ke perubahan.
 
 ---
 
-## 3. README.md
+## 3. README.txt
 
 README adalah dokumentasi pengguna akhir.
 
@@ -232,7 +232,7 @@ JANGAN update README hanya karena:
 - maintenance
 - cleanup kode
 
-Detail teknis → CHANGELOG.md
+Detail teknis → CHANGELOG.txt
 
 ---
 
@@ -240,7 +240,7 @@ Detail teknis → CHANGELOG.md
 
 Sebelum mengedit:
 
-1. baca AGENTS.md
+1. baca AGENTS.txt
 2. cek `build.gradle`
 3. cek entry terbaru CHANGELOG
 
@@ -256,6 +256,7 @@ Sesudah mengedit:
 
 ## 5. Perilaku AI
 
+Penerapan berlaku kepa semua Agent AI yang terlibat dalam pengerjaan Project, terutama untuk model Agent GitHub CoPilot (important)
 Kerjakan hanya sesuai request user.
 
 JANGAN:
@@ -263,7 +264,7 @@ JANGAN:
 - mengubah file di luar scope request
 - mengaudit seluruh project tanpa diminta
 - mengecek dependency, permission, README, atau CHANGELOG bila tidak relevan
-- membuat checklist panjang maupun singkat untuk request sederhana
+- membuat checklist panjang maupun singkat untuk request sederhana (important)
 - memberi penjelasan panjang bila tidak diminta
 - melakukan over-engineering
 
@@ -297,5 +298,4 @@ JANGAN:
 - menambahkan rekomendasi besar di luar request
 
 Jika request sederhana:
-
 jawab sederhana.

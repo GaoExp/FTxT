@@ -3,6 +3,30 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.17.2] - 2026-05-26
+
+### ♻️ Lifecycle Changes
+
+- Assets dokumentasi diganti ekstensi .md → .txt (AGENTS, CHANGELOG, README).
+- SettingsActivity diperbarui baca file .txt dari assets.
+- Task Gradle syncDocs ditambahkan dengan rename .md → .txt otomatis saat build.
+
+### ✏️ File Changed
+
+- app/build.gradle
+- app/src/main/assets/AGENTS.txt
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- README.md
+
+### 🔢 Version
+
+- versionCode: 44 → 45
+- versionName: 2.3.1.17.1 → 2.3.1.17.2
+
+---
+
 ## [2.3.1.17.1] - 2026-05-24
 
 ### 🔧 Optimasi & Penyesuaianan
@@ -12,7 +36,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 43 → 44, versionName: 2.3.1.17.0 → 2.3.1.17.1)
+- app/build.gradle
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/java/exp/ftxt/MainActivity.java
 
@@ -42,7 +66,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 42 → 43, versionName: 2.3.1.16.1 → 2.3.1.17.0)
+- app/build.gradle 
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/drawer_menu.xml
@@ -63,7 +87,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 41 → 42, versionName: 2.3.1.16.0 → 2.3.1.16.1)
+- app/build.gradle
 - app/src/main/assets/README.md
 
 ### 🔢 Version
@@ -82,7 +106,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 40 → 41, versionName: 2.3.1.15.0 → 2.3.1.16.0)
+- app/build.gradle 
 - app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
 - app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
 - app/src/main/java/exp/ftxt/core/FloatingService.java
@@ -134,7 +158,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 37 → 38, versionName: 2.3.1.12.0 → 2.3.1.13.0)
+- app/build.gradle
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/drawer_menu.xml
@@ -164,7 +188,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 36 → 37, versionName: 2.3.1.11.0 → 2.3.1.12.0)
+- app/build.gradle
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/main_menu.xml
@@ -189,7 +213,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 35 → 36, versionName: 2.3.1.10.0 → 2.3.1.11.0)
+- app/build.gradle
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/values/strings.xml
@@ -219,7 +243,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 34 → 35, versionName: 2.3.1.9.6 → 2.3.1.10.0)
+- app/build.gradle
 - app/src/main/AndroidManifest.xml
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/java/exp/ftxt/SettingsActivity.java
@@ -256,7 +280,7 @@ Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di fold
 
 ### ✏️️ File Changed
 
-- app/build.gradle (versionCode: 33 → 34, versionName: 2.3.1.9.5 → 2.3.1.9.6)
+- app/build.gradle
 - app/src/main/java/exp/ftxt/MainActivity.java
 
 ### 🔢 Version
@@ -276,6 +300,7 @@ Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di fold
 
 ### ✏️️ File Changed
 
+- app/build.gradle
 - app/src/main/java/exp/ftxt/HSVColorPickerView.java
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/dialog_hsv_color_picker.xml
@@ -667,32 +692,4 @@ Tidak wajib dimigrasikan retroaktif.
   - ON: Teks tidak dapat disentuh, sentuhan langsung ke aplikasi di belakang
   - OFF: Teks dapat disentuh dan dipindahkan
 
-### 📝 File yang Dibuat & Diubah
-
-#### ✅ MainActivity.java (UPDATED)
-- Tambah variabel static `isPositionLocked` & `isTouchPassthrough`
-- Tambah widgets: `lockPositionSwitch`, `touchPassthroughSwitch`
-- Tambah event listeners untuk kedua switch
-
-#### ✅ FloatingService.java (UPDATED)
-- Tambah method `updateTouchFlags()` untuk manage FLAG_NOT_TOUCHABLE
-- Modifikasi touch listener untuk check `isPositionLocked` & `isTouchPassthrough`
-- Panggil `updateTouchFlags()` saat service onCreate()
-
-#### ✅ activity_main.xml (UPDATED)
-- Tambah 2 Switch elements untuk kontrol fitur baru
-
-#### ✅ app/build.gradle (UPDATED)
-- versionCode: 22 → 23
-- versionName: 7.0 → 7.1
-
----
-
-## [7.0] ⤵️-  Previous Release
-
-### Features
-- Overlay floating text display
-- Customizable text size with SeekBar
-- Color selection for text
-- Text edit capability
-- Overlay enable/disable toggle
+### 📝 File

@@ -1,7 +1,7 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.17.1`        
-**Last Updated:** `2026-05-24`
+**Current Release:** `2.3.1.17.2`        
+**Last Updated:** `2026-05-26`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -195,6 +195,8 @@ shadow_enabled
 
 ```txt
 FTxT/
+├── CHANGELOG.md
+├── README.md
 ├── app/
 │   ├── src/main/
 │   │   ├── java/exp/ftxt/
@@ -223,9 +225,9 @@ FTxT/
 │   │   │   └── SettingsActivity.java
 │   │   │
 │   │   ├── assets/
-│   │   │   ├── AGENTS.md 
-│   │   │   ├── CHANGELOG.md
-│   │   │   └── README.md
+│   │   │   ├── AGENTS.txt 
+│   │   │   ├── CHANGELOG.txt
+│   │   │   └── README.txt
 │   │   │
 │   │   ├── res/
 │   │   │   ├── layout/
@@ -295,7 +297,7 @@ Contoh:
 - minor = feature release counter
 - patch = maintenance / bugfix / optimasi
 
-Lihat `CHANGELOG.md` untuk riwayat perubahan lengkap.
+Lihat `CHANGELOG.txt` untuk riwayat perubahan lengkap.
 
 ---
 
@@ -320,10 +322,8 @@ FloatingService.updateShadowStatic();
 
 ### Settings Documentation
 File dokumentasi dibaca langsung dari assets folder pada saat runtime:
-- assets/CHANGELOG.md
-- assets/README.md
-
-Tidak perlu duplikasi file, update sekali dan semua reflect otomatis di app.
+- assets/CHANGELOG.txt
+- assets/README.txt
 
 ---
 
