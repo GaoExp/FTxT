@@ -3,6 +3,29 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.17.3] - 2026-05-26
+
+### 🐞 Bug Fixes
+
+- Tombol kembali (back arrow) di SettingsActivity tidak berfungsi — tambah `setNavigationOnClickListener`.
+
+### 🔧 Optimasi & Penyesuaian
+
+- Padding dialog ditingkatkan 24px → 25dp (density-independent).
+- Ukuran teks dialog ditingkatkan 12sp → 40sp.
+
+### ✏️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+
+### 🔢 Version
+
+- versionCode: 45 → 46
+- versionName: 2.3.1.17.2 → 2.3.1.17.3
+
+---
+
 ## [2.3.1.17.2] - 2026-05-26
 
 ### ♻️ Lifecycle Changes

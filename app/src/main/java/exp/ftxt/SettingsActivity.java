@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.view.View;
+import android.util.TypedValue;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -23,6 +24,7 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         Button changelogButton = findViewById(R.id.changelogButton);
         Button readmeButton = findViewById(R.id.readmeButton);
@@ -48,8 +50,9 @@ public class SettingsActivity extends AppCompatActivity {
         ScrollView scrollView = new ScrollView(this);
         TextView textView = new TextView(this);
         textView.setText(content);
-        textView.setPadding(24, 24, 24, 24);
-        textView.setTextSize(12);
+        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
+        textView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+        textView.setTextSize(40);
         scrollView.addView(textView);
 
         builder.setView(scrollView);
