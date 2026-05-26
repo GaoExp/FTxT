@@ -279,14 +279,14 @@ FTxT/
 
 Format:
 
-```txt
+```version
 major.removed.restored.minor.patch
 ```
 
 Contoh:
 
 ```txt
-2.3.1.16.0
+1.0.0.12.2
 ```
 
 - major = milestone besar / generasi project

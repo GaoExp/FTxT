@@ -1,6 +1,6 @@
 # AGENTS.md — Pedoman AI Project FTxT
 
-Dokumen ini adalah aturan kerja untuk AI agent yang memodifikasi project FTxT.
+Dokumen ini adalah aturan kerja untuk AI agent yang memodifikasi project.
 
 Gunakan bahasa Indonesia.
 
@@ -167,11 +167,18 @@ Format:
 Gunakan section sesuai kebutuhan:
 
 ```md
+### 🔢 Version
 ### ✨ Fitur Baru
-### ♻️ Lifecycle Changes
-### 🔧 Perbaikan
-### 🐛 Bug Fixes
-### 🔄 Optimasi
+### 🚮️ Fitur Dihapus
+### 📥️ Fitur Dipulihkan
+### ♻️️ Lifecycle Changes
+### 🔁️ Perubahan Fitur
+### 🗒️ File Added
+### ✏️️ File Changed
+### 🔥️ File Removed
+### 🔧 Optimasi & Penyesuaian
+### 🐞 Bug Fixes
+### 💡 Catatan
 ```
 
 ### Aturan
@@ -181,16 +188,6 @@ WAJIB:
 - update versionCode dicatat
 - update versionName dicatat
 
-Gunakan:
-
-`♻️ Lifecycle Changes`
-
-bila:
-- fitur dihapus
-- fitur dipulihkan
-- fitur deprecated
-- fitur disable
-- perubahan lifecycle fitur
 
 JANGAN:
 - menambah changelog untuk perubahan trivial
@@ -218,6 +215,7 @@ WAJIB update bila:
 - ada fitur baru
 - ada fitur dihapus
 - ada fitur dipulihkan
+- ada perubahan struktur project
 - ada perubahan UI/UX besar
 - Current Version berubah
 - Latest Changes berubah
@@ -225,7 +223,6 @@ WAJIB update bila:
 
 Update hanya jika relevan:
 - daftar fitur
-- struktur project
 - requirement
 - permission
 
@@ -266,7 +263,7 @@ JANGAN:
 - mengubah file di luar scope request
 - mengaudit seluruh project tanpa diminta
 - mengecek dependency, permission, README, atau CHANGELOG bila tidak relevan
-- membuat checklist panjang untuk request sederhana
+- membuat checklist panjang maupun singkat untuk request sederhana
 - memberi penjelasan panjang bila tidak diminta
 - melakukan over-engineering
 

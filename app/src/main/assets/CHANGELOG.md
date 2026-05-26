@@ -5,18 +5,18 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ## [2.3.1.17.1] - 2026-05-24
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Toolbar color diubah menjadi biru muda (#2196F3).
 - Icon tema sekarang dinamis: bulan (mode gelap) / matahari (mode terang).
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 43 → 44, versionName: 2.3.1.17.0 → 2.3.1.17.1)
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/java/exp/ftxt/MainActivity.java
 
-### 📝 File Added
+### 🗒️ File Addeed
 
 - app/src/main/res/drawable/ic_sun.xml
 
@@ -35,12 +35,12 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - **Modul Baru**: CPU Monitor, Temperature, dan Logo Display ditambahkan ke drawer (Coming Soon).
 - **String Resource**: Semua nama modul dipindah ke strings.xml.
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Floating Text: Shadow switch dipindah ke bawah tombol Pilih Warna.
 - FPS Display: Kunci Posisi switch dipindah ke atas SeekBar ukuran.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 42 → 43, versionName: 2.3.1.16.1 → 2.3.1.17.0)
 - app/src/main/java/exp/ftxt/MainActivity.java
@@ -57,11 +57,11 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ## [2.3.1.16.1] - 2026-05-24
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Sinkronisasi struktur project & deskripsi file di README.md dengan filesystem aktual.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 41 → 42, versionName: 2.3.1.16.0 → 2.3.1.16.1)
 - app/src/main/assets/README.md
@@ -80,7 +80,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - **FPS Draggable**: FPS overlay bisa digeser (drag) dan dikunci posisinya.
 - Limit SeekBar: min 5 → max 120 (sebelumnya min 10 → max 60).
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 40 → 41, versionName: 2.3.1.15.0 → 2.3.1.16.0)
 - app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
@@ -109,7 +109,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - FloatingService pindah ke `core/`, update AndroidManifest.
 - HSVColorPickerView di root dihapus (duplikat).
 
-### 🐛 Bug Fixes
+### 🐞 Bug Fixes
 
 - **FPS tidak tampil**: Service kini bisa start tanpa text overlay (FPS standalone).
 - **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
@@ -125,21 +125,21 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✨ Fitur Baru
 
-### 🐛 Perubahan Sidebar
+### 🔧 Optimasi & Penyesuaianan (Perubahan Sidebar)
 
 - Header sidebar: ikon & teks "Pengaturan" diganti dengan header "FTxT" (sejajar toolbar).
 - Daftar modul: Floating Text, FPS Display, Network Stats, Battery Monitor, Clock Module.
 - Klik item sidebar → toast "Coming Soon" (modul belum diimplementasi).
 - Default selection ke "Floating Text".
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 37 → 38, versionName: 2.3.1.12.0 → 2.3.1.13.0)
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/drawer_menu.xml
 
-### 📝 File Added
+### 🗒️ File Added
 
 - app/src/main/res/layout/nav_header.xml
 
@@ -157,19 +157,19 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - Toggle tema (gelap/terang) via ikon bulan di toolbar kanan.
 - Tema tersimpan dan bertahan setelah app ditutup.
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Kembalikan ikon Pengaturan ke toolbar kanan.
 - NavigationView tidak pakai hardcoded color agar otomatis ikut tema.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 36 → 37, versionName: 2.3.1.11.0 → 2.3.1.12.0)
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/main_menu.xml
 
-### 📝 File Added
+### 🗒️ File Added
 
 - app/src/main/res/drawable/ic_theme.xml
 
@@ -182,23 +182,23 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ## [2.3.1.11.0] - 2026-05-24
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Ubah toolbar atas menjadi navigation drawer (sidebar kiri) dengan hamburger menu.
 - Menu Pengaturan dipindah dari toolbar icon ke NavigationView di drawer.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 35 → 36, versionName: 2.3.1.10.0 → 2.3.1.11.0)
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/values/strings.xml
 
-### 📝 File Added
+### 🗒️ File Added
 
 - app/src/main/res/menu/drawer_menu.xml
 
-### 📝 File Removed
+### ️🔥 File Removed
 
 - app/src/main/res/menu/main_menu.xml
 
@@ -217,21 +217,21 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - SettingsActivity membaca langsung dari file assets (single source of truth).
 - Hapus duplikasi file: CHANGELOG.md, README.md, dan AGENTS.md hanya ada di assets folder.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 34 → 35, versionName: 2.3.1.9.6 → 2.3.1.10.0)
 - app/src/main/AndroidManifest.xml
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/java/exp/ftxt/SettingsActivity.java
 
-### 📝 File Added
+### 🗒️ File Added
 
 - app/src/main/assets/CHANGELOG.md
 - app/src/main/assets/README.md
 - app/src/main/assets/AGENTS.md
 - app/src/main/res/layout/activity_settings.xml
 
-### 📝 File Removed (Duplikasi)
+### ️🔥 File Removed (Duplikasi)
 
 - app/src/main/res/raw/changelog.txt
 - app/src/main/res/raw/readme.txt
@@ -241,7 +241,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - versionCode: 34 → 35
 - versionName: 2.3.1.9.6 → 2.3.1.10.0
 
-### 📌 Catatan
+### 💡 Catatan
 
 Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di folder assets. Update hanya dilakukan di assets, tidak ada duplikasi file lagi.
 
@@ -249,12 +249,12 @@ Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di fold
 
 ## [2.3.1.9.6] - 2026-05-24
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Perbaiki typo default teks overlay ("MTxT AKTIF" ↔ "FTxT AKTIF").
 - Pastikan SeekBar ukuran teks memiliki batas minimum 10 dan sinkronisasi UI saat progress di-bawah batas.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/build.gradle (versionCode: 33 → 34, versionName: 2.3.1.9.5 → 2.3.1.9.6)
 - app/src/main/java/exp/ftxt/MainActivity.java
@@ -268,22 +268,19 @@ Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di fold
 
 ## [2.3.1.9.5] - 2026-05-24
 
-### 🔄 Optimasi
+### 🔧 Optimasi & Penyesuaian
 
 - Persiapan struktur modular untuk module overlay.
 - HSVColorPickerView dipindah ke shared component.
-
-### 🔧 Perbaikan
-
 - Update import package setelah refactor namespace.
 
-### 📝 File Changed
+### ✏️️ File Changed
 
 - app/src/main/java/exp/ftxt/HSVColorPickerView.java
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/dialog_hsv_color_picker.xml
 
-### 📝 File Added
+### 🗒️ File Added
 
 - app/src/main/java/exp/ftxt/modules/clock/
 - app/src/main/java/exp/ftxt/modules/cpu/
@@ -307,12 +304,12 @@ Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di fold
 - **Shadow Toggle**
   Tambah switch "Shadow" untuk menyalakan / mematikan latar semi-transparent di belakang teks overlay.
 
-### 🔧 Perbaikan
+### 🔧 Optimasi & Penyesuaianan
 
 - Version bump & maintenance.
 - Smoke build verification.
 
-### 📝 File yang Diubah
+### ✏️️ File Diubah
 
 #### 🔢 app/build.gradle (UPDATED)
 
@@ -351,24 +348,24 @@ Aturan utama:
 Section yang tersedia:
 
 ```md
+### 🔢 Version
 ### ✨ Fitur Baru
-### ♻️ Lifecycle Changes
-### 🔧 Perbaikan
-### 🐛 Bug Fixes
-### 🔄 Optimasi
+### 🚮️ Fitur Dihapus
+### 📥️ Fitur Dipulihkan
+### ♻️️ Lifecycle Changes
+### 🔁️ Perubahan Fitur
+### 🗒️ File Added
+### ✏️️ File Changed
+### 🔥️ File Removed
+### 🔧 Optimasi & Penyesuaian
+### 🐞 Bug Fixes
+### 💡 Catatan
 ```
-
-Gunakan `♻️ Lifecycle Changes` untuk:
-- fitur dihapus
-- fitur dipulihkan
-- fitur deprecated
-- perubahan lifecycle fitur
-
-Catatan:
-
+---
+```📌
 Entry lama dapat memakai format sebelumnya.
 Tidak wajib dimigrasikan retroaktif.
-
+```
 ---
 
 ## [9.3] - 2026-05-17
@@ -691,7 +688,7 @@ Tidak wajib dimigrasikan retroaktif.
 
 ---
 
-## [7.0] - Previous Release
+## [7.0] ⤵️-  Previous Release
 
 ### Features
 - Overlay floating text display
