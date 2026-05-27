@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (id == R.id.nav_network || id == R.id.nav_battery || id == R.id.nav_clock
-                    || id == R.id.nav_cpu || id == R.id.nav_temp || id == R.id.nav_logo) {
+                    || id == R.id.nav_cpu || id == R.id.nav_crosshair || id == R.id.nav_watermark || id == R.id.nav_logo) {
                 Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawers();
                 return true;

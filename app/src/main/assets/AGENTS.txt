@@ -256,7 +256,7 @@ Sesudah mengedit:
 
 ## 5. Perilaku AI
 
-Penerapan berlaku kepa semua Agent AI yang terlibat dalam pengerjaan Project, terutama untuk model Agent GitHub CoPilot (important)
+Penerapan berlaku kepada semua Agent AI yang terlibat dalam pengerjaan Project, terutama untuk model Agent GitHub CoPilot (important)
 Kerjakan hanya sesuai request user.
 
 JANGAN:

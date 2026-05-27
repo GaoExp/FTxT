@@ -162,11 +162,11 @@ Overlay hilang, konfigurasi tetap tersimpan.
 Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
 - Bulan 🌙 → Toggle tema gelap/terang
+- **Tutup Aplikasi** → Keluar dari aplikasi sepenuhnya.
 
 ### 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
 - Pilih modul overlay yang diinginkan.
-- **Tutup Aplikasi** → Keluar dari aplikasi sepenuhnya.
 
 ### 9. Background Config
 Aktifkan switch Background untuk menampilkan latar belakang overlay:
@@ -184,15 +184,17 @@ Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 
 ## 🎯 Dokumentasi Teknis
 
-### HSV Color Model
-FTxT menggunakan model warna HSV.
+### ARGB Color Model
+FTxT menggunakan model warna ARGB dengan slider.
 
 ```txt
-Hue (0–360°)       = Jenis warna
-Saturation (0–100) = Intensitas warna
-Value (0–100)      = Brightness
-Alpha (0–255)      = Transparansi
+Alpha (0–255) = Transparansi
+Red (0–255)   = Komponen merah
+Green (0–255) = Komponen hijau
+Blue (0–255)  = Komponen biru
 ```
+
+Informasi HSV juga ditampilkan sebagai referensi tambahan.
 
 ---
 
@@ -250,10 +252,11 @@ FTxT/
 │   │   │   │   ├── fps/
 │   │   │   │   │   ├── FpsConfig.java
 │   │   │   │   │   └── FpsModule.java
-│   │   │   │   ├── cpu/       (empty)
-│   │   │   │   ├── clock/     (empty)
-│   │   │   │   ├── temp/      (empty)
-│   │   │   │   └── logo/      (empty)
+│   │   │   │   ├── cpu/         (empty)
+│   │   │   │   ├── clock/       (empty)
+│   │   │   │   ├── crosshair/   (empty)
+│   │   │   │   ├── logo/        (empty)
+│   │   │   │   └── watermark/   (empty)
 │   │   │   │
 │   │   │   ├── shared/
 │   │   │   │   ├── color/

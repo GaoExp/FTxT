@@ -3,6 +3,61 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.27.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Crosshair & Watermark**: Tambah entry modul Crosshair dan Watermark di navigation drawer (Coming Soon).
+- **Hapus Temperature**: Hapus entry modul Temperature dari navigation drawer.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/modules/crosshair/`
+- `app/src/main/java/exp/ftxt/modules/watermark/`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/menu/drawer_menu.xml
+- app/src/main/res/values/strings.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔥️ File Removed
+
+- `app/src/main/java/exp/ftxt/modules/temp/`
+
+### 🔢 Version
+
+- versionCode: 60 → 61
+- versionName: 2.3.1.26.3 → 2.3.1.27.0
+
+---
+
+## [2.3.1.26.3] - 2026-05-27
+
+### 🐞 Bug Fixes
+
+- **Dokumentasi Color Model**: Perbaiki dokumentasi model warna di README dari HSV (lama) menjadi ARGB sesuai implementasi color picker saat ini.
+
+### ✏️️ File Changed
+
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- app/build.gradle
+
+### 🔢 Version
+
+- versionCode: 59 → 60
+- versionName: 2.3.1.26.2 → 2.3.1.26.3
+
+---
+
 ## [2.3.1.26.2] - 2026-05-27
 
 ### 🐞 Bug Fixes
