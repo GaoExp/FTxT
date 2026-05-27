@@ -46,6 +46,21 @@ public class TextPanelController {
         applyInitialTints();
     }
 
+    public void autoStart() {
+        boolean overlayOn = activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .getBoolean("text_overlay_on", false);
+        if (!overlayOn) return;
+
+        TextConfig.text = editText.getText().toString().trim();
+        if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
+
+        if (FloatingService.instance != null) {
+            FloatingService.createTextOverlayStatic();
+        } else {
+            activity.startService(new android.content.Intent(activity, FloatingService.class));
+        }
+    }
+
     private void bindViews() {
         editText = activity.findViewById(R.id.editText);
         seekBar = activity.findViewById(R.id.textSizeSeekBar);
@@ -67,6 +82,10 @@ public class TextPanelController {
     }
 
     private void loadConfig() {
+        boolean overlayOn = activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .getBoolean("text_overlay_on", false);
+        overlaySwitch.setChecked(overlayOn);
+        touchPassthroughSwitch.setChecked(TextConfig.touchPassthrough);
         bgSwitch.setChecked(TextConfig.bgEnabled);
         bgConfigContainer.setVisibility(TextConfig.bgEnabled ? View.VISIBLE : View.GONE);
         bgPaddingSeekBar.setProgress(TextConfig.bgPadding);
@@ -138,6 +157,8 @@ public class TextPanelController {
         touchPassthroughSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             activity.applySwitchTint(touchPassthroughSwitch, isChecked);
             TextConfig.touchPassthrough = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("text_lock", isChecked).apply();
             FloatingService.updateTouchFlagsStatic();
         });
 

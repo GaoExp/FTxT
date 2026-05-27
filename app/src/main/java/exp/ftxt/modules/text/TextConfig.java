@@ -8,7 +8,7 @@ public class TextConfig {
     public static String text = "FTxT AKTIF";
     public static float size = 20f;
     public static int color = Color.WHITE;
-    public static boolean touchPassthrough = false;
+    public static boolean touchPassthrough = true;
     public static ShadowConfig shadow = new ShadowConfig();
     public static boolean bgEnabled = false;
     public static int bgColor = 0xCC000000;

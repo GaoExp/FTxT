@@ -3,6 +3,114 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.26.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Akses Izin di Pengaturan**: Toggle switch untuk semua izin aplikasi (Overlay, Notifikasi, Optimasi Baterai) di halaman Settings, di atas CHANGELOG/README.
+  - Izin Overlay: buka halaman izin overlay sistem.
+  - Izin Notifikasi: minta izin runtime (Android 13+).
+  - Optimasi Baterai: buka halaman nonaktifkan optimasi baterai.
+  - Status switch otomatis sinkron saat halaman dibuka/kembali.
+
+### ♻️️ Lifecycle Changes
+
+- `activity_settings.xml` — tambah 3 switch + label di atas tombol CHANGELOG.
+- `SettingsActivity.java` — bind switch, listener permission request, `updatePermissionSwitches()` di `onResume()`.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 56 → 57
+- versionName: 2.3.1.25.0 → 2.3.1.26.0
+
+---
+
+## [2.3.1.25.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Force Close**: Tombol "Tutup Aplikasi" dipindah ke SettingsActivity (di bawah CHANGELOG/README, pojok kiri bawah).
+  - Hapus `nav_exit` dari navigation drawer.
+  - `forceClose()`: stop service → destroy overlay → `finishAffinity()` → `System.exit(0)`.
+  - Service berhenti total, overlay hilang dari layar, proses aplikasi mati.
+
+### ♻️️ Lifecycle Changes
+
+- `activity_settings.xml` — tambah Button `exitButton` dengan layout_weight push ke bawah.
+- `SettingsActivity.java` — handler `exitButton` panggil `forceClose()`.
+- `drawer_menu.xml` — hapus item `nav_exit`.
+- `MainActivity.java` — hapus handler `nav_exit` dari drawer listener.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- app/src/main/res/menu/drawer_menu.xml
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 55 → 56
+- versionName: 2.3.1.24.0 → 2.3.1.25.0
+
+---
+
+## [2.3.1.24.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Auto-Start & Permission**: Aplikasi langsung minta izin dan auto-start overlay saat dibuka.
+  - `onResume()` cek izin overlay, notif, dan baterai secara otomatis.
+  - Jika izin overlay sudah diberikan, service langsung start tanpa perlu toggle manual.
+  - `FloatingService.onCreate()` restore overlay text dari pref `text_overlay_on`.
+  - Kembali dari Settings izin → `onResume()` lanjutkan auto-start.
+
+- **Kunci Posisi Default ON**: `touchPassthrough` sekarang default `true`.
+  - `TextConfig.touchPassthrough = true` (sebelumnya `false`).
+  - `FpsConfig.touchPassthrough = true` (sebelumnya `false`).
+  - `TextPanelController.loadConfig()` restore switch state dari pref `text_lock`.
+  - Nilai default untuk `text_lock` dan `fps_lock` diubah jadi `true`.
+
+### ♻️️ Lifecycle Changes
+
+- `TextPanelController.loadConfig()` — restore `overlaySwitch` dan `touchPassthroughSwitch` dari saved prefs.
+- `TextPanelController.touchPassthroughSwitch` listener — simpan pref `text_lock`.
+- `TextPanelController.autoStart()` — method baru untuk start service dari MainActivity.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 54 → 55
+- versionName: 2.3.1.23.0 → 2.3.1.24.0
+
+---
+
 ## [2.3.1.23.0] - 2026-05-27
 
 ### ✨ Fitur Baru

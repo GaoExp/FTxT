@@ -37,8 +37,4 @@
 
     </group>
 
-    <item
-        android:id="@+id/nav_exit"
-        android:title="@string/nav_exit"/>
-
 </menu>

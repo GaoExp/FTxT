@@ -1,39 +1,40 @@
 package exp.ftxt;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.view.View;
 import android.util.TypedValue;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
-/**
- * Activity Pengaturan untuk menampilkan CHANGELOG dan README dalam dialog scrollable.
- *
- * Membaca file dokumentasi langsung dari assets/:
- * - assets/CHANGELOG.txt
- * - assets/README.txt
- *
- * Fitur:
- * - Tombol −/+ untuk zoom ukuran teks (4–60sp)
- * - ScrollView untuk konten panjang
- *
- * Dipanggil oleh:
- * - MainActivity → MainActivity.java (onOptionsItemSelected — action_settings)
- *
- * File dokumentasi dikelola di:
- * - assets/AGENTS.txt   → lihat AGENTS.txt
- * - assets/CHANGELOG.txt → lihat CHANGELOG.txt
- * - assets/README.txt   → lihat README.txt
- */
+import exp.ftxt.core.FloatingService;
+
 public class SettingsActivity extends AppCompatActivity {
+
+    private Switch overlaySwitch;
+    private Switch notificationSwitch;
+    private Switch batterySwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +46,77 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> finish());
 
+        overlaySwitch = findViewById(R.id.overlayPermissionSwitch);
+        notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
+        batterySwitch = findViewById(R.id.batteryPermissionSwitch);
+
         Button changelogButton = findViewById(R.id.changelogButton);
         Button readmeButton = findViewById(R.id.readmeButton);
+        Button exitButton = findViewById(R.id.exitButton);
+
+        updatePermissionSwitches();
+
+        overlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (!Settings.canDrawOverlays(this)) {
+                    startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getPackageName())));
+                }
+            }
+        });
+
+        notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
+                }
+            }
+        });
+
+        batterySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+                if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
+                    startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                            Uri.parse("package:" + getPackageName())));
+                }
+            }
+        });
 
         changelogButton.setOnClickListener(v -> showChangelogDialog());
         readmeButton.setOnClickListener(v -> showReadmeDialog());
+
+        exitButton.setOnClickListener(v -> forceClose());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updatePermissionSwitches();
+    }
+
+    private void updatePermissionSwitches() {
+        overlaySwitch.setChecked(Settings.canDrawOverlays(this));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationSwitch.setChecked(ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED);
+        } else {
+            notificationSwitch.setChecked(true);
+        }
+
+        PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+        batterySwitch.setChecked(pm.isIgnoringBatteryOptimizations(getPackageName()));
+    }
+
+    private void forceClose() {
+        if (FloatingService.instance != null) {
+            stopService(new Intent(this, FloatingService.class));
+        }
+        finishAffinity();
+        System.exit(0);
     }
 
     private void showChangelogDialog() {

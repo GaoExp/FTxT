@@ -113,11 +113,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            if (id == R.id.nav_exit) {
-                finishAffinity();
-                return true;
-            }
-
             return false;
         });
 
@@ -128,6 +123,34 @@ public class MainActivity extends AppCompatActivity {
         // FpsPanelController:  binding + listener untuk FPS Display panel
         textPanel = new TextPanelController(this);
         fpsPanel = new FpsPanelController(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        autoRequestAndStart();
+    }
+
+    private void autoRequestAndStart() {
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        boolean wasOverlayOn = prefs.getBoolean("text_overlay_on", false);
+        if (!wasOverlayOn && !FpsConfig.enabled) return;
+        if (FloatingService.instance != null) return;
+
+        if (!PermissionHelper.hasOverlayPermission(this)) {
+            PermissionHelper.requestOverlayPermission(this);
+            return;
+        }
+
+        if (!PermissionHelper.hasNotificationPermission(this)) {
+            PermissionHelper.requestNotificationPermission(this);
+        }
+
+        if (!PermissionHelper.isIgnoringBatteryOptimizations(this)) {
+            PermissionHelper.requestDisableBatteryOptimization(this);
+        }
+
+        startService(new Intent(this, FloatingService.class));
     }
 
     @Override
@@ -244,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
     private void loadShadowConfigs() {
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
 
-        TextConfig.touchPassthrough = false;
+        TextConfig.touchPassthrough = prefs.getBoolean("text_lock", true);
 
         TextConfig.shadow.enabled = prefs.getBoolean("shadow_enabled", false);
         TextConfig.shadow.color = prefs.getInt("shadow_color", Color.BLACK);
@@ -264,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.shadow.blur = prefs.getFloat("fps_shadow_blur", 5f);
         FpsConfig.shadow.offsetX = prefs.getFloat("fps_shadow_offset_x", 3f);
         FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
-        FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", false);
+        FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", true);
         FpsConfig.bgEnabled = prefs.getBoolean("fps_bg_enabled", false);
         FpsConfig.bgColor = prefs.getInt("fps_bg_color", 0xCC000000);
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
