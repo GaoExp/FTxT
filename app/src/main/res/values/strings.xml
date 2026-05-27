@@ -12,5 +12,6 @@
     <string name="nav_cpu">CPU Monitor</string>
     <string name="nav_temp">Temperature</string>
     <string name="nav_logo">Logo Display</string>
+    <string name="nav_exit">Tutup Aplikasi</string>
 </resources>
 

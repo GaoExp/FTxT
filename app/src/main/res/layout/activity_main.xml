@@ -119,6 +119,60 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/shadowConfigText"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/shadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Blur Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Shadow X"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowOffsetXSeekBar"
+                        android:max="30"
+                        android:progress="3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Shadow Y"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowOffsetYSeekBar"
+                        android:max="30"
+                        android:progress="3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
             <!-- FPS Panel -->
@@ -208,6 +262,60 @@
                         android:text="Shadow"
                         android:layout_marginStart="8dp"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/shadowConfigFps"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/fpsShadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Blur Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Shadow X"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowOffsetXSeekBar"
+                        android:max="30"
+                        android:progress="3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Shadow Y"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowOffsetYSeekBar"
+                        android:max="30"
+                        android:progress="3"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>

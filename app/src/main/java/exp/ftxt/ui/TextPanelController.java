@@ -2,8 +2,10 @@ package exp.ftxt.ui;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
@@ -14,19 +16,6 @@ import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.modules.text.TextConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 
-/**
- * Controller untuk panel Floating Text di MainActivity.
- *
- * Mengekstrak semua binding view, listener, dan konfigurasi
- * yang sebelumnya berada di MainActivity.onCreate().
- *
- * Dipakai oleh:
- * - MainActivity → MainActivity.java (onCreate — text panel section)
- *
- * Terkait dengan:
- * - FpsPanelController → ui/FpsPanelController.java (panel saudara di drawer)
- * - PermissionHelper   → utils/PermissionHelper.java (permission overlay)
- */
 public class TextPanelController {
 
     private final MainActivity activity;
@@ -37,6 +26,11 @@ public class TextPanelController {
     private Switch overlaySwitch;
     private Switch touchPassthroughSwitch;
     private Switch shadowSwitch;
+    private LinearLayout shadowConfigContainer;
+    private Button shadowColorButton;
+    private SeekBar shadowBlurSeekBar;
+    private SeekBar shadowOffsetXSeekBar;
+    private SeekBar shadowOffsetYSeekBar;
 
     public TextPanelController(MainActivity activity) {
         this.activity = activity;
@@ -53,10 +47,19 @@ public class TextPanelController {
         overlaySwitch = activity.findViewById(R.id.overlaySwitch);
         touchPassthroughSwitch = activity.findViewById(R.id.touchPassthroughSwitch);
         shadowSwitch = activity.findViewById(R.id.shadowSwitch);
+        shadowConfigContainer = activity.findViewById(R.id.shadowConfigText);
+        shadowColorButton = activity.findViewById(R.id.shadowColorButton);
+        shadowBlurSeekBar = activity.findViewById(R.id.shadowBlurSeekBar);
+        shadowOffsetXSeekBar = activity.findViewById(R.id.shadowOffsetXSeekBar);
+        shadowOffsetYSeekBar = activity.findViewById(R.id.shadowOffsetYSeekBar);
     }
 
     private void loadConfig() {
-        shadowSwitch.setChecked(TextConfig.shadow);
+        shadowSwitch.setChecked(TextConfig.shadow.enabled);
+        shadowConfigContainer.setVisibility(TextConfig.shadow.enabled ? View.VISIBLE : View.GONE);
+        shadowBlurSeekBar.setProgress((int) TextConfig.shadow.blur);
+        shadowOffsetXSeekBar.setProgress((int) TextConfig.shadow.offsetX);
+        shadowOffsetYSeekBar.setProgress((int) TextConfig.shadow.offsetY);
     }
 
     private void setupListeners() {
@@ -123,10 +126,54 @@ public class TextPanelController {
 
         shadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             activity.applySwitchTint(shadowSwitch, isChecked);
-            TextConfig.shadow = isChecked;
+            TextConfig.shadow.enabled = isChecked;
+            shadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("shadow_enabled", isChecked).apply();
+            saveShadowPrefs();
             FloatingService.updateShadowStatic();
+        });
+
+        shadowColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Shadow", TextConfig.shadow.color, color -> {
+                TextConfig.shadow.color = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("shadow_color", color).apply();
+                FloatingService.updateShadowStatic();
+            });
+        });
+
+        shadowBlurSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.shadow.blur = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("shadow_blur", (float) progress).apply();
+                FloatingService.updateShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        shadowOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.shadow.offsetX = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("shadow_offset_x", (float) progress).apply();
+                FloatingService.updateShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        shadowOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.shadow.offsetY = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("shadow_offset_y", (float) progress).apply();
+                FloatingService.updateShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
     }
 
@@ -134,5 +181,14 @@ public class TextPanelController {
         activity.applySwitchTint(overlaySwitch, overlaySwitch.isChecked());
         activity.applySwitchTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
         activity.applySwitchTint(shadowSwitch, shadowSwitch.isChecked());
+    }
+
+    private void saveShadowPrefs() {
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE).edit()
+                .putInt("shadow_color", TextConfig.shadow.color)
+                .putFloat("shadow_blur", TextConfig.shadow.blur)
+                .putFloat("shadow_offset_x", TextConfig.shadow.offsetX)
+                .putFloat("shadow_offset_y", TextConfig.shadow.offsetY)
+                .apply();
     }
 }

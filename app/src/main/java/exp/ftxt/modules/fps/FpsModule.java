@@ -6,10 +6,10 @@ import android.graphics.PixelFormat;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayShadow;
+import exp.ftxt.shared.ui.ShadowTextView;
 
 /**
  * Module untuk mengelola overlay FPS Display.
@@ -27,7 +27,7 @@ import exp.ftxt.shared.ui.OverlayShadow;
  */
 public class FpsModule {
 
-    private TextView view;
+    private ShadowTextView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private SharedPreferences prefs;
@@ -45,7 +45,8 @@ public class FpsModule {
         if (running) return;
         wm = windowManager;
 
-        view = new TextView(context);
+        view = new ShadowTextView(context);
+        view.setShadowConfig(FpsConfig.shadow);
         view.setText("0.0 FPS");
         view.setTextSize(FpsConfig.size);
         view.setTextColor(FpsConfig.color);
@@ -63,8 +64,6 @@ public class FpsModule {
         params.x = prefs.getInt("fps_x", 16);
         params.y = prefs.getInt("fps_y", 16);
 
-        // Shadow awal dari konfigurasi
-        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
         OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
         updateTouchFlags();
 
@@ -106,11 +105,9 @@ public class FpsModule {
         if (view != null) view.setTextColor(color);
     }
 
-    public void updateShadow(boolean enabled) {
-        FpsConfig.shadow = enabled;
-        // Delegasi ke OverlayShadow
-        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
-        OverlayShadow.apply(view, params, wm, enabled, 4f);
+    public void updateShadow() {
+        if (view != null) view.setShadowConfig(FpsConfig.shadow);
+        OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
     }
 
     public void updateTouchFlags() {

@@ -5,10 +5,10 @@ import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayShadow;
+import exp.ftxt.shared.ui.ShadowTextView;
 
 /**
  * Module untuk mengelola overlay teks floating.
@@ -25,7 +25,7 @@ import exp.ftxt.shared.ui.OverlayShadow;
  */
 public class TextModule {
 
-    private TextView view;
+    private ShadowTextView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
@@ -41,7 +41,8 @@ public class TextModule {
     public void createOverlay() {
         if (view != null) return;
 
-        view = new TextView(context);
+        view = new ShadowTextView(context);
+        view.setShadowConfig(TextConfig.shadow);
         view.setText(TextConfig.text);
         view.setTextSize(TextConfig.size);
         view.setTextColor(TextConfig.color);
@@ -59,11 +60,7 @@ public class TextModule {
         params.x = prefs.getInt("text_x", 100);
         params.y = prefs.getInt("text_y", 300);
 
-        // Apply shadow dari konfigurasi (untuk initial state)
-        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
-        if (TextConfig.shadow) {
-            OverlayShadow.apply(view, params, wm, true, 8f);
-        }
+        OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
 
         updateTouchFlags();
 
@@ -93,11 +90,9 @@ public class TextModule {
         if (view != null) view.setTextColor(color);
     }
 
-    public void updateShadow(boolean enabled) {
-        TextConfig.shadow = enabled;
-        // Delegasi ke OverlayShadow
-        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
-        OverlayShadow.apply(view, params, wm, enabled, 8f);
+    public void updateShadow() {
+        if (view != null) view.setShadowConfig(TextConfig.shadow);
+        OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
     }
 
     public void updateTouchFlags() {

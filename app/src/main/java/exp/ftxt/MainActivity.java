@@ -1,6 +1,7 @@
 package exp.ftxt;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -112,24 +113,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
+            if (id == R.id.nav_exit) {
+                finishAffinity();
+                return true;
+            }
+
             return false;
         });
 
-        // Load saved configs before init controllers
-        // Lihat: TextConfig → modules/text/TextConfig.java
-        // Lihat: FpsConfig  → modules/fps/FpsConfig.java
-        TextConfig.shadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("shadow_enabled", false);
-        TextConfig.touchPassthrough = false;
-
-        FpsConfig.enabled = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("fps_enabled", false);
-        FpsConfig.color = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getInt("fps_color", Color.WHITE);
-        FpsConfig.shadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("fps_shadow", false);
-        FpsConfig.touchPassthrough = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("fps_lock", false);
+        loadShadowConfigs();
 
         // Init panel controllers
         // TextPanelController: binding + listener untuk Floating Text panel
@@ -243,5 +235,30 @@ public class MainActivity extends AppCompatActivity {
     public boolean isTextOverlayOn() {
         return getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("text_overlay_on", false);
+    }
+
+    // ========================================================================
+    // Shadow config loading — dipanggil saat onCreate
+    // ========================================================================
+
+    private void loadShadowConfigs() {
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+
+        TextConfig.touchPassthrough = false;
+
+        TextConfig.shadow.enabled = prefs.getBoolean("shadow_enabled", false);
+        TextConfig.shadow.color = prefs.getInt("shadow_color", Color.BLACK);
+        TextConfig.shadow.blur = prefs.getFloat("shadow_blur", 5f);
+        TextConfig.shadow.offsetX = prefs.getFloat("shadow_offset_x", 3f);
+        TextConfig.shadow.offsetY = prefs.getFloat("shadow_offset_y", 3f);
+        FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
+        FpsConfig.color = prefs.getInt("fps_color", Color.WHITE);
+
+        FpsConfig.shadow.enabled = prefs.getBoolean("fps_shadow_enabled", false);
+        FpsConfig.shadow.color = prefs.getInt("fps_shadow_color", Color.BLACK);
+        FpsConfig.shadow.blur = prefs.getFloat("fps_shadow_blur", 5f);
+        FpsConfig.shadow.offsetX = prefs.getFloat("fps_shadow_offset_x", 3f);
+        FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
+        FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", false);
     }
 }

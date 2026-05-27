@@ -1,6 +1,9 @@
 package exp.ftxt.ui;
 
+import android.content.Intent;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 
@@ -10,22 +13,6 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 
-import android.content.Intent;
-
-/**
- * Controller untuk panel FPS Display di MainActivity.
- *
- * Mengekstrak semua binding view, listener, dan konfigurasi FPS
- * yang sebelumnya berada di MainActivity.onCreate().
- *
- * Dipakai oleh:
- * - MainActivity → MainActivity.java (onCreate — FPS panel section)
- *
- * Terkait dengan:
- * - TextPanelController → ui/TextPanelController.java (panel saudara di drawer)
- * - PermissionHelper    → utils/PermissionHelper.java (permission overlay)
- * - FloatingService     → core/FloatingService.java (startFpsStatic, stopFpsStatic)
- */
 public class FpsPanelController {
 
     private final MainActivity activity;
@@ -34,6 +21,11 @@ public class FpsPanelController {
     private SeekBar fpsSizeSeekBar;
     private Button fpsColorButton;
     private Switch fpsShadowSwitch;
+    private LinearLayout fpsShadowConfigContainer;
+    private Button fpsShadowColorButton;
+    private SeekBar fpsShadowBlurSeekBar;
+    private SeekBar fpsShadowOffsetXSeekBar;
+    private SeekBar fpsShadowOffsetYSeekBar;
     private Switch fpsLockSwitch;
 
     public FpsPanelController(MainActivity activity) {
@@ -48,6 +40,11 @@ public class FpsPanelController {
         fpsSizeSeekBar = activity.findViewById(R.id.fpsSizeSeekBar);
         fpsColorButton = activity.findViewById(R.id.fpsColorButton);
         fpsShadowSwitch = activity.findViewById(R.id.fpsShadowSwitch);
+        fpsShadowConfigContainer = activity.findViewById(R.id.shadowConfigFps);
+        fpsShadowColorButton = activity.findViewById(R.id.fpsShadowColorButton);
+        fpsShadowBlurSeekBar = activity.findViewById(R.id.fpsShadowBlurSeekBar);
+        fpsShadowOffsetXSeekBar = activity.findViewById(R.id.fpsShadowOffsetXSeekBar);
+        fpsShadowOffsetYSeekBar = activity.findViewById(R.id.fpsShadowOffsetYSeekBar);
         fpsLockSwitch = activity.findViewById(R.id.fpsLockSwitch);
     }
 
@@ -55,8 +52,12 @@ public class FpsPanelController {
         fpsSwitch.setChecked(FpsConfig.enabled);
         activity.applySwitchTint(fpsSwitch, FpsConfig.enabled);
         fpsSizeSeekBar.setProgress((int) FpsConfig.size);
-        fpsShadowSwitch.setChecked(FpsConfig.shadow);
-        activity.applySwitchTint(fpsShadowSwitch, FpsConfig.shadow);
+        fpsShadowSwitch.setChecked(FpsConfig.shadow.enabled);
+        activity.applySwitchTint(fpsShadowSwitch, FpsConfig.shadow.enabled);
+        fpsShadowConfigContainer.setVisibility(FpsConfig.shadow.enabled ? View.VISIBLE : View.GONE);
+        fpsShadowBlurSeekBar.setProgress((int) FpsConfig.shadow.blur);
+        fpsShadowOffsetXSeekBar.setProgress((int) FpsConfig.shadow.offsetX);
+        fpsShadowOffsetYSeekBar.setProgress((int) FpsConfig.shadow.offsetY);
         fpsLockSwitch.setChecked(FpsConfig.touchPassthrough);
         activity.applySwitchTint(fpsLockSwitch, FpsConfig.touchPassthrough);
     }
@@ -72,12 +73,10 @@ public class FpsPanelController {
                 if (FloatingService.instance != null) {
                     FloatingService.startFpsStatic();
                 } else {
-                    // Start service for FPS only (or alongside text)
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
                 FloatingService.stopFpsStatic();
-                // Stop service if text overlay is also off
                 if (!activity.isTextOverlayOn()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -105,11 +104,55 @@ public class FpsPanelController {
         });
 
         fpsShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FpsConfig.shadow = isChecked;
+            FpsConfig.shadow.enabled = isChecked;
             activity.applySwitchTint(fpsShadowSwitch, isChecked);
+            fpsShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                    .edit().putBoolean("fps_shadow", isChecked).apply();
+                    .edit().putBoolean("fps_shadow_enabled", isChecked).apply();
+            saveFpsShadowPrefs();
             FloatingService.updateFpsShadowStatic();
+        });
+
+        fpsShadowColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Shadow FPS", FpsConfig.shadow.color, color -> {
+                FpsConfig.shadow.color = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_shadow_color", color).apply();
+                FloatingService.updateFpsShadowStatic();
+            });
+        });
+
+        fpsShadowBlurSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                FpsConfig.shadow.blur = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("fps_shadow_blur", (float) progress).apply();
+                FloatingService.updateFpsShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        fpsShadowOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                FpsConfig.shadow.offsetX = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("fps_shadow_offset_x", (float) progress).apply();
+                FloatingService.updateFpsShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        fpsShadowOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                FpsConfig.shadow.offsetY = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("fps_shadow_offset_y", (float) progress).apply();
+                FloatingService.updateFpsShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         fpsLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -119,5 +162,14 @@ public class FpsPanelController {
                     .edit().putBoolean("fps_lock", isChecked).apply();
             FloatingService.updateFpsTouchFlagsStatic();
         });
+    }
+
+    private void saveFpsShadowPrefs() {
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE).edit()
+                .putInt("fps_shadow_color", FpsConfig.shadow.color)
+                .putFloat("fps_shadow_blur", FpsConfig.shadow.blur)
+                .putFloat("fps_shadow_offset_x", FpsConfig.shadow.offsetX)
+                .putFloat("fps_shadow_offset_y", FpsConfig.shadow.offsetY)
+                .apply();
     }
 }

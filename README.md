@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.18.1`        
+**Current Release:** `2.3.1.21.0`        
 **Last Updated:** `2026-05-27`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -28,15 +28,15 @@ Atur ukuran teks secara langsung tanpa restart overlay.
 - Instant apply
 
 
-### Advanced HSV Color Picker 🎨
-Color picker berbasis HSV dengan kontrol warna penuh.
+### RGB Color Picker 🎨
+Color picker dengan kontrol ARGB slider dan info warna lengkap.
 
 Fitur:
-- Circular color wheel
-- Saturation adjustment
-- Brightness slider
-- Alpha / transparency slider
+- Color name auto-detection
 - Live preview
+- HEX value display (8 digit #AARRGGBB)
+- HSV value display
+- R, G, B, A sliders (0–255)
 - Real-time apply
 
 
@@ -57,6 +57,17 @@ Toggle tema gelap atau terang dari toolbar.
 - Tema tersimpan otomatis
 - Berlaku untuk seluruh app
 - NavigationView ikut menyesuaikan tema
+
+### Configurable Shadow 🌑
+
+Konfigurasi shadow teks untuk setiap modul overlay.
+
+Fitur:
+- Enable/disable shadow
+- Warna shadow (color picker with alpha)
+- Blur radius (0–50)
+- Offset X & Y (0–30)
+- Diterapkan real-time via `setShadowLayer()`
 
 ### FPS Display Overlay 📊
 Tampilkan FPS counter sebagai overlay yang bisa digeser.
@@ -115,11 +126,10 @@ Perubahan langsung diterapkan jika overlay aktif.
 ### 4. Pilih Warna
 Tekan tombol:
 `Pilih Warna`
-Dialog HSV akan menampilkan:
-- Color wheel
-- Brightness slider
-- Alpha slider
-- Live preview
+Dialog akan menampilkan:
+- Nama warna otomatis
+- HEX, HSV, ARGB
+- R, G, B, A slider
 
 Klik:
 - **OK** → Terapkan
@@ -142,6 +152,13 @@ Ikon di pojok kanan toolbar:
 
 ### 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
+- Pilih modul overlay yang diinginkan.
+- **Tutup Aplikasi** → Keluar dari aplikasi sepenuhnya.
+
+### 9. Shadow Config
+Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
+- Pilih warna shadow (dengan alpha/transparansi via color picker)
+- Atur blur, offset X, offset Y
 
 ---
 
@@ -220,11 +237,13 @@ FTxT/
 │   │   │   ├── shared/
 │   │   │   │   ├── color/
 │   │   │   │   │   ├── ColorMath.java
+│   │   │   │   │   ├── ColorNameResolver.java
 │   │   │   │   │   └── HSVColorPickerView.java
 │   │   │   │   └── ui/
 │   │   │   │       ├── ColorPickerDialog.java
 │   │   │   │       ├── OverlayDragHandler.java
-│   │   │   │       └── OverlayShadow.java
+│   │   │   │       ├── OverlayShadow.java
+│   │   │   │       └── ShadowTextView.java
 │   │   │   │
 │   │   │   ├── ui/
 │   │   │   │   ├── TextPanelController.java
@@ -284,9 +303,11 @@ FTxT/
 | modules/fps/FpsModule.java | Module logic FPS overlay |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
+| shared/color/ColorNameResolver.java | Konversi warna ke nama |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper HSV picker |
 | shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
+| shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
 | ui/TextPanelController.java | Controller panel Floating Text |
 | ui/FpsPanelController.java | Controller panel FPS Display |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |

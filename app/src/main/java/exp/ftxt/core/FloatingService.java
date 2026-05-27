@@ -133,8 +133,7 @@ public class FloatingService extends Service {
 
     public static void updateShadowStatic() {
         if (instance != null && instance.textModule != null) {
-            boolean shadow = instance.prefs.getBoolean("shadow_enabled", false);
-            instance.textModule.updateShadow(shadow);
+            instance.textModule.updateShadow();
         }
     }
 
@@ -166,7 +165,7 @@ public class FloatingService extends Service {
 
     public static void updateFpsShadowStatic() {
         if (instance != null && instance.fpsModule != null) {
-            instance.fpsModule.updateShadow(FpsConfig.shadow);
+            instance.fpsModule.updateShadow();
         }
     }
 

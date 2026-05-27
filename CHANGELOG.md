@@ -3,6 +3,129 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.21.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Alpha Slider**: Tambah slider Alpha/Transparansi (0–255) di dialog color picker RGB.
+  - Kontrol penuh ARGB (Alpha, Red, Green, Blue).
+  - Tampilan HEX jadi 8 digit (#AARRGGBB).
+  - Tampilan RGB jadi ARGB (Alpha, R, G, B).
+
+- **Kill App Button**: Tambah menu "Tutup Aplikasi" di navigation drawer.
+  - Panggil `finishAffinity()` untuk menutup semua aktivitas dan menghentikan proses aplikasi.
+
+### 🚮️ Fitur Dihapus
+
+- **Shadow Opacity**: Hapus konfigurasi opacity shadow terpisah.
+  - Sekarang alpha langsung diatur via color picker warna shadow.
+  - `ShadowConfig.opacity` dan `getColorWithOpacity()` dihapus.
+  - `ShadowTextView` pakai `shadowConfig.color` langsung.
+  - Seekbar opacity shadow dihapus dari UI (Text & FPS).
+  - Pref `shadow_opacity` / `fps_shadow_opacity` tidak lagi dimuat.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/shared/ui/ShadowConfig.java
+- app/src/main/java/exp/ftxt/shared/ui/ShadowTextView.java
+- app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/menu/drawer_menu.xml
+- app/src/main/res/values/strings.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 51 → 52
+- versionName: 2.3.1.20.0 → 2.3.1.21.0
+
+---
+
+## [2.3.1.20.0] - 2026-05-27
+
+### 🔁️ Perubahan Fitur
+
+- **Color Picker**: Circular HSV wheel diganti dengan RGB slider + color info display.
+  - Menampilkan nama warna, HEX, HSV, RGB.
+  - Kontrol R, G, B via 3 seekbar (0–255).
+  - Live preview + color naming otomatis.
+  - `ColorNameResolver.java` — utility untuk konversi warna ke nama.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/color/ColorNameResolver.java`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔥️ File Removed (de facto)
+
+- `shared/color/HSVColorPickerView.java` — tidak lagi dipakai (code dipertahankan)
+- `shared/color/ColorMath.java` — tidak lagi dipakai (code dipertahankan)
+
+### 🔢 Version
+
+- versionCode: 50 → 51
+- versionName: 2.3.1.19.0 → 2.3.1.20.0
+
+---
+
+## [2.3.1.19.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Shadow Config**: Konfigurasi shadow modular dengan Enable, Warna, Blur, X/Y Offset, Opacity.
+  - `ShadowConfig.java` — class konfigurasi shadow reusable untuk semua modul.
+  - `OverlayShadow.java` — apply background + elevation (text shadow via `ShadowTextView`).
+  - `ShadowTextView.java` — custom TextView terapkan shadow di `onDraw()` setiap frame (reliable untuk overlay).
+  - Shadow dapat dikonfigurasi terpisah per modul (Text & FPS).
+  - Kontrol UI: Shadow switch → container config muncul (color button, opacity/blur/offset seekbars).
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/ShadowConfig.java`
+- `app/src/main/java/exp/ftxt/shared/ui/ShadowTextView.java`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- README.md
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+
+### 🔢 Version
+
+- versionCode: 49 → 50
+- versionName: 2.3.1.18.1 → 2.3.1.19.0
+
+---
+
 ## [2.3.1.18.1] - 2026-05-27
 
 ### ♻️ Lifecycle Changes
