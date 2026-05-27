@@ -15,6 +15,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.modules.text.TextConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.utils.PermissionHelper;
 
 public class TextPanelController {
 
@@ -128,6 +129,14 @@ public class TextPanelController {
         });
 
         overlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
+                overlaySwitch.setChecked(false);
+                activity.applySwitchTint(overlaySwitch, false);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putBoolean("text_overlay_on", false).apply();
+                return;
+            }
+
             activity.applySwitchTint(overlaySwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_overlay_on", isChecked).apply();
@@ -141,7 +150,6 @@ public class TextPanelController {
                     return;
                 }
 
-                if (activity.checkOverlayPermission()) return;
                 if (activity.checkNotificationPermission()) return;
                 activity.checkBatteryOptimization();
 

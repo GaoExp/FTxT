@@ -12,6 +12,7 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.utils.PermissionHelper;
 
 public class FpsPanelController {
 
@@ -82,6 +83,14 @@ public class FpsPanelController {
 
     private void setupListeners() {
         fpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
+                fpsSwitch.setChecked(false);
+                activity.applySwitchTint(fpsSwitch, false);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putBoolean("fps_enabled", false).apply();
+                return;
+            }
+
             FpsConfig.enabled = isChecked;
             activity.applySwitchTint(fpsSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)

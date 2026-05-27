@@ -3,6 +3,58 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.26.2] - 2026-05-27
+
+### 🐞 Bug Fixes
+
+- **Switch Modul Tidak Minta Izin Mandiri**: Switch Floating Text dan FPS Display sekarang hanya mati diam-diam tanpa meminta izin overlay. Izin harus dinyalakan dulu lewat Settings > Akses Izin > Izin Overlay.
+
+### ♻️️ Lifecycle Changes
+
+- `TextPanelController.java` — hapus `PermissionHelper.requestOverlayPermission()` dari switch handler.
+- `FpsPanelController.java` — hapus `PermissionHelper.requestOverlayPermission()` dari switch handler.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 58 → 59
+- versionName: 2.3.1.26.1 → 2.3.1.26.2
+
+---
+
+## [2.3.1.26.1] - 2026-05-27
+
+### 🐞 Bug Fixes
+
+- **Overlay Permission Gate**: Switch Floating Text dan FPS Display sekarang menolak menyala jika izin Overlay belum diberikan. Switch otomatis kembali ke OFF dan meminta izin.
+
+### ♻️️ Lifecycle Changes
+
+- `TextPanelController.java` — tambah cek `PermissionHelper.hasOverlayPermission()` sebelum switch ON.
+- `FpsPanelController.java` — tambah cek `PermissionHelper.hasOverlayPermission()` sebelum switch ON.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 57 → 58
+- versionName: 2.3.1.26.0 → 2.3.1.26.1
+
+---
+
 ## [2.3.1.26.0] - 2026-05-27
 
 ### ✨ Fitur Baru

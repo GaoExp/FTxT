@@ -1,6 +1,8 @@
 package exp.ftxt;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +15,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.view.View;
 import android.util.TypedValue;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,15 +58,15 @@ public class SettingsActivity extends AppCompatActivity {
         updatePermissionSwitches();
 
         overlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                if (!Settings.canDrawOverlays(this)) {
-                    startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:" + getPackageName())));
-                }
+            applySwitchTint(overlaySwitch, isChecked);
+            if (isChecked && !Settings.canDrawOverlays(this)) {
+                startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName())));
             }
         });
 
         notificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(notificationSwitch, isChecked);
             if (isChecked && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -76,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         batterySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(batterySwitch, isChecked);
             if (isChecked) {
                 PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
                 if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
@@ -97,18 +99,35 @@ public class SettingsActivity extends AppCompatActivity {
         updatePermissionSwitches();
     }
 
-    private void updatePermissionSwitches() {
-        overlaySwitch.setChecked(Settings.canDrawOverlays(this));
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationSwitch.setChecked(ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED);
+    private void applySwitchTint(Switch sw, boolean isChecked) {
+        if (isChecked) {
+            sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+            sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#90CAF9")));
         } else {
-            notificationSwitch.setChecked(true);
+            sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
+            sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
+    }
+
+    private void updatePermissionSwitches() {
+        boolean overlayOk = Settings.canDrawOverlays(this);
+        overlaySwitch.setChecked(overlayOk);
+        applySwitchTint(overlaySwitch, overlayOk);
+
+        boolean notifOk;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notifOk = ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            notifOk = true;
+        }
+        notificationSwitch.setChecked(notifOk);
+        applySwitchTint(notificationSwitch, notifOk);
 
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        batterySwitch.setChecked(pm.isIgnoringBatteryOptimizations(getPackageName()));
+        boolean batteryOk = pm.isIgnoringBatteryOptimizations(getPackageName());
+        batterySwitch.setChecked(batteryOk);
+        applySwitchTint(batterySwitch, batteryOk);
     }
 
     private void forceClose() {
