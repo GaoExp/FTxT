@@ -3,6 +3,24 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.18.0] - 2026-05-26
+
+### ✨ Fitur Baru
+
+- Dialog Settings: tambah tombol −/+ untuk zoom ukuran teks (4–60sp), default 14sp.
+
+### ✏️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+
+### 🔢 Version
+
+- versionCode: 47 → 48
+- versionName: 2.3.1.17.4 → 2.3.1.18.0
+
+---
+
 ## [2.3.1.17.4] - 2026-05-26
 
 ### 🔧 Optimasi & Penyesuaian
