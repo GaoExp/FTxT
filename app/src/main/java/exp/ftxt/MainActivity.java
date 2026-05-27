@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                if (progress < 5) { progress = 5; sb.setProgress(progress); }
+                if (progress < 1) { progress = 1; sb.setProgress(progress); }
                 TextConfig.size = progress;
                 FloatingService.updateTextSizeStatic();
             }
@@ -282,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
         fpsSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 5) { progress = 5; sb.setProgress(progress); }
+                if (progress > 140) { progress = 140; sb.setProgress(progress); }
                 FpsConfig.size = progress;
                 FloatingService.updateFpsSizeStatic();
             }

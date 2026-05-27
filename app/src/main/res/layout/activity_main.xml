@@ -86,7 +86,7 @@
 
                 <SeekBar
                     android:id="@+id/textSizeSeekBar"
-                    android:max="120"
+                    android:max="150"
                     android:progress="20"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -179,7 +179,7 @@
 
                 <SeekBar
                     android:id="@+id/fpsSizeSeekBar"
-                    android:max="120"
+                    android:max="140"
                     android:progress="14"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

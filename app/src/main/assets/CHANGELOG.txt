@@ -3,6 +3,26 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.17.4] - 2026-05-26
+
+### 🔧 Optimasi & Penyesuaian
+
+- Floating Text size range diperluas: 1–150 sp (sebelumnya 5–120).
+- FPS Display size range diperluas: 5–140 sp (sebelumnya 5–120).
+
+### ✏️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+
+### 🔢 Version
+
+- versionCode: 46 → 47
+- versionName: 2.3.1.17.3 → 2.3.1.17.4
+
+---
+
 ## [2.3.1.17.3] - 2026-05-26
 
 ### 🐞 Bug Fixes
@@ -41,7 +61,7 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - app/src/main/assets/CHANGELOG.txt
 - app/src/main/assets/README.txt
 - app/src/main/java/exp/ftxt/SettingsActivity.java
-- README.txt
+- README.md
 
 ### 🔢 Version
 
