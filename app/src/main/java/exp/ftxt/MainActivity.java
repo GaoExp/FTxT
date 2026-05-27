@@ -251,6 +251,11 @@ public class MainActivity extends AppCompatActivity {
         TextConfig.shadow.blur = prefs.getFloat("shadow_blur", 5f);
         TextConfig.shadow.offsetX = prefs.getFloat("shadow_offset_x", 3f);
         TextConfig.shadow.offsetY = prefs.getFloat("shadow_offset_y", 3f);
+        TextConfig.bgEnabled = prefs.getBoolean("text_bg_enabled", false);
+        TextConfig.bgColor = prefs.getInt("text_bg_color", 0xCC000000);
+        TextConfig.bgPadding = prefs.getInt("text_bg_padding", 25);
+        TextConfig.bgOffsetX = prefs.getInt("text_bg_offset_x", 0);
+        TextConfig.bgOffsetY = prefs.getInt("text_bg_offset_y", 0);
         FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
         FpsConfig.color = prefs.getInt("fps_color", Color.WHITE);
 
@@ -260,5 +265,10 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.shadow.offsetX = prefs.getFloat("fps_shadow_offset_x", 3f);
         FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
         FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", false);
+        FpsConfig.bgEnabled = prefs.getBoolean("fps_bg_enabled", false);
+        FpsConfig.bgColor = prefs.getInt("fps_bg_color", 0xCC000000);
+        FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
+        FpsConfig.bgOffsetX = prefs.getInt("fps_bg_offset_x", 0);
+        FpsConfig.bgOffsetY = prefs.getInt("fps_bg_offset_y", 0);
     }
 }

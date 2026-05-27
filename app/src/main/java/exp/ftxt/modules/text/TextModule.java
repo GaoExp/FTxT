@@ -46,7 +46,7 @@ public class TextModule {
         view.setText(TextConfig.text);
         view.setTextSize(TextConfig.size);
         view.setTextColor(TextConfig.color);
-        view.setPadding(25, 20, 25, 20);
+        applyBackground();
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -93,6 +93,20 @@ public class TextModule {
     public void updateShadow() {
         if (view != null) view.setShadowConfig(TextConfig.shadow);
         OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
+    }
+
+    public void updateBackground() {
+        applyBackground();
+    }
+
+    private void applyBackground() {
+        if (view == null) return;
+        int pad = TextConfig.bgPadding;
+        view.setPadding(pad, pad, pad, pad);
+        view.setBgEnabled(TextConfig.bgEnabled);
+        view.setBgColor(TextConfig.bgColor);
+        view.setBgOffsetX(TextConfig.bgOffsetX);
+        view.setBgOffsetY(TextConfig.bgOffsetY);
     }
 
     public void updateTouchFlags() {

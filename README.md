@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.21.0`        
+**Current Release:** `2.3.1.23.0`        
 **Last Updated:** `2026-05-27`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -57,6 +57,17 @@ Toggle tema gelap atau terang dari toolbar.
 - Tema tersimpan otomatis
 - Berlaku untuk seluruh app
 - NavigationView ikut menyesuaikan tema
+
+### Configurable Background 🎨
+Konfigurasi latar belakang overlay dengan warna kustom (termasuk alpha/transparansi).
+
+Fitur:
+- Enable/disable background
+- Pilih warna background via color picker (ARGB dengan alpha slider)
+- Ukuran background (padding dari teks, 0–80px)
+- Offset X/Y background (0–60px)
+- Berlaku untuk Floating Text dan FPS Display
+- Real-time update
 
 ### Configurable Shadow 🌑
 
@@ -155,7 +166,14 @@ Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
 - Pilih modul overlay yang diinginkan.
 - **Tutup Aplikasi** → Keluar dari aplikasi sepenuhnya.
 
-### 9. Shadow Config
+### 9. Background Config
+Aktifkan switch Background untuk menampilkan latar belakang overlay:
+- Pilih warna background (dengan alpha/transparansi via color picker)
+- Atur ukuran background (padding dari teks)
+- Atur offset X/Y background
+- Background dan Shadow adalah fitur terpisah
+
+### 10. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
 - Atur blur, offset X, offset Y
@@ -184,6 +202,7 @@ Color Change → updateTextColorStatic()
 Text Change  → updateTextStatic()
 Size Change  → updateTextSizeStatic()
 Touch Mode   → updateTouchFlagsStatic()
+Background   → updateTextBackgroundStatic() / updateFpsBackgroundStatic()
 Shadow       → updateShadowStatic()
 ```
 

@@ -27,6 +27,12 @@ public class FpsPanelController {
     private SeekBar fpsShadowOffsetXSeekBar;
     private SeekBar fpsShadowOffsetYSeekBar;
     private Switch fpsLockSwitch;
+    private Switch fpsBgSwitch;
+    private LinearLayout fpsBgConfigContainer;
+    private Button fpsBgColorButton;
+    private SeekBar fpsBgPaddingSeekBar;
+    private SeekBar fpsBgOffsetXSeekBar;
+    private SeekBar fpsBgOffsetYSeekBar;
 
     public FpsPanelController(MainActivity activity) {
         this.activity = activity;
@@ -46,12 +52,24 @@ public class FpsPanelController {
         fpsShadowOffsetXSeekBar = activity.findViewById(R.id.fpsShadowOffsetXSeekBar);
         fpsShadowOffsetYSeekBar = activity.findViewById(R.id.fpsShadowOffsetYSeekBar);
         fpsLockSwitch = activity.findViewById(R.id.fpsLockSwitch);
+        fpsBgSwitch = activity.findViewById(R.id.fpsBgSwitch);
+        fpsBgConfigContainer = activity.findViewById(R.id.bgConfigFps);
+        fpsBgColorButton = activity.findViewById(R.id.fpsBgColorButton);
+        fpsBgPaddingSeekBar = activity.findViewById(R.id.fpsBgPaddingSeekBar);
+        fpsBgOffsetXSeekBar = activity.findViewById(R.id.fpsBgOffsetXSeekBar);
+        fpsBgOffsetYSeekBar = activity.findViewById(R.id.fpsBgOffsetYSeekBar);
     }
 
     private void loadConfig() {
         fpsSwitch.setChecked(FpsConfig.enabled);
         activity.applySwitchTint(fpsSwitch, FpsConfig.enabled);
         fpsSizeSeekBar.setProgress((int) FpsConfig.size);
+        fpsBgSwitch.setChecked(FpsConfig.bgEnabled);
+        activity.applySwitchTint(fpsBgSwitch, FpsConfig.bgEnabled);
+        fpsBgConfigContainer.setVisibility(FpsConfig.bgEnabled ? View.VISIBLE : View.GONE);
+        fpsBgPaddingSeekBar.setProgress(FpsConfig.bgPadding);
+        fpsBgOffsetXSeekBar.setProgress(FpsConfig.bgOffsetX);
+        fpsBgOffsetYSeekBar.setProgress(FpsConfig.bgOffsetY);
         fpsShadowSwitch.setChecked(FpsConfig.shadow.enabled);
         activity.applySwitchTint(fpsShadowSwitch, FpsConfig.shadow.enabled);
         fpsShadowConfigContainer.setVisibility(FpsConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -101,6 +119,58 @@ public class FpsPanelController {
                         .edit().putInt("fps_color", color).apply();
                 FloatingService.updateFpsColorStatic();
             });
+        });
+
+        fpsBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FpsConfig.bgEnabled = isChecked;
+            activity.applySwitchTint(fpsBgSwitch, isChecked);
+            fpsBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("fps_bg_enabled", isChecked).apply();
+            FloatingService.updateFpsBackgroundStatic();
+        });
+
+        fpsBgColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Background FPS", FpsConfig.bgColor, color -> {
+                FpsConfig.bgColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_bg_color", color).apply();
+                FloatingService.updateFpsBackgroundStatic();
+            });
+        });
+
+        fpsBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 0) progress = 0;
+                FpsConfig.bgPadding = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_bg_padding", progress).apply();
+                FloatingService.updateFpsBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        fpsBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                FpsConfig.bgOffsetX = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_bg_offset_x", progress).apply();
+                FloatingService.updateFpsBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        fpsBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                FpsConfig.bgOffsetY = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_bg_offset_y", progress).apply();
+                FloatingService.updateFpsBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         fpsShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

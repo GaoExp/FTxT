@@ -50,7 +50,7 @@ public class FpsModule {
         view.setText("0.0 FPS");
         view.setTextSize(FpsConfig.size);
         view.setTextColor(FpsConfig.color);
-        view.setPadding(10, 8, 10, 8);
+        applyBackground();
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -108,6 +108,20 @@ public class FpsModule {
     public void updateShadow() {
         if (view != null) view.setShadowConfig(FpsConfig.shadow);
         OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
+    }
+
+    public void updateBackground() {
+        applyBackground();
+    }
+
+    private void applyBackground() {
+        if (view == null) return;
+        int pad = FpsConfig.bgPadding;
+        view.setPadding(pad, pad, pad, pad);
+        view.setBgEnabled(FpsConfig.bgEnabled);
+        view.setBgColor(FpsConfig.bgColor);
+        view.setBgOffsetX(FpsConfig.bgOffsetX);
+        view.setBgOffsetY(FpsConfig.bgOffsetY);
     }
 
     public void updateTouchFlags() {

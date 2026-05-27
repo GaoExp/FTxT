@@ -3,6 +3,94 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.23.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Background Ukuran & Offset**: Tambah kontrol ukuran (padding) dan posisi X/Y background.
+  - `bgPadding` — slider ukuran background (0–80px), mengatur jarak tepi background ke teks.
+  - `bgOffsetX` — slider offset horizontal background (0–60px).
+  - `bgOffsetY` — slider offset vertikal background (0–60px).
+  - Background digambar langsung di `onDraw()` via `ShadowTextView` dengan canvas translate.
+
+### ♻️️ Lifecycle Changes
+
+- `ShadowTextView.java` — draw background rect langsung di `onDraw()` dengan Paint; pakai `canvas.translate()` untuk offset.
+- Hapus `setPadding()` hardcoded dari `TextModule.createOverlay()` dan `FpsModule.start()` — padding diatur via `applyBackground()`.
+- Hapus `view.setBackgroundColor()` — background digambar manual via `ShadowTextView.onDraw()`.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/shared/ui/ShadowTextView.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- app/src/main/res/layout/activity_main.xml
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 53 → 54
+- versionName: 2.3.1.22.0 → 2.3.1.23.0
+
+---
+
+## [2.3.1.22.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Background Config**: Konfigurasi background overlay terpisah dari shadow.
+  - Background bisa diaktifkan/dimatikan via switch sendiri.
+  - Pilih warna background dengan color picker (ARGB, alpha slider tersedia).
+  - Tidak lagi pakai hardcoded black semi-transparent (`0x88000000`).
+  - Berlaku untuk Floating Text dan FPS Display.
+
+### 🚮️ Fitur Dihapus
+
+- **Hardcoded Background**: Hapus background hitam otomatis dari `OverlayShadow.apply()`.
+  - Background shadow dulu otomatis `0x88000000` saat shadow diaktifkan.
+  - Sekarang background dan shadow adalah fitur terpisah.
+
+### ♻️️ Lifecycle Changes
+
+- `OverlayShadow.java` tidak lagi set background color — hanya handle elevation.
+- Background diterapkan langsung via `view.setBackgroundColor()` di module masing-masing.
+- `TextModule.updateBackground()` / `FpsModule.updateBackground()` — method baru.
+- `FloatingService.updateTextBackgroundStatic()` / `updateFpsBackgroundStatic()` — delegate baru.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- app/src/main/res/layout/activity_main.xml
+- CHANGELOG.md
+- README.md
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 52 → 53
+- versionName: 2.3.1.21.0 → 2.3.1.22.0
+
+---
+
 ## [2.3.1.21.0] - 2026-05-27
 
 ### ✨ Fitur Baru

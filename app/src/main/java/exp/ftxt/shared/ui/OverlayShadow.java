@@ -1,6 +1,5 @@
 package exp.ftxt.shared.ui;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -12,11 +11,9 @@ public class OverlayShadow {
         if (view == null) return;
 
         if (config.enabled) {
-            view.setBackgroundColor(0x88000000);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 view.setElevation(elevation);
         } else {
-            view.setBackgroundColor(Color.TRANSPARENT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 view.setElevation(0f);
         }

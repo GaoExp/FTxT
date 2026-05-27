@@ -137,6 +137,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateTextBackgroundStatic() {
+        if (instance != null && instance.textModule != null) {
+            instance.textModule.updateBackground();
+        }
+    }
+
     // --- FPS Module Delegates ---
 
     public static void startFpsStatic() {
@@ -166,6 +172,12 @@ public class FloatingService extends Service {
     public static void updateFpsShadowStatic() {
         if (instance != null && instance.fpsModule != null) {
             instance.fpsModule.updateShadow();
+        }
+    }
+
+    public static void updateFpsBackgroundStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.updateBackground();
         }
     }
 

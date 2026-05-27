@@ -31,6 +31,12 @@ public class TextPanelController {
     private SeekBar shadowBlurSeekBar;
     private SeekBar shadowOffsetXSeekBar;
     private SeekBar shadowOffsetYSeekBar;
+    private Switch bgSwitch;
+    private LinearLayout bgConfigContainer;
+    private Button bgColorButton;
+    private SeekBar bgPaddingSeekBar;
+    private SeekBar bgOffsetXSeekBar;
+    private SeekBar bgOffsetYSeekBar;
 
     public TextPanelController(MainActivity activity) {
         this.activity = activity;
@@ -52,9 +58,20 @@ public class TextPanelController {
         shadowBlurSeekBar = activity.findViewById(R.id.shadowBlurSeekBar);
         shadowOffsetXSeekBar = activity.findViewById(R.id.shadowOffsetXSeekBar);
         shadowOffsetYSeekBar = activity.findViewById(R.id.shadowOffsetYSeekBar);
+        bgSwitch = activity.findViewById(R.id.bgSwitch);
+        bgConfigContainer = activity.findViewById(R.id.bgConfigText);
+        bgColorButton = activity.findViewById(R.id.bgColorButton);
+        bgPaddingSeekBar = activity.findViewById(R.id.bgPaddingSeekBar);
+        bgOffsetXSeekBar = activity.findViewById(R.id.bgOffsetXSeekBar);
+        bgOffsetYSeekBar = activity.findViewById(R.id.bgOffsetYSeekBar);
     }
 
     private void loadConfig() {
+        bgSwitch.setChecked(TextConfig.bgEnabled);
+        bgConfigContainer.setVisibility(TextConfig.bgEnabled ? View.VISIBLE : View.GONE);
+        bgPaddingSeekBar.setProgress(TextConfig.bgPadding);
+        bgOffsetXSeekBar.setProgress(TextConfig.bgOffsetX);
+        bgOffsetYSeekBar.setProgress(TextConfig.bgOffsetY);
         shadowSwitch.setChecked(TextConfig.shadow.enabled);
         shadowConfigContainer.setVisibility(TextConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         shadowBlurSeekBar.setProgress((int) TextConfig.shadow.blur);
@@ -124,6 +141,58 @@ public class TextPanelController {
             FloatingService.updateTouchFlagsStatic();
         });
 
+        bgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            activity.applySwitchTint(bgSwitch, isChecked);
+            TextConfig.bgEnabled = isChecked;
+            bgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("text_bg_enabled", isChecked).apply();
+            FloatingService.updateTextBackgroundStatic();
+        });
+
+        bgColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Background", TextConfig.bgColor, color -> {
+                TextConfig.bgColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_color", color).apply();
+                FloatingService.updateTextBackgroundStatic();
+            });
+        });
+
+        bgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 0) progress = 0;
+                TextConfig.bgPadding = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_padding", progress).apply();
+                FloatingService.updateTextBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        bgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.bgOffsetX = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_offset_x", progress).apply();
+                FloatingService.updateTextBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        bgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.bgOffsetY = progress;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_offset_y", progress).apply();
+                FloatingService.updateTextBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
         shadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             activity.applySwitchTint(shadowSwitch, isChecked);
             TextConfig.shadow.enabled = isChecked;
@@ -180,6 +249,7 @@ public class TextPanelController {
     private void applyInitialTints() {
         activity.applySwitchTint(overlaySwitch, overlaySwitch.isChecked());
         activity.applySwitchTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
+        activity.applySwitchTint(bgSwitch, bgSwitch.isChecked());
         activity.applySwitchTint(shadowSwitch, shadowSwitch.isChecked());
     }
 
