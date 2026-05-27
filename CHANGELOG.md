@@ -3,6 +3,52 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.18.1] - 2026-05-27
+
+### ♻️ Lifecycle Changes
+
+- **Refactor modular (pemecahan file)**: 5 file besar dipecah menjadi file-file kecil terfokus.
+  - `MainActivity` (381→247) → `TextPanelController` + `FpsPanelController` + `PermissionHelper`
+  - `FloatingService` (201→196) → `NotificationHelper` + `WakeLockManager`
+  - `TextModule` + `FpsModule` → shared `OverlayDragHandler` + `OverlayShadow`
+  - `HSVColorPickerView` (242→169) → `ColorMath`
+- Semua kode diberi komentar cross-reference ke file terkait (lokasi + fungsi).
+- Aturan workflow: CHANGELOG.md + README.md (root) dan .txt (assets) wajib sinkron setiap update.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java`
+- `app/src/main/java/exp/ftxt/utils/PermissionHelper.java`
+- `app/src/main/java/exp/ftxt/core/NotificationHelper.java`
+- `app/src/main/java/exp/ftxt/core/WakeLockManager.java`
+- `app/src/main/java/exp/ftxt/shared/ui/OverlayDragHandler.java`
+- `app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java`
+- `app/src/main/java/exp/ftxt/shared/color/ColorMath.java`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/shared/color/HSVColorPickerView.java
+- app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/assets/AGENTS.txt
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 48 → 49
+- versionName: 2.3.1.18.0 → 2.3.1.18.1
+
+---
+
 ## [2.3.1.18.0] - 2026-05-26
 
 ### ✨ Fitur Baru
@@ -127,7 +173,9 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- app/build.gradle 
+- CHANGELOG.md (root)
+- README.md (root)
+- app/build.gradle
 - app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/res/menu/drawer_menu.xml

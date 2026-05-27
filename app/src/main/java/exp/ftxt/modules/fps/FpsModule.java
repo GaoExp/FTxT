@@ -3,14 +3,28 @@ package exp.ftxt.modules.fps;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
-import android.os.Build;
 import android.view.Choreographer;
 import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayShadow;
+
+/**
+ * Module untuk mengelola overlay FPS Display.
+ *
+ * Membuat, menghapus, dan memperbarui TextView FPS counter melalui WindowManager.
+ * Menggunakan Choreographer.FrameCallback untuk menghitung FPS real-time.
+ *
+ * Menggunakan:
+ * - OverlayDragHandler → shared/ui/OverlayDragHandler.java (drag-to-move)
+ * - OverlayShadow      → shared/ui/OverlayShadow.java (shadow bg + elevation)
+ *
+ * Dipanggil oleh:
+ * - FloatingService → core/FloatingService.java (static delegates)
+ * - FpsConfig       → modules/fps/FpsConfig.java (konfigurasi statis)
+ */
 public class FpsModule {
 
     private TextView view;
@@ -22,8 +36,6 @@ public class FpsModule {
     private long lastFrameTime = 0;
     private int frameCount = 0;
     private float fpsValue = 0;
-    private int startX, startY;
-    private float touchX, touchY;
 
     public void init(SharedPreferences sp) {
         prefs = sp;
@@ -51,8 +63,9 @@ public class FpsModule {
         params.x = prefs.getInt("fps_x", 16);
         params.y = prefs.getInt("fps_y", 16);
 
-        // updateShadow expects a boolean parameter; pass current FpsConfig.shadow value
-        updateShadow(FpsConfig.shadow);
+        // Shadow awal dari konfigurasi
+        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
+        OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
         updateTouchFlags();
 
         try {
@@ -95,7 +108,9 @@ public class FpsModule {
 
     public void updateShadow(boolean enabled) {
         FpsConfig.shadow = enabled;
-        applyShadowToView();
+        // Delegasi ke OverlayShadow
+        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
+        OverlayShadow.apply(view, params, wm, enabled, 4f);
     }
 
     public void updateTouchFlags() {
@@ -106,7 +121,10 @@ public class FpsModule {
             view.setOnTouchListener(null);
         } else {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-            view.setOnTouchListener(touchListener);
+            // Gunakan OverlayDragHandler dari shared component
+            // Lihat: OverlayDragHandler → shared/ui/OverlayDragHandler.java
+            view.setOnTouchListener(new OverlayDragHandler(params, wm,
+                    this::savePosition));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
@@ -116,51 +134,14 @@ public class FpsModule {
         return running;
     }
 
-    private void applyShadowToView() {
-        if (view == null) return;
-        if (FpsConfig.shadow) {
-            view.setBackgroundColor(0x88000000);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                view.setElevation(4f);
-        } else {
-            view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                view.setElevation(0f);
-        }
-        if (wm != null) {
-            try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
-        }
-    }
-
     private void savePosition() {
         if (params != null && prefs != null) {
             prefs.edit().putInt("fps_x", params.x).putInt("fps_y", params.y).apply();
         }
     }
 
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    startX = params.x;
-                    startY = params.y;
-                    touchX = event.getRawX();
-                    touchY = event.getRawY();
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    params.x = startX + (int) (event.getRawX() - touchX);
-                    params.y = startY + (int) (event.getRawY() - touchY);
-                    wm.updateViewLayout(view, params);
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    savePosition();
-                    return true;
-            }
-            return false;
-        }
-    };
-
+    // Choreographer FrameCallback untuk menghitung FPS real-time
+    // Menghitung frameCount dalam interval 1 detik
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {

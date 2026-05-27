@@ -10,6 +10,22 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+/**
+ * Custom View untuk circular HSV color picker wheel.
+ *
+ * Menggambar color wheel (hue sweep), saturation gradient radial,
+ * dan selector circle. Touch event menghitung hue & saturation
+ * dari posisi sentuhan.
+ *
+ * Menggunakan:
+ * - ColorMath → shared/color/ColorMath.java (utilitas perhitungan warna/posisi)
+ *
+ * Dipanggil oleh:
+ * - ColorPickerDialog → shared/ui/ColorPickerDialog.java (show method)
+ *
+ * Terkait dengan:
+ * - ColorMath  → shared/color/ColorMath.java (utilitas HSV)
+ */
 public class HSVColorPickerView extends View {
 
     private Paint colorWheelPaint;
@@ -35,34 +51,24 @@ public class HSVColorPickerView extends View {
         init();
     }
 
-    public HSVColorPickerView(
-            Context context,
-            AttributeSet attrs) {
+    public HSVColorPickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public HSVColorPickerView(
-            Context context,
-            AttributeSet attrs,
-            int defStyleAttr) {
+    public HSVColorPickerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     private void init() {
-        colorWheelPaint = new Paint(
-                Paint.ANTI_ALIAS_FLAG);
-        selectorPaint = new Paint(
-                Paint.ANTI_ALIAS_FLAG);
-        saturationGradientPaint = new Paint(
-                Paint.ANTI_ALIAS_FLAG);
+        colorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        saturationGradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        selectorPaint.setStyle(
-                Paint.Style.STROKE);
+        selectorPaint.setStyle(Paint.Style.STROKE);
         selectorPaint.setStrokeWidth(3f);
-        selectorPaint.setColor(
-                Color.WHITE);
+        selectorPaint.setColor(Color.WHITE);
     }
 
     @Override
@@ -71,165 +77,86 @@ public class HSVColorPickerView extends View {
 
         wheelCenterX = getWidth() / 2f;
         wheelCenterY = getHeight() / 2f;
-        wheelRadius = Math.min(
-                wheelCenterX,
-                wheelCenterY) - 20f;
+        wheelRadius = Math.min(wheelCenterX, wheelCenterY) - 20f;
 
         drawColorWheel(canvas);
         drawSaturationGradient(canvas);
         drawSelector(canvas);
     }
 
-    private void drawColorWheel(
-            Canvas canvas) {
-        int[] colors = new int[361];
-        for (int i = 0; i < 361; i++) {
-            colors[i] = Color.HSVToColor(
-                    new float[]{
-                            i,
-                            1f,
-                            1f
-                    }
-            );
-        }
+    // Draw ring warna (hue sweep 0–360)
+    // Menggunakan ColorMath.generateHueColors() untuk array warna
+    // Lihat: ColorMath → shared/color/ColorMath.java
+    private void drawColorWheel(Canvas canvas) {
+        int[] colors = ColorMath.generateHueColors();
 
-        Shader shader = new SweepGradient(
-                wheelCenterX,
-                wheelCenterY,
-                colors,
-                null
-        );
-
+        Shader shader = new SweepGradient(wheelCenterX, wheelCenterY, colors, null);
         colorWheelPaint.setShader(shader);
-        canvas.drawCircle(
-                wheelCenterX,
-                wheelCenterY,
-                wheelRadius,
-                colorWheelPaint
-        );
+        canvas.drawCircle(wheelCenterX, wheelCenterY, wheelRadius, colorWheelPaint);
     }
 
-    private void drawSaturationGradient(
-            Canvas canvas) {
+    // Draw gradient saturation radial di dalam wheel
+    // Dari putih (pusat) ke warna hue murni (tepi)
+    private void drawSaturationGradient(Canvas canvas) {
         float radius = wheelRadius * 0.7f;
         int[] colors = new int[]{
                 Color.WHITE,
-                Color.HSVToColor(
-                        new float[]{
-                                hue,
-                                1f,
-                                1f
-                        }
-                )
+                Color.HSVToColor(new float[]{hue, 1f, 1f})
         };
 
-        Shader shader = new android.graphics
-                .RadialGradient(
-                wheelCenterX,
-                wheelCenterY,
-                radius,
-                colors,
-                new float[]{0f, 1f},
-                android.graphics.Shader
-                .TileMode.CLAMP
-        );
+        Shader shader = new android.graphics.RadialGradient(
+                wheelCenterX, wheelCenterY, radius,
+                colors, new float[]{0f, 1f},
+                android.graphics.Shader.TileMode.CLAMP);
 
-        saturationGradientPaint
-        .setShader(shader);
-        canvas.drawCircle(
-                wheelCenterX,
-                wheelCenterY,
-                radius,
-                saturationGradientPaint
-        );
+        saturationGradientPaint.setShader(shader);
+        canvas.drawCircle(wheelCenterX, wheelCenterY, radius, saturationGradientPaint);
     }
 
-    private void drawSelector(
-            Canvas canvas) {
-        float angle = (float) Math.toRadians(
-                hue);
-        float radius = wheelRadius *
-                saturation * 0.7f;
+    // Draw selector circle pada posisi hue + saturation
+    // Menggunakan ColorMath.getSelectorPosition()
+    // Lihat: ColorMath → shared/color/ColorMath.java
+    private void drawSelector(Canvas canvas) {
+        float[] pos = ColorMath.getSelectorPosition(
+                wheelCenterX, wheelCenterY, wheelRadius * 0.7f, hue, saturation);
 
-        float selectorX =
-                wheelCenterX +
-                (float)(radius *
-                Math.cos(angle));
-
-        float selectorY =
-                wheelCenterY +
-                (float)(radius *
-                Math.sin(angle));
-
-        canvas.drawCircle(
-                selectorX,
-                selectorY,
-                selectorRadius,
-                selectorPaint
-        );
+        canvas.drawCircle(pos[0], pos[1], selectorRadius, selectorPaint);
     }
 
     @Override
-    public boolean onTouchEvent(
-            MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
 
-        float dx = x - wheelCenterX;
-        float dy = y - wheelCenterY;
-        float distance = (float) Math.sqrt(
-                dx * dx + dy * dy);
-
+        float distance = ColorMath.calculateDistance(wheelCenterX, wheelCenterY, x, y);
         float maxRadius = wheelRadius * 0.7f;
 
         if (distance > maxRadius) {
-            float angle = (float) Math.atan2(
-                    dy,
-                    dx);
-            hue = (float) Math.toDegrees(
-                    angle);
-            if (hue < 0) {
-                hue += 360;
-            }
+            // Sentuhan di luar area saturation → hanya set hue
+            hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
             saturation = 1f;
         } else {
-            hue = (float) Math.toDegrees(
-                    Math.atan2(dy, dx));
-            if (hue < 0) {
-                hue += 360;
-            }
+            // Sentuhan di dalam saturation area → hue + saturation
+            hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
             saturation = distance / maxRadius;
         }
 
         invalidate();
 
         if (listener != null) {
-            int color = Color.HSVToColor(
-                    new float[]{
-                            hue,
-                            saturation,
-                            1f
-                    }
-            );
+            int color = Color.HSVToColor(new float[]{hue, saturation, 1f});
             listener.onColorChange(color);
         }
 
         return true;
     }
 
-    public void setOnColorChangeListener(
-            OnColorChangeListener listener) {
+    public void setOnColorChangeListener(OnColorChangeListener listener) {
         this.listener = listener;
     }
 
     public int getCurrentColor() {
-        return Color.HSVToColor(
-                new float[]{
-                        hue,
-                        saturation,
-                        1f
-                }
-        );
+        return Color.HSVToColor(new float[]{hue, saturation, 1f});
     }
 
     public void setColor(int color) {

@@ -1,7 +1,7 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.17.4`        
-**Last Updated:** `2026-05-26`
+**Current Release:** `2.3.1.18.1`        
+**Last Updated:** `2026-05-27`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -201,7 +201,9 @@ FTxT/
 │   ├── src/main/
 │   │   ├── java/exp/ftxt/
 │   │   │   ├── core/
-│   │   │   │   └── FloatingService.java
+│   │   │   │   ├── FloatingService.java
+│   │   │   │   ├── NotificationHelper.java
+│   │   │   │   └── WakeLockManager.java
 │   │   │   │
 │   │   │   ├── modules/
 │   │   │   │   ├── text/
@@ -217,9 +219,19 @@ FTxT/
 │   │   │   │
 │   │   │   ├── shared/
 │   │   │   │   ├── color/
+│   │   │   │   │   ├── ColorMath.java
 │   │   │   │   │   └── HSVColorPickerView.java
 │   │   │   │   └── ui/
-│   │   │   │       └── ColorPickerDialog.java
+│   │   │   │       ├── ColorPickerDialog.java
+│   │   │   │       ├── OverlayDragHandler.java
+│   │   │   │       └── OverlayShadow.java
+│   │   │   │
+│   │   │   ├── ui/
+│   │   │   │   ├── TextPanelController.java
+│   │   │   │   └── FpsPanelController.java
+│   │   │   │
+│   │   │   ├── utils/
+│   │   │   │   └── PermissionHelper.java
 │   │   │   │
 │   │   │   ├── MainActivity.java
 │   │   │   └── SettingsActivity.java
@@ -261,15 +273,23 @@ FTxT/
 
 | File | Deskripsi |
 |------|-----------|
-| MainActivity.java | Activity utama & kontrol UI |
+| MainActivity.java | Activity utama & kontrol UI (delegasi ke panel controllers) |
 | SettingsActivity.java | Settings dengan dokumentasi in-app |
 | core/FloatingService.java | Overlay service, touch handling, persistence |
+| core/NotificationHelper.java | Helper channel & notifikasi foreground |
+| core/WakeLockManager.java | Manajemen partial wake lock |
 | modules/text/TextConfig.java | Konfigurasi teks overlay |
 | modules/text/TextModule.java | Module logic teks overlay |
 | modules/fps/FpsConfig.java | Konfigurasi FPS overlay |
 | modules/fps/FpsModule.java | Module logic FPS overlay |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
+| shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper HSV picker |
+| shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
+| shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
+| ui/TextPanelController.java | Controller panel Floating Text |
+| ui/FpsPanelController.java | Controller panel FPS Display |
+| utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_main.xml | Layout utama |
 | activity_settings.xml | Layout settings menu |
 | dialog_hsv_color_picker.xml | Layout dialog picker |

@@ -1,16 +1,9 @@
 package exp.ftxt.core;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.IBinder;
-import android.os.PowerManager;
-
-import androidx.core.app.NotificationCompat;
 
 import android.view.WindowManager;
 
@@ -20,10 +13,24 @@ import exp.ftxt.modules.fps.FpsModule;
 import exp.ftxt.modules.text.TextConfig;
 import exp.ftxt.modules.text.TextModule;
 
+/**
+ * Foreground service untuk mengelola overlay Floating Text dan FPS Display.
+ *
+ * Menggunakan:
+ * - NotificationHelper → core/NotificationHelper.java (channel + notification)
+ * - WakeLockManager   → core/WakeLockManager.java (partial wake lock)
+ * - TextModule         → modules/text/TextModule.java
+ * - FpsModule          → modules/fps/FpsModule.java
+ *
+ * Dipanggil oleh:
+ * - MainActivity       → MainActivity.java (start/stop service via TextPanelController & FpsPanelController)
+ * - TextPanelController → ui/TextPanelController.java
+ * - FpsPanelController  → ui/FpsPanelController.java
+ */
 public class FloatingService extends Service {
 
     private WindowManager windowManager;
-    private PowerManager.WakeLock wakeLock;
+    private WakeLockManager wakeLockManager;
     private SharedPreferences prefs;
 
     public static FloatingService instance;
@@ -41,16 +48,12 @@ public class FloatingService extends Service {
         textModule = new TextModule();
         fpsModule = new FpsModule();
 
-        createNotificationChannel();
-        Notification notification = new NotificationCompat.Builder(this, "ftxt_overlay")
-                .setContentTitle("FTxT")
-                .setContentText("Overlay sedang aktif")
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setOngoing(true)
-                .build();
-
+        // Notification channel + foreground service
+        // Lihat: NotificationHelper → core/NotificationHelper.java
+        NotificationHelper.createChannel(this);
         try {
-            startForeground(1, notification);
+            startForeground(NotificationHelper.NOTIFICATION_ID,
+                    NotificationHelper.buildNotification(this));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,22 +61,21 @@ public class FloatingService extends Service {
         try {
             windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-            // Init modules
             textModule.init(windowManager, this, prefs);
             fpsModule.init(prefs);
 
-            // Create text overlay only if text module is active
+            // Buat text overlay jika sebelumnya aktif
             if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                     .getBoolean("text_overlay_on", false)) {
                 textModule.createOverlay();
             }
 
-            // Acquire wake lock
-            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "FTxT:OverlayWakeLock");
-            wakeLock.acquire();
+            // Wake lock agar CPU tidak tidur
+            // Lihat: WakeLockManager → core/WakeLockManager.java
+            wakeLockManager = new WakeLockManager();
+            wakeLockManager.acquire(this);
 
-            // Start FPS if enabled
+            // Start FPS jika diaktifkan
             if (FpsConfig.enabled) {
                 fpsModule.start(windowManager, this);
             }
@@ -83,7 +85,13 @@ public class FloatingService extends Service {
         }
     }
 
-    // === Text Module Visibility ===
+    // ========================================================================
+    // Static delegates — dipanggil oleh MainActivity/panel controllers
+    // TextModule methods → modules/text/TextModule.java
+    // FpsModule methods  → modules/fps/FpsModule.java
+    // ========================================================================
+
+    // --- Text Module Visibility ---
 
     public static void createTextOverlayStatic() {
         if (instance != null && instance.textModule != null) {
@@ -97,7 +105,7 @@ public class FloatingService extends Service {
         }
     }
 
-    // === Text Module Delegates ===
+    // --- Text Module Delegates ---
 
     public static void updateTextStatic() {
         if (instance != null && instance.textModule != null) {
@@ -130,7 +138,7 @@ public class FloatingService extends Service {
         }
     }
 
-    // === FPS Module Delegates ===
+    // --- FPS Module Delegates ---
 
     public static void startFpsStatic() {
         if (instance != null && instance.fpsModule != null) {
@@ -168,16 +176,6 @@ public class FloatingService extends Service {
         }
     }
 
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    "ftxt_overlay", "FTxT Overlay", NotificationManager.IMPORTANCE_LOW);
-            channel.setDescription("Notifikasi overlay FTxT");
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -185,10 +183,7 @@ public class FloatingService extends Service {
         fpsModule.stop();
         textModule.savePosition(prefs);
 
-        if (wakeLock != null && wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-
+        wakeLockManager.release();
         textModule.destroyOverlay();
 
         instance = null;

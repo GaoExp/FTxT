@@ -1,25 +1,38 @@
 package exp.ftxt.modules.text;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayShadow;
+
+/**
+ * Module untuk mengelola overlay teks floating.
+ *
+ * Membuat, menghapus, dan memperbarui TextView overlay melalui WindowManager.
+ *
+ * Menggunakan:
+ * - OverlayDragHandler → shared/ui/OverlayDragHandler.java (drag-to-move)
+ * - OverlayShadow      → shared/ui/OverlayShadow.java (shadow bg + elevation)
+ *
+ * Dipanggil oleh:
+ * - FloatingService → core/FloatingService.java (static delegates)
+ * - TextConfig      → modules/text/TextConfig.java (konfigurasi statis)
+ */
 public class TextModule {
 
     private TextView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
-    private android.content.SharedPreferences prefs;
-    private int startX, startY;
-    private float touchX, touchY;
+    private SharedPreferences prefs;
 
     public void init(WindowManager windowManager, Context ctx,
-                     android.content.SharedPreferences sp) {
+                     SharedPreferences sp) {
         wm = windowManager;
         context = ctx;
         prefs = sp;
@@ -46,7 +59,12 @@ public class TextModule {
         params.x = prefs.getInt("text_x", 100);
         params.y = prefs.getInt("text_y", 300);
 
-        updateShadow();
+        // Apply shadow dari konfigurasi (untuk initial state)
+        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
+        if (TextConfig.shadow) {
+            OverlayShadow.apply(view, params, wm, true, 8f);
+        }
+
         updateTouchFlags();
 
         wm.addView(view, params);
@@ -77,28 +95,9 @@ public class TextModule {
 
     public void updateShadow(boolean enabled) {
         TextConfig.shadow = enabled;
-        if (view != null) {
-            if (enabled) {
-                view.setBackgroundColor(0x88000000);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-                    view.setElevation(8f);
-            } else {
-                view.setBackgroundColor(android.graphics.Color.TRANSPARENT);
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-                    view.setElevation(0f);
-            }
-            if (wm != null) {
-                try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
-            }
-        }
-    }
-
-    private void updateShadow() {
-        if (TextConfig.shadow) {
-            view.setBackgroundColor(0x88000000);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-                view.setElevation(8f);
-        }
+        // Delegasi ke OverlayShadow
+        // Lihat: OverlayShadow → shared/ui/OverlayShadow.java
+        OverlayShadow.apply(view, params, wm, enabled, 8f);
     }
 
     public void updateTouchFlags() {
@@ -109,7 +108,10 @@ public class TextModule {
             view.setOnTouchListener(null);
         } else {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-            view.setOnTouchListener(touchListener);
+            // Gunakan OverlayDragHandler dari shared component
+            // Lihat: OverlayDragHandler → shared/ui/OverlayDragHandler.java
+            view.setOnTouchListener(new OverlayDragHandler(params, wm,
+                    () -> savePosition(prefs)));
         }
 
         if (wm != null) {
@@ -117,14 +119,14 @@ public class TextModule {
         }
     }
 
-    public void loadPosition(android.content.SharedPreferences prefs) {
+    public void loadPosition(SharedPreferences prefs) {
         if (params != null) {
             params.x = prefs.getInt("text_x", 100);
             params.y = prefs.getInt("text_y", 300);
         }
     }
 
-    public void savePosition(android.content.SharedPreferences prefs) {
+    public void savePosition(SharedPreferences prefs) {
         if (params != null) {
             prefs.edit().putInt("text_x", params.x).putInt("text_y", params.y).apply();
         }
@@ -133,27 +135,4 @@ public class TextModule {
     public boolean isActive() {
         return view != null;
     }
-
-    private View.OnTouchListener touchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View v, MotionEvent event) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    startX = params.x;
-                    startY = params.y;
-                    touchX = event.getRawX();
-                    touchY = event.getRawY();
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    params.x = startX + (int) (event.getRawX() - touchX);
-                    params.y = startY + (int) (event.getRawY() - touchY);
-                    wm.updateViewLayout(view, params);
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    savePosition(prefs);
-                    return true;
-            }
-            return false;
-        }
-    };
 }

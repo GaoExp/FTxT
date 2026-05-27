@@ -14,6 +14,25 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+/**
+ * Activity Pengaturan untuk menampilkan CHANGELOG dan README dalam dialog scrollable.
+ *
+ * Membaca file dokumentasi langsung dari assets/:
+ * - assets/CHANGELOG.txt
+ * - assets/README.txt
+ *
+ * Fitur:
+ * - Tombol −/+ untuk zoom ukuran teks (4–60sp)
+ * - ScrollView untuk konten panjang
+ *
+ * Dipanggil oleh:
+ * - MainActivity → MainActivity.java (onOptionsItemSelected — action_settings)
+ *
+ * File dokumentasi dikelola di:
+ * - assets/AGENTS.txt   → lihat AGENTS.txt
+ * - assets/CHANGELOG.txt → lihat CHANGELOG.txt
+ * - assets/README.txt   → lihat README.txt
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     @Override

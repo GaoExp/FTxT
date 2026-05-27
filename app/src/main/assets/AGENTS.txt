@@ -249,8 +249,8 @@ Sesudah mengedit:
 1. update kode
 2. update versionCode
 3. update versionName
-4. tambah CHANGELOG entry bila relevan
-5. update README bila relevan
+4. update `CHANGELOG.md` (root) + `CHANGELOG.txt` (assets) — keduanya selalu sinkron
+5. update `README.md` (root) + `README.txt` (assets) — keduanya selalu sinkron
 
 ---
 

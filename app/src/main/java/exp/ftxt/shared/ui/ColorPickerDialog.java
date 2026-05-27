@@ -11,6 +11,17 @@ import androidx.appcompat.app.AlertDialog;
 import exp.ftxt.shared.color.HSVColorPickerView;
 import exp.ftxt.R;
 
+/**
+ * Dialog wrapper untuk HSVColorPickerView dengan kontrol brightness & alpha.
+ *
+ * Menggunakan:
+ * - HSVColorPickerView → shared/color/HSVColorPickerView.java (color wheel)
+ * - ColorMath          → shared/color/ColorMath.java (utilitas warna via HSVColorPickerView)
+ *
+ * Dipanggil oleh:
+ * - TextPanelController → ui/TextPanelController.java (tombol Pilih Warna)
+ * - FpsPanelController  → ui/FpsPanelController.java (tombol Pilih Warna FPS)
+ */
 public class ColorPickerDialog {
 
     public interface ColorCallback {

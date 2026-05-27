@@ -1,61 +1,58 @@
 package exp.ftxt;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.SeekBar;
-import android.widget.Switch;
-import android.widget.Toast;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatDelegate;
+
 import com.google.android.material.navigation.NavigationView;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.modules.text.TextConfig;
-import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.ui.FpsPanelController;
+import exp.ftxt.ui.TextPanelController;
+import exp.ftxt.utils.PermissionHelper;
 
+/**
+ * Activity utama FTxT.
+ *
+ * Mengelola:
+ * - Toolbar & Navigation Drawer (sidebar modular)
+ * - Theme toggle (gelap/terang)
+ * - Delegasi panel UI → TextPanelController dan FpsPanelController
+ * - Delegasi permission → PermissionHelper
+ * - Switch tint utility
+ *
+ * Panel UI didelegasikan ke:
+ * - TextPanelController → ui/TextPanelController.java
+ * - FpsPanelController  → ui/FpsPanelController.java
+ *
+ * Permission didelegasikan ke:
+ * - PermissionHelper → utils/PermissionHelper.java
+ *
+ * Service overlay:
+ * - FloatingService → core/FloatingService.java
+ */
 public class MainActivity extends AppCompatActivity {
 
-    EditText editText;
-    SeekBar seekBar;
-    Button colorButton;
-    Switch overlaySwitch;
-    Switch touchPassthroughSwitch;
-    Switch shadowSwitch;
-
-    // FPS views
-    Switch fpsSwitch;
-    SeekBar fpsSizeSeekBar;
-    Button fpsColorButton;
-    Switch fpsShadowSwitch;
-    Switch fpsLockSwitch;
-
-    // panels
     View panelText;
     View panelFps;
+
+    private TextPanelController textPanel;
+    private FpsPanelController fpsPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationView navView = findViewById(R.id.navView);
         navView.setCheckedItem(R.id.nav_floating_text);
 
+        // Navigation drawer: switch antar panel modular
+        // Panel baru bisa ditambahkan di sini + drawer_menu.xml
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
@@ -116,7 +115,9 @@ public class MainActivity extends AppCompatActivity {
             return false;
         });
 
-        // === Load saved configs ===
+        // Load saved configs before init controllers
+        // Lihat: TextConfig → modules/text/TextConfig.java
+        // Lihat: FpsConfig  → modules/fps/FpsConfig.java
         TextConfig.shadow = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("shadow_enabled", false);
         TextConfig.touchPassthrough = false;
@@ -130,196 +131,11 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.touchPassthrough = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("fps_lock", false);
 
-        // === Bind text views ===
-        editText = findViewById(R.id.editText);
-        seekBar = findViewById(R.id.textSizeSeekBar);
-        colorButton = findViewById(R.id.colorButton);
-        overlaySwitch = findViewById(R.id.overlaySwitch);
-        touchPassthroughSwitch = findViewById(R.id.touchPassthroughSwitch);
-        shadowSwitch = findViewById(R.id.shadowSwitch);
-
-        // === Bind FPS views ===
-        fpsSwitch = findViewById(R.id.fpsSwitch);
-        fpsSizeSeekBar = findViewById(R.id.fpsSizeSeekBar);
-        fpsColorButton = findViewById(R.id.fpsColorButton);
-        fpsShadowSwitch = findViewById(R.id.fpsShadowSwitch);
-        fpsLockSwitch = findViewById(R.id.fpsLockSwitch);
-
-        // === Text controls ===
-
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                TextConfig.text = s.toString().trim();
-                if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
-                FloatingService.updateTextStatic();
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-
-        seekBar.setProgress(20);
-
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                if (progress < 1) { progress = 1; sb.setProgress(progress); }
-                TextConfig.size = progress;
-                FloatingService.updateTextSizeStatic();
-            }
-            @Override public void onStartTrackingTouch(SeekBar sb) {}
-            @Override public void onStopTrackingTouch(SeekBar sb) {}
-        });
-
-        colorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(this, "Pilih Warna", TextConfig.color, color -> {
-                TextConfig.color = color;
-                FloatingService.updateTextColorStatic();
-            });
-        });
-
-        overlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            applySwitchTint(overlaySwitch, isChecked);
-
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putBoolean("text_overlay_on", isChecked).apply();
-
-            if (isChecked) {
-                TextConfig.text = editText.getText().toString().trim();
-                if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
-
-                // If service already running (FPS), just create text overlay
-                if (FloatingService.instance != null) {
-                    FloatingService.createTextOverlayStatic();
-                    return;
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && !Settings.canDrawOverlays(this)) {
-                    Toast.makeText(this, "Izinkan overlay di pengaturan", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            Uri.parse("package:" + getPackageName())));
-                    overlaySwitch.setChecked(false);
-                    return;
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                        && ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.POST_NOTIFICATIONS)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
-                    overlaySwitch.setChecked(false);
-                    return;
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-                    if (!pm.isIgnoringBatteryOptimizations(getPackageName())) {
-                        Toast.makeText(this, "Nonaktifkan optimasi baterai", Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                                Uri.parse("package:" + getPackageName())));
-                    }
-                }
-
-                startService(new Intent(this, FloatingService.class));
-            } else {
-                FloatingService.destroyTextOverlayStatic();
-                if (!FpsConfig.enabled) {
-                    stopService(new Intent(this, FloatingService.class));
-                }
-            }
-        });
-
-        touchPassthroughSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            applySwitchTint(touchPassthroughSwitch, isChecked);
-            TextConfig.touchPassthrough = isChecked;
-            FloatingService.updateTouchFlagsStatic();
-        });
-
-        shadowSwitch.setChecked(TextConfig.shadow);
-
-        shadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            applySwitchTint(shadowSwitch, isChecked);
-            TextConfig.shadow = isChecked;
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putBoolean("shadow_enabled", isChecked).apply();
-            FloatingService.updateShadowStatic();
-        });
-
-        // initial tints
-        applySwitchTint(overlaySwitch, overlaySwitch.isChecked());
-        applySwitchTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
-        applySwitchTint(shadowSwitch, shadowSwitch.isChecked());
-
-        // === FPS controls ===
-
-        fpsSwitch.setChecked(FpsConfig.enabled);
-        applySwitchTint(fpsSwitch, FpsConfig.enabled);
-
-        fpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FpsConfig.enabled = isChecked;
-            applySwitchTint(fpsSwitch, isChecked);
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putBoolean("fps_enabled", isChecked).apply();
-
-            if (isChecked) {
-                if (FloatingService.instance != null) {
-                    FloatingService.startFpsStatic();
-                } else {
-                    // Start service for FPS only
-                    startService(new Intent(this, FloatingService.class));
-                }
-            } else {
-                FloatingService.stopFpsStatic();
-                // Stop service if text overlay also off
-                if (!overlaySwitch.isChecked()) {
-                    stopService(new Intent(this, FloatingService.class));
-                }
-            }
-        });
-
-        fpsSizeSeekBar.setProgress((int) FpsConfig.size);
-
-        fpsSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                if (progress < 5) { progress = 5; sb.setProgress(progress); }
-                if (progress > 140) { progress = 140; sb.setProgress(progress); }
-                FpsConfig.size = progress;
-                FloatingService.updateFpsSizeStatic();
-            }
-            @Override public void onStartTrackingTouch(SeekBar sb) {}
-            @Override public void onStopTrackingTouch(SeekBar sb) {}
-        });
-
-        fpsColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(this, "Pilih Warna FPS", FpsConfig.color, color -> {
-                FpsConfig.color = color;
-                getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                        .edit().putInt("fps_color", color).apply();
-                FloatingService.updateFpsColorStatic();
-            });
-        });
-
-        fpsShadowSwitch.setChecked(FpsConfig.shadow);
-        applySwitchTint(fpsShadowSwitch, FpsConfig.shadow);
-
-        fpsShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FpsConfig.shadow = isChecked;
-            applySwitchTint(fpsShadowSwitch, isChecked);
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putBoolean("fps_shadow", isChecked).apply();
-            FloatingService.updateFpsShadowStatic();
-        });
-
-        fpsLockSwitch.setChecked(FpsConfig.touchPassthrough);
-        applySwitchTint(fpsLockSwitch, FpsConfig.touchPassthrough);
-
-        fpsLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FpsConfig.touchPassthrough = isChecked;
-            applySwitchTint(fpsLockSwitch, isChecked);
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putBoolean("fps_lock", isChecked).apply();
-            FloatingService.updateFpsTouchFlagsStatic();
-        });
+        // Init panel controllers
+        // TextPanelController: binding + listener untuk Floating Text panel
+        // FpsPanelController:  binding + listener untuk FPS Display panel
+        textPanel = new TextPanelController(this);
+        fpsPanel = new FpsPanelController(this);
     }
 
     @Override
@@ -360,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == 100) {
+        if (requestCode == PermissionHelper.NOTIFICATION_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Izin notifikasi diberikan", Toast.LENGTH_SHORT).show();
             } else {
@@ -369,7 +185,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void applySwitchTint(Switch sw, boolean isChecked) {
+    // ========================================================================
+    // Switch tint utility — dipanggil oleh TextPanelController & FpsPanelController
+    // Lihat: TextPanelController → ui/TextPanelController.java
+    // Lihat: FpsPanelController  → ui/FpsPanelController.java
+    // ========================================================================
+    public void applySwitchTint(Switch sw, boolean isChecked) {
         if (isChecked) {
             sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
             sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#90CAF9")));
@@ -377,5 +198,50 @@ public class MainActivity extends AppCompatActivity {
             sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
             sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
+    }
+
+    // ========================================================================
+    // Permission helpers — dipanggil oleh TextPanelController saat toggle overlay
+    // Delegasi ke: PermissionHelper → utils/PermissionHelper.java
+    // ========================================================================
+
+    /**
+     * Periksa dan minta izin overlay. Return true jika perlu handling (izin belum diberikan).
+     */
+    public boolean checkOverlayPermission() {
+        if (!PermissionHelper.hasOverlayPermission(this)) {
+            PermissionHelper.requestOverlayPermission(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Periksa dan minta izin notifikasi (Android 13+). Return true jika perlu handling.
+     */
+    public boolean checkNotificationPermission() {
+        if (!PermissionHelper.hasNotificationPermission(this)) {
+            PermissionHelper.requestNotificationPermission(this);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Periksa dan minta nonaktifkan optimasi baterai jika perlu.
+     */
+    public void checkBatteryOptimization() {
+        if (!PermissionHelper.isIgnoringBatteryOptimizations(this)) {
+            PermissionHelper.requestDisableBatteryOptimization(this);
+        }
+    }
+
+    /**
+     * Cek apakah switch text overlay sedang ON.
+     * Dipanggil oleh FpsPanelController saat FPS dimatikan.
+     */
+    public boolean isTextOverlayOn() {
+        return getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("text_overlay_on", false);
     }
 }
