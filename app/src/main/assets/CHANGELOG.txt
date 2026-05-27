@@ -3,6 +3,34 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.28.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Edit HEX Manual**: Tambah ikon sunting di samping nilai HEX untuk mengedit warna secara manual via input teks.
+- **Salin Nilai Warna**: Tekan lama nilai HEX, HSV, atau ARGB untuk menyalin ke clipboard.
+
+### 🗒️ File Added
+
+- `app/src/main/res/drawable/ic_edit.xml`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+- app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 61 → 62
+- versionName: 2.3.1.27.0 → 2.3.1.28.0
+
+---
+
 ## [2.3.1.27.0] - 2026-05-27
 
 ### ✨ Fitur Baru

@@ -1,11 +1,17 @@
 package exp.ftxt.shared.ui;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -27,6 +33,7 @@ public class ColorPickerDialog {
         TextView hexValue = dialogView.findViewById(R.id.hexValue);
         TextView hsvValue = dialogView.findViewById(R.id.hsvValue);
         TextView rgbValue = dialogView.findViewById(R.id.rgbValue);
+        ImageButton hexEditButton = dialogView.findViewById(R.id.hexEditButton);
         SeekBar redSeekBar = dialogView.findViewById(R.id.redSeekBar);
         SeekBar greenSeekBar = dialogView.findViewById(R.id.greenSeekBar);
         SeekBar blueSeekBar = dialogView.findViewById(R.id.blueSeekBar);
@@ -62,6 +69,56 @@ public class ColorPickerDialog {
         blueSeekBar.setOnSeekBarChangeListener(listener);
         alphaSeekBar.setOnSeekBarChangeListener(listener);
 
+        hexEditButton.setOnClickListener(v -> {
+            String currentHex = String.format("#%02X%02X%02X%02X",
+                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(), blueSeekBar.getProgress());
+
+            EditText input = new EditText(activity);
+            input.setText(currentHex);
+            input.setSelection(input.length());
+
+            new AlertDialog.Builder(activity)
+                    .setTitle("Edit HEX")
+                    .setView(input)
+                    .setPositiveButton("OK", (d, w) -> {
+                        try {
+                            int color = parseHex(input.getText().toString().trim());
+                            alphaSeekBar.setProgress(Color.alpha(color));
+                            redSeekBar.setProgress(Color.red(color));
+                            greenSeekBar.setProgress(Color.green(color));
+                            blueSeekBar.setProgress(Color.blue(color));
+                            updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
+                                    redLabel, greenLabel, blueLabel, alphaLabel,
+                                    redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                        } catch (IllegalArgumentException e) {
+                            Toast.makeText(activity, "HEX tidak valid", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("Batal", null)
+                    .show();
+        });
+
+        hexValue.setOnLongClickListener(v -> {
+            copyToClipboard(activity, String.format("#%02X%02X%02X%02X",
+                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(), blueSeekBar.getProgress()));
+            Toast.makeText(activity, "HEX disalin", Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
+        hsvValue.setOnLongClickListener(v -> {
+            copyToClipboard(activity, hsvValue.getText().toString());
+            Toast.makeText(activity, "HSV disalin", Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
+        rgbValue.setOnLongClickListener(v -> {
+            copyToClipboard(activity, rgbValue.getText().toString());
+            Toast.makeText(activity, "ARGB disalin", Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
         builder.setTitle(title);
         builder.setView(dialogView);
 
@@ -77,6 +134,18 @@ public class ColorPickerDialog {
 
         cancelButton.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
+    }
+
+    private static int parseHex(String hex) {
+        if (hex.startsWith("#")) hex = hex.substring(1);
+        if (hex.length() == 6) hex = "FF" + hex;
+        if (hex.length() != 8) throw new IllegalArgumentException();
+        return (int) Long.parseLong(hex, 16);
+    }
+
+    private static void copyToClipboard(Context context, String text) {
+        ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        cm.setPrimaryClip(ClipData.newPlainText("color", text));
     }
 
     private static void updateDisplay(TextView preview, TextView hex, TextView hsv, TextView rgb,
