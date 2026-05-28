@@ -3,6 +3,47 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.4.1.38.1] - 2026-05-28
+
+### ♻️️ Perubahan Fitur
+
+- **Refactor Package Structure**: Rename folder `modules` → `features` untuk naming yang lebih konsisten dan semantik. Semua import statements dan dokumentasi internal telah diperbarui.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/shared/ui/OverlayDragHandler.java
+- STRUKTUR.md
+- app/src/main/assets/STRUKTUR.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🗒️ File Added
+
+- app/src/main/java/exp/ftxt/features/text/TextConfig.java
+- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- app/src/main/java/exp/ftxt/features/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/features/fps/FpsModule.java
+
+### 🔥️ File Removed
+
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java (deprecated)
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java (deprecated)
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java (deprecated)
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java (deprecated)
+
+### 🔢 Version
+
+- versionCode: 83 → 84
+- versionName: 2.4.1.38.0 → 2.4.1.38.1
+
+---
+
 ## [2.4.1.38.0] - 2026-05-28
 
 ### 🚮️ Fitur Dihapus

@@ -8,10 +8,10 @@ import android.os.IBinder;
 import android.view.WindowManager;
 
 import exp.ftxt.R;
-import exp.ftxt.modules.fps.FpsConfig;
-import exp.ftxt.modules.fps.FpsModule;
-import exp.ftxt.modules.text.TextConfig;
-import exp.ftxt.modules.text.TextModule;
+import exp.ftxt.features.fps.FpsConfig;
+import exp.ftxt.features.fps.FpsModule;
+import exp.ftxt.features.text.TextConfig;
+import exp.ftxt.features.text.TextModule;
 
 /**
  * Foreground service untuk mengelola overlay Floating Text dan FPS Display.
@@ -19,8 +19,8 @@ import exp.ftxt.modules.text.TextModule;
  * Menggunakan:
  * - NotificationHelper → core/NotificationHelper.java (channel + notification)
  * - WakeLockManager   → core/WakeLockManager.java (partial wake lock)
- * - TextModule         → modules/text/TextModule.java
- * - FpsModule          → modules/fps/FpsModule.java
+ * - TextModule         → features/text/TextModule.java
+ * - FpsModule          → features/fps/FpsModule.java
  *
  * Dipanggil oleh:
  * - MainActivity       → MainActivity.java (start/stop service via TextPanelController & FpsPanelController)

@@ -16,7 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.modules.text.TextConfig;
+import exp.ftxt.features.text.TextConfig;
 import exp.ftxt.shared.ui.XyPadView;
 
 public class PositionController {

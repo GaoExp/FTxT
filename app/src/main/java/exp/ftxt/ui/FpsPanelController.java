@@ -12,7 +12,7 @@ import android.widget.TextView;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.modules.fps.FpsConfig;
+import exp.ftxt.features.fps.FpsConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;

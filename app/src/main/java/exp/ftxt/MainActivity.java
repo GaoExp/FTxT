@@ -38,8 +38,8 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.modules.fps.FpsConfig;
-import exp.ftxt.modules.text.TextConfig;
+import exp.ftxt.features.fps.FpsConfig;
+import exp.ftxt.features.text.TextConfig;
 import exp.ftxt.ui.FpsPanelController;
 import exp.ftxt.ui.TextPanelController;
 import exp.ftxt.utils.PermissionHelper;

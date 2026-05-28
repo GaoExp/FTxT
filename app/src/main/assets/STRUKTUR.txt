@@ -16,7 +16,7 @@ FTxT/
 │   │   │   │   ├── NotificationHelper.java
 │   │   │   │   └── WakeLockManager.java
 │   │   │   │
-│   │   │   ├── modules/
+│   │   │   ├── features/
 │   │   │   │   ├── text/
 │   │   │   │   │   ├── TextConfig.java
 │   │   │   │   │   └── TextModule.java
