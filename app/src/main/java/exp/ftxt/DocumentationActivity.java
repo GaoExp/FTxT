@@ -25,6 +25,7 @@ public class DocumentationActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Dokumentasi");
         toolbar.setNavigationOnClickListener(v -> finish());
 
         findViewById(R.id.docReadmeButton).setOnClickListener(v -> showDoc("README"));

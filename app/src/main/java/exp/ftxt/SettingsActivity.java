@@ -34,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Konfigurasi");
         toolbar.setNavigationOnClickListener(v -> finish());
 
         overlaySwitch = findViewById(R.id.overlayPermissionSwitch);

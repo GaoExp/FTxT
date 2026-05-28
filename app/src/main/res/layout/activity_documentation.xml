@@ -9,13 +9,13 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#222222"
+        android:background="#2196F3"
         android:title="Dokumentasi"/>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
+        android:padding="0dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -24,52 +24,95 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:text="Pilih dokumen untuk dibaca:"
-                android:textSize="14sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"/>
-
-            <Button
                 android:id="@+id/docReadmeButton"
                 android:text="README"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"/>
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <TextView
                 android:id="@+id/docChangelogButton"
                 android:text="CHANGELOG"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"/>
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <TextView
                 android:id="@+id/docPanduanButton"
                 android:text="PANDUAN"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"/>
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <TextView
                 android:id="@+id/docStrukturButton"
                 android:text="STRUKTUR"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"/>
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <TextView
                 android:id="@+id/docDevelopmentButton"
                 android:text="DEVELOPMENT"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"/>
+                android:clickable="true"
+                android:focusable="true"/>
 
-            <Button
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <TextView
                 android:id="@+id/docTentangButton"
                 android:text="TENTANG"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"/>
 
         </LinearLayout>
 

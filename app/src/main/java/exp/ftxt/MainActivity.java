@@ -1,28 +1,37 @@
 package exp.ftxt;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.util.TypedValue;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
-
-import com.google.android.material.navigation.NavigationView;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
@@ -59,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
     private TextPanelController textPanel;
     private FpsPanelController fpsPanel;
 
+    private LinearLayout navItemContainer;
+    private Button btnTambahGrup;
+    private static final String PREFS_CUSTOM_GROUPS = "custom_groups";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Initialize SplashScreen API (must be called before setContentView)
@@ -87,17 +100,16 @@ public class MainActivity extends AppCompatActivity {
         panelText = findViewById(R.id.panel_text);
         panelFps = findViewById(R.id.panel_fps);
 
-        NavigationView navView = findViewById(R.id.navView);
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-        int savedNavItem = prefs.getInt("nav_selected_item", R.id.nav_floating_text);
-        navView.setCheckedItem(savedNavItem);
-        if (savedNavItem == R.id.nav_fps) {
+        int savedNavItem = prefs.getInt("nav_selected_item", R.id.navFloatingText);
+        if (savedNavItem == R.id.navFps) {
             panelText.setVisibility(View.GONE);
             panelFps.setVisibility(View.VISIBLE);
             getSupportActionBar().setTitle(R.string.nav_fps);
         }
 
-        TextView navTitle = navView.getHeaderView(0).findViewById(R.id.navHeaderTitle);
+        // Navigation drawer header
+        TextView navTitle = findViewById(R.id.navHeaderTitle);
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             navTitle.setText("FTxT v" + v);
@@ -105,46 +117,78 @@ public class MainActivity extends AppCompatActivity {
             navTitle.setText("FTxT");
         }
 
-        // Navigation drawer: switch antar panel modular
-        // Panel baru bisa ditambahkan di sini + drawer_menu.xml
-        navView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
+        // Collapsible groups
+        LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
+        TextView overlayIndicator = findViewById(R.id.groupOverlayIndicator);
+        LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
+        TextView fiturIndicator = findViewById(R.id.groupFiturIndicator);
 
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE).edit()
-                    .putInt("nav_selected_item", id).apply();
+        findViewById(R.id.groupOverlayHeader).setOnClickListener(v -> {
+            boolean visible = overlayContent.getVisibility() == View.VISIBLE;
+            overlayContent.setVisibility(visible ? View.GONE : View.VISIBLE);
+            overlayIndicator.setText(visible ? "+" : "−");
+        });
 
-            if (id == R.id.nav_floating_text) {
+        findViewById(R.id.groupFiturHeader).setOnClickListener(v -> {
+            boolean visible = fiturContent.getVisibility() == View.VISIBLE;
+            fiturContent.setVisibility(visible ? View.GONE : View.VISIBLE);
+            fiturIndicator.setText(visible ? "+" : "−");
+        });
+
+        // Drawer item click listener
+        View.OnClickListener navItemListener = v -> {
+            int id = v.getId();
+            prefs.edit().putInt("nav_selected_item", id).apply();
+            updateNavSelection(id);
+
+            if (id == R.id.navFloatingText) {
                 panelText.setVisibility(View.VISIBLE);
                 panelFps.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(R.string.nav_floating_text);
                 drawerLayout.closeDrawers();
                 textPanel.onPanelShown();
-                return true;
+                return;
             }
 
-            if (id == R.id.nav_fps) {
+            if (id == R.id.navFps) {
                 panelText.setVisibility(View.GONE);
                 panelFps.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.nav_fps);
                 drawerLayout.closeDrawers();
-                return true;
+                return;
             }
 
-            if (id == R.id.nav_dokumentasi) {
+            if (id == R.id.navDokumentasi) {
                 drawerLayout.closeDrawers();
                 startActivity(new Intent(this, DocumentationActivity.class));
-                return true;
+                return;
             }
 
-            if (id == R.id.nav_network || id == R.id.nav_battery || id == R.id.nav_clock
-                    || id == R.id.nav_cpu || id == R.id.nav_crosshair || id == R.id.nav_watermark || id == R.id.nav_logo) {
+            if (id == R.id.navNetwork || id == R.id.navBattery || id == R.id.navClock
+                    || id == R.id.navCpu || id == R.id.navCrosshair || id == R.id.navWatermark || id == R.id.navLogo) {
                 Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawers();
-                return true;
             }
+        };
 
-            return false;
-        });
+        findViewById(R.id.navFloatingText).setOnClickListener(navItemListener);
+        findViewById(R.id.navFps).setOnClickListener(navItemListener);
+        findViewById(R.id.navNetwork).setOnClickListener(navItemListener);
+        findViewById(R.id.navBattery).setOnClickListener(navItemListener);
+        findViewById(R.id.navClock).setOnClickListener(navItemListener);
+        findViewById(R.id.navCpu).setOnClickListener(navItemListener);
+        findViewById(R.id.navCrosshair).setOnClickListener(navItemListener);
+        findViewById(R.id.navWatermark).setOnClickListener(navItemListener);
+        findViewById(R.id.navLogo).setOnClickListener(navItemListener);
+        findViewById(R.id.navDokumentasi).setOnClickListener(navItemListener);
+
+        updateNavSelection(savedNavItem);
+
+        navItemContainer = findViewById(R.id.navItemContainer);
+        btnTambahGrup = findViewById(R.id.btnTambahGrup);
+        btnTambahGrup.setOnClickListener(v -> showAddGroupDialog());
+        setupDrawerAllItemsDrag();
+        loadCustomGroups();
 
         loadShadowConfigs();
 
@@ -376,5 +420,299 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
         FpsConfig.bgOffsetX = prefs.getInt("fps_bg_offset_x", 0);
         FpsConfig.bgOffsetY = prefs.getInt("fps_bg_offset_y", 0);
+    }
+
+    private void updateNavSelection(int selectedId) {
+        int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
+                R.id.navClock, R.id.navCpu, R.id.navCrosshair, R.id.navWatermark, R.id.navLogo, R.id.navDokumentasi};
+        for (int id : allIds) {
+            View v = findViewById(id);
+            if (v != null) {
+                v.setSelected(v.getId() == selectedId);
+            }
+        }
+    }
+
+    // ========================================================================
+    // Tambah Grup — dialog untuk membuat grup kustom di sidebar
+    // ========================================================================
+
+    private void showAddGroupDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Tambah Grup Baru");
+
+        EditText input = new EditText(this);
+        input.setHint("Nama grup");
+        int pad = dp(20);
+        input.setPadding(pad, pad / 2, pad, pad / 2);
+        builder.setView(input);
+
+        builder.setPositiveButton("Tambah", (dialog, which) -> {
+            String name = input.getText().toString().trim();
+            if (!name.isEmpty()) {
+                addCustomGroup(name);
+            }
+        });
+        builder.setNegativeButton("Batal", null);
+        builder.show();
+    }
+
+    private void addCustomGroup(String name) {
+        LinearLayout groupSection = createDynamicGroup(name, new String[0]);
+        navItemContainer.addView(groupSection);
+
+        saveCustomGroups();
+    }
+
+    private boolean isLoadingGroups = false;
+
+    private LinearLayout createDynamicGroup(String name, String[] items) {
+        int groupId = View.generateViewId();
+        int contentId = View.generateViewId();
+        int indicatorId = View.generateViewId();
+
+        LinearLayout section = new LinearLayout(this);
+        section.setOrientation(LinearLayout.VERTICAL);
+        section.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // Divider
+        View divider = new View(this);
+        divider.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 1));
+        divider.setBackgroundColor(0xFFE0E0E0);
+        section.addView(divider);
+        section.setTag("custom_group");
+
+        // Group header
+        LinearLayout header = new LinearLayout(this);
+        header.setId(groupId);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setPadding(dp(16), dp(16), dp(16), dp(16));
+        header.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        header.setClickable(true);
+        header.setFocusable(true);
+        header.setBackgroundResource(android.R.attr.selectableItemBackground);
+
+        TextView title = new TextView(this);
+        title.setText(name);
+        title.setTextSize(14);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
+        title.setTextColor(0xFF333333);
+        title.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+        TextView indicator = new TextView(this);
+        indicator.setId(indicatorId);
+        indicator.setText("−");
+        indicator.setTextSize(16);
+        indicator.setTextColor(0xFF999999);
+
+        header.addView(title);
+        header.addView(indicator);
+        section.addView(header);
+
+        // Content
+        LinearLayout content = new LinearLayout(this);
+        content.setId(contentId);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        for (String item : items) {
+            addItemToGroup(content, item);
+        }
+
+        // Add item button inside group
+        LinearLayout addRow = new LinearLayout(this);
+        addRow.setOrientation(LinearLayout.HORIZONTAL);
+        addRow.setPadding(dp(32), dp(4), dp(16), dp(12));
+
+        EditText itemInput = new EditText(this);
+        itemInput.setHint("Tambah item...");
+        itemInput.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        itemInput.setTextSize(14);
+
+        Button addBtn = new Button(this);
+        addBtn.setText("+");
+        addBtn.setTextSize(14);
+        addBtn.setOnClickListener(v -> {
+            String itemName = itemInput.getText().toString().trim();
+            if (!itemName.isEmpty()) {
+                addItemToGroup(content, itemName);
+                itemInput.setText("");
+                saveCustomGroups();
+            }
+        });
+
+        addRow.addView(itemInput);
+        addRow.addView(addBtn);
+        content.addView(addRow);
+
+        section.addView(content);
+
+        // Collapse/expand toggle
+        header.setOnClickListener(v -> {
+            boolean visible = content.getVisibility() == View.VISIBLE;
+            content.setVisibility(visible ? View.GONE : View.VISIBLE);
+            indicator.setText(visible ? "+" : "−");
+        });
+
+        return section;
+    }
+
+    private void addItemToGroup(LinearLayout content, String itemText) {
+        int insertPos = content.getChildCount() - 1; // before add-item row
+        TextView item = new TextView(this);
+        item.setText(itemText);
+        item.setTextSize(16);
+        item.setPadding(dp(32), dp(12), dp(16), dp(12));
+        item.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        item.setBackgroundResource(android.R.attr.selectableItemBackground);
+        item.setClickable(true);
+        item.setFocusable(true);
+        item.setLongClickable(true);
+
+        makeDraggable(item);
+        content.addView(item, insertPos);
+
+        if (!isLoadingGroups) saveCustomGroups();
+    }
+
+    // ========================================================================
+    // Drag-to-reorder — long-press untuk memindahkan item
+    // ========================================================================
+
+    private void setupDrawerAllItemsDrag() {
+        // Setup drag on all built-in items in Overlay group
+        LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
+        for (int i = 0; i < overlayContent.getChildCount(); i++) {
+            View child = overlayContent.getChildAt(i);
+            child.setLongClickable(true);
+            makeDraggable(child);
+        }
+
+        // Setup drag on all built-in items in Fitur group
+        LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
+        for (int i = 0; i < fiturContent.getChildCount(); i++) {
+            View child = fiturContent.getChildAt(i);
+            child.setLongClickable(true);
+            makeDraggable(child);
+        }
+    }
+
+    private void makeDraggable(View view) {
+        view.setOnLongClickListener(v -> {
+            ClipData data = ClipData.newPlainText("", "");
+            View.DragShadowBuilder shadow = new View.DragShadowBuilder(v);
+            v.startDragAndDrop(data, shadow, v, 0);
+            v.setVisibility(View.INVISIBLE);
+            return true;
+        });
+
+        view.setOnDragListener((v, event) -> {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return true;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    v.setAlpha(0.5f);
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    v.setAlpha(1f);
+                    return true;
+                case DragEvent.ACTION_DROP: {
+                    View dragged = (View) event.getLocalState();
+                    ViewGroup parent = (ViewGroup) v.getParent();
+                    if (parent != null && dragged.getParent() == parent) {
+                        int draggedIdx = parent.indexOfChild(dragged);
+                        int targetIdx = parent.indexOfChild(v);
+                        if (draggedIdx >= 0 && targetIdx >= 0 && draggedIdx != targetIdx) {
+                            parent.removeView(dragged);
+                            parent.addView(dragged, targetIdx);
+                            saveCustomGroups();
+                        }
+                    }
+                    dragged.setVisibility(View.VISIBLE);
+                    return true;
+                }
+                case DragEvent.ACTION_DRAG_ENDED: {
+                    View dv = (View) event.getLocalState();
+                    if (dv != null) {
+                        dv.setVisibility(View.VISIBLE);
+                        dv.setAlpha(1f);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    // ========================================================================
+    // Persistensi grup kustom ke SharedPreferences (JSON)
+    // ========================================================================
+
+    private void saveCustomGroups() {
+        JSONArray arr = new JSONArray();
+        for (int i = 0; i < navItemContainer.getChildCount(); i++) {
+            View child = navItemContainer.getChildAt(i);
+            if ("custom_group".equals(child.getTag()) && child instanceof LinearLayout) {
+                LinearLayout section = (LinearLayout) child;
+                if (section.getChildCount() >= 3) {
+                    LinearLayout header = (LinearLayout) section.getChildAt(1);
+                    if (header.getChildCount() >= 1 && header.getChildAt(0) instanceof TextView) {
+                        String name = ((TextView) header.getChildAt(0)).getText().toString();
+                        LinearLayout content = (LinearLayout) section.getChildAt(2);
+                        JSONArray itemsArr = new JSONArray();
+                        for (int j = 0; j < content.getChildCount() - 1; j++) {
+                            View itemView = content.getChildAt(j);
+                            if (itemView instanceof TextView) {
+                                itemsArr.put(((TextView) itemView).getText().toString());
+                            }
+                        }
+                        try {
+                            JSONObject obj = new JSONObject();
+                            obj.put("name", name);
+                            obj.put("items", itemsArr);
+                            arr.put(obj);
+                        } catch (Exception e) {
+                            // skip
+                        }
+                    }
+                }
+            }
+        }
+
+        getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .edit().putString(PREFS_CUSTOM_GROUPS, arr.toString()).apply();
+    }
+
+    private void loadCustomGroups() {
+        isLoadingGroups = true;
+        String json = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getString(PREFS_CUSTOM_GROUPS, "[]");
+        try {
+            JSONArray arr = new JSONArray(json);
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                String name = obj.getString("name");
+                JSONArray itemsArr = obj.getJSONArray("items");
+                String[] items = new String[itemsArr.length()];
+                for (int j = 0; j < itemsArr.length(); j++) {
+                    items[j] = itemsArr.getString(j);
+                }
+                LinearLayout section = createDynamicGroup(name, items);
+                navItemContainer.addView(section);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        isLoadingGroups = false;
+    }
+
+    private int dp(float dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 }

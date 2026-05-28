@@ -10,8 +10,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#222222"
-        android:title="Pengaturan"/>
+        android:background="#2196F3"
+        android:title="Konfigurasi"/>
 
     <LinearLayout
         android:orientation="vertical"
