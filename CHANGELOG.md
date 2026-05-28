@@ -3,6 +3,35 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.35.0] - 2026-05-28
+
+### ✨ Fitur Baru
+
+- **DocumentationActivity**: Antarmuka khusus dokumentasi dengan daftar 6 dokumen (README, CHANGELOG, PANDUAN, STRUKTUR, DEVELOPMENT, TENTANG) — bukan lagi dialog tengah, melainkan halaman penuh seperti Settings.
+- **Drawer → Dokumentasi**: Entry "Dokumentasi" ditambahkan di navigation drawer (di luar grup module) untuk akses cepat tanpa melalui popup settings.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/menu/drawer_menu.xml
+- app/src/main/res/values/strings.xml
+- AndroidManifest.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/DocumentationActivity.java`
+- `app/src/main/res/layout/activity_documentation.xml`
+
+### 🔢 Version
+
+- versionCode: 77 → 78
+- versionName: 2.3.1.34.0 → 2.3.1.35.0
+
+---
+
 ## [2.3.1.34.0] - 2026-05-28
 
 ### ✨ Fitur Baru
