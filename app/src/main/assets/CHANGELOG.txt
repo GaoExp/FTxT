@@ -3,11 +3,12 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
-## [2.3.1.28.0] - 2026-05-27
+## [2.3.1.29.0] - 2026-05-27
 
 ### ✨ Fitur Baru
 
 - **Edit HEX Manual**: Tambah ikon sunting di samping nilai HEX untuk mengedit warna secara manual via input teks.
+- **Edit ARGB Langsung**: Klik label R, G, B, A untuk mengedit nilai numerik—slider menyesuaikan otomatis.
 - **Salin Nilai Warna**: Tekan lama nilai HEX, HSV, atau ARGB untuk menyalin ke clipboard.
 
 ### 🗒️ File Added
@@ -26,8 +27,8 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### 🔢 Version
 
-- versionCode: 61 → 62
-- versionName: 2.3.1.27.0 → 2.3.1.28.0
+- versionCode: 61 → 63
+- versionName: 2.3.1.27.0 → 2.3.1.29.0
 
 ---
 

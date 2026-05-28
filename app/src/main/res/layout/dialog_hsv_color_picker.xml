@@ -78,7 +78,9 @@
             android:textStyle="bold"
             android:textColor="#E53935"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <SeekBar
             android:id="@+id/redSeekBar"
@@ -103,7 +105,9 @@
             android:textStyle="bold"
             android:textColor="#43A047"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <SeekBar
             android:id="@+id/greenSeekBar"
@@ -128,7 +132,9 @@
             android:textStyle="bold"
             android:textColor="#1E88E5"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <SeekBar
             android:id="@+id/blueSeekBar"
@@ -153,7 +159,9 @@
             android:textStyle="bold"
             android:textColor="#757575"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <SeekBar
             android:id="@+id/alphaSeekBar"

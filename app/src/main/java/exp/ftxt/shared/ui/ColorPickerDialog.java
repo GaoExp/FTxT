@@ -119,6 +119,26 @@ public class ColorPickerDialog {
             return true;
         });
 
+        redLabel.setOnClickListener(v -> showValueEditor(activity, "R", redSeekBar, 255,
+                colorPreview, hexValue, hsvValue, rgbValue,
+                redLabel, greenLabel, blueLabel, alphaLabel,
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+
+        greenLabel.setOnClickListener(v -> showValueEditor(activity, "G", greenSeekBar, 255,
+                colorPreview, hexValue, hsvValue, rgbValue,
+                redLabel, greenLabel, blueLabel, alphaLabel,
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+
+        blueLabel.setOnClickListener(v -> showValueEditor(activity, "B", blueSeekBar, 255,
+                colorPreview, hexValue, hsvValue, rgbValue,
+                redLabel, greenLabel, blueLabel, alphaLabel,
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+
+        alphaLabel.setOnClickListener(v -> showValueEditor(activity, "A", alphaSeekBar, 255,
+                colorPreview, hexValue, hsvValue, rgbValue,
+                redLabel, greenLabel, blueLabel, alphaLabel,
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+
         builder.setTitle(title);
         builder.setView(dialogView);
 
@@ -146,6 +166,37 @@ public class ColorPickerDialog {
     private static void copyToClipboard(Context context, String text) {
         ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("color", text));
+    }
+
+    private static void showValueEditor(Activity activity, String label, SeekBar bar, int max,
+                                          TextView colorPreview, TextView hexValue, TextView hsvValue, TextView rgbValue,
+                                          TextView redLabel, TextView greenLabel, TextView blueLabel, TextView alphaLabel,
+                                          SeekBar redSeekBar, SeekBar greenSeekBar, SeekBar blueSeekBar, SeekBar alphaSeekBar) {
+        EditText input = new EditText(activity);
+        input.setText(String.valueOf(bar.getProgress()));
+        input.setSelection(input.length());
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Edit " + label)
+                .setView(input)
+                .setPositiveButton("OK", (d, w) -> {
+                    try {
+                        int val = Integer.parseInt(input.getText().toString().trim());
+                        if (val < 0 || val > max) {
+                            Toast.makeText(activity, "Nilai harus 0-" + max, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        bar.setProgress(val);
+                        updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
+                                redLabel, greenLabel, blueLabel, alphaLabel,
+                                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
     }
 
     private static void updateDisplay(TextView preview, TextView hex, TextView hsv, TextView rgb,

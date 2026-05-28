@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.28.0`        
+**Current Release:** `2.3.1.29.0`        
 **Last Updated:** `2026-05-27`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -37,7 +37,7 @@ Fitur:
 - HEX value display (8 digit #AARRGGBB), bisa diedit manual
 - HSV value display, tekan lama untuk salin
 - ARGB value display, tekan lama untuk salin
-- R, G, B, A sliders (0–255)
+- R, G, B, A sliders (0–255), label bisa diklik untuk edit manual
 - Real-time apply
 
 
