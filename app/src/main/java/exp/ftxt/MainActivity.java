@@ -76,8 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(R.string.nav_floating_text);
-
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.nav_open, R.string.nav_close);
@@ -88,7 +86,14 @@ public class MainActivity extends AppCompatActivity {
         panelFps = findViewById(R.id.panel_fps);
 
         NavigationView navView = findViewById(R.id.navView);
-        navView.setCheckedItem(R.id.nav_floating_text);
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        int savedNavItem = prefs.getInt("nav_selected_item", R.id.nav_floating_text);
+        navView.setCheckedItem(savedNavItem);
+        if (savedNavItem == R.id.nav_fps) {
+            panelText.setVisibility(View.GONE);
+            panelFps.setVisibility(View.VISIBLE);
+            getSupportActionBar().setTitle(R.string.nav_fps);
+        }
 
         TextView navTitle = navView.getHeaderView(0).findViewById(R.id.navHeaderTitle);
         try {
@@ -103,11 +108,15 @@ public class MainActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE).edit()
+                    .putInt("nav_selected_item", id).apply();
+
             if (id == R.id.nav_floating_text) {
                 panelText.setVisibility(View.VISIBLE);
                 panelFps.setVisibility(View.GONE);
                 getSupportActionBar().setTitle(R.string.nav_floating_text);
                 drawerLayout.closeDrawers();
+                textPanel.onPanelShown();
                 return true;
             }
 
@@ -141,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (textPanel != null && panelText.getVisibility() == View.VISIBLE) {
+            textPanel.onPanelShown();
+        }
         autoRequestAndStart();
     }
 

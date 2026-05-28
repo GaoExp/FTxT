@@ -44,6 +44,7 @@ public class TextPanelController {
     private TextView textSizeLabel, bgPaddingLabel, bgOffsetXLabel, bgOffsetYLabel;
     private TextView bgMarginLabel, bgRadiusLabel;
     private TextView shadowBlurLabel, shadowOffsetXLabel, shadowOffsetYLabel;
+    private PositionController positionController;
 
     public TextPanelController(MainActivity activity) {
         this.activity = activity;
@@ -51,6 +52,13 @@ public class TextPanelController {
         loadConfig();
         setupListeners();
         applyInitialTints();
+        positionController = new PositionController(activity);
+    }
+
+    public void onPanelShown() {
+        if (positionController != null) {
+            positionController.refresh();
+        }
     }
 
     public void autoStart() {

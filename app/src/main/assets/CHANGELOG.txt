@@ -3,6 +3,74 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.33.0] - 2026-05-28
+
+### ✨ Fitur Baru
+
+- **Kontrol Posisi 3-in-1**: Tambah sistem kontrol posisi untuk Floating Text dengan 3 metode input sinkron: Slider X/Y, D-Pad (↑↓←→, tahan untuk repeat), dan XY Pad (drag area 2D). State posisi menggunakan nilai float 0.0–1.0 yang dibagikan.
+- **Shared State**: Semua kontrol membaca/menulis ke state `TextConfig.posX`/`posY` yang sama dengan guard `isUpdating` untuk hindari infinite loop.
+- **Position Migration**: Migrasi posisi dari pixel absolut (`text_x`/`text_y`) ke persentase layar (`text_pos_x`/`text_pos_y`) dengan backward compatibility otomatis.
+- **XyPadView**: Custom View 2D drag area di `shared/ui/XyPadView.java`.
+- **PositionController**: Controller modular untuk semua kontrol posisi di `ui/PositionController.java`.
+- **Potret/Landscape Auto-Config**: Posisi overlay disimpan terpisah untuk mode portrait dan landscape, otomatis berganti saat orientasi berubah.
+- **Preset Posisi**: Simpan/load posisi favorit (max 10 preset) dengan nama kustom.
+- **Reset Posisi**: Tombol untuk mengembalikan posisi ke tengah layar (0.5, 0.5).
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java`
+- `app/src/main/java/exp/ftxt/ui/PositionController.java`
+
+### 🔢 Version
+
+- versionCode: 73 → 74
+- versionName: 2.3.1.32.7 → 2.3.1.33.0
+
+---
+
+## [2.3.1.32.5] - 2026-05-28
+
+### 🐛 Perbaikan
+
+- **Shadow config flicker**: Tambah `android:visibility="gone"` pada `shadowConfigText` dan `shadowConfigFps` agar tidak tampil sesaat sebelum controller set visibility.
+- **Panel reset saat ganti tema**: Simpan panel terpilih (`nav_selected_item`) ke SharedPreferences agar tidak kembali ke Floating Text setelah `recreate()`.
+
+### 🧹 Bersih-Bersih
+
+- **Hapus `nav_exit`**: String `nav_exit` yang sudah tidak dipakai (Force Close sudah dipindah ke Settings).
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/res/values/strings.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 70 → 71
+- versionName: 2.3.1.32.4 → 2.3.1.32.5
+
+---
+
 ## [2.3.1.32.4] - 2026-05-28
 
 ### 🔧 Optimasi & Penyesuaian

@@ -242,6 +242,7 @@
                 <LinearLayout
                     android:id="@+id/shadowConfigText"
                     android:orientation="vertical"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -299,6 +300,125 @@
                         android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:text="Kontrol Posisi"
+                    android:layout_marginTop="16dp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/posXLabel"
+                    android:text="X: 0.50"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/posXSeekBar"
+                    android:max="1000"
+                    android:progress="500"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/posYLabel"
+                    android:text="Y: 0.50"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/posYSeekBar"
+                    android:max="1000"
+                    android:progress="500"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnUp"
+                        android:text="↑"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/btnLeft"
+                            android:text="←"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"/>
+
+                        <Space
+                            android:layout_width="64dp"
+                            android:layout_height="1dp"/>
+
+                        <Button
+                            android:id="@+id/btnRight"
+                            android:text="→"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"/>
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnDown"
+                        android:text="↓"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"/>
+
+                </LinearLayout>
+
+                <exp.ftxt.shared.ui.XyPadView
+                    android:id="@+id/xyPad"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnSavePreset"
+                        android:text="Simpan Preset"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnLoadPreset"
+                        android:text="Muat Preset"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnResetPos"
+                        android:text="Reset"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
 
                 </LinearLayout>
 
@@ -525,6 +645,7 @@
                 <LinearLayout
                     android:id="@+id/shadowConfigFps"
                     android:orientation="vertical"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 

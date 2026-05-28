@@ -17,4 +17,6 @@ public class TextConfig {
     public static int bgOffsetY = 0;
     public static int bgMargin = 0;
     public static int bgRadius = 0;
+    public static float posX = 0.5f;
+    public static float posY = 0.5f;
 }

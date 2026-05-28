@@ -2,7 +2,9 @@ package exp.ftxt.modules.text;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -30,12 +32,19 @@ public class TextModule {
     private WindowManager wm;
     private Context context;
     private SharedPreferences prefs;
+    private int screenWidth;
+    private int screenHeight;
 
     public void init(WindowManager windowManager, Context ctx,
                      SharedPreferences sp) {
         wm = windowManager;
         context = ctx;
         prefs = sp;
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
+        loadPosition(prefs);
     }
 
     public void createOverlay() {
@@ -52,13 +61,15 @@ public class TextModule {
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 PixelFormat.TRANSLUCENT
         );
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = prefs.getInt("text_x", 100);
-        params.y = prefs.getInt("text_y", 300);
+        params.x = (int)(TextConfig.posX * screenWidth);
+        params.y = (int)(TextConfig.posY * screenHeight);
 
         OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
 
@@ -93,6 +104,18 @@ public class TextModule {
     public void updateShadow() {
         if (view != null) view.setShadowConfig(TextConfig.shadow);
         OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
+    }
+
+    public void updatePosition() {
+        if (view != null && params != null && wm != null) {
+            params.x = (int)(TextConfig.posX * screenWidth);
+            params.y = (int)(TextConfig.posY * screenHeight);
+            try {
+                wm.updateViewLayout(view, params);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void updateBackground() {
@@ -130,16 +153,56 @@ public class TextModule {
         }
     }
 
+    private String posSuffix() {
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
     public void loadPosition(SharedPreferences prefs) {
+        String sfx = posSuffix();
+        String keyX = "text_pos_x" + sfx;
+        String keyY = "text_pos_y" + sfx;
+
+        if (prefs.contains(keyX) && prefs.contains(keyY)) {
+            TextConfig.posX = prefs.getFloat(keyX, 0.5f);
+            TextConfig.posY = prefs.getFloat(keyY, 0.5f);
+        } else if (prefs.contains("text_pos_x")) {
+            TextConfig.posX = prefs.getFloat("text_pos_x", 0.5f);
+            TextConfig.posY = prefs.getFloat("text_pos_y", 0.5f);
+            prefs.edit()
+                    .putFloat(keyX, TextConfig.posX)
+                    .putFloat(keyY, TextConfig.posY)
+                    .remove("text_pos_x")
+                    .remove("text_pos_y")
+                    .apply();
+        } else if (prefs.contains("text_x")) {
+            TextConfig.posX = (float) prefs.getInt("text_x", 100) / screenWidth;
+            TextConfig.posY = (float) prefs.getInt("text_y", 300) / screenHeight;
+            prefs.edit()
+                    .putFloat(keyX, TextConfig.posX)
+                    .putFloat(keyY, TextConfig.posY)
+                    .remove("text_x")
+                    .remove("text_y")
+                    .apply();
+        } else {
+            TextConfig.posX = 0.5f;
+            TextConfig.posY = 0.5f;
+        }
         if (params != null) {
-            params.x = prefs.getInt("text_x", 100);
-            params.y = prefs.getInt("text_y", 300);
+            params.x = (int)(TextConfig.posX * screenWidth);
+            params.y = (int)(TextConfig.posY * screenHeight);
         }
     }
 
     public void savePosition(SharedPreferences prefs) {
         if (params != null) {
-            prefs.edit().putInt("text_x", params.x).putInt("text_y", params.y).apply();
+            TextConfig.posX = (float) params.x / screenWidth;
+            TextConfig.posY = (float) params.y / screenHeight;
+            String sfx = posSuffix();
+            prefs.edit()
+                    .putFloat("text_pos_x" + sfx, TextConfig.posX)
+                    .putFloat("text_pos_y" + sfx, TextConfig.posY)
+                    .apply();
         }
     }
 

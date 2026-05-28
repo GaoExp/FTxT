@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.32.4`        
+**Current Release:** `2.3.1.33.0`        
 **Last Updated:** `2026-05-28`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -52,6 +52,41 @@ Kontrol perilaku sentuhan overlay. **Default: ON** (Kunci Posisi aktif).
 - Sentuhan diteruskan ke aplikasi belakang
 - Overlay tidak mengganggu interaksi aplikasi lain
 
+
+### Position Control 🎯
+Kontrol posisi overlay Floating Text secara presisi dengan 3 metode input yang saling sinkron.
+
+**Slider X/Y**
+- Slider horizontal untuk sumbu X dan Y (0%–100%)
+- Nilai ditampilkan sebagai persentase layar
+- Real-time update posisi overlay
+
+**D-Pad ↑↓←→**
+- Tombol arah untuk penyesuaian step (1% per klik)
+- Tahan tombol untuk gerakan kontinu (repeat 100ms)
+- Presisi untuk fine-tuning posisi
+
+**XY Pad (Drag Area)**
+- Area 2D kotak dengan titik draggable
+- Drag bebas ke posisi mana pun
+- Posisi titik selalu sinkron dengan slider dan D-Pad
+
+**Shared State**
+- Semua metode membaca state `posX`/`posY` yang sama (0.0–1.0)
+- Tidak ada infinite loop berkat guard `isUpdating`
+- Posisi tersimpan otomatis saat overlay di-drag manual
+
+**Orientation-Aware**
+- Posisi tersimpan terpisah untuk mode potret dan landscape
+- Konfigurasi otomatis berganti saat orientasi berubah
+
+**Preset Posisi**
+- Simpan posisi favorit (max 10 preset) dengan nama kustom
+- Muat preset dengan sekali klik
+- Tombol "Simpan Preset" dan "Muat Preset" di panel kontrol
+
+**Reset Posisi**
+- Tombol "Reset" untuk mengembalikan posisi ke tengah layar (50%, 50%)
 
 ### Dark/Light Theme Toggle 🌙
 Toggle tema gelap atau terang dari toolbar.
@@ -186,7 +221,7 @@ Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
 - Bulan 🌙 → Toggle tema gelap/terang
 
-Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.32.4") di samping nama aplikasi di navigation drawer header.
+Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.33.0") di samping nama aplikasi di navigation drawer header.
 
 ### 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
@@ -242,7 +277,7 @@ Shadow       → updateShadowStatic()
 ---
 
 ### Position Persistence
-Posisi overlay disimpan menggunakan SharedPreferences.
+Posisi overlay disimpan menggunakan SharedPreferences dengan pemisahan orientasi.
 
 Behaviour:
 ```txt
@@ -253,8 +288,10 @@ onCreate()    → Restore posisi terakhir
 
 SharedPreferences key:
 ```txt
-text_x
-text_y
+text_pos_x_port   → Posisi X mode potret
+text_pos_y_port   → Posisi Y mode potret
+text_pos_x_land   → Posisi X mode landscape
+text_pos_y_land   → Posisi Y mode landscape
 shadow_enabled
 ```
 
@@ -362,7 +399,9 @@ FTxT/
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
 | shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
 | shared/ui/SliderLabelEditor.java | Shared utility edit nilai slider via dialog |
+| shared/ui/XyPadView.java | Custom View 2D drag area untuk kontrol posisi |
 | ui/TextPanelController.java | Controller panel Floating Text |
+| ui/PositionController.java | Controller kontrol posisi (slider, d-pad, xy-pad) |
 | ui/FpsPanelController.java | Controller panel FPS Display |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_main.xml | Layout utama |

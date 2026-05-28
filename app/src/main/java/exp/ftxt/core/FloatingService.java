@@ -131,6 +131,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateTextPositionStatic() {
+        if (instance != null && instance.textModule != null) {
+            instance.textModule.updatePosition();
+        }
+    }
+
     public static void updateShadowStatic() {
         if (instance != null && instance.textModule != null) {
             instance.textModule.updateShadow();
