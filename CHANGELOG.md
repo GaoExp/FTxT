@@ -17,8 +17,6 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - app/src/main/java/exp/ftxt/shared/ui/ShadowConfig.java
 - app/src/main/java/exp/ftxt/ui/TextPanelController.java
 - app/src/main/java/exp/ftxt/ui/FpsPanelController.java
-- README.md
-- app/src/main/assets/README.txt
 - CHANGELOG.md
 - app/src/main/assets/CHANGELOG.txt
 

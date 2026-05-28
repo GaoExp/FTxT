@@ -208,7 +208,6 @@ JANGAN isi:
 - refactor internal
 - cleanup kecil
 - dependency update
-- patch-only changes
 - perubahan invisible bagi user
 
 WAJIB update bila:
@@ -249,8 +248,8 @@ Sesudah mengedit:
 1. update kode
 2. update versionCode
 3. update versionName
-4. update `CHANGELOG.md` (root) + `CHANGELOG.txt` (assets) — keduanya selalu sinkron
-5. update `README.md` (root) + `README.txt` (assets) — keduanya selalu sinkron
+4. update `CHANGELOG.md` (root) + `CHANGELOG.txt` (assets) 
+5. update `README.md` (root) + `README.txt` (assets) 
 
 ---
 
