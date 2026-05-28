@@ -8,5 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="SettingsPopupAnimation" parent="android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/settings_popup_enter</item>
+        <item name="android:windowExitAnimation">@anim/settings_popup_exit</item>
+    </style>
+
+    <style name="SettingsPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupAnimationStyle">@style/SettingsPopupAnimation</item>
+    </style>
+
 </resources>
 

@@ -1,6 +1,7 @@
 package exp.ftxt;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.net.Uri;
@@ -8,7 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +19,6 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-
-import exp.ftxt.core.FloatingService;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -40,8 +39,12 @@ public class SettingsActivity extends AppCompatActivity {
         overlaySwitch = findViewById(R.id.overlayPermissionSwitch);
         notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
         batterySwitch = findViewById(R.id.batteryPermissionSwitch);
+        CheckBox confirmExitCheck = findViewById(R.id.confirmExitCheck);
 
-        Button exitButton = findViewById(R.id.exitButton);
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        confirmExitCheck.setChecked(prefs.getBoolean("confirm_exit", false));
+        confirmExitCheck.setOnCheckedChangeListener((buttonView, isChecked) ->
+                prefs.edit().putBoolean("confirm_exit", isChecked).apply());
 
         updatePermissionSwitches();
 
@@ -75,7 +78,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        exitButton.setOnClickListener(v -> forceClose());
     }
 
     @Override
@@ -114,15 +116,6 @@ public class SettingsActivity extends AppCompatActivity {
         batterySwitch.setChecked(batteryOk);
         applySwitchTint(batterySwitch, batteryOk);
     }
-
-    private void forceClose() {
-        if (FloatingService.instance != null) {
-            stopService(new Intent(this, FloatingService.class));
-        }
-        finishAffinity();
-        System.exit(0);
-    }
-
 
 }
 

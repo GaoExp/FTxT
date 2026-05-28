@@ -3,6 +3,34 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.34.0] - 2026-05-28
+
+### ✨ Fitur Baru
+
+- **Konfirmasi Keluar**: Opsi checkbox di Konfigurasi — ketika aktif, tombol kembali harus ditekan dua kali untuk keluar dari aplikasi. Toast "Tekan kembali lagi untuk keluar" muncul pada tekan pertama.
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Popup di Bawah Ikon**: Popup settings kini muncul sebagai dropdown di bawah ikon pengaturan (PopupMenu + Gravity.END), bukan dialog tengah.
+- **Tutup Aplikasi Pindah ke Popup**: Tombol "Tutup Aplikasi" dipindah dari SettingsActivity ke popup settings, bisa diakses dari mana saja.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- app/src/main/res/values/strings.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 76 → 77
+- versionName: 2.3.1.33.2 → 2.3.1.34.0
+
+---
+
 ## [2.3.1.33.2] - 2026-05-28
 
 ### 🔧 Optimasi & Penyesuaian

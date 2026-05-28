@@ -6,15 +6,17 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.util.TypedValue;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -299,20 +301,52 @@ public class MainActivity extends AppCompatActivity {
     // ========================================================================
 
     // ========================================================================
-    // Settings popup — gear icon → pilih Konfigurasi atau Lihat Dokumentasi
+    // Settings popup — gear icon → dropdown: Konfigurasi, Dokumentasi, Tutup
     // ========================================================================
     private void showSettingsPopup() {
-        String[] items = {"Konfigurasi", "Lihat Dokumentasi"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pengaturan");
-        builder.setItems(items, (dialog, which) -> {
-            if (which == 0) {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);
+        popup.getMenu().add("Konfigurasi");
+        popup.getMenu().add("Lihat Dokumentasi");
+        popup.getMenu().add("Tutup Aplikasi");
+        popup.setOnMenuItemClickListener(item -> {
+            String title = item.getTitle().toString();
+            if (title.equals("Konfigurasi")) {
                 startActivity(new Intent(this, SettingsActivity.class));
-            } else {
+            } else if (title.equals("Lihat Dokumentasi")) {
                 showDocumentationDialog();
+            } else if (title.equals("Tutup Aplikasi")) {
+                forceClose();
             }
+            return true;
         });
-        builder.create().show();
+        popup.show();
+    }
+
+    private long backPressedTime;
+
+    @Override
+    public void onBackPressed() {
+        boolean confirmExit = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("confirm_exit", false);
+        if (confirmExit) {
+            if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                super.onBackPressed();
+            } else {
+                backPressedTime = System.currentTimeMillis();
+                Toast.makeText(this, "Tekan kembali lagi untuk keluar", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    private void forceClose() {
+        if (FloatingService.instance != null) {
+            stopService(new Intent(this, FloatingService.class));
+        }
+        finishAffinity();
+        System.exit(0);
     }
 
     private void showDocumentationDialog() {
