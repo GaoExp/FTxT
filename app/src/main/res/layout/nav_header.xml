@@ -9,6 +9,7 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/navHeaderTitle"
         android:text="FTxT"
         android:textSize="20sp"
         android:textColor="#FFFFFF"

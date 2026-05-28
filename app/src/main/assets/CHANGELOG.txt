@@ -3,6 +3,29 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.30.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Versi di Sidebar**: Tambah nomor versi terkini di samping nama aplikasi di header navigation drawer (contoh: FTxT v2.3.1.30.0).
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/nav_header.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 63 → 64
+- versionName: 2.3.1.29.0 → 2.3.1.30.0
+
+---
+
 ## [2.3.1.29.0] - 2026-05-27
 
 ### ✨ Fitur Baru

@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -84,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationView navView = findViewById(R.id.navView);
         navView.setCheckedItem(R.id.nav_floating_text);
+
+        TextView navTitle = navView.getHeaderView(0).findViewById(R.id.navHeaderTitle);
+        try {
+            String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            navTitle.setText("FTxT v" + v);
+        } catch (PackageManager.NameNotFoundException e) {
+            navTitle.setText("FTxT");
+        }
 
         // Navigation drawer: switch antar panel modular
         // Panel baru bisa ditambahkan di sini + drawer_menu.xml
