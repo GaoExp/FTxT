@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.32.0`        
+**Current Release:** `2.3.1.32.2`        
 **Last Updated:** `2026-05-28`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -65,8 +65,8 @@ Konfigurasi latar belakang overlay dengan warna kustom (termasuk alpha/transpara
 Fitur:
 - Enable/disable background
 - Pilih warna background via color picker (ARGB dengan alpha slider)
-- Ukuran background (padding dari teks, 0–80px)
-- Offset X/Y background (0–60px)
+- Ukuran background (padding dari teks, 0–80 px)
+- Offset X/Y background (-60 hingga 60 px, default 0 di tengah)
 - Berlaku untuk Floating Text dan FPS Display
 - Real-time update
 
@@ -77,8 +77,8 @@ Konfigurasi shadow teks untuk setiap modul overlay.
 Fitur:
 - Enable/disable shadow
 - Warna shadow (color picker with alpha)
-- Blur radius (0–50)
-- Offset X & Y (0–30)
+- Blur radius (0–50 px)
+- Offset X & Y (-60 hingga 60 px, default 0 di tengah)
 - Diterapkan real-time via `setShadowLayer()`
 
 ### FPS Display Overlay 📊
@@ -87,10 +87,16 @@ Tampilkan FPS counter sebagai overlay yang bisa digeser.
 - FPS overlay draggable (bebas dipindah)
 - Posisi bisa dikunci
 - Range FPS limit: 5–140 FPS
-- Opsi hanya tampilkan angka (sembunyikan teks "FPS")
+- Opsi "Hanya Tampilkan Angka": aktifkan toggle untuk menampilkan hanya nilai numerik FPS (menyembunyikan teks "FPS")
 
 ### Slider Labels with Edit 🏷️
 Semua slider menampilkan nilai numerik terkini pada labelnya dan bisa diklik untuk mengedit nilai secara langsung via dialog input—slider menyesuaikan otomatis.
+
+Fitur:
+- Setiap label slider menampilkan nilai saat ini (contoh: "Ukuran Teks: 20 sp", "Offset X: 0")
+- Klik label untuk membuka dialog input numerik
+- Masukkan nilai baru, slider akan menyesuaikan otomatis
+- Dialog memvalidasi range nilai sesuai batas min-max masing-masing slider
 
 ### Overlay Toggle 🔘
 Aktifkan atau nonaktifkan overlay dengan satu switch.
@@ -100,6 +106,16 @@ Termasuk:
 - Request notifikasi Android 13+
 - Battery optimization request
 - WakeLock selama overlay berjalan
+
+### Android SplashScreen API 🎬
+Splash screen menampilkan icon launcher aplikasi saat startup dengan transisi halus.
+
+Fitur:
+- Menggunakan SplashScreen API resmi Android (androidx.core:core-splashscreen)
+- Icon launcher dengan background warna tema
+- Tanpa custom splash activity
+- Tanpa fake loading delay
+- Kompatibel Android 8.0+ (API 26+), dengan optimasi untuk Android 12+ (API 31+)
 
 ---
 
@@ -167,7 +183,8 @@ Overlay hilang, konfigurasi tetap tersimpan.
 Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
 - Bulan 🌙 → Toggle tema gelap/terang
-- **Tutup Aplikasi** → Keluar dari aplikasi sepenuhnya.
+
+Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.32.1") di samping nama aplikasi di navigation drawer header.
 
 ### 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
@@ -176,14 +193,17 @@ Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
 ### 9. Background Config
 Aktifkan switch Background untuk menampilkan latar belakang overlay:
 - Pilih warna background (dengan alpha/transparansi via color picker)
-- Atur ukuran background (padding dari teks)
-- Atur offset X/Y background
-- Background dan Shadow adalah fitur terpisah
+- Atur ukuran background (padding dari teks, 0–80 px)
+- Atur offset X/Y background (-60 hingga 60 px)
+- Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
+- Klik label untuk edit nilai manual via dialog input
 
 ### 10. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
-- Atur blur, offset X, offset Y
+- Atur blur radius (0–50 px)
+- Atur offset X, offset Y (-60 hingga 60 px, default 0)
+- Klik label untuk edit nilai manual via dialog input
 
 ---
 

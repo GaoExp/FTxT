@@ -3,6 +3,33 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.32.2] - 2026-05-28
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Android SplashScreen API**: Implementasi SplashScreen API resmi Android menggunakan icon launcher aplikasi. Splash screen menampilkan icon app dengan background warna tema, tanpa custom splash activity atau fake loading delay.
+
+### 🗒️ File Added
+
+- app/src/main/res/values/themes.xml
+- app/src/main/res/values-v31/themes.xml
+- app/src/main/res/drawable/splash_screen.xml
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/AndroidManifest.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 67 → 68
+- versionName: 2.3.1.32.1 → 2.3.1.32.2
+
+---
+
 ## [2.3.1.32.1] - 2026-05-28
 
 ### 🔧 Optimasi & Penyesuaian

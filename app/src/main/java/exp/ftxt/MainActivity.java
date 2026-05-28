@@ -17,6 +17,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
@@ -58,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Initialize SplashScreen API (must be called before setContentView)
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+
         boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("theme_dark", false);
 

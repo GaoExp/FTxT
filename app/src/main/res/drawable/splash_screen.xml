@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background color -->
+    <item android:drawable="@color/colorPrimary" />
+
+    <!-- Icon launcher di tengah -->
+    <item
+        android:drawable="@mipmap/ic_launcher"
+        android:gravity="center" />
+
+</layer-list>
