@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -24,6 +25,9 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -70,11 +74,30 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout navItemContainer;
     private Button btnTambahGrup;
-    private static final String PREFS_CUSTOM_GROUPS = "custom_groups";
+    private static final String PREFS_SIDEBAR_STATE = "sidebar_state";
+
+    private boolean isDeleteMode = false;
+    private final List<View> markedViews = new ArrayList<>();
+    private View deleteFooterBar;
+    private Button btnHapus;
+    private Button btnBatal;
+    private Button btnDeleteToggle;
+
+    private static final String DEFAULT_SIDEBAR_JSON =
+        "[{\"n\":\"Overlay\",\"b\":true,\"i\":[" +
+            "{\"id\":\"navFloatingText\",\"l\":\"Floating Text\"}," +
+            "{\"id\":\"navFps\",\"l\":\"FPS Display\"}]}," +
+        "{\"n\":\"Fitur\",\"b\":true,\"i\":[" +
+            "{\"id\":\"navNetwork\",\"l\":\"Network Stats\"}," +
+            "{\"id\":\"navBattery\",\"l\":\"Battery Monitor\"}," +
+            "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
+            "{\"id\":\"navCpu\",\"l\":\"CPU Monitor\"}," +
+            "{\"id\":\"navCrosshair\",\"l\":\"Crosshair\"}," +
+            "{\"id\":\"navWatermark\",\"l\":\"Watermark\"}," +
+            "{\"id\":\"navLogo\",\"l\":\"Logo Display\"}]}]";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Initialize SplashScreen API (must be called before setContentView)
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
 
         boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
@@ -108,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.nav_fps);
         }
 
-        // Navigation drawer header
         TextView navTitle = findViewById(R.id.navHeaderTitle);
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -117,84 +139,22 @@ public class MainActivity extends AppCompatActivity {
             navTitle.setText("FTxT");
         }
 
-        // Collapsible groups
-        LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
-        TextView overlayIndicator = findViewById(R.id.groupOverlayIndicator);
-        LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
-        TextView fiturIndicator = findViewById(R.id.groupFiturIndicator);
-
-        findViewById(R.id.groupOverlayHeader).setOnClickListener(v -> {
-            boolean visible = overlayContent.getVisibility() == View.VISIBLE;
-            overlayContent.setVisibility(visible ? View.GONE : View.VISIBLE);
-            overlayIndicator.setText(visible ? "+" : "−");
-        });
-
-        findViewById(R.id.groupFiturHeader).setOnClickListener(v -> {
-            boolean visible = fiturContent.getVisibility() == View.VISIBLE;
-            fiturContent.setVisibility(visible ? View.GONE : View.VISIBLE);
-            fiturIndicator.setText(visible ? "+" : "−");
-        });
-
-        // Drawer item click listener
-        View.OnClickListener navItemListener = v -> {
-            int id = v.getId();
-            prefs.edit().putInt("nav_selected_item", id).apply();
-            updateNavSelection(id);
-
-            if (id == R.id.navFloatingText) {
-                panelText.setVisibility(View.VISIBLE);
-                panelFps.setVisibility(View.GONE);
-                getSupportActionBar().setTitle(R.string.nav_floating_text);
-                drawerLayout.closeDrawers();
-                textPanel.onPanelShown();
-                return;
-            }
-
-            if (id == R.id.navFps) {
-                panelText.setVisibility(View.GONE);
-                panelFps.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_fps);
-                drawerLayout.closeDrawers();
-                return;
-            }
-
-            if (id == R.id.navDokumentasi) {
-                drawerLayout.closeDrawers();
-                startActivity(new Intent(this, DocumentationActivity.class));
-                return;
-            }
-
-            if (id == R.id.navNetwork || id == R.id.navBattery || id == R.id.navClock
-                    || id == R.id.navCpu || id == R.id.navCrosshair || id == R.id.navWatermark || id == R.id.navLogo) {
-                Toast.makeText(this, "Coming Soon", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawers();
-            }
-        };
-
-        findViewById(R.id.navFloatingText).setOnClickListener(navItemListener);
-        findViewById(R.id.navFps).setOnClickListener(navItemListener);
-        findViewById(R.id.navNetwork).setOnClickListener(navItemListener);
-        findViewById(R.id.navBattery).setOnClickListener(navItemListener);
-        findViewById(R.id.navClock).setOnClickListener(navItemListener);
-        findViewById(R.id.navCpu).setOnClickListener(navItemListener);
-        findViewById(R.id.navCrosshair).setOnClickListener(navItemListener);
-        findViewById(R.id.navWatermark).setOnClickListener(navItemListener);
-        findViewById(R.id.navLogo).setOnClickListener(navItemListener);
-        findViewById(R.id.navDokumentasi).setOnClickListener(navItemListener);
-
-        updateNavSelection(savedNavItem);
-
         navItemContainer = findViewById(R.id.navItemContainer);
         btnTambahGrup = findViewById(R.id.btnTambahGrup);
         btnTambahGrup.setOnClickListener(v -> showAddGroupDialog());
-        setupDrawerAllItemsDrag();
-        loadCustomGroups();
+        btnDeleteToggle = findViewById(R.id.btnDeleteMode);
+        btnDeleteToggle.setOnClickListener(v -> toggleDeleteMode());
+
+        deleteFooterBar = findViewById(R.id.deleteFooterBar);
+        btnHapus = findViewById(R.id.btnHapus);
+        btnBatal = findViewById(R.id.btnBatal);
+        btnHapus.setOnClickListener(v -> executeDeletion());
+        btnBatal.setOnClickListener(v -> toggleDeleteMode());
+
+        rebuildSidebar();
 
         loadShadowConfigs();
 
-        // Init panel controllers
-        // TextPanelController: binding + listener untuk Floating Text panel
-        // FpsPanelController:  binding + listener untuk FPS Display panel
         textPanel = new TextPanelController(this);
         fpsPanel = new FpsPanelController(this);
     }
@@ -461,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout groupSection = createDynamicGroup(name, new String[0]);
         navItemContainer.addView(groupSection);
 
-        saveCustomGroups();
+        saveSidebarState();
     }
 
     private boolean isLoadingGroups = false;
@@ -493,7 +453,7 @@ public class MainActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         header.setClickable(true);
         header.setFocusable(true);
-        header.setBackgroundResource(android.R.attr.selectableItemBackground);
+        header.setBackgroundResource(resolveSelectableItemBackground());
 
         TextView title = new TextView(this);
         title.setText(name);
@@ -519,37 +479,13 @@ public class MainActivity extends AppCompatActivity {
         content.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+        section.addView(content);
+
         for (String item : items) {
             addItemToGroup(content, item);
         }
 
-        // Add item button inside group
-        LinearLayout addRow = new LinearLayout(this);
-        addRow.setOrientation(LinearLayout.HORIZONTAL);
-        addRow.setPadding(dp(32), dp(4), dp(16), dp(12));
-
-        EditText itemInput = new EditText(this);
-        itemInput.setHint("Tambah item...");
-        itemInput.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        itemInput.setTextSize(14);
-
-        Button addBtn = new Button(this);
-        addBtn.setText("+");
-        addBtn.setTextSize(14);
-        addBtn.setOnClickListener(v -> {
-            String itemName = itemInput.getText().toString().trim();
-            if (!itemName.isEmpty()) {
-                addItemToGroup(content, itemName);
-                itemInput.setText("");
-                saveCustomGroups();
-            }
-        });
-
-        addRow.addView(itemInput);
-        addRow.addView(addBtn);
-        content.addView(addRow);
-
-        section.addView(content);
+        setupDragTarget(content);
 
         // Collapse/expand toggle
         header.setOnClickListener(v -> {
@@ -562,22 +498,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addItemToGroup(LinearLayout content, String itemText) {
-        int insertPos = content.getChildCount() - 1; // before add-item row
         TextView item = new TextView(this);
         item.setText(itemText);
         item.setTextSize(16);
         item.setPadding(dp(32), dp(12), dp(16), dp(12));
         item.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        item.setBackgroundResource(android.R.attr.selectableItemBackground);
+        item.setBackgroundResource(resolveSelectableItemBackground());
         item.setClickable(true);
         item.setFocusable(true);
-        item.setLongClickable(true);
 
         makeDraggable(item);
-        content.addView(item, insertPos);
+        content.addView(item);
 
-        if (!isLoadingGroups) saveCustomGroups();
+        if (!isLoadingGroups) saveSidebarState();
     }
 
     // ========================================================================
@@ -589,17 +523,28 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
         for (int i = 0; i < overlayContent.getChildCount(); i++) {
             View child = overlayContent.getChildAt(i);
-            child.setLongClickable(true);
             makeDraggable(child);
         }
+        setupDragTarget(overlayContent);
 
         // Setup drag on all built-in items in Fitur group
         LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
         for (int i = 0; i < fiturContent.getChildCount(); i++) {
             View child = fiturContent.getChildAt(i);
-            child.setLongClickable(true);
             makeDraggable(child);
         }
+        setupDragTarget(fiturContent);
+    }
+
+    private int selectableBgResId = -1;
+
+    private int resolveSelectableItemBackground() {
+        if (selectableBgResId == -1) {
+            TypedValue out = new TypedValue();
+            getTheme().resolveAttribute(android.R.attr.selectableItemBackground, out, true);
+            selectableBgResId = out.resourceId;
+        }
+        return selectableBgResId;
     }
 
     private void makeDraggable(View view) {
@@ -610,32 +555,56 @@ public class MainActivity extends AppCompatActivity {
             v.setVisibility(View.INVISIBLE);
             return true;
         });
+    }
 
-        view.setOnDragListener((v, event) -> {
+    private void setupDragTarget(ViewGroup container) {
+        container.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     return true;
+
                 case DragEvent.ACTION_DRAG_ENTERED:
-                    v.setAlpha(0.5f);
-                    return true;
                 case DragEvent.ACTION_DRAG_EXITED:
-                    v.setAlpha(1f);
                     return true;
+
                 case DragEvent.ACTION_DROP: {
                     View dragged = (View) event.getLocalState();
-                    ViewGroup parent = (ViewGroup) v.getParent();
-                    if (parent != null && dragged.getParent() == parent) {
-                        int draggedIdx = parent.indexOfChild(dragged);
-                        int targetIdx = parent.indexOfChild(v);
-                        if (draggedIdx >= 0 && targetIdx >= 0 && draggedIdx != targetIdx) {
-                            parent.removeView(dragged);
-                            parent.addView(dragged, targetIdx);
-                            saveCustomGroups();
+                    if (dragged == null) return true;
+                    ViewGroup dropTarget = (ViewGroup) v;
+                    ViewGroup oldParent = (ViewGroup) dragged.getParent();
+                    if (oldParent == null) return true;
+
+                    float dropY = event.getY();
+                    int targetIdx = -1;
+                    for (int i = 0; i < dropTarget.getChildCount(); i++) {
+                        View child = dropTarget.getChildAt(i);
+                        float midY = child.getY() + child.getHeight() / 2f;
+                        if (dropY < midY) {
+                            targetIdx = i;
+                            break;
                         }
                     }
+                    if (targetIdx == -1) {
+                        targetIdx = dropTarget.getChildCount();
+                    }
+
+                    if (oldParent == dropTarget) {
+                        int draggedIdx = dropTarget.indexOfChild(dragged);
+                        if (draggedIdx >= 0 && draggedIdx != targetIdx) {
+                            if (draggedIdx < targetIdx) targetIdx--;
+                            dropTarget.removeView(dragged);
+                            dropTarget.addView(dragged, targetIdx);
+                        }
+                    } else {
+                        oldParent.removeView(dragged);
+                        dropTarget.addView(dragged, targetIdx);
+                    }
+                    saveSidebarState();
                     dragged.setVisibility(View.VISIBLE);
+                    dragged.setAlpha(1f);
                     return true;
                 }
+
                 case DragEvent.ACTION_DRAG_ENDED: {
                     View dv = (View) event.getLocalState();
                     if (dv != null) {
@@ -653,62 +622,298 @@ public class MainActivity extends AppCompatActivity {
     // Persistensi grup kustom ke SharedPreferences (JSON)
     // ========================================================================
 
-    private void saveCustomGroups() {
+    private void saveSidebarState() {
         JSONArray arr = new JSONArray();
-        for (int i = 0; i < navItemContainer.getChildCount(); i++) {
-            View child = navItemContainer.getChildAt(i);
-            if ("custom_group".equals(child.getTag()) && child instanceof LinearLayout) {
-                LinearLayout section = (LinearLayout) child;
-                if (section.getChildCount() >= 3) {
-                    LinearLayout header = (LinearLayout) section.getChildAt(1);
-                    if (header.getChildCount() >= 1 && header.getChildAt(0) instanceof TextView) {
-                        String name = ((TextView) header.getChildAt(0)).getText().toString();
+        try {
+            // Overlay group
+            LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
+            TextView overlayInd = findViewById(R.id.groupOverlayIndicator);
+            JSONObject overlayGrp = buildGroupJson("Overlay", overlayContent,
+                    overlayInd != null && "−".equals(overlayInd.getText().toString()), true);
+            arr.put(overlayGrp);
+
+            // Fitur group
+            LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
+            TextView fiturInd = findViewById(R.id.groupFiturIndicator);
+            JSONObject fiturGrp = buildGroupJson("Fitur", fiturContent,
+                    fiturInd != null && "−".equals(fiturInd.getText().toString()), true);
+            arr.put(fiturGrp);
+
+            // Custom groups
+            for (int i = 0; i < navItemContainer.getChildCount(); i++) {
+                View child = navItemContainer.getChildAt(i);
+                if ("custom_group".equals(child.getTag()) && child instanceof LinearLayout) {
+                    LinearLayout section = (LinearLayout) child;
+                    if (section.getChildCount() >= 3) {
+                        LinearLayout header = (LinearLayout) section.getChildAt(1);
                         LinearLayout content = (LinearLayout) section.getChildAt(2);
-                        JSONArray itemsArr = new JSONArray();
-                        for (int j = 0; j < content.getChildCount() - 1; j++) {
-                            View itemView = content.getChildAt(j);
-                            if (itemView instanceof TextView) {
-                                itemsArr.put(((TextView) itemView).getText().toString());
+                        if (header.getChildCount() >= 1 && header.getChildAt(0) instanceof TextView) {
+                            String name = ((TextView) header.getChildAt(0)).getText().toString();
+                            JSONObject grp = buildGroupJson(name, content,
+                                    content.getVisibility() == View.VISIBLE, false);
+                            arr.put(grp);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // skip
+        }
+        getSharedPreferences(PREFS_SIDEBAR_STATE, MODE_PRIVATE)
+                .edit().putString("sidebar_json", arr.toString()).apply();
+    }
+
+    private JSONObject buildGroupJson(String name, LinearLayout content, boolean expanded, boolean builtIn) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("n", name);
+            obj.put("b", expanded);
+            JSONArray itemsArr = new JSONArray();
+            for (int j = 0; j < content.getChildCount(); j++) {
+                View v = content.getChildAt(j);
+                if (v instanceof TextView) {
+                    String text = ((TextView) v).getText().toString();
+                    if (text.startsWith("☐ ") || text.startsWith("☑ ")) {
+                        text = text.substring(2);
+                    }
+                    JSONObject itemObj = new JSONObject();
+                    itemObj.put("l", text);
+                    if (builtIn) {
+                        int id = v.getId();
+                        if (id != View.NO_ID) {
+                            String resName = getResources().getResourceEntryName(id);
+                            itemObj.put("id", resName);
+                        }
+                    }
+                    itemsArr.put(itemObj);
+                }
+            }
+            obj.put("i", itemsArr);
+        } catch (Exception e) { /* skip */ }
+        return obj;
+    }
+
+    private String loadSidebarState() {
+        String json = getSharedPreferences(PREFS_SIDEBAR_STATE, MODE_PRIVATE)
+                .getString("sidebar_json", null);
+        return json != null ? json : DEFAULT_SIDEBAR_JSON;
+    }
+
+    // ========================================================================
+    // Rebuild sidebar — baca state, hapus & buat ulang semua grup + item
+    // ========================================================================
+
+    private void rebuildSidebar() {
+        isLoadingGroups = true;
+
+        for (int i = navItemContainer.getChildCount() - 1; i >= 0; i--) {
+            if ("custom_group".equals(navItemContainer.getChildAt(i).getTag())) {
+                navItemContainer.removeViewAt(i);
+            }
+        }
+
+        LinearLayout overlayContent = findViewById(R.id.groupOverlayContent);
+        LinearLayout fiturContent = findViewById(R.id.groupFiturContent);
+        overlayContent.removeAllViews();
+        fiturContent.removeAllViews();
+
+        try {
+            JSONArray arr = new JSONArray(loadSidebarState());
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject g = arr.getJSONObject(i);
+                String name = g.getString("n");
+                boolean expanded = g.getBoolean("b");
+                JSONArray items = g.getJSONArray("i");
+
+                if ("Overlay".equals(name)) {
+                    repopulateGroup(overlayContent, items);
+                    applyExpandedState(R.id.groupOverlayHeader, overlayContent, R.id.groupOverlayIndicator, expanded);
+                } else if ("Fitur".equals(name)) {
+                    repopulateGroup(fiturContent, items);
+                    applyExpandedState(R.id.groupFiturHeader, fiturContent, R.id.groupFiturIndicator, expanded);
+                } else {
+                    String[] labels = new String[items.length()];
+                    for (int j = 0; j < items.length(); j++) {
+                        labels[j] = items.getJSONObject(j).getString("l");
+                    }
+                    LinearLayout section = createDynamicGroup(name, labels);
+                    View content = section.getChildAt(2);
+                    if (content != null) {
+                        content.setVisibility(expanded ? View.VISIBLE : View.GONE);
+                        View header = section.getChildAt(1);
+                        if (header instanceof LinearLayout) {
+                            LinearLayout headerLayout = (LinearLayout) header;
+                            if (headerLayout.getChildCount() >= 2 && headerLayout.getChildAt(1) instanceof TextView) {
+                                ((TextView) headerLayout.getChildAt(1)).setText(expanded ? "−" : "+");
                             }
                         }
-                        try {
-                            JSONObject obj = new JSONObject();
-                            obj.put("name", name);
-                            obj.put("items", itemsArr);
-                            arr.put(obj);
-                        } catch (Exception e) {
-                            // skip
-                        }
+                    }
+                    navItemContainer.addView(section);
+                }
+            }
+        } catch (Exception e) {
+            // fallback — state rusak, rebuild dari default
+            try {
+                JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
+                for (int i = 0; i < def.length(); i++) {
+                    JSONObject g = def.getJSONObject(i);
+                    JSONArray items = g.getJSONArray("i");
+                    if ("Overlay".equals(g.getString("n"))) {
+                        repopulateGroup(overlayContent, items);
+                    } else if ("Fitur".equals(g.getString("n"))) {
+                        repopulateGroup(fiturContent, items);
+                    }
+                }
+            } catch (Exception e2) { /* ignore */ }
+        }
+
+        setupBuiltInGroupToggle(R.id.groupOverlayHeader, overlayContent, R.id.groupOverlayIndicator);
+        setupBuiltInGroupToggle(R.id.groupFiturHeader, fiturContent, R.id.groupFiturIndicator);
+        setupDrawerAllItemsDrag();
+
+        if (isDeleteMode) {
+            applyDeleteModeToContainer(overlayContent);
+            applyDeleteModeToContainer(fiturContent);
+            for (int i = 0; i < navItemContainer.getChildCount(); i++) {
+                View child = navItemContainer.getChildAt(i);
+                if ("custom_group".equals(child.getTag()) && child instanceof LinearLayout) {
+                    LinearLayout section = (LinearLayout) child;
+                    if (section.getChildCount() >= 3 && section.getChildAt(2) instanceof LinearLayout) {
+                        applyDeleteModeToContainer((LinearLayout) section.getChildAt(2));
                     }
                 }
             }
         }
 
-        getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .edit().putString(PREFS_CUSTOM_GROUPS, arr.toString()).apply();
+        isLoadingGroups = false;
     }
 
-    private void loadCustomGroups() {
-        isLoadingGroups = true;
-        String json = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getString(PREFS_CUSTOM_GROUPS, "[]");
-        try {
-            JSONArray arr = new JSONArray(json);
-            for (int i = 0; i < arr.length(); i++) {
-                JSONObject obj = arr.getJSONObject(i);
-                String name = obj.getString("name");
-                JSONArray itemsArr = obj.getJSONArray("items");
-                String[] items = new String[itemsArr.length()];
-                for (int j = 0; j < itemsArr.length(); j++) {
-                    items[j] = itemsArr.getString(j);
+    private void repopulateGroup(LinearLayout container, JSONArray items) {
+        container.removeAllViews();
+        for (int i = 0; i < items.length(); i++) {
+            try {
+                JSONObject item = items.getJSONObject(i);
+                String label = item.getString("l");
+                String id = item.optString("id", null);
+
+                TextView tv = new TextView(this);
+                tv.setText(label);
+                tv.setTextSize(16);
+                tv.setPadding(dp(32), dp(12), dp(16), dp(12));
+                tv.setLayoutParams(new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                tv.setBackgroundResource(resolveSelectableItemBackground());
+                tv.setClickable(true);
+                tv.setFocusable(true);
+
+                if (id != null) {
+                    int idRes = getResources().getIdentifier(id, "id", getPackageName());
+                    if (idRes != 0) tv.setId(idRes);
                 }
-                LinearLayout section = createDynamicGroup(name, items);
-                navItemContainer.addView(section);
-            }
-        } catch (Exception e) {
-            // ignore
+
+                makeDraggable(tv);
+                container.addView(tv);
+            } catch (Exception e) { /* skip */ }
         }
-        isLoadingGroups = false;
+    }
+
+    private void applyExpandedState(int headerId, ViewGroup content, int indicatorId, boolean expanded) {
+        View indicator = findViewById(indicatorId);
+        if (indicator instanceof TextView) {
+            ((TextView) indicator).setText(expanded ? "−" : "+");
+        }
+        content.setVisibility(expanded ? View.VISIBLE : View.GONE);
+    }
+
+    private void setupBuiltInGroupToggle(int headerId, ViewGroup content, int indicatorId) {
+        View header = findViewById(headerId);
+        TextView indicator = findViewById(indicatorId);
+        if (header != null && indicator != null) {
+            header.setOnClickListener(v -> {
+                boolean visible = content.getVisibility() == View.VISIBLE;
+                content.setVisibility(visible ? View.GONE : View.VISIBLE);
+                indicator.setText(visible ? "+" : "−");
+                saveSidebarState();
+            });
+        }
+    }
+
+    // ========================================================================
+    // Delete mode — CheckBox + footer [Batal][Hapus]
+    // ========================================================================
+
+    private void toggleDeleteMode() {
+        isDeleteMode = !isDeleteMode;
+        deleteFooterBar.setVisibility(isDeleteMode ? View.VISIBLE : View.GONE);
+        btnDeleteToggle.setText(isDeleteMode ? "Batal" : "Hapus");
+
+        if (!isDeleteMode) markedViews.clear();
+
+        applyDeleteModeToContainer(findViewById(R.id.groupOverlayContent));
+        applyDeleteModeToContainer(findViewById(R.id.groupFiturContent));
+
+        for (int i = 0; i < navItemContainer.getChildCount(); i++) {
+            View child = navItemContainer.getChildAt(i);
+            if ("custom_group".equals(child.getTag()) && child instanceof LinearLayout) {
+                LinearLayout section = (LinearLayout) child;
+                if (section.getChildCount() >= 3 && section.getChildAt(2) instanceof LinearLayout) {
+                    applyDeleteModeToContainer((LinearLayout) section.getChildAt(2));
+                }
+            }
+        }
+    }
+
+    private void toggleItemMark(TextView tv) {
+        if (markedViews.contains(tv)) {
+            markedViews.remove(tv);
+            tv.setBackgroundResource(resolveSelectableItemBackground());
+            String t = tv.getText().toString();
+            if (t.startsWith("☑ ")) tv.setText("☐ " + t.substring(2));
+        } else {
+            markedViews.add(tv);
+            tv.setBackgroundColor(0xFFFFEBEE);
+            String t = tv.getText().toString();
+            tv.setText((t.startsWith("☐ ") ? "☑ " : "☑ ") + (t.startsWith("☐ ") || t.startsWith("☑ ") ? t.substring(2) : t));
+        }
+    }
+
+    private void applyDeleteModeToContainer(LinearLayout container) {
+        if (container == null) return;
+        for (int i = 0; i < container.getChildCount(); i++) {
+            View child = container.getChildAt(i);
+            if (child instanceof TextView) {
+                TextView tv = (TextView) child;
+                if (isDeleteMode) {
+                    String t = tv.getText().toString();
+                    if (!t.startsWith("☐ ") && !t.startsWith("☑ ")) tv.setText("☐ " + t);
+                    tv.setOnClickListener(v -> toggleItemMark(tv));
+                } else {
+                    String t = tv.getText().toString();
+                    if (t.startsWith("☐ ") || t.startsWith("☑ ")) tv.setText(t.substring(2));
+                    tv.setOnClickListener(null);
+                    tv.setBackgroundResource(resolveSelectableItemBackground());
+                }
+            }
+        }
+    }
+
+    private void executeDeletion() {
+        if (markedViews.isEmpty()) {
+            Toast.makeText(this, "Pilih item yang ingin dihapus", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (View v : markedViews) {
+            ViewGroup parent = (ViewGroup) v.getParent();
+            if (parent != null) parent.removeView(v);
+        }
+        markedViews.clear();
+        isDeleteMode = false;
+        btnDeleteToggle.setText("Hapus");
+        deleteFooterBar.setVisibility(View.GONE);
+
+        saveSidebarState();
+        rebuildSidebar();
     }
 
     private int dp(float dp) {

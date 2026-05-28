@@ -3,6 +3,42 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.4.1.38.0] - 2026-05-28
+
+### 🚮️ Fitur Dihapus
+
+- **Hapus "Tambah Item" Per-Grup**: Setiap grup kustom tidak lagi memiliki EditText + Button "+" untuk menambah item. Item hanya bisa ditambah melalui mekanisme internal (drag antar grup atau restore state).
+
+### ✨ Fitur Baru
+
+- **Drag Cross-Container**: Item sidebar kini bisa di-drag bebas antar grup (Overly, Fitur, grup kustom). Pindahkan item dari satu grup ke grup lain dengan long-press dan drop.
+- **Mode Hapus**: Tombol "Hapus" di sidebar mengaktifkan mode delete. Setiap item mendapat CheckBox (☐/☑). Pilih item yang ingin dihapus, lalu tekan [Hapus] di footer untuk eksekusi. [Batal] untuk membatalkan.
+- **Penyimpanan State Penuh**: Semua state sidebar (grup built-in + kustom, urutan item, status collapse/expand) disimpan dan dipulihkan sepenuhnya.
+
+### ♻️️ Perubahan Fitur
+
+- **Drag-to-Reorder**: Sekarang mendukung cross-container drag. Item bisa dipindah antar grup manapun.
+- **rebuildSidebar()**: Method baru untuk membangun ulang seluruh sidebar dari state JSON. Dipanggil saat `onCreate()` dan setelah operasi penghapusan.
+- **saveSidebarState() / loadSidebarState()**: Menggantikan `saveCustomGroups()` / `loadCustomGroups()`. Menyimpan state penuh semua grup (built-in + kustom).
+- **Collapse/Expand Built-in**: Grup Overlay dan Fitur kini dapat di-collapse/expand (sebelumnya hanya grup kustom yang bisa).
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/drawer_content.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 82 → 83
+- versionName: 2.3.1.37.1 → 2.4.1.38.0
+
+---
+
 ## [2.3.1.37.0] - 2026-05-28
 
 ### ✨ Fitur Baru
