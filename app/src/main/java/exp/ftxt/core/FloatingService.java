@@ -187,6 +187,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateFpsDisplayStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.updateDisplay();
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

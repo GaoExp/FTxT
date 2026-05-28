@@ -6,8 +6,8 @@ public class ShadowConfig {
     public boolean enabled = false;
     public int color = Color.BLACK;
     public float blur = 5f;
-    public float offsetX = 3f;
-    public float offsetY = 3f;
+    public float offsetX = 0f;
+    public float offsetY = 0f;
 
     public ShadowConfig() {}
 

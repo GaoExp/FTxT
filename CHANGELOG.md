@@ -3,6 +3,83 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.32.1] - 2026-05-28
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Offset Range -60 hingga 60**: Semua offset (Background X/Y dan Shadow X/Y) di panel Floating Text dan FPS Display sekarang memiliki range -60 hingga 60, dengan posisi default 0 di tengah. SeekBar memetakan progress 0-120 ke offset -60..60.
+- **Default Shadow Offset**: Nilai default shadow offset X/Y diubah dari 3 menjadi 0.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/shared/ui/ShadowConfig.java
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 66 → 67
+- versionName: 2.3.1.32.0 → 2.3.1.32.1
+
+---
+
+## [2.3.1.32.0] - 2026-05-28
+
+### ✨ Fitur Baru
+
+- **Label Slider Menampilkan Nilai**: Semua label slider di panel Floating Text dan FPS Display kini menampilkan nilai numerik terkini (contoh: "Ukuran Teks: 20", "Offset X: 0").
+- **Edit Nilai Slider Manual**: Klik label slider untuk mengedit nilai numerik langsung via dialog input—slider menyesuaikan otomatis.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 65 → 66
+- versionName: 2.3.1.31.0 → 2.3.1.32.0
+
+---
+
+## [2.3.1.31.0] - 2026-05-27
+
+### ✨ Fitur Baru
+
+- **Hanya Tampilkan Nilai FPS**: Tambah toggle di panel FPS untuk menyembunyikan teks "FPS" dan hanya menampilkan angka.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 64 → 65
+- versionName: 2.3.1.30.0 → 2.3.1.31.0
+
+---
+
 ## [2.3.1.30.0] - 2026-05-27
 
 ### ✨ Fitur Baru

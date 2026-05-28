@@ -15,4 +15,5 @@ public class FpsConfig {
     public static int bgPadding = 10;
     public static int bgOffsetX = 0;
     public static int bgOffsetY = 0;
+    public static boolean showOnlyValue = false;
 }

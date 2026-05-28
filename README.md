@@ -1,7 +1,7 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.30.0`        
-**Last Updated:** `2026-05-27`
+**Current Release:** `2.3.1.32.1`        
+**Last Updated:** `2026-05-28`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -87,6 +87,10 @@ Tampilkan FPS counter sebagai overlay yang bisa digeser.
 - FPS overlay draggable (bebas dipindah)
 - Posisi bisa dikunci
 - Range FPS limit: 5–140 FPS
+- Opsi hanya tampilkan angka (sembunyikan teks "FPS")
+
+### Slider Labels with Edit 🏷️
+Semua slider menampilkan nilai numerik terkini pada labelnya dan bisa diklik untuk mengedit nilai secara langsung via dialog input—slider menyesuaikan otomatis.
 
 ### Overlay Toggle 🔘
 Aktifkan atau nonaktifkan overlay dengan satu switch.

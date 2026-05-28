@@ -79,10 +79,13 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
-                    android:text="Ukuran Teks"
+                    android:id="@+id/textSizeLabel"
+                    android:text="Ukuran Teks: 20"
                     android:layout_marginTop="12dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <SeekBar
                     android:id="@+id/textSizeSeekBar"
@@ -134,10 +137,13 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Ukuran Background"
+                        android:id="@+id/bgPaddingLabel"
+                        android:text="Ukuran Background: 25"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/bgPaddingSeekBar"
@@ -147,28 +153,34 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Offset X"
+                        android:id="@+id/bgOffsetXLabel"
+                        android:text="Offset X: 0"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/bgOffsetXSeekBar"
-                        android:max="60"
-                        android:progress="0"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Offset Y"
+                        android:id="@+id/bgOffsetYLabel"
+                        android:text="Offset Y: 0"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/bgOffsetYSeekBar"
-                        android:max="60"
-                        android:progress="0"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -209,10 +221,13 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Blur Shadow"
+                        android:id="@+id/shadowBlurLabel"
+                        android:text="Blur Shadow: 5"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/shadowBlurSeekBar"
@@ -222,28 +237,34 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Shadow X"
+                        android:id="@+id/shadowOffsetXLabel"
+                        android:text="Shadow X: 3"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/shadowOffsetXSeekBar"
-                        android:max="30"
-                        android:progress="3"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Shadow Y"
+                        android:id="@+id/shadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/shadowOffsetYSeekBar"
-                        android:max="30"
-                        android:progress="3"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -301,11 +322,21 @@
 
                 </LinearLayout>
 
+                <CheckBox
+                    android:id="@+id/fpsValueOnlyCheck"
+                    android:text="Hanya Tampilkan Nilai"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
-                    android:text="Ukuran Teks"
+                    android:id="@+id/fpsSizeLabel"
+                    android:text="Ukuran Teks: 14"
                     android:layout_marginTop="12dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
                 <SeekBar
                     android:id="@+id/fpsSizeSeekBar"
@@ -357,10 +388,13 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Ukuran Background"
+                        android:id="@+id/fpsBgPaddingLabel"
+                        android:text="Ukuran Background: 10"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsBgPaddingSeekBar"
@@ -370,28 +404,34 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Offset X"
+                        android:id="@+id/fpsBgOffsetXLabel"
+                        android:text="Offset X: 0"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsBgOffsetXSeekBar"
-                        android:max="60"
-                        android:progress="0"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Offset Y"
+                        android:id="@+id/fpsBgOffsetYLabel"
+                        android:text="Offset Y: 0"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsBgOffsetYSeekBar"
-                        android:max="60"
-                        android:progress="0"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -432,10 +472,13 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Blur Shadow"
+                        android:id="@+id/fpsShadowBlurLabel"
+                        android:text="Blur Shadow: 5"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsShadowBlurSeekBar"
@@ -445,28 +488,34 @@
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Shadow X"
+                        android:id="@+id/fpsShadowOffsetXLabel"
+                        android:text="Shadow X: 3"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsShadowOffsetXSeekBar"
-                        android:max="30"
-                        android:progress="3"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
                     <TextView
-                        android:text="Shadow Y"
+                        android:id="@+id/fpsShadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
                         android:layout_marginTop="8dp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
                     <SeekBar
                         android:id="@+id/fpsShadowOffsetYSeekBar"
-                        android:max="30"
-                        android:progress="3"
+                        android:max="120"
+                        android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 

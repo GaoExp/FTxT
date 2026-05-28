@@ -47,7 +47,7 @@ public class FpsModule {
 
         view = new ShadowTextView(context);
         view.setShadowConfig(FpsConfig.shadow);
-        view.setText("0.0 FPS");
+        view.setText(FpsConfig.showOnlyValue ? "0.0" : "0.0 FPS");
         view.setTextSize(FpsConfig.size);
         view.setTextColor(FpsConfig.color);
         applyBackground();
@@ -114,6 +114,14 @@ public class FpsModule {
         applyBackground();
     }
 
+    public void updateDisplay() {
+        if (view != null) {
+            view.setText(FpsConfig.showOnlyValue
+                    ? String.format("%.1f", fpsValue)
+                    : String.format("%.1f FPS", fpsValue));
+        }
+    }
+
     private void applyBackground() {
         if (view == null) return;
         int pad = FpsConfig.bgPadding;
@@ -166,7 +174,9 @@ public class FpsModule {
                 frameCount = 0;
                 lastFrameTime = frameTimeNanos;
                 if (view != null) {
-                    view.setText(String.format("%.1f FPS", fpsValue));
+                    view.setText(FpsConfig.showOnlyValue
+                            ? String.format("%.1f", fpsValue)
+                            : String.format("%.1f FPS", fpsValue));
                 }
             }
             if (running && FpsConfig.enabled) {

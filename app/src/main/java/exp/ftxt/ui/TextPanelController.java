@@ -8,6 +8,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
@@ -38,6 +42,8 @@ public class TextPanelController {
     private SeekBar bgPaddingSeekBar;
     private SeekBar bgOffsetXSeekBar;
     private SeekBar bgOffsetYSeekBar;
+    private TextView textSizeLabel, bgPaddingLabel, bgOffsetXLabel, bgOffsetYLabel;
+    private TextView shadowBlurLabel, shadowOffsetXLabel, shadowOffsetYLabel;
 
     public TextPanelController(MainActivity activity) {
         this.activity = activity;
@@ -80,6 +86,13 @@ public class TextPanelController {
         bgPaddingSeekBar = activity.findViewById(R.id.bgPaddingSeekBar);
         bgOffsetXSeekBar = activity.findViewById(R.id.bgOffsetXSeekBar);
         bgOffsetYSeekBar = activity.findViewById(R.id.bgOffsetYSeekBar);
+        textSizeLabel = activity.findViewById(R.id.textSizeLabel);
+        bgPaddingLabel = activity.findViewById(R.id.bgPaddingLabel);
+        bgOffsetXLabel = activity.findViewById(R.id.bgOffsetXLabel);
+        bgOffsetYLabel = activity.findViewById(R.id.bgOffsetYLabel);
+        shadowBlurLabel = activity.findViewById(R.id.shadowBlurLabel);
+        shadowOffsetXLabel = activity.findViewById(R.id.shadowOffsetXLabel);
+        shadowOffsetYLabel = activity.findViewById(R.id.shadowOffsetYLabel);
     }
 
     private void loadConfig() {
@@ -90,13 +103,20 @@ public class TextPanelController {
         bgSwitch.setChecked(TextConfig.bgEnabled);
         bgConfigContainer.setVisibility(TextConfig.bgEnabled ? View.VISIBLE : View.GONE);
         bgPaddingSeekBar.setProgress(TextConfig.bgPadding);
-        bgOffsetXSeekBar.setProgress(TextConfig.bgOffsetX);
-        bgOffsetYSeekBar.setProgress(TextConfig.bgOffsetY);
+        bgOffsetXSeekBar.setProgress(TextConfig.bgOffsetX + 60);
+        bgOffsetYSeekBar.setProgress(TextConfig.bgOffsetY + 60);
         shadowSwitch.setChecked(TextConfig.shadow.enabled);
         shadowConfigContainer.setVisibility(TextConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         shadowBlurSeekBar.setProgress((int) TextConfig.shadow.blur);
-        shadowOffsetXSeekBar.setProgress((int) TextConfig.shadow.offsetX);
-        shadowOffsetYSeekBar.setProgress((int) TextConfig.shadow.offsetY);
+        shadowOffsetXSeekBar.setProgress((int) TextConfig.shadow.offsetX + 60);
+        shadowOffsetYSeekBar.setProgress((int) TextConfig.shadow.offsetY + 60);
+        textSizeLabel.setText("Ukuran Teks: " + (int) TextConfig.size);
+        bgPaddingLabel.setText("Ukuran Background: " + TextConfig.bgPadding);
+        bgOffsetXLabel.setText("Offset X: " + TextConfig.bgOffsetX);
+        bgOffsetYLabel.setText("Offset Y: " + TextConfig.bgOffsetY);
+        shadowBlurLabel.setText("Blur Shadow: " + (int) TextConfig.shadow.blur);
+        shadowOffsetXLabel.setText("Shadow X: " + (int) TextConfig.shadow.offsetX);
+        shadowOffsetYLabel.setText("Shadow Y: " + (int) TextConfig.shadow.offsetY);
     }
 
     private void setupListeners() {
@@ -115,6 +135,7 @@ public class TextPanelController {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 1) { progress = 1; sb.setProgress(progress); }
                 TextConfig.size = progress;
+                textSizeLabel.setText("Ukuran Teks: " + progress);
                 FloatingService.updateTextSizeStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -192,6 +213,7 @@ public class TextPanelController {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
                 TextConfig.bgPadding = progress;
+                bgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_padding", progress).apply();
                 FloatingService.updateTextBackgroundStatic();
@@ -202,9 +224,11 @@ public class TextPanelController {
 
         bgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.bgOffsetX = progress;
+                int offset = progress - 60;
+                TextConfig.bgOffsetX = offset;
+                bgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putInt("text_bg_offset_x", progress).apply();
+                        .edit().putInt("text_bg_offset_x", offset).apply();
                 FloatingService.updateTextBackgroundStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -213,9 +237,11 @@ public class TextPanelController {
 
         bgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.bgOffsetY = progress;
+                int offset = progress - 60;
+                TextConfig.bgOffsetY = offset;
+                bgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putInt("text_bg_offset_y", progress).apply();
+                        .edit().putInt("text_bg_offset_y", offset).apply();
                 FloatingService.updateTextBackgroundStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -244,6 +270,7 @@ public class TextPanelController {
         shadowBlurSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 TextConfig.shadow.blur = progress;
+                shadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("shadow_blur", (float) progress).apply();
                 FloatingService.updateShadowStatic();
@@ -254,9 +281,11 @@ public class TextPanelController {
 
         shadowOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.shadow.offsetX = progress;
+                int offset = progress - 60;
+                TextConfig.shadow.offsetX = offset;
+                shadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putFloat("shadow_offset_x", (float) progress).apply();
+                        .edit().putFloat("shadow_offset_x", (float) offset).apply();
                 FloatingService.updateShadowStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -265,14 +294,84 @@ public class TextPanelController {
 
         shadowOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.shadow.offsetY = progress;
+                int offset = progress - 60;
+                TextConfig.shadow.offsetY = offset;
+                shadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putFloat("shadow_offset_y", (float) progress).apply();
+                        .edit().putFloat("shadow_offset_y", (float) offset).apply();
                 FloatingService.updateShadowStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
+
+        textSizeLabel.setOnClickListener(v ->
+                showSliderEditor("Ukuran Teks", seekBar, 150, textSizeLabel, "Ukuran Teks: "));
+        bgPaddingLabel.setOnClickListener(v ->
+                showSliderEditor("Ukuran Background", bgPaddingSeekBar, 80, bgPaddingLabel, "Ukuran Background: "));
+        bgOffsetXLabel.setOnClickListener(v ->
+                showOffsetEditor("Offset X", bgOffsetXSeekBar, bgOffsetXLabel, "Offset X: "));
+        bgOffsetYLabel.setOnClickListener(v ->
+                showOffsetEditor("Offset Y", bgOffsetYSeekBar, bgOffsetYLabel, "Offset Y: "));
+        shadowBlurLabel.setOnClickListener(v ->
+                showSliderEditor("Blur Shadow", shadowBlurSeekBar, 50, shadowBlurLabel, "Blur Shadow: "));
+        shadowOffsetXLabel.setOnClickListener(v ->
+                showOffsetEditor("Shadow X", shadowOffsetXSeekBar, shadowOffsetXLabel, "Shadow X: "));
+        shadowOffsetYLabel.setOnClickListener(v ->
+                showOffsetEditor("Shadow Y", shadowOffsetYSeekBar, shadowOffsetYLabel, "Shadow Y: "));
+    }
+
+    private void showSliderEditor(String title, SeekBar bar, int max, TextView label, String prefix) {
+        EditText input = new EditText(activity);
+        input.setText(String.valueOf(bar.getProgress()));
+        input.setSelection(input.length());
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Edit " + title)
+                .setView(input)
+                .setPositiveButton("OK", (d, w) -> {
+                    try {
+                        int val = Integer.parseInt(input.getText().toString().trim());
+                        if (val < 0 || val > max) {
+                            Toast.makeText(activity, "Nilai harus 0-" + max, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        bar.setProgress(val);
+                        label.setText(prefix + val);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void showOffsetEditor(String title, SeekBar bar, TextView label, String prefix) {
+        EditText input = new EditText(activity);
+        int currentOffset = bar.getProgress() - 60;
+        input.setText(String.valueOf(currentOffset));
+        input.setSelection(input.length());
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
+                | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Edit " + title)
+                .setView(input)
+                .setPositiveButton("OK", (d, w) -> {
+                    try {
+                        int val = Integer.parseInt(input.getText().toString().trim());
+                        if (val < -60 || val > 60) {
+                            Toast.makeText(activity, "Nilai harus -60 hingga 60", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        bar.setProgress(val + 60);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
     }
 
     private void applyInitialTints() {

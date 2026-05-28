@@ -297,6 +297,7 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.shadow.offsetX = prefs.getFloat("fps_shadow_offset_x", 3f);
         FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
         FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", true);
+        FpsConfig.showOnlyValue = prefs.getBoolean("fps_show_only_value", false);
         FpsConfig.bgEnabled = prefs.getBoolean("fps_bg_enabled", false);
         FpsConfig.bgColor = prefs.getInt("fps_bg_color", 0xCC000000);
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
