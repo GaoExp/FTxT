@@ -15,4 +15,6 @@ public class TextConfig {
     public static int bgPadding = 25;
     public static int bgOffsetX = 0;
     public static int bgOffsetY = 0;
+    public static int bgMargin = 0;
+    public static int bgRadius = 0;
 }

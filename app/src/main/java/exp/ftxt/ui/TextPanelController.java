@@ -9,16 +9,13 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AlertDialog;
-
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
 import exp.ftxt.modules.text.TextConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class TextPanelController {
@@ -42,7 +39,10 @@ public class TextPanelController {
     private SeekBar bgPaddingSeekBar;
     private SeekBar bgOffsetXSeekBar;
     private SeekBar bgOffsetYSeekBar;
+    private SeekBar bgMarginSeekBar;
+    private SeekBar bgRadiusSeekBar;
     private TextView textSizeLabel, bgPaddingLabel, bgOffsetXLabel, bgOffsetYLabel;
+    private TextView bgMarginLabel, bgRadiusLabel;
     private TextView shadowBlurLabel, shadowOffsetXLabel, shadowOffsetYLabel;
 
     public TextPanelController(MainActivity activity) {
@@ -86,10 +86,14 @@ public class TextPanelController {
         bgPaddingSeekBar = activity.findViewById(R.id.bgPaddingSeekBar);
         bgOffsetXSeekBar = activity.findViewById(R.id.bgOffsetXSeekBar);
         bgOffsetYSeekBar = activity.findViewById(R.id.bgOffsetYSeekBar);
+        bgMarginSeekBar = activity.findViewById(R.id.bgMarginSeekBar);
+        bgRadiusSeekBar = activity.findViewById(R.id.bgRadiusSeekBar);
         textSizeLabel = activity.findViewById(R.id.textSizeLabel);
         bgPaddingLabel = activity.findViewById(R.id.bgPaddingLabel);
         bgOffsetXLabel = activity.findViewById(R.id.bgOffsetXLabel);
         bgOffsetYLabel = activity.findViewById(R.id.bgOffsetYLabel);
+        bgMarginLabel = activity.findViewById(R.id.bgMarginLabel);
+        bgRadiusLabel = activity.findViewById(R.id.bgRadiusLabel);
         shadowBlurLabel = activity.findViewById(R.id.shadowBlurLabel);
         shadowOffsetXLabel = activity.findViewById(R.id.shadowOffsetXLabel);
         shadowOffsetYLabel = activity.findViewById(R.id.shadowOffsetYLabel);
@@ -248,6 +252,30 @@ public class TextPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
+        bgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.bgMargin = progress;
+                bgMarginLabel.setText("Margin: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_margin", progress).apply();
+                FloatingService.updateTextBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        bgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                TextConfig.bgRadius = progress;
+                bgRadiusLabel.setText("Radius: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("text_bg_radius", progress).apply();
+                FloatingService.updateTextBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
         shadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             activity.applySwitchTint(shadowSwitch, isChecked);
             TextConfig.shadow.enabled = isChecked;
@@ -306,72 +334,23 @@ public class TextPanelController {
         });
 
         textSizeLabel.setOnClickListener(v ->
-                showSliderEditor("Ukuran Teks", seekBar, 150, textSizeLabel, "Ukuran Teks: "));
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", seekBar, 150, textSizeLabel, "Ukuran Teks: "));
         bgPaddingLabel.setOnClickListener(v ->
-                showSliderEditor("Ukuran Background", bgPaddingSeekBar, 80, bgPaddingLabel, "Ukuran Background: "));
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", bgPaddingSeekBar, 80, bgPaddingLabel, "Ukuran Background: "));
         bgOffsetXLabel.setOnClickListener(v ->
-                showOffsetEditor("Offset X", bgOffsetXSeekBar, bgOffsetXLabel, "Offset X: "));
+                SliderLabelEditor.showOffsetEditor(activity, "Offset X", bgOffsetXSeekBar, bgOffsetXLabel, "Offset X: "));
         bgOffsetYLabel.setOnClickListener(v ->
-                showOffsetEditor("Offset Y", bgOffsetYSeekBar, bgOffsetYLabel, "Offset Y: "));
+                SliderLabelEditor.showOffsetEditor(activity, "Offset Y", bgOffsetYSeekBar, bgOffsetYLabel, "Offset Y: "));
+        bgMarginLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Margin Background", bgMarginSeekBar, 30, bgMarginLabel, "Margin: "));
+        bgRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Background", bgRadiusSeekBar, 50, bgRadiusLabel, "Radius: "));
         shadowBlurLabel.setOnClickListener(v ->
-                showSliderEditor("Blur Shadow", shadowBlurSeekBar, 50, shadowBlurLabel, "Blur Shadow: "));
+                SliderLabelEditor.showSliderEditor(activity, "Blur Shadow", shadowBlurSeekBar, 50, shadowBlurLabel, "Blur Shadow: "));
         shadowOffsetXLabel.setOnClickListener(v ->
-                showOffsetEditor("Shadow X", shadowOffsetXSeekBar, shadowOffsetXLabel, "Shadow X: "));
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow X", shadowOffsetXSeekBar, shadowOffsetXLabel, "Shadow X: "));
         shadowOffsetYLabel.setOnClickListener(v ->
-                showOffsetEditor("Shadow Y", shadowOffsetYSeekBar, shadowOffsetYLabel, "Shadow Y: "));
-    }
-
-    private void showSliderEditor(String title, SeekBar bar, int max, TextView label, String prefix) {
-        EditText input = new EditText(activity);
-        input.setText(String.valueOf(bar.getProgress()));
-        input.setSelection(input.length());
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Edit " + title)
-                .setView(input)
-                .setPositiveButton("OK", (d, w) -> {
-                    try {
-                        int val = Integer.parseInt(input.getText().toString().trim());
-                        if (val < 0 || val > max) {
-                            Toast.makeText(activity, "Nilai harus 0-" + max, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        bar.setProgress(val);
-                        label.setText(prefix + val);
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
-
-    private void showOffsetEditor(String title, SeekBar bar, TextView label, String prefix) {
-        EditText input = new EditText(activity);
-        int currentOffset = bar.getProgress() - 60;
-        input.setText(String.valueOf(currentOffset));
-        input.setSelection(input.length());
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
-                | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Edit " + title)
-                .setView(input)
-                .setPositiveButton("OK", (d, w) -> {
-                    try {
-                        int val = Integer.parseInt(input.getText().toString().trim());
-                        if (val < -60 || val > 60) {
-                            Toast.makeText(activity, "Nilai harus -60 hingga 60", Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        bar.setProgress(val + 60);
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", shadowOffsetYSeekBar, shadowOffsetYLabel, "Shadow Y: "));
     }
 
     private void applyInitialTints() {

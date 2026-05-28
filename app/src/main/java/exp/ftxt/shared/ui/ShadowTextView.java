@@ -12,12 +12,15 @@ public class ShadowTextView extends TextView {
     private int bgColor;
     private int bgOffsetX;
     private int bgOffsetY;
+    private int bgMargin = 0;
+    private int bgRadius = 0;
     private final Paint bgPaint;
 
     public ShadowTextView(Context context) {
         super(context);
         bgPaint = new Paint();
         bgPaint.setStyle(Paint.Style.FILL);
+        bgPaint.setAntiAlias(true);
     }
 
     public void setShadowConfig(ShadowConfig config) {
@@ -46,13 +49,34 @@ public class ShadowTextView extends TextView {
         invalidate();
     }
 
+    public void setBgMargin(int margin) {
+        bgMargin = margin;
+        invalidate();
+    }
+
+    public void setBgRadius(int radius) {
+        bgRadius = radius;
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (bgEnabled) {
             bgPaint.setColor(bgColor);
             canvas.save();
             canvas.translate(bgOffsetX, bgOffsetY);
-            canvas.drawRect(0, 0, getWidth(), getHeight(), bgPaint);
+            
+            float left = -bgMargin;
+            float top = -bgMargin;
+            float right = getWidth() + bgMargin;
+            float bottom = getHeight() + bgMargin;
+            
+            if (bgRadius > 0) {
+                canvas.drawRoundRect(left, top, right, bottom, bgRadius, bgRadius, bgPaint);
+            } else {
+                canvas.drawRect(left, top, right, bottom, bgPaint);
+            }
+            
             canvas.restore();
         }
 

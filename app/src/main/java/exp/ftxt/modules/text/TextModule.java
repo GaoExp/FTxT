@@ -107,6 +107,8 @@ public class TextModule {
         view.setBgColor(TextConfig.bgColor);
         view.setBgOffsetX(TextConfig.bgOffsetX);
         view.setBgOffsetY(TextConfig.bgOffsetY);
+        view.setBgMargin(TextConfig.bgMargin);
+        view.setBgRadius(TextConfig.bgRadius);
     }
 
     public void updateTouchFlags() {

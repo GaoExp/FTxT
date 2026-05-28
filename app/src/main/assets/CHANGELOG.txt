@@ -3,6 +3,63 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.32.4] - 2026-05-28
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Slider Label Editor Shared Utility**: Ekstrak `showSliderEditor()` dan `showOffsetEditor()` ke `shared/ui/SliderLabelEditor.java` untuk menghilangkan duplikasi kode antara `TextPanelController` dan `FpsPanelController`.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/SliderLabelEditor.java`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 69 → 70
+- versionName: 2.3.1.32.3 → 2.3.1.32.4
+
+---
+
+## [2.3.1.32.3] - 2026-05-28
+
+### ✨ Fitur Baru
+
+- **Background Margin & Radius**: Tambah slider margin (0–30 px) dan radius/rounded corner (0–50 px) pada konfigurasi background untuk modul Floating Text dan FPS Display.
+- **Direct Label Edit**: Klik label margin dan radius untuk mengedit nilai langsung via dialog input.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/shared/ui/ShadowTextView.java
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/ui/TextPanelController.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- README.md
+- app/src/main/assets/README.txt
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 68 → 69
+- versionName: 2.3.1.32.2 → 2.3.1.32.3
+
+---
+
 ## [2.3.1.32.2] - 2026-05-28
 
 ### 🔧 Optimasi & Penyesuaian

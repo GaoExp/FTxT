@@ -130,6 +130,8 @@ public class FpsModule {
         view.setBgColor(FpsConfig.bgColor);
         view.setBgOffsetX(FpsConfig.bgOffsetX);
         view.setBgOffsetY(FpsConfig.bgOffsetY);
+        view.setBgMargin(FpsConfig.bgMargin);
+        view.setBgRadius(FpsConfig.bgRadius);
     }
 
     public void updateTouchFlags() {

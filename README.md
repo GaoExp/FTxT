@@ -1,6 +1,6 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.3.1.32.2`        
+**Current Release:** `2.3.1.32.4`        
 **Last Updated:** `2026-05-28`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -67,6 +67,8 @@ Fitur:
 - Pilih warna background via color picker (ARGB dengan alpha slider)
 - Ukuran background (padding dari teks, 0–80 px)
 - Offset X/Y background (-60 hingga 60 px, default 0 di tengah)
+- Margin background (jarak dari padding, 0–30 px)
+- Radius background (rounded corner, 0–50 px)
 - Berlaku untuk Floating Text dan FPS Display
 - Real-time update
 
@@ -184,7 +186,7 @@ Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
 - Bulan 🌙 → Toggle tema gelap/terang
 
-Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.32.1") di samping nama aplikasi di navigation drawer header.
+Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.32.4") di samping nama aplikasi di navigation drawer header.
 
 ### 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
@@ -195,6 +197,8 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 - Pilih warna background (dengan alpha/transparansi via color picker)
 - Atur ukuran background (padding dari teks, 0–80 px)
 - Atur offset X/Y background (-60 hingga 60 px)
+- Atur margin background (0–30 px)
+- Atur radius background untuk rounded corner (0–50 px)
 - Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
 - Klik label untuk edit nilai manual via dialog input
 
@@ -357,6 +361,7 @@ FTxT/
 | shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
 | shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
+| shared/ui/SliderLabelEditor.java | Shared utility edit nilai slider via dialog |
 | ui/TextPanelController.java | Controller panel Floating Text |
 | ui/FpsPanelController.java | Controller panel FPS Display |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
