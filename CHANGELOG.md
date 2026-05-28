@@ -3,6 +3,68 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.3.1.33.2] - 2026-05-28
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Popup Settings**: Tombol pengaturan (gear) kini menampilkan popup dengan dua opsi: "Konfigurasi" (izin + Tutup Aplikasi) dan "Lihat Dokumentasi" (6 dokumen).
+- **Dokumentasi via Popup**: Dokumentasi dipindah dari SettingsActivity ke popup di MainActivity — akses lebih cepat tanpa buka halaman baru.
+- **SettingsActivity Ringkas**: Hanya berisi Konfigurasi (izin overlay/notifikasi/baterai + Tutup Aplikasi). Tombol dokumentasi dihapus.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 75 → 76
+- versionName: 2.3.1.33.1 → 2.3.1.33.2
+
+---
+
+## [2.3.1.33.1] - 2026-05-28
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Dokumentasi Dipisah**: README.md dipecah menjadi 4 file terpisah untuk modularitas:
+  - `STRUKTUR.md` — Struktur project & deskripsi file
+  - `PANDUAN.md` — Panduan penggunaan lengkap
+  - `DEVELOPMENT.md` — Info teknis, environment, versioning
+  - `TENTANG.md` — Lisensi, author, support
+- README.md kini ringkas dengan ringkasan fitur dan referensi ke file dokumentasi terkait.
+- Semua file memiliki versi .md (root) dan .txt (assets) yang disinkronkan secara manual.
+- SettingsActivity mendapat 4 tombol baru untuk membaca file dokumentasi baru.
+- Gradle task `syncDocs` diperbarui untuk menyertakan semua file dokumentasi baru.
+
+### ✏️️ File Changed
+
+- CHANGELOG.md
+- README.md
+- app/build.gradle
+- app/src/main/java/exp/ftxt/SettingsActivity.java
+- app/src/main/res/layout/activity_settings.xml
+- app/src/main/assets/CHANGELOG.txt
+- app/src/main/assets/README.txt
+
+### 🗒️ File Added
+
+- `STRUKTUR.md` + `app/src/main/assets/STRUKTUR.txt`
+- `PANDUAN.md` + `app/src/main/assets/PANDUAN.txt`
+- `DEVELOPMENT.md` + `app/src/main/assets/DEVELOPMENT.txt`
+- `TENTANG.md` + `app/src/main/assets/TENTANG.txt`
+
+### 🔢 Version
+
+- versionCode: 74 → 75
+- versionName: 2.3.1.33.0 → 2.3.1.33.1
+
+---
+
 ## [2.3.1.33.0] - 2026-05-28
 
 ### ✨ Fitur Baru

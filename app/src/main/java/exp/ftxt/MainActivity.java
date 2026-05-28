@@ -9,11 +9,16 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.util.TypedValue;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +26,10 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.modules.fps.FpsConfig;
@@ -193,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            showSettingsPopup();
             return true;
         }
 
@@ -288,6 +297,113 @@ public class MainActivity extends AppCompatActivity {
     // ========================================================================
     // Shadow config loading — dipanggil saat onCreate
     // ========================================================================
+
+    // ========================================================================
+    // Settings popup — gear icon → pilih Konfigurasi atau Lihat Dokumentasi
+    // ========================================================================
+    private void showSettingsPopup() {
+        String[] items = {"Konfigurasi", "Lihat Dokumentasi"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Pengaturan");
+        builder.setItems(items, (dialog, which) -> {
+            if (which == 0) {
+                startActivity(new Intent(this, SettingsActivity.class));
+            } else {
+                showDocumentationDialog();
+            }
+        });
+        builder.create().show();
+    }
+
+    private void showDocumentationDialog() {
+        String[] docs = {"README", "CHANGELOG", "PANDUAN", "STRUKTUR", "DEVELOPMENT", "TENTANG"};
+        String[] files = {"README.txt", "CHANGELOG.txt", "PANDUAN.txt", "STRUKTUR.txt", "DEVELOPMENT.txt", "TENTANG.txt"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Lihat Dokumentasi");
+        builder.setItems(docs, (dialog, which) -> {
+            String content = readAssetFile(files[which]);
+            showContentDialog(docs[which], content);
+        });
+        builder.setNegativeButton("Tutup", null);
+        builder.create().show();
+    }
+
+    private float currentDocTextSize = 14;
+
+    private void showContentDialog(String title, String content) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title);
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout controls = new LinearLayout(this);
+        controls.setOrientation(LinearLayout.HORIZONTAL);
+        controls.setPadding(16, 8, 16, 4);
+
+        Button minusBtn = new Button(this);
+        minusBtn.setText("−");
+        minusBtn.setTextSize(18);
+        controls.addView(minusBtn);
+
+        TextView sizeLabel = new TextView(this);
+        sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
+        sizeLabel.setPadding(16, 0, 16, 0);
+        sizeLabel.setGravity(android.view.Gravity.CENTER);
+        sizeLabel.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        controls.addView(sizeLabel);
+
+        Button plusBtn = new Button(this);
+        plusBtn.setText("+");
+        plusBtn.setTextSize(18);
+        controls.addView(plusBtn);
+
+        ScrollView scrollView = new ScrollView(this);
+        TextView textView = new TextView(this);
+        textView.setText(content);
+        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
+        textView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+        textView.setTextSize(currentDocTextSize);
+        scrollView.addView(textView);
+
+        root.addView(controls);
+        root.addView(scrollView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+
+        minusBtn.setOnClickListener(v -> {
+            if (currentDocTextSize > 4) {
+                currentDocTextSize -= 2;
+                textView.setTextSize(currentDocTextSize);
+                sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
+            }
+        });
+
+        plusBtn.setOnClickListener(v -> {
+            if (currentDocTextSize < 60) {
+                currentDocTextSize += 2;
+                textView.setTextSize(currentDocTextSize);
+                sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
+            }
+        });
+
+        builder.setView(root);
+        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
+    }
+
+    private String readAssetFile(String filename) {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(getAssets().open(filename)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            content.append("Error reading file: ").append(e.getMessage());
+        }
+        return content.toString();
+    }
 
     private void loadShadowConfigs() {
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);

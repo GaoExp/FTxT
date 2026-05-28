@@ -6,8 +6,7 @@ Gunakan bahasa Indonesia.
  
 Tujuan: 
 - konsistensi versi 
-- konsistensi CHANGELOG 
-- konsistensi README 
+- konsistensi dokumentasi (CHANGELOG, README, STRUKTUR, PANDUAN, DEVELOPMENT, TENTANG)
 - mudah dibaca manusia 
 - mengurangi perilaku AI yang terlalu verbose atau over-engineering 
  
@@ -233,10 +232,20 @@ Ringkas, faktual, langsung ke perubahan.
  
 --- 
  
-## 3. README.txt 
- 
-README adalah dokumentasi pengguna akhir. 
- 
+## 3. Dokumentasi (.md root ↔ .txt assets)
+
+Dokumentasi terdiri dari 5 pasang file yang harus disinkronkan secara manual:
+
+| Root (.md)          | Assets (.txt)             | Isi                              |
+|---------------------|---------------------------|----------------------------------|
+| README.md           | README.txt                | Ringkasan fitur & referensi      |
+| STRUKTUR.md         | STRUKTUR.txt              | Struktur project & deskripsi file|
+| PANDUAN.md          | PANDUAN.txt               | Panduan penggunaan lengkap       |
+| DEVELOPMENT.md      | DEVELOPMENT.txt           | Info teknis, environment, version|
+| TENTANG.md          | TENTANG.txt               | Lisensi, author, support         |
+
+### README / PANDUAN (Dokumentasi pengguna akhir)
+
 JANGAN menambahkan isi: 
 - detail implementasi teknis 
 - cleanup kecil
@@ -248,27 +257,51 @@ WAJIB update bila:
 - ada perubahan struktur project 
 - ada perubahan UI/UX besar 
 - Current Version berubah 
-- Latest Changes berubah 
 - Last Updated berubah 
- 
+
 Update hanya jika relevan: 
 - daftar fitur 
 - requirement 
 - permission 
- 
-Detail teknis → CHANGELOG.txt 
+
+Detail teknis → CHANGELOG / DEVELOPMENT
+
+### STRUKTUR
+
+WAJIB update bila:
+- ada file/direktori baru
+- ada file/direktori dihapus
+- ada perubahan struktur package
+
+### DEVELOPMENT
+
+WAJIB update bila:
+- ada perubahan environment (SDK, permission, dependency)
+- ada perubahan versioning scheme
+- ada perubahan teknis signifikan
+
+### TENTANG
+
+Update hanya jika:
+- ada perubahan author/support info
+- ada perubahan lisensi
  
 --- 
  
 ## 4. Workflow AI 
- 
+
 Sesudah mengedit: 
- 
+
 1. update kode 
 2. update versionCode 
 3. update versionName 
 4. update `CHANGELOG.md` (root) + `CHANGELOG.txt` (assets)
-5. update `README.md` (root) + `README.txt` (assets)
+5. update pasangan dokumentasi yang relevan (.md root + .txt assets):
+   - `README.md` + `README.txt`
+   - `STRUKTUR.md` + `STRUKTUR.txt`
+   - `PANDUAN.md` + `PANDUAN.txt`
+   - `DEVELOPMENT.md` + `DEVELOPMENT.txt`
+   - `TENTANG.md` + `TENTANG.txt`
  
 --- 
  

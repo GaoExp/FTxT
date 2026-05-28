@@ -13,8 +13,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 74
-        versionName "2.3.1.33.0"
+        versionCode 76
+        versionName "2.3.1.33.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,6 +42,10 @@ android {
 task syncDocs(type: Copy) {
     from rootProject.file('README.md')
     from rootProject.file('CHANGELOG.md')
+    from rootProject.file('STRUKTUR.md')
+    from rootProject.file('PANDUAN.md')
+    from rootProject.file('DEVELOPMENT.md')
+    from rootProject.file('TENTANG.md')
     into file('src/main/assets')
     rename { name -> name.replace('.md', '.txt') }
 }
