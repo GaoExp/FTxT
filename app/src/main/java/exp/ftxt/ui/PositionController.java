@@ -8,7 +8,9 @@ import android.os.Handler;
 import android.text.InputType;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -34,6 +36,7 @@ public class PositionController {
     private boolean isUpdating = false;
     private final Handler repeatHandler = new Handler();
     private Runnable repeatRunnable;
+    private Handler holdHandler;
 
     private static final float DPAD_STEP = 0.01f;
     private static final int REPEAT_INTERVAL = 100;
@@ -206,24 +209,109 @@ public class PositionController {
             return;
         }
 
-        String[] names = new String[count];
+        final String[] names = new String[count];
         for (int i = 0; i < count; i++) {
             names[i] = prefs.getString("preset_" + (i + 1) + "_name", "Preset " + (i + 1));
         }
 
-        new AlertDialog.Builder(activity)
+        ListView listView = new ListView(activity);
+        listView.setAdapter(new ArrayAdapter<>(activity,
+                android.R.layout.simple_list_item_1, names));
+
+        final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Muat Preset")
-                .setItems(names, (dialog, which) -> {
-                    int idx = which + 1;
-                    float x = prefs.getFloat("preset_" + idx + "_x", 0.5f);
-                    float y = prefs.getFloat("preset_" + idx + "_y", 0.5f);
-                    onPositionChanged(x, y);
+                .setView(listView)
+                .setNegativeButton("Batal", null)
+                .show();
+
+        holdHandler = new Handler();
+        final int[] heldPos = {-1};
+        final boolean[] longPressFired = {false};
+        final Runnable[] holdRunnable = {null};
+
+        listView.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN: {
+                    int pos = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                    if (pos >= 0) {
+                        heldPos[0] = pos;
+                        holdRunnable[0] = () -> {
+                            if (heldPos[0] == pos) {
+                                longPressFired[0] = true;
+                                confirmDeletePreset(pos, names[pos], dialog);
+                            }
+                        };
+                        holdHandler.postDelayed(holdRunnable[0], 2000);
+                    }
+                    return false;
+                }
+                case MotionEvent.ACTION_MOVE:
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    holdHandler.removeCallbacks(holdRunnable[0]);
+                    heldPos[0] = -1;
+                    return false;
+            }
+            return false;
+        });
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            if (longPressFired[0]) {
+                longPressFired[0] = false;
+                return;
+            }
+            int idx = position + 1;
+            float x = prefs.getFloat("preset_" + idx + "_x", 0.5f);
+            float y = prefs.getFloat("preset_" + idx + "_y", 0.5f);
+            onPositionChanged(x, y);
+            dialog.dismiss();
+        });
+    }
+
+    private void confirmDeletePreset(int position, String name, AlertDialog parentDialog) {
+        int idx = position + 1;
+        new AlertDialog.Builder(activity)
+                .setTitle("Hapus Preset")
+                .setMessage("Hapus preset \"" + name + "\"?")
+                .setPositiveButton("Ya", (d, w) -> {
+                    deletePreset(idx);
+                    parentDialog.dismiss();
+                    showLoadPresetDialog();
                 })
                 .setNegativeButton("Batal", null)
                 .show();
     }
 
+    private void deletePreset(int idx) {
+        int count = prefs.getInt(KEY_PRESET_COUNT, 0);
+        for (int i = idx; i < count; i++) {
+            int next = i + 1;
+            String nextName = prefs.getString("preset_" + next + "_name", "");
+            float nextX = prefs.getFloat("preset_" + next + "_x", 0.5f);
+            float nextY = prefs.getFloat("preset_" + next + "_y", 0.5f);
+            prefs.edit()
+                    .putString("preset_" + i + "_name", nextName)
+                    .putFloat("preset_" + i + "_x", nextX)
+                    .putFloat("preset_" + i + "_y", nextY)
+                    .apply();
+        }
+        prefs.edit()
+                .remove("preset_" + count + "_name")
+                .remove("preset_" + count + "_x")
+                .remove("preset_" + count + "_y")
+                .putInt(KEY_PRESET_COUNT, count - 1)
+                .apply();
+    }
+
     // ====================================================================
+
+    public void cleanup() {
+        stopRepeat();
+        if (holdHandler != null) {
+            holdHandler.removeCallbacksAndMessages(null);
+            holdHandler = null;
+        }
+    }
 
     public void refresh() {
         syncAll();

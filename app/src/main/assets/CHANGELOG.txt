@@ -3,6 +3,46 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.5.1.40.1] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **XyPad Tidak Bisa Di-drag**: `NestedScrollView` meng-intercept sentuhan pada `XyPadView` sehingga dot tidak bisa digerakkan. Ditambahkan `requestDisallowInterceptTouchEvent(true)` pada ACTION_DOWN dan `false` pada ACTION_UP/CANCEL.
+
+- **Handler Memory Leak**: `Handler` pada `PositionController` (repeatHandler untuk D-pad dan holdHandler untuk long-press hapus preset) tidak pernah dibersihkan saat Activity di-destroy. Ditambahkan metode `cleanup()` yang dipanggil di `MainActivity.onDestroy()`.
+
+## [2.5.1.40.0] - 2026-05-29
+
+### ✨ Fitur Baru
+
+- **Hapus Preset Posisi**: Tahan preset 2 detik di dialog Muat Preset untuk memunculkan dialog konfirmasi hapus dengan tombol [Ya] [Batal].
+
+### 🐞 Bug Fixes
+
+- **Sidebar Tidak Responsif**: Item sidebar yang dibuat ulang secara programmatic oleh `rebuildSidebar()` tidak memiliki `OnClickListener`, sehingga tidak bisa dipilih. Ditambahkan listener yang meng-handle navigasi panel, update title, simpan state, dan tutup drawer.
+
+- **ScrollView pada Panel**: Panel Floating Text dan FPS Display tidak bisa di-scroll saat konten melebihi layar (misal konfigurasi Background/Shadow terbuka). Ditambahkan `ScrollView` dengan `fillViewport="true"` pada kedua panel.
+
+### ♻️️ Perubahan Fitur
+
+- **Tata Letak Kontrol Posisi**: XY Pad diubah menjadi vertikal (250dp, `layout_weight="1"`) dan D-Pad dipindah ke samping kanan dalam satu baris horizontal, mengisi ruang kosong yang sebelumnya terbuang.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- app/src/main/res/layout/activity_main.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 88 → 89
+- versionName: 2.5.1.39.2 → 2.5.1.40.0
+
+---
+
 ## [2.5.1.39.2] - 2026-05-29
 
 ### 🐞 Bug Fixes

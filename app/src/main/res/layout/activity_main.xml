@@ -30,6 +30,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -435,6 +447,10 @@
 
             </LinearLayout>
 
+            </androidx.core.widget.NestedScrollView>
+
+            </LinearLayout>
+
             <!-- FPS Panel -->
             <LinearLayout
                 android:id="@+id/panel_fps"
@@ -443,6 +459,17 @@
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:orientation="horizontal"
@@ -716,6 +743,10 @@
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>
+
+            </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
 
             </LinearLayout>
 

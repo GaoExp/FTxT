@@ -574,6 +574,12 @@ public class MainActivity extends AppCompatActivity {
         return tv;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (textPanel != null) textPanel.cleanup();
+    }
+
     private int dp(float dp) {
         return (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());

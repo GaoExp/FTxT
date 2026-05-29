@@ -61,6 +61,13 @@ public class TextPanelController {
         }
     }
 
+    public void cleanup() {
+        if (positionController != null) {
+            positionController.cleanup();
+            positionController = null;
+        }
+    }
+
     public void autoStart() {
         boolean overlayOn = activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .getBoolean("text_overlay_on", false);
