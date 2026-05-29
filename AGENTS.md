@@ -1,4 +1,4 @@
-# AGENTS.txt — Pedoman AI Project FTxT 
+# AGENTS.md — Pedoman AI Project FTxT 
  
 Dokumen ini adalah aturan kerja untuk AI agent yang memodifikasi project. 
  
@@ -17,7 +17,7 @@ Tujuan:
 File: 
 `app/build.gradle` 
  
-### versionCode 
+### versionCode         
  
 WAJIB: 
 - integer 
@@ -234,7 +234,7 @@ Ringkas, faktual, langsung ke perubahan.
  
 ## 3. Dokumentasi (.md root ↔ .txt assets)
 
-Dokumentasi terdiri dari 5 pasang file yang harus disinkronkan secara manual:
+Dokumentasi terdiri dari 6 pasang file yang harus disinkronkan secara manual:
 
 | Root (.md)          | Assets (.txt)             | Isi                              |
 |---------------------|---------------------------|----------------------------------|
@@ -243,6 +243,7 @@ Dokumentasi terdiri dari 5 pasang file yang harus disinkronkan secara manual:
 | PANDUAN.md          | PANDUAN.txt               | Panduan penggunaan lengkap       |
 | DEVELOPMENT.md      | DEVELOPMENT.txt           | Info teknis, environment, version|
 | TENTANG.md          | TENTANG.txt               | Lisensi, author, support         |
+| CHANGELOG.md        | CHANGELOG.txt             | Riwayat perubahan release        |
 
 ### README / PANDUAN (Dokumentasi pengguna akhir)
 
@@ -285,6 +286,11 @@ WAJIB update bila:
 Update hanya jika:
 - ada perubahan author/support info
 - ada perubahan lisensi
+
+### CHANGELOG
+
+Update WAJIB setiap ada perubahan kode.
+Aturan penulisan ada di **Section 2 — CHANGELOG.txt** di atas.
  
 --- 
  

@@ -2,9 +2,13 @@
 
 ```
 FTxT/
+├── AGENTS.md
 ├── CHANGELOG.md
 ├── README.md
 ├── STRUKTUR.md
+├── _karantina/
+│   └── exp/ftxt/shared/ui/
+│       └── XyPadView.java
 ├── PANDUAN.md
 ├── DEVELOPMENT.md
 ├── TENTANG.md
@@ -36,12 +40,16 @@ FTxT/
 │   │   │   │   │   └── HSVColorPickerView.java
 │   │   │   │   └── ui/
 │   │   │   │       ├── ColorPickerDialog.java
+│   │   │   │       ├── DpadController.java
 │   │   │   │       ├── OverlayDragHandler.java
 │   │   │   │       ├── OverlayShadow.java
+│   │   │   │       ├── PositionPresetManager.java
 │   │   │   │       ├── ShadowConfig.java
 │   │   │   │       ├── ShadowTextView.java
+│   │   │   │       ├── SliderPositionController.java
 │   │   │   │       ├── SliderLabelEditor.java
-│   │   │   │       └── XyPadView.java
+│   │   │   │       ├── ShadowTextView.java
+│   │   │   │       └── SliderLabelEditor.java
 │   │   │   │
 │   │   │   ├── ui/
 │   │   │   │   ├── TextPanelController.java
@@ -51,23 +59,28 @@ FTxT/
 │   │   │   ├── utils/
 │   │   │   │   └── PermissionHelper.java
 │   │   │   │
+│   │   │   ├── DocumentationActivity.java
 │   │   │   ├── MainActivity.java
 │   │   │   └── SettingsActivity.java
 │   │   │
 │   │   ├── assets/
-│   │   │   ├── AGENTS.txt
 │   │   │   ├── CHANGELOG.txt
+│   │   │   ├── DEVELOPMENT.txt
+│   │   │   ├── PANDUAN.txt
 │   │   │   ├── README.txt
 │   │   │   ├── STRUKTUR.txt
-│   │   │   ├── PANDUAN.txt
-│   │   │   ├── DEVELOPMENT.txt
 │   │   │   └── TENTANG.txt
 │   │   │
 │   │   ├── res/
+│   │   │   ├── anim/
+│   │   │   │   ├── settings_popup_enter.xml
+│   │   │   │   └── settings_popup_exit.xml
 │   │   │   ├── layout/
+│   │   │   │   ├── activity_documentation.xml
 │   │   │   │   ├── activity_main.xml
 │   │   │   │   ├── activity_settings.xml
 │   │   │   │   ├── dialog_hsv_color_picker.xml
+│   │   │   │   ├── drawer_content.xml
 │   │   │   │   └── nav_header.xml
 │   │   │   ├── drawable/
 │   │   │   │   ├── ic_edit.xml
@@ -78,16 +91,17 @@ FTxT/
 │   │   │   │   ├── ic_theme.xml
 │   │   │   │   └── splash_screen.xml
 │   │   │   ├── menu/
-│   │   │   │   └── drawer_menu.xml
+│   │   │   │   ├── drawer_menu.xml
+│   │   │   │   └── main_menu.xml
 │   │   │   ├── mipmap-anydpi-v26/
 │   │   │   │   └── ic_launcher.xml
-│   │   │   └── values/
-│   │   │       ├── colors.xml
-│   │   │       ├── strings.xml
-│   │   │       ├── styles.xml
-│   │   │       ├── themes.xml
-│   │   │       └── values-v31/
-│   │   │           └── themes.xml
+│   │   │   ├── values/
+│   │   │   │   ├── colors.xml
+│   │   │   │   ├── strings.xml
+│   │   │   │   ├── styles.xml
+│   │   │   │   └── themes.xml
+│   │   │   └── values-v31/
+│   │   │       └── themes.xml
 │   │   │
 │   │   └── AndroidManifest.xml
 │   │
@@ -100,30 +114,35 @@ FTxT/
 
 | File | Deskripsi |
 |------|-----------|
+| DocumentationActivity.java | Activity dokumentasi in-app dengan daftar 6 dokumen |
 | MainActivity.java | Activity utama & kontrol UI (delegasi ke panel controllers) |
-| SettingsActivity.java | Settings dengan dokumentasi in-app & toggle izin |
+| SettingsActivity.java | Settings dengan toggle izin aplikasi |
 | core/FloatingService.java | Overlay service, touch handling, persistence |
 | core/NotificationHelper.java | Helper channel & notifikasi foreground |
 | core/WakeLockManager.java | Manajemen partial wake lock |
-| modules/text/TextConfig.java | Konfigurasi teks overlay |
-| modules/text/TextModule.java | Module logic teks overlay |
-| modules/fps/FpsConfig.java | Konfigurasi FPS overlay |
-| modules/fps/FpsModule.java | Module logic FPS overlay |
+| features/text/TextConfig.java | Konfigurasi teks overlay |
+| features/text/TextModule.java | Module logic teks overlay |
+| features/fps/FpsConfig.java | Konfigurasi FPS overlay |
+| features/fps/FpsModule.java | Module logic FPS overlay |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper color picker (ARGB) |
+| shared/ui/DpadController.java | Shared D-Pad controller dengan touch repeat |
 | shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
+| shared/ui/PositionPresetManager.java | Shared manager simpan/load/hapus preset posisi |
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
 | shared/ui/ShadowConfig.java | Konfigurasi shadow modular |
 | shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
 | shared/ui/SliderLabelEditor.java | Shared utility edit nilai slider via dialog |
-| shared/ui/XyPadView.java | Custom View 2D drag area untuk kontrol posisi |
+| _karantina/exp/ftxt/shared/ui/XyPadView.java | Custom View 2D drag area — DIKARANTINA |
 | ui/TextPanelController.java | Controller panel Floating Text |
-| ui/PositionController.java | Controller kontrol posisi (slider, d-pad, xy-pad) |
+| ui/PositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/FpsPanelController.java | Controller panel FPS Display |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
+| activity_documentation.xml | Layout halaman dokumentasi |
 | activity_main.xml | Layout utama |
 | activity_settings.xml | Layout settings menu |
 | dialog_hsv_color_picker.xml | Layout dialog color picker |
+| drawer_content.xml | Layout sidebar drawer konten |
 | nav_header.xml | Header navigation drawer |

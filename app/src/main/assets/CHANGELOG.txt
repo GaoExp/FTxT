@@ -3,6 +3,77 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.6.1.42.0] - 2026-05-29
+
+### 🚮️ Fitur Dihapus
+
+- **Karantina XY Pad**: `XyPadView.java` dipindahkan dari `shared/ui/` ke `_karantina/` untuk diarsipkan. XY Pad tidak lagi aktif di UI. Dapat dipulihkan kembali di masa depan dengan mengembalikan file ke `shared/ui/` dan menghubungkan kembali di `PositionController` + layout.
+
+### ♻️️ Perubahan Fitur
+
+- **PositionController**: Referensi XY Pad dihapus — turun dari 159 ke 153 baris. Sekarang hanya mengelola Slider + D-Pad + Preset + Orientasi.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- app/src/main/res/layout/activity_main.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- STRUKTUR.md
+- app/src/main/assets/STRUKTUR.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🔥️ File Removed
+
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` → dipindah ke `_karantina/exp/ftxt/shared/ui/XyPadView.java`
+
+### 🗒️ File Added
+
+- `_karantina/exp/ftxt/shared/ui/XyPadView.java`
+
+### 🔢 Version
+
+- versionCode: 95 → 96
+- versionName: 2.5.1.41.4 → 2.6.1.42.0
+
+---
+
+## [2.5.1.41.4] - 2026-05-29
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Ekstrak D-Pad ke Shared Component**: Logika D-Pad (touch listener dengan repeat) diekstrak dari `PositionController.java` ke `shared/ui/DpadController.java` — mengurangi duplikasi dan meningkatkan modularitas, mengikuti pola `XyPadView` dan `SliderLabelEditor`.
+
+- **Ekstrak Preset Posisi ke Shared Component**: Sistem preset posisi (simpan/load/hapus dengan long-press) diekstrak dari `PositionController.java` ke `shared/ui/PositionPresetManager.java` — mengurangi kompleksitas `PositionController` dari 350 menjadi 159 baris.
+
+- **Ekstrak Slider X/Y ke Shared Component**: Slider SeekBar posisi X dan Y (dengan label) diekstrak ke `shared/ui/SliderPositionController.java` — masing-masing dengan `isUpdating` guard sendiri untuk mencegah infinite loop saat sinkronisasi.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/DpadController.java`
+- `app/src/main/java/exp/ftxt/shared/ui/PositionPresetManager.java`
+- `app/src/main/java/exp/ftxt/shared/ui/SliderPositionController.java`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+- STRUKTUR.md
+- app/src/main/assets/STRUKTUR.txt
+- README.md
+- app/src/main/assets/README.txt
+
+### 🔢 Version
+
+- versionCode: 94 → 95
+- versionName: 2.5.1.41.3 → 2.5.1.41.4
+
+---
+
 ## [2.5.1.41.3] - 2026-05-29
 
 ### 🐞 Bug Fixes

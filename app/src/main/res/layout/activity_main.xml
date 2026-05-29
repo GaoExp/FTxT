@@ -352,64 +352,47 @@
                     android:layout_height="wrap_content"/>
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
+                    android:gravity="center"
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <exp.ftxt.shared.ui.XyPadView
-                        android:id="@+id/xyPad"
-                        android:layout_width="0dp"
-                        android:layout_height="250dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"/>
+                    <Button
+                        android:id="@+id/btnUp"
+                        android:text="↑"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"/>
 
                     <LinearLayout
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
                         android:gravity="center"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp">
+                        android:layout_height="wrap_content">
 
                         <Button
-                            android:id="@+id/btnUp"
-                            android:text="↑"
+                            android:id="@+id/btnLeft"
+                            android:text="←"
                             android:layout_width="48dp"
                             android:layout_height="48dp"/>
 
-                        <LinearLayout
-                            android:orientation="horizontal"
-                            android:gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <Button
-                                android:id="@+id/btnLeft"
-                                android:text="←"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"/>
-
-                            <Space
-                                android:layout_width="64dp"
-                                android:layout_height="1dp"/>
-
-                            <Button
-                                android:id="@+id/btnRight"
-                                android:text="→"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"/>
-
-                        </LinearLayout>
+                        <Space
+                            android:layout_width="64dp"
+                            android:layout_height="1dp"/>
 
                         <Button
-                            android:id="@+id/btnDown"
-                            android:text="↓"
+                            android:id="@+id/btnRight"
+                            android:text="→"
                             android:layout_width="48dp"
                             android:layout_height="48dp"/>
 
                     </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnDown"
+                        android:text="↓"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"/>
 
                 </LinearLayout>
 
