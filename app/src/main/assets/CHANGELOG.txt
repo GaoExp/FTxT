@@ -3,6 +3,98 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.5.1.41.3] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **Overlay Baru Pakai Dimensi Layar Lama**: `TextModule.createOverlay()` menggunakan `screenWidth`/`screenHeight` yang disimpan saat `init()`. Jika overlay dihapus lalu dibuat ulang setelah rotasi layar, posisinya dihitung dengan dimensi lama. Sekarang `createOverlay()` juga refresh dimensi dari `WindowManager`.
+- **Suffix Orientasi Tidak Sinkron**: `TextModule.posSuffix()` selalu membaca orientasi perangkat fisik, sementara `PositionController` bisa dioverride manual (tombol Potret/Lanskap). Akibatnya, drag overlay menyimpan posisi ke key orientasi yang salah. Sekarang `TextModule` punya `orientationSuffix` yang bisa di-set dari `PositionController`, dan di-reset tiap `PositionController` dibuat atau berganti mode.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 93 → 94
+- versionName: 2.5.1.41.2 → 2.5.1.41.3
+
+---
+
+## [2.5.1.41.2] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **Posisi Layar Landscape Tidak Akurat**: `screenWidth`/`screenHeight` di `TextModule` menggunakan dimensi layar saat service start (tidak update saat orientasi berubah). Akibatnya slider, D-Pad, dan XY Pad menghitung posisi dengan ukuran layar yang salah. Sekarang `updatePosition()`, `loadPosition()`, dan `savePosition()` selalu mengambil dimensi layar terkini.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 92 → 93
+- versionName: 2.5.1.41.1 → 2.5.1.41.2
+
+---
+
+## [2.5.1.41.1] - 2026-05-29
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Auto-Apply Posisi Orientasi**: Posisi overlay kini otomatis diterapkan saat orientasi layar berubah, tanpa perlu menekan tombol [Potret]/[Lanskap] secara manual.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 91 → 92
+- versionName: 2.5.1.41.0 → 2.5.1.41.1
+
+---
+
+## [2.5.1.41.0] - 2026-05-29
+
+### ✨ Fitur Baru
+
+- **Orientasi Mode Posisi**: Tambah tombol [Potret] [Lanskap] di kontrol posisi untuk mengatur posisi overlay secara terpisah per orientasi. Setiap perubahan posisi otomatis tersimpan ke orientasi yang sedang aktif.
+
+### ♻️️ Perubahan Fitur
+
+- **Penyimpanan Posisi Langsung**: `onPositionChanged()` kini langsung menyimpan posisi ke SharedPreferences, tidak hanya saat drag berhenti.
+
+### 🗒️ File Added
+
+- Tombol `btnPortrait` / `btnLandscape` di `activity_main.xml`
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 90 → 91
+- versionName: 2.5.1.40.1 → 2.5.1.41.0
+
+---
+
 ## [2.5.1.40.1] - 2026-05-29
 
 ### 🐞 Bug Fixes

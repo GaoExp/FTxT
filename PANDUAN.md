@@ -58,7 +58,10 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 - Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
 - Klik label untuk edit nilai manual via dialog input
 
-## 10. Shadow Config
+## 10. Orientasi Posisi
+Gunakan tombol [Potret] dan [Lanskap] di bawah kontrol posisi untuk mengatur posisi overlay secara terpisah untuk mode potret dan lanskap. Posisi masing-masing mode disimpan dan dipulihkan otomatis saat orientasi perangkat berubah.
+
+## 11. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
 - Atur blur radius (0–50 px)

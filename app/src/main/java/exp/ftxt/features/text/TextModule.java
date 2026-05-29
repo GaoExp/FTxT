@@ -34,12 +34,18 @@ public class TextModule {
     private SharedPreferences prefs;
     private int screenWidth;
     private int screenHeight;
+    private String orientationSuffix;
+
+    public void setOrientationSuffix(String suffix) {
+        this.orientationSuffix = suffix;
+    }
 
     public void init(WindowManager windowManager, Context ctx,
                      SharedPreferences sp) {
         wm = windowManager;
         context = ctx;
         prefs = sp;
+        orientationSuffix = null;
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(metrics);
         screenWidth = metrics.widthPixels;
@@ -49,6 +55,11 @@ public class TextModule {
 
     public void createOverlay() {
         if (view != null) return;
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
 
         view = new ShadowTextView(context);
         view.setShadowConfig(TextConfig.shadow);
@@ -108,6 +119,10 @@ public class TextModule {
 
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
             params.x = (int)(TextConfig.posX * screenWidth);
             params.y = (int)(TextConfig.posY * screenHeight);
             try {
@@ -154,6 +169,7 @@ public class TextModule {
     }
 
     private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
         return (context.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
     }
@@ -189,6 +205,10 @@ public class TextModule {
             TextConfig.posY = 0.5f;
         }
         if (params != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
             params.x = (int)(TextConfig.posX * screenWidth);
             params.y = (int)(TextConfig.posY * screenHeight);
         }
@@ -196,6 +216,10 @@ public class TextModule {
 
     public void savePosition(SharedPreferences prefs) {
         if (params != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
             TextConfig.posX = (float) params.x / screenWidth;
             TextConfig.posY = (float) params.y / screenHeight;
             String sfx = posSuffix();

@@ -137,6 +137,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void setTextOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.textModule != null) {
+            instance.textModule.setOrientationSuffix(suffix);
+        }
+    }
+
     public static void updateShadowStatic() {
         if (instance != null && instance.textModule != null) {
             instance.textModule.updateShadow();

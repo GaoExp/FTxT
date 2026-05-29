@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.text.InputType;
 import android.view.MotionEvent;
@@ -32,6 +33,8 @@ public class PositionController {
     private TextView posYLabel;
     private View btnUp, btnDown, btnLeft, btnRight;
     private XyPadView xyPad;
+    private View btnPortrait, btnLandscape;
+    private String currentOrientation;
 
     private boolean isUpdating = false;
     private final Handler repeatHandler = new Handler();
@@ -48,6 +51,13 @@ public class PositionController {
     public PositionController(Activity activity) {
         this.activity = activity;
         this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int orientation = activity.getResources().getConfiguration().orientation;
+        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+        loadPositionFromPrefs(currentOrientation);
+
+        FloatingService.setTextOrientationSuffixStatic(currentOrientation);
+
         bindViews();
         setupListeners();
         syncAll();
@@ -63,6 +73,8 @@ public class PositionController {
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
         xyPad = activity.findViewById(R.id.xyPad);
+        btnPortrait = activity.findViewById(R.id.btnPortrait);
+        btnLandscape = activity.findViewById(R.id.btnLandscape);
     }
 
     private void setupListeners() {
@@ -106,6 +118,10 @@ public class PositionController {
         if (btnResetPos != null) {
             btnResetPos.setOnClickListener(v -> resetPosition());
         }
+
+        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
+        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
+        updateOrientationButtons();
     }
 
     private void setupDpadRepeat(View button, float dx, float dy) {
@@ -150,6 +166,7 @@ public class PositionController {
         TextConfig.posX = x;
         TextConfig.posY = y;
         syncAll();
+        savePositionToPrefs(currentOrientation);
         FloatingService.updateTextPositionStatic();
     }
 
@@ -301,6 +318,43 @@ public class PositionController {
                 .remove("preset_" + count + "_y")
                 .putInt(KEY_PRESET_COUNT, count - 1)
                 .apply();
+    }
+
+    // ====================================================================
+    // Orientation mode — Potret / Lanskap
+    // ====================================================================
+
+    private void setOrientationMode(String mode) {
+        if (mode.equals(currentOrientation)) return;
+
+        savePositionToPrefs(currentOrientation);
+
+        currentOrientation = mode;
+        FloatingService.setTextOrientationSuffixStatic(mode);
+        loadPositionFromPrefs(mode);
+
+        syncAll();
+        FloatingService.updateTextPositionStatic();
+        updateOrientationButtons();
+    }
+
+    private void savePositionToPrefs(String orient) {
+        String sfx = "_" + orient;
+        prefs.edit()
+                .putFloat("text_pos_x" + sfx, TextConfig.posX)
+                .putFloat("text_pos_y" + sfx, TextConfig.posY)
+                .apply();
+    }
+
+    private void loadPositionFromPrefs(String orient) {
+        String sfx = "_" + orient;
+        TextConfig.posX = prefs.getFloat("text_pos_x" + sfx, 0.5f);
+        TextConfig.posY = prefs.getFloat("text_pos_y" + sfx, 0.5f);
+    }
+
+    private void updateOrientationButtons() {
+        btnPortrait.setSelected("port".equals(currentOrientation));
+        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     // ====================================================================

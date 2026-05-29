@@ -32,7 +32,8 @@
 
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:overScrollMode="always"
                 android:scrollbars="vertical"
                 android:fillViewport="true">
@@ -445,6 +446,30 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnPortrait"
+                        android:text="Potret"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnLandscape"
+                        android:text="Lanskap"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
@@ -464,6 +489,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
                 android:fillViewport="true">
 
             <LinearLayout

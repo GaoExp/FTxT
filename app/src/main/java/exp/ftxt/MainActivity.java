@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
             textPanel.onPanelShown();
         }
         autoRequestAndStart();
+        FloatingService.updateTextPositionStatic();
     }
 
     private void autoRequestAndStart() {
