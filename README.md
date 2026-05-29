@@ -1,7 +1,7 @@
 # FTxT — Floating Text Overlay
 
-**Current Release:** `2.4.1.38.0`
-**Last Updated:** `2026-05-28`
+**Current Release:** `2.5.1.39.2`
+**Last Updated:** `2026-05-29`
 
 FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -11,7 +11,7 @@ FTxT adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks flo
 
 - **Floating Text Overlay** — Teks custom di atas semua aplikasi, real-time update
 - **FPS Display Overlay** — FPS counter draggable dengan opsi hanya angka
-- **RGB Color Picker** — ARGB slider, color name auto-detection, HEX edit manual
+- **Classic Color Wheel + ARGB Sliders** — Full disk color wheel dengan crosshair, ARGB slider, two-way sync, color name auto-detection, HEX edit manual
 - **Touch Passthrough** — Kunci posisi agar sentuhan tembus ke aplikasi belakang (default ON)
 - **Position Control 3-in-1** — Slider X/Y, D-Pad, XY Pad, preset posisi, orientation-aware
 - **Configurable Background** — Warna, ukuran, offset, margin, radius (independen dari shadow)

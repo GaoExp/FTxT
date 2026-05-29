@@ -3,6 +3,31 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.5.1.39.2] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **Sidebar Tidak Responsif**: Item sidebar yang dibuat ulang secara programmatic oleh `rebuildSidebar()` tidak memiliki `OnClickListener`, sehingga tidak bisa dipilih. Ditambahkan listener yang meng-handle navigasi panel, update title, simpan state, dan tutup drawer.
+
+### ♻️️ Perubahan Fitur
+
+- **Tata Letak Kontrol Posisi**: XY Pad diubah menjadi vertikal (250dp, `layout_weight="1"`) dan D-Pad dipindah ke samping kanan dalam satu baris horizontal, mengisi ruang kosong yang sebelumnya terbuang.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/layout/activity_main.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 87 → 88
+- versionName: 2.5.1.39.1 → 2.5.1.39.2
+
+---
+
 ## [2.5.1.39.1] - 2026-05-29
 
 ### ✨ Fitur Baru

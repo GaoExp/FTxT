@@ -498,7 +498,6 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONArray arr = new JSONArray(loadSidebarState());
 
-            // Migrasi dari format lama (grup) ke format flat
             if (arr.length() > 0) {
                 JSONObject first = arr.getJSONObject(0);
                 if (first.has("n")) {
@@ -517,56 +516,62 @@ public class MainActivity extends AppCompatActivity {
                 JSONObject item = arr.getJSONObject(i);
                 String label = item.getString("l");
                 String id = item.optString("id", null);
-
-                TextView tv = new TextView(this);
-                tv.setText(label);
-                tv.setTextSize(16);
-                tv.setPadding(dp(16), dp(12), dp(16), dp(12));
-                tv.setLayoutParams(new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                tv.setBackgroundResource(resolveSelectableItemBackground());
-                tv.setClickable(true);
-                tv.setFocusable(true);
-
-                if (id != null) {
-                    int idRes = getResources().getIdentifier(id, "id", getPackageName());
-                    if (idRes != 0) tv.setId(idRes);
-                }
-
-                makeDraggable(tv);
-                navItemContainer.addView(tv);
+                navItemContainer.addView(buildSidebarItem(label, id));
             }
         } catch (Exception e) {
-            // fallback
             try {
                 JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
                 for (int i = 0; i < def.length(); i++) {
                     JSONObject item = def.getJSONObject(i);
                     String label = item.getString("l");
                     String id = item.optString("id", null);
-
-                    TextView tv = new TextView(this);
-                    tv.setText(label);
-                    tv.setTextSize(16);
-                    tv.setPadding(dp(16), dp(12), dp(16), dp(12));
-                    tv.setLayoutParams(new LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                    tv.setBackgroundResource(resolveSelectableItemBackground());
-                    tv.setClickable(true);
-                    tv.setFocusable(true);
-
-                    if (id != null) {
-                        int idRes = getResources().getIdentifier(id, "id", getPackageName());
-                        if (idRes != 0) tv.setId(idRes);
-                    }
-
-                    makeDraggable(tv);
-                    navItemContainer.addView(tv);
+                    navItemContainer.addView(buildSidebarItem(label, id));
                 }
             } catch (Exception e2) { /* ignore */ }
         }
 
         setupDrawerAllItemsDrag();
+    }
+
+    private TextView buildSidebarItem(String label, String id) {
+        TextView tv = new TextView(this);
+        tv.setText(label);
+        tv.setTextSize(16);
+        tv.setPadding(dp(16), dp(12), dp(16), dp(12));
+        tv.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        tv.setBackgroundResource(resolveSelectableItemBackground());
+        tv.setClickable(true);
+        tv.setFocusable(true);
+
+        if (id != null) {
+            int idRes = getResources().getIdentifier(id, "id", getPackageName());
+            if (idRes != 0) tv.setId(idRes);
+        }
+
+        tv.setOnClickListener(v -> {
+            int itemId = v.getId();
+            updateNavSelection(itemId);
+
+            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                    .edit().putInt("nav_selected_item", itemId).apply();
+
+            if (itemId == R.id.navFps) {
+                panelText.setVisibility(View.GONE);
+                panelFps.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle(R.string.nav_fps);
+            } else {
+                panelText.setVisibility(View.VISIBLE);
+                panelFps.setVisibility(View.GONE);
+                getSupportActionBar().setTitle(R.string.nav_floating_text);
+            }
+
+            DrawerLayout drawer = findViewById(R.id.drawerLayout);
+            drawer.closeDrawers();
+        });
+
+        makeDraggable(tv);
+        return tv;
     }
 
     private int dp(float dp) {
