@@ -3,6 +3,29 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.5.1.39.0] - 2026-05-29
+
+### 🚮️ Fitur Dihapus
+
+- **Hapus Sistem Grup Sidebar**: Navigasi sidebar tidak lagi menggunakan grup (Overlay, Fitur). Semua item ditampilkan flat dalam satu daftar. Tombol "Tambah Grup" dihapus. Grup kustom yang tersimpan otomatis dimigrasi ke format flat.
+
+- **Hapus Tombol "Hapus" Sidebar**: Tombol dan mode hapus item di footer sidebar dihapus untuk menyederhanakan navigasi.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/drawer_content.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 85 → 86
+- versionName: 2.4.1.38.2 → 2.5.1.39.0
+
+---
+
 ## [2.4.1.38.2] - 2026-05-29
 
 ### 🔧 Optimasi & Penyesuaian
