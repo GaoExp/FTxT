@@ -139,8 +139,12 @@ public class TextModule {
 
     private void applyBackground() {
         if (view == null) return;
-        int pad = TextConfig.bgPadding;
-        view.setPadding(pad, pad, pad, pad);
+        if (TextConfig.bgEnabled) {
+            int pad = TextConfig.bgPadding;
+            view.setPadding(pad, pad, pad, pad);
+        } else {
+            view.setPadding(0, 0, 0, 0);
+        }
         view.setBgEnabled(TextConfig.bgEnabled);
         view.setBgColor(TextConfig.bgColor);
         view.setBgOffsetX(TextConfig.bgOffsetX);

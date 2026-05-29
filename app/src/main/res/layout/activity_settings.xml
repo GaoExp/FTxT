@@ -117,7 +117,7 @@
 
             <TextView
                 android:text="Ketika diaktifkan, tombol kembali harus tekan dua kali untuk keluar dari aplikasi"
-                android:textSize="12sp"
+                android:textSize="8sp"
                 android:textColor="#888888"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

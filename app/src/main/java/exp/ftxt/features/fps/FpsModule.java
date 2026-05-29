@@ -126,8 +126,12 @@ public class FpsModule {
 
     private void applyBackground() {
         if (view == null) return;
-        int pad = FpsConfig.bgPadding;
-        view.setPadding(pad, pad, pad, pad);
+        if (FpsConfig.bgEnabled) {
+            int pad = FpsConfig.bgPadding;
+            view.setPadding(pad, pad, pad, pad);
+        } else {
+            view.setPadding(0, 0, 0, 0);
+        }
         view.setBgEnabled(FpsConfig.bgEnabled);
         view.setBgColor(FpsConfig.bgColor);
         view.setBgOffsetX(FpsConfig.bgOffsetX);
