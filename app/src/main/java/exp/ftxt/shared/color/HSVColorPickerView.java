@@ -10,32 +10,16 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * Custom View untuk circular HSV color picker wheel.
- *
- * Menggambar color wheel (hue sweep), saturation gradient radial,
- * dan selector circle. Touch event menghitung hue & saturation
- * dari posisi sentuhan.
- *
- * Menggunakan:
- * - ColorMath → shared/color/ColorMath.java (utilitas perhitungan warna/posisi)
- *
- * Dipanggil oleh:
- * - ColorPickerDialog → shared/ui/ColorPickerDialog.java (show method)
- *
- * Terkait dengan:
- * - ColorMath  → shared/color/ColorMath.java (utilitas HSV)
- */
 public class HSVColorPickerView extends View {
 
     private Paint colorWheelPaint;
-    private Paint selectorPaint;
-    private Paint saturationGradientPaint;
+    private Paint crosshairDarkPaint;
+    private Paint crosshairLightPaint;
+    private Paint centerDotPaint;
 
     private float wheelRadius;
     private float wheelCenterX;
     private float wheelCenterY;
-    private float selectorRadius = 15f;
 
     private float hue = 0f;
     private float saturation = 1f;
@@ -63,12 +47,20 @@ public class HSVColorPickerView extends View {
 
     private void init() {
         colorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        saturationGradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        selectorPaint.setStyle(Paint.Style.STROKE);
-        selectorPaint.setStrokeWidth(3f);
-        selectorPaint.setColor(Color.WHITE);
+        crosshairDarkPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        crosshairDarkPaint.setStyle(Paint.Style.STROKE);
+        crosshairDarkPaint.setStrokeWidth(4f);
+        crosshairDarkPaint.setColor(Color.BLACK);
+
+        crosshairLightPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        crosshairLightPaint.setStyle(Paint.Style.STROKE);
+        crosshairLightPaint.setStrokeWidth(2f);
+        crosshairLightPaint.setColor(Color.WHITE);
+
+        centerDotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        centerDotPaint.setStyle(Paint.Style.FILL);
+        centerDotPaint.setColor(Color.WHITE);
     }
 
     @Override
@@ -80,13 +72,10 @@ public class HSVColorPickerView extends View {
         wheelRadius = Math.min(wheelCenterX, wheelCenterY) - 20f;
 
         drawColorWheel(canvas);
-        drawSaturationGradient(canvas);
-        drawSelector(canvas);
+        drawSaturationOverlay(canvas);
+        drawCrosshair(canvas);
     }
 
-    // Draw ring warna (hue sweep 0–360)
-    // Menggunakan ColorMath.generateHueColors() untuk array warna
-    // Lihat: ColorMath → shared/color/ColorMath.java
     private void drawColorWheel(Canvas canvas) {
         int[] colors = ColorMath.generateHueColors();
 
@@ -95,32 +84,40 @@ public class HSVColorPickerView extends View {
         canvas.drawCircle(wheelCenterX, wheelCenterY, wheelRadius, colorWheelPaint);
     }
 
-    // Draw gradient saturation radial di dalam wheel
-    // Dari putih (pusat) ke warna hue murni (tepi)
-    private void drawSaturationGradient(Canvas canvas) {
-        float radius = wheelRadius * 0.7f;
+    private void drawSaturationOverlay(Canvas canvas) {
         int[] colors = new int[]{
-                Color.WHITE,
-                Color.HSVToColor(new float[]{hue, 1f, 1f})
+                0xFFFFFFFF,
+                0x00FFFFFF
         };
 
         Shader shader = new android.graphics.RadialGradient(
-                wheelCenterX, wheelCenterY, radius,
+                wheelCenterX, wheelCenterY, wheelRadius,
                 colors, new float[]{0f, 1f},
                 android.graphics.Shader.TileMode.CLAMP);
 
-        saturationGradientPaint.setShader(shader);
-        canvas.drawCircle(wheelCenterX, wheelCenterY, radius, saturationGradientPaint);
+        colorWheelPaint.setShader(shader);
+        canvas.drawCircle(wheelCenterX, wheelCenterY, wheelRadius, colorWheelPaint);
     }
 
-    // Draw selector circle pada posisi hue + saturation
-    // Menggunakan ColorMath.getSelectorPosition()
-    // Lihat: ColorMath → shared/color/ColorMath.java
-    private void drawSelector(Canvas canvas) {
+    private void drawCrosshair(Canvas canvas) {
         float[] pos = ColorMath.getSelectorPosition(
-                wheelCenterX, wheelCenterY, wheelRadius * 0.7f, hue, saturation);
+                wheelCenterX, wheelCenterY, wheelRadius, hue, saturation);
+        float cx = pos[0];
+        float cy = pos[1];
+        float crossSize = Math.min(wheelRadius * 0.15f, 24f);
+        float ringRadius = Math.min(wheelRadius * 0.08f, 14f);
 
-        canvas.drawCircle(pos[0], pos[1], selectorRadius, selectorPaint);
+        crosshairDarkPaint.setStrokeWidth(5f);
+        canvas.drawLine(cx - crossSize, cy, cx + crossSize, cy, crosshairDarkPaint);
+        canvas.drawLine(cx, cy - crossSize, cx, cy + crossSize, crosshairDarkPaint);
+        canvas.drawCircle(cx, cy, ringRadius, crosshairDarkPaint);
+
+        crosshairLightPaint.setStrokeWidth(3f);
+        canvas.drawLine(cx - crossSize, cy, cx + crossSize, cy, crosshairLightPaint);
+        canvas.drawLine(cx, cy - crossSize, cx, cy + crossSize, crosshairLightPaint);
+        canvas.drawCircle(cx, cy, ringRadius, crosshairLightPaint);
+
+        canvas.drawCircle(cx, cy, 3f, centerDotPaint);
     }
 
     @Override
@@ -129,17 +126,13 @@ public class HSVColorPickerView extends View {
         float y = event.getY();
 
         float distance = ColorMath.calculateDistance(wheelCenterX, wheelCenterY, x, y);
-        float maxRadius = wheelRadius * 0.7f;
 
-        if (distance > maxRadius) {
-            // Sentuhan di luar area saturation → hanya set hue
-            hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
-            saturation = 1f;
-        } else {
-            // Sentuhan di dalam saturation area → hue + saturation
-            hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
-            saturation = distance / maxRadius;
+        if (distance > wheelRadius) {
+            return true;
         }
+
+        hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
+        saturation = Math.min(distance / wheelRadius, 1f);
 
         invalidate();
 

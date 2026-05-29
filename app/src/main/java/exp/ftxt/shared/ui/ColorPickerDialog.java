@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.shared.color.ColorNameResolver;
+import exp.ftxt.shared.color.HSVColorPickerView;
 
 public class ColorPickerDialog {
 
@@ -29,6 +30,7 @@ public class ColorPickerDialog {
         View dialogView = activity.getLayoutInflater()
                 .inflate(R.layout.dialog_hsv_color_picker, null);
 
+        HSVColorPickerView colorWheel = dialogView.findViewById(R.id.colorWheel);
         TextView colorPreview = dialogView.findViewById(R.id.colorPreview);
         TextView hexValue = dialogView.findViewById(R.id.hexValue);
         TextView hsvValue = dialogView.findViewById(R.id.hsvValue);
@@ -50,24 +52,47 @@ public class ColorPickerDialog {
         blueSeekBar.setProgress(Color.blue(initialColor));
         alphaSeekBar.setProgress(Color.alpha(initialColor));
 
+        colorWheel.setColor(initialColor);
+
         updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                 redLabel, greenLabel, blueLabel, alphaLabel,
                 redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
 
-        SeekBar.OnSeekBarChangeListener listener = new SeekBar.OnSeekBarChangeListener() {
+        final boolean[] isUpdating = {false};
+
+        SeekBar.OnSeekBarChangeListener sliderListener = new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int p, boolean f) {
+                if (isUpdating[0]) return;
+                isUpdating[0] = true;
+                int color = Color.argb(alphaSeekBar.getProgress(),
+                        redSeekBar.getProgress(),
+                        greenSeekBar.getProgress(), blueSeekBar.getProgress());
+                colorWheel.setColor(color);
                 updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                         redLabel, greenLabel, blueLabel, alphaLabel,
                         redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                isUpdating[0] = false;
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         };
 
-        redSeekBar.setOnSeekBarChangeListener(listener);
-        greenSeekBar.setOnSeekBarChangeListener(listener);
-        blueSeekBar.setOnSeekBarChangeListener(listener);
-        alphaSeekBar.setOnSeekBarChangeListener(listener);
+        redSeekBar.setOnSeekBarChangeListener(sliderListener);
+        greenSeekBar.setOnSeekBarChangeListener(sliderListener);
+        blueSeekBar.setOnSeekBarChangeListener(sliderListener);
+        alphaSeekBar.setOnSeekBarChangeListener(sliderListener);
+
+        colorWheel.setOnColorChangeListener(color -> {
+            if (isUpdating[0]) return;
+            isUpdating[0] = true;
+            redSeekBar.setProgress(Color.red(color));
+            greenSeekBar.setProgress(Color.green(color));
+            blueSeekBar.setProgress(Color.blue(color));
+            updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
+                    redLabel, greenLabel, blueLabel, alphaLabel,
+                    redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+            isUpdating[0] = false;
+        });
 
         hexEditButton.setOnClickListener(v -> {
             String currentHex = String.format("#%02X%02X%02X%02X",
@@ -84,13 +109,16 @@ public class ColorPickerDialog {
                     .setPositiveButton("OK", (d, w) -> {
                         try {
                             int color = parseHex(input.getText().toString().trim());
+                            isUpdating[0] = true;
                             alphaSeekBar.setProgress(Color.alpha(color));
                             redSeekBar.setProgress(Color.red(color));
                             greenSeekBar.setProgress(Color.green(color));
                             blueSeekBar.setProgress(Color.blue(color));
+                            colorWheel.setColor(color);
                             updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                                     redLabel, greenLabel, blueLabel, alphaLabel,
                                     redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                            isUpdating[0] = false;
                         } catch (IllegalArgumentException e) {
                             Toast.makeText(activity, "HEX tidak valid", Toast.LENGTH_SHORT).show();
                         }
@@ -122,22 +150,26 @@ public class ColorPickerDialog {
         redLabel.setOnClickListener(v -> showValueEditor(activity, "R", redSeekBar, 255,
                 colorPreview, hexValue, hsvValue, rgbValue,
                 redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
+                colorWheel, isUpdating));
 
         greenLabel.setOnClickListener(v -> showValueEditor(activity, "G", greenSeekBar, 255,
                 colorPreview, hexValue, hsvValue, rgbValue,
                 redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
+                colorWheel, isUpdating));
 
         blueLabel.setOnClickListener(v -> showValueEditor(activity, "B", blueSeekBar, 255,
                 colorPreview, hexValue, hsvValue, rgbValue,
                 redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
+                colorWheel, isUpdating));
 
         alphaLabel.setOnClickListener(v -> showValueEditor(activity, "A", alphaSeekBar, 255,
                 colorPreview, hexValue, hsvValue, rgbValue,
                 redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar));
+                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
+                colorWheel, isUpdating));
 
         builder.setTitle(title);
         builder.setView(dialogView);
@@ -171,7 +203,8 @@ public class ColorPickerDialog {
     private static void showValueEditor(Activity activity, String label, SeekBar bar, int max,
                                           TextView colorPreview, TextView hexValue, TextView hsvValue, TextView rgbValue,
                                           TextView redLabel, TextView greenLabel, TextView blueLabel, TextView alphaLabel,
-                                          SeekBar redSeekBar, SeekBar greenSeekBar, SeekBar blueSeekBar, SeekBar alphaSeekBar) {
+                                          SeekBar redSeekBar, SeekBar greenSeekBar, SeekBar blueSeekBar, SeekBar alphaSeekBar,
+                                          HSVColorPickerView colorWheel, boolean[] isUpdating) {
         EditText input = new EditText(activity);
         input.setText(String.valueOf(bar.getProgress()));
         input.setSelection(input.length());
@@ -187,10 +220,16 @@ public class ColorPickerDialog {
                             Toast.makeText(activity, "Nilai harus 0-" + max, Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        isUpdating[0] = true;
                         bar.setProgress(val);
+                        int color = Color.argb(alphaSeekBar.getProgress(),
+                                redSeekBar.getProgress(),
+                                greenSeekBar.getProgress(), blueSeekBar.getProgress());
+                        colorWheel.setColor(color);
                         updateDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                                 redLabel, greenLabel, blueLabel, alphaLabel,
                                 redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                        isUpdating[0] = false;
                     } catch (NumberFormatException e) {
                         Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
                     }

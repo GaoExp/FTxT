@@ -3,6 +3,30 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.5.1.39.1] - 2026-05-29
+
+### ✨ Fitur Baru
+
+- **Classic Color Wheel (Full Disk)**: Color Picker ARGB Sliders kini dilengkapi Color Wheel penuh dengan indikator crosshair. Saturation mencakup seluruh area wheel (full disk), bukan hanya area dalam.
+
+- **Two-Way Synchronization**: Pergerakan crosshair di Color Wheel otomatis menyesuaikan slider R, G, B secara real-time, dan sebaliknya. Dilengkapi flag `isUpdating` untuk mencegah infinite loop.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/shared/color/HSVColorPickerView.java
+- app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java
+- app/src/main/res/layout/dialog_hsv_color_picker.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 86 → 87
+- versionName: 2.5.1.39.0 → 2.5.1.39.1
+
+---
+
 ## [2.5.1.39.0] - 2026-05-29
 
 ### 🚮️ Fitur Dihapus
