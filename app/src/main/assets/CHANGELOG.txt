@@ -3,7 +3,11 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
-## [2.6.1.42.1] - 2026-05-29
+## [2.6.1.43.0] - 2026-05-29
+
+### ✨ Fitur Baru
+
+- **Tampilan Koordinat Posisi Real-time**: Label "Kontrol Posisi" kini menampilkan koordinat pixel sesungguhnya (contoh: `540X1200`) yang berubah langsung saat slider, D-Pad, preset, atau drag overlay — menggunakan `getRealMetrics()` untuk akurasi full screen.
 
 ### 🔧 Optimasi & Penyesuaian
 
@@ -14,19 +18,26 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - **Padding Background Mendorong Teks**: `applyBackground()` selalu set padding (`bgPadding=25`) meski background mati, mendorong teks menjauh dari tepi view — menyebabkan gap kecil di X=0, Y=0. Sekarang padding cuma diterapkan saat `bgEnabled=true`.
 - **Hal yang sama diterapkan di `FpsModule.applyBackground()` untuk konsistensi.
 
+### 🗒️ File Added
+
+- `OverlayDragHandler`: konstruktor baru dengan parameter `onDragMove` callback untuk update posisi real-time saat drag.
+
 ### ✏️️ File Changed
 
 - app/build.gradle
 - app/src/main/res/layout/activity_main.xml
 - app/src/main/java/exp/ftxt/features/text/TextModule.java
 - app/src/main/java/exp/ftxt/features/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/ui/PositionController.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/shared/ui/OverlayDragHandler.java
 - CHANGELOG.md
 - app/src/main/assets/CHANGELOG.txt
 
 ### 🔢 Version
 
-- versionCode: 96 → 97
-- versionName: 2.6.1.42.0 → 2.6.1.42.1
+- versionCode: 97 → 98
+- versionName: 2.6.1.42.1 → 2.6.1.43.0
 
 ---
 

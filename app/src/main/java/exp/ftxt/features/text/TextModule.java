@@ -36,6 +36,8 @@ public class TextModule {
     private int screenHeight;
     private String orientationSuffix;
 
+    public static Runnable onPositionUpdate;
+
     public void setOrientationSuffix(String suffix) {
         this.orientationSuffix = suffix;
     }
@@ -130,6 +132,7 @@ public class TextModule {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (onPositionUpdate != null) onPositionUpdate.run();
         }
     }
 
@@ -161,10 +164,9 @@ public class TextModule {
             view.setOnTouchListener(null);
         } else {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-            // Gunakan OverlayDragHandler dari shared component
-            // Lihat: OverlayDragHandler → shared/ui/OverlayDragHandler.java
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
-                    () -> savePosition(prefs)));
+                    () -> savePosition(prefs),
+                    onPositionUpdate));
         }
 
         if (wm != null) {
@@ -236,5 +238,10 @@ public class TextModule {
 
     public boolean isActive() {
         return view != null;
+    }
+
+    public int[] getCurrentPosition() {
+        if (params != null) return new int[]{params.x, params.y};
+        return null;
     }
 }

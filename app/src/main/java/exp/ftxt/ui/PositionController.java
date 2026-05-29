@@ -4,11 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.TextView;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.text.TextConfig;
+import exp.ftxt.features.text.TextModule;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.PositionPresetManager;
 import exp.ftxt.shared.ui.SliderPositionController;
@@ -25,6 +29,8 @@ public class PositionController {
     private DpadController dpad;
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
+    private TextView coordDisplay;
+    private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -39,6 +45,15 @@ public class PositionController {
         FloatingService.setTextOrientationSuffixStatic(currentOrientation);
 
         bindViews();
+
+        WindowManager wm = activity.getWindowManager();
+        DisplayMetrics realMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(realMetrics);
+        displayWidth = realMetrics.widthPixels;
+        displayHeight = realMetrics.heightPixels;
+
+        TextModule.onPositionUpdate = this::updateCoordDisplay;
+
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.posXSeekBar),
@@ -58,6 +73,7 @@ public class PositionController {
         btnRight = activity.findViewById(R.id.btnRight);
         btnPortrait = activity.findViewById(R.id.btnPortrait);
         btnLandscape = activity.findViewById(R.id.btnLandscape);
+        coordDisplay = activity.findViewById(R.id.posCoordDisplay);
     }
 
     private void setupListeners() {
@@ -139,6 +155,7 @@ public class PositionController {
     // ====================================================================
 
     public void cleanup() {
+        TextModule.onPositionUpdate = null;
         if (dpad != null) dpad.cleanup();
         if (presetManager != null) presetManager.cleanup();
     }
@@ -149,5 +166,20 @@ public class PositionController {
 
     public void syncAll() {
         sliderController.sync(TextConfig.posX, TextConfig.posY);
+        updateCoordDisplay();
+    }
+
+    private void updateCoordDisplay() {
+        if (coordDisplay == null) return;
+        int px, py;
+        int[] pos = FloatingService.getTextCurrentPosition();
+        if (pos != null) {
+            px = pos[0];
+            py = pos[1];
+        } else {
+            px = Math.round(TextConfig.posX * displayWidth);
+            py = Math.round(TextConfig.posY * displayHeight);
+        }
+        coordDisplay.setText(px + "X" + py);
     }
 }

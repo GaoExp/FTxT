@@ -21,13 +21,19 @@ public class OverlayDragHandler implements View.OnTouchListener {
     private final WindowManager.LayoutParams params;
     private final WindowManager wm;
     private final Runnable onSavePosition;
+    private final Runnable onDragMove;
     private int startX, startY;
     private float touchX, touchY;
 
     public OverlayDragHandler(WindowManager.LayoutParams params, WindowManager wm, Runnable onSavePosition) {
+        this(params, wm, onSavePosition, null);
+    }
+
+    public OverlayDragHandler(WindowManager.LayoutParams params, WindowManager wm, Runnable onSavePosition, Runnable onDragMove) {
         this.params = params;
         this.wm = wm;
         this.onSavePosition = onSavePosition;
+        this.onDragMove = onDragMove;
     }
 
     @Override
@@ -43,9 +49,11 @@ public class OverlayDragHandler implements View.OnTouchListener {
                 params.x = startX + (int) (event.getRawX() - touchX);
                 params.y = startY + (int) (event.getRawY() - touchY);
                 wm.updateViewLayout(v, params);
+                if (onDragMove != null) onDragMove.run();
                 return true;
             case MotionEvent.ACTION_UP:
                 if (onSavePosition != null) onSavePosition.run();
+                if (onDragMove != null) onDragMove.run();
                 return true;
         }
         return false;

@@ -143,6 +143,13 @@ public class FloatingService extends Service {
         }
     }
 
+    public static int[] getTextCurrentPosition() {
+        if (instance != null && instance.textModule != null) {
+            return instance.textModule.getCurrentPosition();
+        }
+        return null;
+    }
+
     public static void updateShadowStatic() {
         if (instance != null && instance.textModule != null) {
             instance.textModule.updateShadow();
