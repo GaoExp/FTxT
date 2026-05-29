@@ -3,43 +3,66 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
-## [2.6.1.43.2] - 2026-05-29
+## [2.6.1.45.0] - 2026-05-29
 
-### 🐞 Bug Fixes
+### ✨ Fitur Baru
 
-- **Posisi Overlay Mentok ke Atas Tidak Akurat**: Saat slider Y=0, overlay berhenti di `params.y=0`, padahal batas fisik layar berada di `params.y=-10`. Ditambahkan `posCalibrationY` yang melacak minimum Y saat drag dan mengoreksi kalkulasi posisi agar slider Y=0 setara dengan posisi drag mentok ke atas.
+- **Grid Posisi 3×3**: Tombol cepat 9 posisi (TL/TC/TR/ML/C/MR/BL/BC/BR) — satu tap langsung pindah posisi overlay. Tersedia untuk Floating Text dan FPS Display.
+- **Auto Preset Aplikasi**: Deteksi aplikasi foreground otomatis (via UsageStatsManager), simpan & restore posisi per-aplikasi. Aktifkan via toggle "Auto Preset Aplikasi" di kontrol posisi. Berlaku untuk Floating Text dan FPS Display.
+
+### ♻️️ Perubahan Fitur
+
+- **Dialog Muat Preset — Rename**: Tahan preset 2 detik → muncul opsi: Muat / Ganti Nama / Hapus. Sebelumnya langsung konfirmasi hapus.
+- **Cross-module Preset**: Preset (Simpan/Muat) menggunakan key namespace yang sama untuk Text dan FPS — preset bisa dipakai di kedua modul tanpa duplikasi.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/AppPresetWatcher.java`
 
 ### ✏️️ File Changed
 
 - app/build.gradle
-- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- app/src/main/AndroidManifest.xml
+- app/src/main/res/layout/activity_main.xml
+- app/src/main/java/exp/ftxt/shared/ui/PositionPresetManager.java
+- app/src/main/java/exp/ftxt/ui/TextPositionController.java
+- app/src/main/java/exp/ftxt/ui/FpsPositionController.java
 - CHANGELOG.md
 - app/src/main/assets/CHANGELOG.txt
 
 ### 🔢 Version
 
-- versionCode: 99 → 100
-- versionName: 2.6.1.43.1 → 2.6.1.43.2
+- versionCode: 101 → 102
+- versionName: 2.6.1.44.0 → 2.6.1.45.0
 
 ---
 
-## [2.6.1.43.1] - 2026-05-29
+## [2.6.1.44.0] - 2026-05-29
 
-### 🐞 Bug Fixes
+### ✨ Fitur Baru
 
-- **Posisi Overlay Maksimal Terkunci 2244**: `TextModule` menggunakan `getMetrics()` yang mengembalikan ukuran layar tanpa dekorasi sistem (2244), sementara `PositionController` menggunakan `getRealMetrics()` (2460). Akibatnya slider/D-Pad hanya bisa mencapai Y=2244 saat overlay aktif. Semua pemanggilan `getMetrics()` di TextModule diganti `getRealMetrics()` agar konsisten.
+- **Kontrol Posisi FPS Display**: Tambah Slider X/Y, D-Pad, preset posisi, dan tombol orientasi (Potret/Lanskap) pada panel FPS Display — menyamai yang sudah ada di Floating Text. Posisi disimpan terpisah per orientasi dengan sistem normalized 0.0–1.0.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java`
 
 ### ✏️️ File Changed
 
 - app/build.gradle
-- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/features/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/features/fps/FpsModule.java
+- app/src/main/java/exp/ftxt/ui/FpsPanelController.java
+- app/src/main/res/layout/activity_main.xml
 - CHANGELOG.md
 - app/src/main/assets/CHANGELOG.txt
 
 ### 🔢 Version
 
-- versionCode: 98 → 99
-- versionName: 2.6.1.43.0 → 2.6.1.43.1
+- versionCode: 100 → 101
+- versionName: 2.6.1.43.2 → 2.6.1.44.0
 
 ---
 

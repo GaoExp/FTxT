@@ -106,7 +106,7 @@ public class PositionPresetManager {
                         holdRunnable[0] = () -> {
                             if (heldPos[0] == pos) {
                                 longPressFired[0] = true;
-                                confirmDeletePreset(pos, names[pos], dialog);
+                                showPresetOptions(pos, names[pos], dialog);
                             }
                         };
                         holdHandler.postDelayed(holdRunnable[0], 2000);
@@ -136,8 +136,51 @@ public class PositionPresetManager {
         });
     }
 
-    private void confirmDeletePreset(int position, String name, AlertDialog parentDialog) {
+    private void showPresetOptions(int position, String name, AlertDialog parentDialog) {
         int idx = position + 1;
+        String[] options = {"Muat", "Ganti Nama", "Hapus"};
+        new AlertDialog.Builder(activity)
+                .setTitle(name)
+                .setItems(options, (d, which) -> {
+                    switch (which) {
+                        case 0:
+                            float x = prefs.getFloat("preset_" + idx + "_x", 0.5f);
+                            float y = prefs.getFloat("preset_" + idx + "_y", 0.5f);
+                            if (listener != null) listener.onPositionLoaded(x, y);
+                            parentDialog.dismiss();
+                            break;
+                        case 1:
+                            showRenamePresetDialog(idx, name, parentDialog);
+                            break;
+                        case 2:
+                            confirmDeletePreset(idx, name, parentDialog);
+                            break;
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void showRenamePresetDialog(int idx, String currentName, AlertDialog parentDialog) {
+        EditText input = new EditText(activity);
+        input.setText(currentName);
+        input.setSelectAllOnFocus(true);
+        new AlertDialog.Builder(activity)
+                .setTitle("Ganti Nama Preset")
+                .setView(input)
+                .setPositiveButton("Simpan", (d, w) -> {
+                    String newName = input.getText().toString().trim();
+                    if (!newName.isEmpty()) {
+                        prefs.edit().putString("preset_" + idx + "_name", newName).apply();
+                    }
+                    parentDialog.dismiss();
+                    showLoadPresetDialog();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void confirmDeletePreset(int idx, String name, AlertDialog parentDialog) {
         new AlertDialog.Builder(activity)
                 .setTitle("Hapus Preset")
                 .setMessage("Hapus preset \"" + name + "\"?")

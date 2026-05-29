@@ -2,7 +2,9 @@ package exp.ftxt.features.fps;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.util.DisplayMetrics;
 import android.view.Choreographer;
 import android.view.Gravity;
 import android.view.WindowManager;
@@ -11,41 +13,54 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-/**
- * Module untuk mengelola overlay FPS Display.
- *
- * Membuat, menghapus, dan memperbarui TextView FPS counter melalui WindowManager.
- * Menggunakan Choreographer.FrameCallback untuk menghitung FPS real-time.
- *
- * Menggunakan:
- * - OverlayDragHandler → shared/ui/OverlayDragHandler.java (drag-to-move)
- * - OverlayShadow      → shared/ui/OverlayShadow.java (shadow bg + elevation)
- *
- * Dipanggil oleh:
- * - FloatingService → core/FloatingService.java (static delegates)
- * - FpsConfig       → features/fps/FpsConfig.java (konfigurasi statis)
- */
 public class FpsModule {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
+    private Context context;
     private SharedPreferences prefs;
     private boolean running = false;
     private Choreographer choreographer;
     private long lastFrameTime = 0;
     private int frameCount = 0;
     private float fpsValue = 0;
+    private int screenWidth;
+    private int screenHeight;
+    private String orientationSuffix;
+    private int posCalibrationY;
 
-    public void init(SharedPreferences sp) {
-        prefs = sp;
+    public static Runnable onPositionUpdate;
+
+    public void setOrientationSuffix(String suffix) {
+        this.orientationSuffix = suffix;
     }
 
-    public void start(WindowManager windowManager, Context context) {
+    public void init(WindowManager windowManager, Context ctx,
+                     SharedPreferences sp) {
+        wm = windowManager;
+        context = ctx;
+        prefs = sp;
+        orientationSuffix = null;
+        posCalibrationY = 0;
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
+        loadPosition(prefs);
+    }
+
+    public void start(WindowManager windowManager, Context ctx) {
         if (running) return;
         wm = windowManager;
+        context = ctx;
 
-        view = new ShadowTextView(context);
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
+
+        view = new ShadowTextView(ctx);
         view.setShadowConfig(FpsConfig.shadow);
         view.setText(FpsConfig.showOnlyValue ? "0.0" : "0.0 FPS");
         view.setTextSize(FpsConfig.size);
@@ -63,8 +78,8 @@ public class FpsModule {
         );
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = prefs.getInt("fps_x", 16);
-        params.y = prefs.getInt("fps_y", 16);
+        params.x = (int)(FpsConfig.posX * screenWidth);
+        params.y = (int)(FpsConfig.posY * screenHeight) + posCalibrationY;
 
         OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
         updateTouchFlags();
@@ -116,6 +131,23 @@ public class FpsModule {
         applyBackground();
     }
 
+    public void updatePosition() {
+        if (view != null && params != null && wm != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getRealMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
+            params.x = (int)(FpsConfig.posX * screenWidth);
+            params.y = (int)(FpsConfig.posY * screenHeight) + posCalibrationY;
+            try {
+                wm.updateViewLayout(view, params);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (onPositionUpdate != null) onPositionUpdate.run();
+        }
+    }
+
     public void updateDisplay() {
         if (view != null) {
             view.setText(FpsConfig.showOnlyValue
@@ -148,10 +180,9 @@ public class FpsModule {
             view.setOnTouchListener(null);
         } else {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-            // Gunakan OverlayDragHandler dari shared component
-            // Lihat: OverlayDragHandler → shared/ui/OverlayDragHandler.java
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
-                    this::savePosition));
+                    this::savePosition,
+                    onPositionUpdate));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
@@ -161,14 +192,65 @@ public class FpsModule {
         return running;
     }
 
-    private void savePosition() {
-        if (params != null && prefs != null) {
-            prefs.edit().putInt("fps_x", params.x).putInt("fps_y", params.y).apply();
+    public int[] getCurrentPosition() {
+        if (params != null) return new int[]{params.x, params.y};
+        return null;
+    }
+
+    private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
+    public void loadPosition(SharedPreferences prefs) {
+        String sfx = posSuffix();
+        String keyX = "fps_pos_x" + sfx;
+        String keyY = "fps_pos_y" + sfx;
+
+        if (prefs.contains(keyX) && prefs.contains(keyY)) {
+            FpsConfig.posX = prefs.getFloat(keyX, 0.5f);
+            FpsConfig.posY = prefs.getFloat(keyY, 0.5f);
+        } else if (prefs.contains("fps_x")) {
+            FpsConfig.posX = (float) prefs.getInt("fps_x", 16) / screenWidth;
+            FpsConfig.posY = (float) prefs.getInt("fps_y", 16) / screenHeight;
+            prefs.edit()
+                    .putFloat(keyX, FpsConfig.posX)
+                    .putFloat(keyY, FpsConfig.posY)
+                    .remove("fps_x")
+                    .remove("fps_y")
+                    .apply();
+        } else {
+            FpsConfig.posX = 0.5f;
+            FpsConfig.posY = 0.5f;
+        }
+        if (params != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getRealMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
+            params.x = (int)(FpsConfig.posX * screenWidth);
+            params.y = (int)(FpsConfig.posY * screenHeight) + posCalibrationY;
         }
     }
 
-    // Choreographer FrameCallback untuk menghitung FPS real-time
-    // Menghitung frameCount dalam interval 1 detik
+    private void savePosition() {
+        if (params != null && prefs != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getRealMetrics(metrics);
+            screenWidth = metrics.widthPixels;
+            screenHeight = metrics.heightPixels;
+            if (params.y < posCalibrationY) posCalibrationY = params.y;
+            FpsConfig.posX = (float) params.x / screenWidth;
+            FpsConfig.posY = (float)(params.y - posCalibrationY) / screenHeight;
+            String sfx = posSuffix();
+            prefs.edit()
+                    .putFloat("fps_pos_x" + sfx, FpsConfig.posX)
+                    .putFloat("fps_pos_y" + sfx, FpsConfig.posY)
+                    .apply();
+        }
+    }
+
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {

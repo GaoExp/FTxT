@@ -138,6 +138,9 @@ public class MainActivity extends AppCompatActivity {
         if (textPanel != null && panelText.getVisibility() == View.VISIBLE) {
             textPanel.onPanelShown();
         }
+        if (fpsPanel != null && panelFps.getVisibility() == View.VISIBLE) {
+            fpsPanel.onPanelShown();
+        }
         autoRequestAndStart();
         FloatingService.updateTextPositionStatic();
     }
@@ -354,6 +357,8 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
         FpsConfig.bgOffsetX = prefs.getInt("fps_bg_offset_x", 0);
         FpsConfig.bgOffsetY = prefs.getInt("fps_bg_offset_y", 0);
+        FpsConfig.posX = prefs.getFloat("fps_pos_x_port", 0.5f);
+        FpsConfig.posY = prefs.getFloat("fps_pos_y_port", 0.5f);
     }
 
     private void updateNavSelection(int selectedId) {
@@ -579,6 +584,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (textPanel != null) textPanel.cleanup();
+        if (fpsPanel != null) fpsPanel.cleanup();
     }
 
     private int dp(float dp) {

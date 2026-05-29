@@ -53,7 +53,7 @@ FTxT/
 │   │   │   │
 │   │   │   ├── ui/
 │   │   │   │   ├── TextPanelController.java
-│   │   │   │   ├── PositionController.java
+│   │   │   │   ├── TextPositionController.java
 │   │   │   │   └── FpsPanelController.java
 │   │   │   │
 │   │   │   ├── utils/
@@ -137,7 +137,7 @@ FTxT/
 | shared/ui/SliderLabelEditor.java | Shared utility edit nilai slider via dialog |
 | _karantina/exp/ftxt/shared/ui/XyPadView.java | Custom View 2D drag area — DIKARANTINA |
 | ui/TextPanelController.java | Controller panel Floating Text |
-| ui/PositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
+| ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/FpsPanelController.java | Controller panel FPS Display |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |

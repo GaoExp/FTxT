@@ -43,12 +43,27 @@ public class FpsPanelController {
     private TextView fpsSizeLabel, fpsBgPaddingLabel, fpsBgOffsetXLabel, fpsBgOffsetYLabel;
     private TextView fpsBgMarginLabel, fpsBgRadiusLabel;
     private TextView fpsShadowBlurLabel, fpsShadowOffsetXLabel, fpsShadowOffsetYLabel;
+    private FpsPositionController fpsPositionController;
 
     public FpsPanelController(MainActivity activity) {
         this.activity = activity;
         bindViews();
         loadConfig();
         setupListeners();
+        fpsPositionController = new FpsPositionController(activity);
+    }
+
+    public void onPanelShown() {
+        if (fpsPositionController != null) {
+            fpsPositionController.refresh();
+        }
+    }
+
+    public void cleanup() {
+        if (fpsPositionController != null) {
+            fpsPositionController.cleanup();
+            fpsPositionController = null;
+        }
     }
 
     private void bindViews() {

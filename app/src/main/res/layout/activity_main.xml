@@ -463,6 +463,77 @@
 
                 </LinearLayout>
 
+                <!-- Quick Grid Preset -->
+                <TextView
+                    android:text="Grid Posisi"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <Switch
+                        android:id="@+id/textAutoPresetSwitch"
+                        android:showText="false"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Auto Preset Aplikasi"
+                        android:layout_marginStart="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp"
@@ -785,6 +856,249 @@
                         android:progress="60"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- FPS Position Controls -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Kontrol Posisi"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fps_posCoordDisplay"
+                        android:text="540X1200"
+                        android:layout_marginStart="8dp"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/fps_posXLabel"
+                            android:text="X: 0.50"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/fps_posXSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/fps_posYLabel"
+                            android:text="Y: 0.50"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/fps_posYSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/fps_btnUp"
+                            android:text="↑"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <Button
+                                android:id="@+id/fps_btnLeft"
+                                android:text="←"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                            <Space
+                                android:layout_width="60dp"
+                                android:layout_height="0dp"/>
+
+                            <Button
+                                android:id="@+id/fps_btnRight"
+                                android:text="→"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/fps_btnDown"
+                            android:text="↓"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/fps_btnSavePreset"
+                        android:text="Simpan Preset"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/fps_btnLoadPreset"
+                        android:text="Muat Preset"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/fps_btnResetPos"
+                        android:text="Reset"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <!-- FPS Quick Grid Preset -->
+                <TextView
+                    android:text="Grid Posisi"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/fps_btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/fps_btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button android:id="@+id/fps_btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                        <Button android:id="@+id/fps_btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <Switch
+                        android:id="@+id/fpsAutoPresetSwitch"
+                        android:showText="false"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Auto Preset Aplikasi"
+                        android:layout_marginStart="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/fps_btnPortrait"
+                        android:text="Potret"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/fps_btnLandscape"
+                        android:text="Lanskap"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
 
                 </LinearLayout>
 

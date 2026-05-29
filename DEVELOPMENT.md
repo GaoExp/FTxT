@@ -84,7 +84,7 @@ Contoh: `1.0.0.12.2`
 - minor = feature release counter
 - patch = maintenance / bugfix / optimasi
 
-Lihat `CHANGELOG.md` untuk riwayat perubahan lengkap.
+Lihat [CHANGELOG.md](CHANGELOG.md) untuk riwayat perubahan lengkap.
 
 ---
 

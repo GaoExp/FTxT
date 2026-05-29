@@ -62,7 +62,7 @@ public class FloatingService extends Service {
             windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
             textModule.init(windowManager, this, prefs);
-            fpsModule.init(prefs);
+            fpsModule.init(windowManager, this, prefs);
 
             // Buat text overlay jika sebelumnya aktif
             if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
@@ -210,6 +210,25 @@ public class FloatingService extends Service {
         if (instance != null && instance.fpsModule != null) {
             instance.fpsModule.updateDisplay();
         }
+    }
+
+    public static void updateFpsPositionStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.updatePosition();
+        }
+    }
+
+    public static void setFpsOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getFpsCurrentPosition() {
+        if (instance != null && instance.fpsModule != null) {
+            return instance.fpsModule.getCurrentPosition();
+        }
+        return null;
     }
 
     @Override
