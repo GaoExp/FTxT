@@ -3,6 +3,46 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.6.1.43.2] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **Posisi Overlay Mentok ke Atas Tidak Akurat**: Saat slider Y=0, overlay berhenti di `params.y=0`, padahal batas fisik layar berada di `params.y=-10`. Ditambahkan `posCalibrationY` yang melacak minimum Y saat drag dan mengoreksi kalkulasi posisi agar slider Y=0 setara dengan posisi drag mentok ke atas.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 99 → 100
+- versionName: 2.6.1.43.1 → 2.6.1.43.2
+
+---
+
+## [2.6.1.43.1] - 2026-05-29
+
+### 🐞 Bug Fixes
+
+- **Posisi Overlay Maksimal Terkunci 2244**: `TextModule` menggunakan `getMetrics()` yang mengembalikan ukuran layar tanpa dekorasi sistem (2244), sementara `PositionController` menggunakan `getRealMetrics()` (2460). Akibatnya slider/D-Pad hanya bisa mencapai Y=2244 saat overlay aktif. Semua pemanggilan `getMetrics()` di TextModule diganti `getRealMetrics()` agar konsisten.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/java/exp/ftxt/features/text/TextModule.java
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔢 Version
+
+- versionCode: 98 → 99
+- versionName: 2.6.1.43.0 → 2.6.1.43.1
+
+---
+
 ## [2.6.1.43.0] - 2026-05-29
 
 ### ✨ Fitur Baru

@@ -35,6 +35,7 @@ public class TextModule {
     private int screenWidth;
     private int screenHeight;
     private String orientationSuffix;
+    private int posCalibrationY;
 
     public static Runnable onPositionUpdate;
 
@@ -48,8 +49,9 @@ public class TextModule {
         context = ctx;
         prefs = sp;
         orientationSuffix = null;
+        posCalibrationY = 0;
         DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(metrics);
+        wm.getDefaultDisplay().getRealMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
         loadPosition(prefs);
@@ -59,7 +61,7 @@ public class TextModule {
         if (view != null) return;
 
         DisplayMetrics metrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(metrics);
+        wm.getDefaultDisplay().getRealMetrics(metrics);
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
 
@@ -82,7 +84,7 @@ public class TextModule {
 
         params.gravity = Gravity.TOP | Gravity.START;
         params.x = (int)(TextConfig.posX * screenWidth);
-        params.y = (int)(TextConfig.posY * screenHeight);
+        params.y = (int)(TextConfig.posY * screenHeight) + posCalibrationY;
 
         OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
 
@@ -122,11 +124,11 @@ public class TextModule {
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
             DisplayMetrics metrics = new DisplayMetrics();
-            wm.getDefaultDisplay().getMetrics(metrics);
+            wm.getDefaultDisplay().getRealMetrics(metrics);
             screenWidth = metrics.widthPixels;
             screenHeight = metrics.heightPixels;
             params.x = (int)(TextConfig.posX * screenWidth);
-            params.y = (int)(TextConfig.posY * screenHeight);
+            params.y = (int)(TextConfig.posY * screenHeight) + posCalibrationY;
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -212,22 +214,23 @@ public class TextModule {
         }
         if (params != null) {
             DisplayMetrics metrics = new DisplayMetrics();
-            wm.getDefaultDisplay().getMetrics(metrics);
+            wm.getDefaultDisplay().getRealMetrics(metrics);
             screenWidth = metrics.widthPixels;
             screenHeight = metrics.heightPixels;
             params.x = (int)(TextConfig.posX * screenWidth);
-            params.y = (int)(TextConfig.posY * screenHeight);
+            params.y = (int)(TextConfig.posY * screenHeight) + posCalibrationY;
         }
     }
 
     public void savePosition(SharedPreferences prefs) {
         if (params != null) {
             DisplayMetrics metrics = new DisplayMetrics();
-            wm.getDefaultDisplay().getMetrics(metrics);
+            wm.getDefaultDisplay().getRealMetrics(metrics);
             screenWidth = metrics.widthPixels;
             screenHeight = metrics.heightPixels;
+            if (params.y < posCalibrationY) posCalibrationY = params.y;
             TextConfig.posX = (float) params.x / screenWidth;
-            TextConfig.posY = (float) params.y / screenHeight;
+            TextConfig.posY = (float)(params.y - posCalibrationY) / screenHeight;
             String sfx = posSuffix();
             prefs.edit()
                     .putFloat("text_pos_x" + sfx, TextConfig.posX)
