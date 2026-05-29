@@ -384,7 +384,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavSelection(int selectedId) {
         int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navClock, R.id.navCpu, R.id.navCrosshair, R.id.navWatermark, R.id.navLogo, R.id.navDokumentasi};
+                R.id.navClock, R.id.navCpu, R.id.navCrosshair, R.id.navWatermark, R.id.navLogo};
         for (int id : allIds) {
             View v = findViewById(id);
             if (v != null) {

@@ -229,26 +229,6 @@
 
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
-
-            <!-- Dokumentasi -->
-            <TextView
-                android:id="@+id/navDokumentasi"
-                android:text="Dokumentasi"
-                android:textSize="16sp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
-
         </LinearLayout>
 
     </ScrollView>

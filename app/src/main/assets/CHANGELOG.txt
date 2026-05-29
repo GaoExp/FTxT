@@ -3,6 +3,38 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.4.1.38.2] - 2026-05-29
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Hapus Entry Dokumentasi dari Sidebar**: Navigasi "Dokumentasi" dihapus dari drawer kiri karena sudah ada akses "Lihat Dokumentasi" melalui popup Pengaturan (ikon gear).
+
+- **Hapus module files deprecated**: Folder `modules/` yang sudah tidak dipakai (digantikan `features/`) dihapus dari filesystem.
+
+### ✏️️ File Changed
+
+- app/build.gradle
+- app/src/main/res/layout/drawer_content.xml
+- app/src/main/res/values/strings.xml
+- app/src/main/java/exp/ftxt/MainActivity.java
+- app/src/main/res/menu/drawer_menu.xml
+- CHANGELOG.md
+- app/src/main/assets/CHANGELOG.txt
+
+### 🔥️ File Removed
+
+- app/src/main/java/exp/ftxt/modules/text/TextConfig.java
+- app/src/main/java/exp/ftxt/modules/text/TextModule.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java
+- app/src/main/java/exp/ftxt/modules/fps/FpsModule.java
+
+### 🔢 Version
+
+- versionCode: 84 → 85
+- versionName: 2.4.1.38.1 → 2.4.1.38.2
+
+---
+
 ## [2.4.1.38.1] - 2026-05-28
 
 ### ♻️️ Perubahan Fitur

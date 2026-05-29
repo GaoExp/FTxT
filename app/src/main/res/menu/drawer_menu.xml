@@ -41,12 +41,4 @@
 
     </group>
 
-    <group android:checkableBehavior="none">
-
-        <item
-            android:id="@+id/nav_dokumentasi"
-            android:title="@string/nav_dokumentasi"/>
-
-    </group>
-
 </menu>

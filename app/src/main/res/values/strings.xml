@@ -13,7 +13,6 @@
     <string name="nav_crosshair">Crosshair</string>
     <string name="nav_watermark">Watermark</string>
     <string name="nav_logo">Logo Display</string>
-    <string name="nav_dokumentasi">Dokumentasi</string>
 
     <!-- Settings -->
     <string name="confirm_exit_title">Konfirmasi Keluar</string>
