@@ -8,6 +8,10 @@ import android.os.IBinder;
 import android.view.WindowManager;
 
 import exp.ftxt.R;
+import exp.ftxt.features.battery.BatteryConfig;
+import exp.ftxt.features.battery.BatteryModule;
+import exp.ftxt.features.clock.ClockConfig;
+import exp.ftxt.features.clock.ClockModule;
 import exp.ftxt.features.fps.FpsConfig;
 import exp.ftxt.features.fps.FpsModule;
 import exp.ftxt.features.text.TextConfig;
@@ -37,6 +41,8 @@ public class FloatingService extends Service {
 
     private TextModule textModule;
     private FpsModule fpsModule;
+    private ClockModule clockModule;
+    private BatteryModule batteryModule;
 
     @Override
     public void onCreate() {
@@ -47,6 +53,8 @@ public class FloatingService extends Service {
 
         textModule = new TextModule();
         fpsModule = new FpsModule();
+        clockModule = new ClockModule();
+        batteryModule = new BatteryModule();
 
         // Notification channel + foreground service
         // Lihat: NotificationHelper → core/NotificationHelper.java
@@ -63,6 +71,16 @@ public class FloatingService extends Service {
 
             textModule.init(windowManager, this, prefs);
             fpsModule.init(windowManager, this, prefs);
+
+            // Start Clock jika diaktifkan
+            if (ClockConfig.enabled) {
+                clockModule.start(windowManager, this);
+            }
+
+            // Start Battery jika diaktifkan
+            if (BatteryConfig.enabled) {
+                batteryModule.start(windowManager, this);
+            }
 
             // Buat text overlay jika sebelumnya aktif
             if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
@@ -231,10 +249,138 @@ public class FloatingService extends Service {
         return null;
     }
 
+    // --- Clock Module Delegates ---
+
+    public static void startClockStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopClockStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.stop();
+        }
+    }
+
+    public static void updateClockColorStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updateColor(ClockConfig.color);
+        }
+    }
+
+    public static void updateClockSizeStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updateSize(ClockConfig.size);
+        }
+    }
+
+    public static void updateClockShadowStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updateShadow();
+        }
+    }
+
+    public static void updateClockBackgroundStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updateBackground();
+        }
+    }
+
+    public static void updateClockTouchFlagsStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateClockPositionStatic() {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.updatePosition();
+        }
+    }
+
+    public static void setClockOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.clockModule != null) {
+            instance.clockModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getClockCurrentPosition() {
+        if (instance != null && instance.clockModule != null) {
+            return instance.clockModule.getCurrentPosition();
+        }
+        return null;
+    }
+
+    // --- Battery Module Delegates ---
+
+    public static void startBatteryStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopBatteryStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.stop();
+        }
+    }
+
+    public static void updateBatteryColorStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateColor(BatteryConfig.color);
+        }
+    }
+
+    public static void updateBatterySizeStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateSize(BatteryConfig.size);
+        }
+    }
+
+    public static void updateBatteryShadowStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateShadow();
+        }
+    }
+
+    public static void updateBatteryBackgroundStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateBackground();
+        }
+    }
+
+    public static void updateBatteryTouchFlagsStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateBatteryPositionStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updatePosition();
+        }
+    }
+
+    public static void setBatteryOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getBatteryCurrentPosition() {
+        if (instance != null && instance.batteryModule != null) {
+            return instance.batteryModule.getCurrentPosition();
+        }
+        return null;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+        clockModule.stop();
+        batteryModule.stop();
         fpsModule.stop();
         textModule.savePosition(prefs);
 

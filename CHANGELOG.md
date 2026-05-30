@@ -3,37 +3,45 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
-## [2.6.1.45.0] - 2026-05-29
+## [2.6.1.46.0] - 2026-05-30
 
 ### ✨ Fitur Baru
 
-- **Grid Posisi 3×3**: Tombol cepat 9 posisi (TL/TC/TR/ML/C/MR/BL/BC/BR) — satu tap langsung pindah posisi overlay. Tersedia untuk Floating Text dan FPS Display.
-- **Auto Preset Aplikasi**: Deteksi aplikasi foreground otomatis (via UsageStatsManager), simpan & restore posisi per-aplikasi. Aktifkan via toggle "Auto Preset Aplikasi" di kontrol posisi. Berlaku untuk Floating Text dan FPS Display.
-
-### ♻️️ Perubahan Fitur
-
-- **Dialog Muat Preset — Rename**: Tahan preset 2 detik → muncul opsi: Muat / Ganti Nama / Hapus. Sebelumnya langsung konfirmasi hapus.
-- **Cross-module Preset**: Preset (Simpan/Muat) menggunakan key namespace yang sama untuk Text dan FPS — preset bisa dipakai di kedua modul tanpa duplikasi.
+- **Jam Digital Overlay**: Overlay waktu real-time 24 jam format `HH:mm:ss`, update tiap 1 detik. Dapat diatur warna, ukuran, background, shadow, posisi (drag atau kunci), plus kontrol posisi lengkap (slider X/Y, D-Pad, grid 3×3, preset, orientasi). Default ukuran 48sp.
+- **Suhu Baterai Overlay**: Overlay suhu baterai dalam Celsius (°C), update tiap 5 detik. Membaca via `BatteryManager.EXTRA_TEMPERATURE`. Opsi tampilkan hanya nilai. Dilengkapi kontrol posisi lengkap (slider X/Y, D-Pad, grid 3×3, preset, orientasi).
 
 ### 🗒️ File Added
 
-- `app/src/main/java/exp/ftxt/shared/ui/AppPresetWatcher.java`
+- `app/src/main/java/exp/ftxt/features/clock/ClockConfig.java`
+- `app/src/main/java/exp/ftxt/features/clock/ClockModule.java`
+- `app/src/main/java/exp/ftxt/features/battery/BatteryConfig.java`
+- `app/src/main/java/exp/ftxt/features/battery/BatteryModule.java`
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java`
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java`
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java`
 
 ### ✏️️ File Changed
 
 - app/build.gradle
-- app/src/main/AndroidManifest.xml
+- app/src/main/java/exp/ftxt/features/clock/ClockModule.java
+- app/src/main/java/exp/ftxt/features/battery/BatteryModule.java
+- app/src/main/java/exp/ftxt/core/FloatingService.java
+- app/src/main/java/exp/ftxt/ui/ClockPanelController.java
+- app/src/main/java/exp/ftxt/ui/BatteryPanelController.java
+- app/src/main/java/exp/ftxt/MainActivity.java
 - app/src/main/res/layout/activity_main.xml
-- app/src/main/java/exp/ftxt/shared/ui/PositionPresetManager.java
-- app/src/main/java/exp/ftxt/ui/TextPositionController.java
-- app/src/main/java/exp/ftxt/ui/FpsPositionController.java
 - CHANGELOG.md
 - app/src/main/assets/CHANGELOG.txt
+- STRUKTUR.md
+- app/src/main/assets/STRUKTUR.txt
+- README.md
+- app/src/main/assets/README.txt
 
 ### 🔢 Version
 
-- versionCode: 101 → 102
-- versionName: 2.6.1.44.0 → 2.6.1.45.0
+- versionCode: 102 → 103
+- versionName: 2.6.1.45.0 → 2.6.1.46.0
 
 ---
 

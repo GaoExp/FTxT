@@ -27,8 +27,12 @@ FTxT/
 │   │   │   │   ├── fps/
 │   │   │   │   │   ├── FpsConfig.java
 │   │   │   │   │   └── FpsModule.java
-│   │   │   │   ├── cpu/         (empty)
-│   │   │   │   ├── clock/       (empty)
+│   │   │   │   ├── battery/
+│   │   │   │   │   ├── BatteryConfig.java
+│   │   │   │   │   └── BatteryModule.java
+│   │   │   │   ├── clock/
+│   │   │   │   │   ├── ClockConfig.java
+│   │   │   │   │   └── ClockModule.java
 │   │   │   │   ├── crosshair/   (empty)
 │   │   │   │   ├── logo/        (empty)
 │   │   │   │   └── watermark/   (empty)
@@ -54,7 +58,12 @@ FTxT/
 │   │   │   ├── ui/
 │   │   │   │   ├── TextPanelController.java
 │   │   │   │   ├── TextPositionController.java
-│   │   │   │   └── FpsPanelController.java
+│   │   │   │   ├── FpsPanelController.java
+│   │   │   │   ├── FpsPositionController.java
+│   │   │   │   ├── ClockPanelController.java
+│   │   │   │   ├── ClockPositionController.java
+│   │   │   │   ├── BatteryPanelController.java
+│   │   │   │   └── BatteryPositionController.java
 │   │   │   │
 │   │   │   ├── utils/
 │   │   │   │   └── PermissionHelper.java
@@ -124,6 +133,10 @@ FTxT/
 | features/text/TextModule.java | Module logic teks overlay |
 | features/fps/FpsConfig.java | Konfigurasi FPS overlay |
 | features/fps/FpsModule.java | Module logic FPS overlay |
+| features/clock/ClockConfig.java | Konfigurasi jam digital overlay |
+| features/clock/ClockModule.java | Module logic jam digital (update tiap 1 detik) |
+| features/battery/BatteryConfig.java | Konfigurasi suhu baterai overlay |
+| features/battery/BatteryModule.java | Module logic suhu baterai (update tiap 5 detik) |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
@@ -139,6 +152,10 @@ FTxT/
 | ui/TextPanelController.java | Controller panel Floating Text |
 | ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/FpsPanelController.java | Controller panel FPS Display |
+| ui/ClockPanelController.java | Controller panel Jam Digital |
+| ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
+| ui/BatteryPanelController.java | Controller panel Suhu Baterai |
+| ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |
 | activity_main.xml | Layout utama |
