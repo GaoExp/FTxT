@@ -3,6 +3,124 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.7.2.50.0] - 2026-05-30
+
+### ♻️ Perubahan Fitur
+
+- **Semua toggle Switch → CheckBox**: `overlaySwitch`, `touchPassthroughSwitch`, `shadowSwitch`, `bgSwitch` dan varian fps/clock/battery diubah dari Switch menjadi CheckBox di semua 4 panel.
+- **Overlay & Kunci Posisi sejajar horizontal**: Setiap panel kini menampilkan CheckBox overlay dan kunci posisi dalam satu baris horizontal.
+- **Urutan komponen diubah semua panel**: Kontrol Posisi dipindah ke bawah Pilih Warna; Background dipindah ke paling bawah (di bawah Shadow).
+- **Label teks Switch dihapus**: Teks langsung di `android:text` CheckBox, TextView label samping dihapus.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 108→109, versionName 2.7.2.49.0→2.7.2.50.0
+- `app/src/main/res/layout/activity_main.xml` — restruktur urutan & Switch→CheckBox di semua 4 panel
+- `app/src/main/java/exp/ftxt/MainActivity.java` — `applySwitchTint` → `applyCheckboxTint`, parameter Switch→CheckBox
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Switch→CheckBox, applySwitchTint→applyCheckboxTint
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — same
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — same
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — same
+
+---
+
+## [2.7.2.49.0] - 2026-05-30
+
+### 🚮️ Fitur Dihapus
+
+- **Grid Posisi 3×3 FPS/Clock/Battery**: Tombol grid 3×3 untuk quick preset posisi dihapus dari panel FPS Display, Jam Digital, dan Suhu Baterai — melanjutkan penghapusan yang sudah dilakukan di panel Floating Text.
+- **Auto Preset Aplikasi FPS**: Fitur auto-switch preset berdasarkan aplikasi di FPS dihapus (sudah dihapus dari Text di release sebelumnya).
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 107→108, versionName 2.6.2.48.1→2.7.2.49.0
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — hapus grid 3×3, auto preset, AppPresetWatcher
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — hapus grid 3×3
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — hapus grid 3×3
+- `app/src/main/res/layout/activity_main.xml` — hapus grid 3×3 (FPS, Clock, Battery) & auto preset FPS
+
+---
+
+## [2.6.2.48.1] - 2026-05-30
+
+### 🐞 Bug Fixes
+
+- **TextPositionController crash**: Grid 3×3 buttons (`btnPosTL`–`btnPosBR`), orientation buttons (`btnPortrait`/`btnLandscape`), dan auto-preset switch (`autoPresetSwitch`) dihapus dari layout Text panel di release sebelumnya, tapi kode Java masih mereferensinya — menyebabkan `cannot find symbol` saat kompilasi. Semua referensi dihapus dari `TextPositionController.java`.
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Gradle namespace syntax**: `namespace "exp.ftxt"` diganti `namespace = "exp.ftxt"` untuk kompatibilitas Gradle 10.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 106→107, versionName 2.6.2.48.0→2.6.2.48.1
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — hapus grid 3x3, orientation buttons, auto-preset watcher
+
+---
+
+## [2.6.2.48.0] - 2026-05-30
+
+### 🚮️ Fitur Dihapus
+
+- **Grid Posisi 3×3**: Tombol grid 3×3 untuk quick preset posisi dihapus karena kurang berguna. User dapat menggunakan slider X/Y, D-Pad, atau preset system yang lebih flexible.
+- **Auto Preset Aplikasi**: Fitur auto-switch preset berdasarkan orientasi dihapus. Orientasi mode (Potret/Lanskap) masih tersedia melalui kontrol posisi manual.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 105→106, versionName 2.6.1.47.0→2.6.2.48.0
+- `app/src/main/res/layout/activity_main.xml` — hapus grid buttons (9 buttons) dan auto preset switch/buttons
+
+---
+
+## [2.6.1.47.0] - 2026-05-30
+
+### ✨ Fitur Baru
+
+- **Preset Preview**: Tampilan mini-map posisi pada daftar preset saat memuat.
+- **Preset Export/Import**: Ekspor preset ke clipboard (JSON), impor dari clipboard.
+- **More Preset Slots**: Jumlah maksimal preset ditingkatkan dari 10 menjadi 50.
+- **Preset Rename**: Ubah nama preset langsung dari opsi long-press (sudah ada, ditingkatkan).
+- **Visual Preset Editor**: Editor posisi visual dengan drag dot pada mini-map.
+- **Visual Preset Indicator**: Indikator preset aktif ditampilkan di panel kontrol posisi.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/ui/PresetPreviewView.java` — Custom View mini-map posisi
+- `app/src/main/res/layout/preset_list_item.xml` — Layout item daftar preset dengan preview
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 104→105, versionName 2.6.1.46.1→2.6.1.47.0
+- `app/src/main/java/exp/ftxt/shared/ui/PositionPresetManager.java` — overhaul fitur preset
+- `app/src/main/res/layout/activity_main.xml` — tambah preset indicator & export/import button (4 panel)
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — wiring preset indicator & export/import
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — wiring preset indicator & export/import
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — wiring preset indicator & export/import
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — wiring preset indicator & export/import
+
+---
+
+## [2.6.1.46.1] - 2026-05-30
+
+### 🐞 Bug Fixes
+
+- **Slider Posisi**: Slider X/Y tidak tersinkronisasi saat overlay dipindahkan dengan mode drag. Kini slider mengikuti posisi overlay secara real-time.
+- **Sinkronisasi semua overlay**: Perbaikan untuk Text, FPS, Battery, dan Clock overlay.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 103→104, versionName 2.6.1.46.0→2.6.1.46.1
+- `app/src/main/java/exp/ftxt/features/battery/BatteryModule.java` — update Config saat drag
+- `app/src/main/java/exp/ftxt/features/clock/ClockModule.java` — update Config saat drag
+- `app/src/main/java/exp/ftxt/features/text/TextModule.java` — update Config saat drag
+- `app/src/main/java/exp/ftxt/features/fps/FpsModule.java` — update Config saat drag
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — onPositionUpdate syncAll
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — onPositionUpdate syncAll
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — onPositionUpdate syncAll
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — onPositionUpdate syncAll
+
+---
+
 ## [2.6.1.46.0] - 2026-05-30
 
 ### ✨ Fitur Baru

@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -238,17 +238,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ========================================================================
-    // Switch tint utility — dipanggil oleh TextPanelController & FpsPanelController
-    // Lihat: TextPanelController → ui/TextPanelController.java
-    // Lihat: FpsPanelController  → ui/FpsPanelController.java
+    // CheckBox tint utility — dipanggil oleh PanelControllers
     // ========================================================================
-    public void applySwitchTint(Switch sw, boolean isChecked) {
+    public void applyCheckboxTint(CheckBox cb, boolean isChecked) {
         if (isChecked) {
-            sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
-            sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#90CAF9")));
+            cb.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
         } else {
-            sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
-            sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
+            cb.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
         }
     }
 

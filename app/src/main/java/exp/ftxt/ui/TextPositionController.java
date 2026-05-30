@@ -7,14 +7,12 @@ import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.text.TextConfig;
 import exp.ftxt.features.text.TextModule;
-import exp.ftxt.shared.ui.AppPresetWatcher;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.PositionPresetManager;
 import exp.ftxt.shared.ui.SliderPositionController;
@@ -25,18 +23,15 @@ public class TextPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
+    private TextView presetIndicator;
+    private View btnExportImport;
     private int displayWidth, displayHeight;
-
-    private View btnPosTL, btnPosTC, btnPosTR, btnPosML, btnPosC, btnPosMR, btnPosBL, btnPosBC, btnPosBR;
-    private Switch autoPresetSwitch;
-    private AppPresetWatcher autoWatcher;
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -58,9 +53,24 @@ public class TextPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        TextModule.onPositionUpdate = this::updateCoordDisplay;
+        TextModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
+        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
+            @Override
+            public void onPresetLoaded(int idx) {
+                String name = presetManager.getPresetName(idx);
+                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
+            }
+
+            @Override
+            public void onPresetChanged() {
+                updatePresetIndicator();
+            }
+        });
+        if (btnExportImport != null) {
+            btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
+        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.posXSeekBar),
                 activity.findViewById(R.id.posYSeekBar),
@@ -77,19 +87,9 @@ public class TextPositionController {
         btnDown = activity.findViewById(R.id.btnDown);
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
-        btnPortrait = activity.findViewById(R.id.btnPortrait);
-        btnLandscape = activity.findViewById(R.id.btnLandscape);
         coordDisplay = activity.findViewById(R.id.posCoordDisplay);
-        btnPosTL = activity.findViewById(R.id.btnPosTL);
-        btnPosTC = activity.findViewById(R.id.btnPosTC);
-        btnPosTR = activity.findViewById(R.id.btnPosTR);
-        btnPosML = activity.findViewById(R.id.btnPosML);
-        btnPosC = activity.findViewById(R.id.btnPosC);
-        btnPosMR = activity.findViewById(R.id.btnPosMR);
-        btnPosBL = activity.findViewById(R.id.btnPosBL);
-        btnPosBC = activity.findViewById(R.id.btnPosBC);
-        btnPosBR = activity.findViewById(R.id.btnPosBR);
-        autoPresetSwitch = activity.findViewById(R.id.textAutoPresetSwitch);
+        presetIndicator = activity.findViewById(R.id.presetIndicator);
+        btnExportImport = activity.findViewById(R.id.btnExportImport);
     }
 
     private void setupListeners() {
@@ -109,43 +109,6 @@ public class TextPositionController {
         if (btnResetPos != null) {
             btnResetPos.setOnClickListener(v -> resetPosition());
         }
-
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
-
-        setupGridButton(btnPosTL, 0f, 0f);
-        setupGridButton(btnPosTC, 0.5f, 0f);
-        setupGridButton(btnPosTR, 1f, 0f);
-        setupGridButton(btnPosML, 0f, 0.5f);
-        setupGridButton(btnPosC, 0.5f, 0.5f);
-        setupGridButton(btnPosMR, 1f, 0.5f);
-        setupGridButton(btnPosBL, 0f, 1f);
-        setupGridButton(btnPosBC, 0.5f, 1f);
-        setupGridButton(btnPosBR, 1f, 1f);
-
-        autoWatcher = new AppPresetWatcher(activity, "text_", (oldPkg, newPkg, savedX, savedY) -> {
-            autoWatcher.saveCurrentForApp(oldPkg, TextConfig.posX, TextConfig.posY);
-            if (savedX >= 0 && savedY >= 0) {
-                TextConfig.posX = savedX;
-                TextConfig.posY = savedY;
-                syncAll();
-                savePositionToPrefs(currentOrientation);
-                FloatingService.updateTextPositionStatic();
-            }
-        });
-        autoPresetSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                autoWatcher.setOrientationSuffix("_" + currentOrientation);
-                autoWatcher.start();
-            } else {
-                autoWatcher.stop();
-            }
-        });
-    }
-
-    private void setupGridButton(View btn, float x, float y) {
-        btn.setOnClickListener(v -> onPositionChanged(x, y));
     }
 
     private static float clamp(float val) {
@@ -158,9 +121,6 @@ public class TextPositionController {
         syncAll();
         savePositionToPrefs(currentOrientation);
         FloatingService.updateTextPositionStatic();
-        if (autoWatcher != null && autoWatcher.isRunning()) {
-            autoWatcher.saveCurrentForApp(autoWatcher.getCurrentPackage(), x, y);
-        }
     }
 
     private void resetPosition() {
@@ -182,8 +142,6 @@ public class TextPositionController {
 
         syncAll();
         FloatingService.updateTextPositionStatic();
-        updateOrientationButtons();
-        if (autoWatcher != null) autoWatcher.setOrientationSuffix("_" + currentOrientation);
     }
 
     private void savePositionToPrefs(String orient) {
@@ -200,18 +158,12 @@ public class TextPositionController {
         TextConfig.posY = prefs.getFloat("text_pos_y" + sfx, 0.5f);
     }
 
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
-    }
-
     // ====================================================================
 
     public void cleanup() {
         TextModule.onPositionUpdate = null;
         if (dpad != null) dpad.cleanup();
         if (presetManager != null) presetManager.cleanup();
-        if (autoWatcher != null) autoWatcher.cleanup();
     }
 
     public void refresh() {
@@ -235,5 +187,15 @@ public class TextPositionController {
             py = Math.round(TextConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
+    }
+
+    private void updatePresetIndicator() {
+        if (presetIndicator == null) return;
+        String name = presetManager.getActivePresetName();
+        if (name != null) {
+            presetIndicator.setText("Preset: " + name);
+        } else {
+            presetIndicator.setText("");
+        }
     }
 }

@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -20,18 +20,18 @@ public class BatteryPanelController {
 
     private final MainActivity activity;
 
-    private Switch batterySwitch;
+    private CheckBox batterySwitch;
     private SeekBar batterySizeSeekBar;
     private Button batteryColorButton;
-    private Switch batteryShadowSwitch;
+    private CheckBox batteryShadowSwitch;
     private LinearLayout batteryShadowConfigContainer;
     private Button batteryShadowColorButton;
     private SeekBar batteryShadowBlurSeekBar;
     private SeekBar batteryShadowOffsetXSeekBar;
     private SeekBar batteryShadowOffsetYSeekBar;
-    private Switch batteryLockSwitch;
+    private CheckBox batteryLockSwitch;
     private CheckBox batteryValueOnlyCheck;
-    private Switch batteryBgSwitch;
+    private CheckBox batteryBgSwitch;
     private LinearLayout batteryBgConfigContainer;
     private Button batteryBgColorButton;
     private SeekBar batteryBgPaddingSeekBar;
@@ -98,10 +98,10 @@ public class BatteryPanelController {
 
     private void loadConfig() {
         batterySwitch.setChecked(BatteryConfig.enabled);
-        activity.applySwitchTint(batterySwitch, BatteryConfig.enabled);
+        activity.applyCheckboxTint(batterySwitch, BatteryConfig.enabled);
         batterySizeSeekBar.setProgress((int) BatteryConfig.size);
         batteryBgSwitch.setChecked(BatteryConfig.bgEnabled);
-        activity.applySwitchTint(batteryBgSwitch, BatteryConfig.bgEnabled);
+        activity.applyCheckboxTint(batteryBgSwitch, BatteryConfig.bgEnabled);
         batteryBgConfigContainer.setVisibility(BatteryConfig.bgEnabled ? View.VISIBLE : View.GONE);
         batteryBgPaddingSeekBar.setProgress(BatteryConfig.bgPadding);
         batteryBgOffsetXSeekBar.setProgress(BatteryConfig.bgOffsetX + 60);
@@ -109,13 +109,13 @@ public class BatteryPanelController {
         batteryBgMarginSeekBar.setProgress(BatteryConfig.bgMargin);
         batteryBgRadiusSeekBar.setProgress(BatteryConfig.bgRadius);
         batteryShadowSwitch.setChecked(BatteryConfig.shadow.enabled);
-        activity.applySwitchTint(batteryShadowSwitch, BatteryConfig.shadow.enabled);
+        activity.applyCheckboxTint(batteryShadowSwitch, BatteryConfig.shadow.enabled);
         batteryShadowConfigContainer.setVisibility(BatteryConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         batteryShadowBlurSeekBar.setProgress((int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXSeekBar.setProgress((int) BatteryConfig.shadow.offsetX + 60);
         batteryShadowOffsetYSeekBar.setProgress((int) BatteryConfig.shadow.offsetY + 60);
         batteryLockSwitch.setChecked(BatteryConfig.touchPassthrough);
-        activity.applySwitchTint(batteryLockSwitch, BatteryConfig.touchPassthrough);
+        activity.applyCheckboxTint(batteryLockSwitch, BatteryConfig.touchPassthrough);
         batteryValueOnlyCheck.setChecked(BatteryConfig.showOnlyValue);
         batterySizeLabel.setText("Ukuran Teks: " + (int) BatteryConfig.size);
         batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryConfig.bgPadding);
@@ -132,14 +132,14 @@ public class BatteryPanelController {
         batterySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
                 batterySwitch.setChecked(false);
-                activity.applySwitchTint(batterySwitch, false);
+                activity.applyCheckboxTint(batterySwitch, false);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putBoolean("battery_enabled", false).apply();
                 return;
             }
 
             BatteryConfig.enabled = isChecked;
-            activity.applySwitchTint(batterySwitch, isChecked);
+            activity.applyCheckboxTint(batterySwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_enabled", isChecked).apply();
 
@@ -181,7 +181,7 @@ public class BatteryPanelController {
 
         batteryBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryConfig.bgEnabled = isChecked;
-            activity.applySwitchTint(batteryBgSwitch, isChecked);
+            activity.applyCheckboxTint(batteryBgSwitch, isChecked);
             batteryBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_bg_enabled", isChecked).apply();
@@ -262,7 +262,7 @@ public class BatteryPanelController {
 
         batteryShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryConfig.shadow.enabled = isChecked;
-            activity.applySwitchTint(batteryShadowSwitch, isChecked);
+            activity.applyCheckboxTint(batteryShadowSwitch, isChecked);
             batteryShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_shadow_enabled", isChecked).apply();
@@ -319,7 +319,7 @@ public class BatteryPanelController {
 
         batteryLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryConfig.touchPassthrough = isChecked;
-            activity.applySwitchTint(batteryLockSwitch, isChecked);
+            activity.applyCheckboxTint(batteryLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_lock", isChecked).apply();
             FloatingService.updateBatteryTouchFlagsStatic();

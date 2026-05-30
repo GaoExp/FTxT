@@ -7,14 +7,12 @@ import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.fps.FpsConfig;
 import exp.ftxt.features.fps.FpsModule;
-import exp.ftxt.shared.ui.AppPresetWatcher;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.PositionPresetManager;
 import exp.ftxt.shared.ui.SliderPositionController;
@@ -32,11 +30,9 @@ public class FpsPositionController {
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
+    private TextView presetIndicator;
+    private View btnExportImport;
     private int displayWidth, displayHeight;
-
-    private View btnPosTL, btnPosTC, btnPosTR, btnPosML, btnPosC, btnPosMR, btnPosBL, btnPosBC, btnPosBR;
-    private Switch autoPresetSwitch;
-    private AppPresetWatcher autoWatcher;
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -58,9 +54,24 @@ public class FpsPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        FpsModule.onPositionUpdate = this::updateCoordDisplay;
+        FpsModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
+        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
+            @Override
+            public void onPresetLoaded(int idx) {
+                String name = presetManager.getPresetName(idx);
+                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
+            }
+
+            @Override
+            public void onPresetChanged() {
+                updatePresetIndicator();
+            }
+        });
+        if (btnExportImport != null) {
+            btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
+        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.fps_posXSeekBar),
                 activity.findViewById(R.id.fps_posYSeekBar),
@@ -80,16 +91,8 @@ public class FpsPositionController {
         btnPortrait = activity.findViewById(R.id.fps_btnPortrait);
         btnLandscape = activity.findViewById(R.id.fps_btnLandscape);
         coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
-        btnPosTL = activity.findViewById(R.id.fps_btnPosTL);
-        btnPosTC = activity.findViewById(R.id.fps_btnPosTC);
-        btnPosTR = activity.findViewById(R.id.fps_btnPosTR);
-        btnPosML = activity.findViewById(R.id.fps_btnPosML);
-        btnPosC = activity.findViewById(R.id.fps_btnPosC);
-        btnPosMR = activity.findViewById(R.id.fps_btnPosMR);
-        btnPosBL = activity.findViewById(R.id.fps_btnPosBL);
-        btnPosBC = activity.findViewById(R.id.fps_btnPosBC);
-        btnPosBR = activity.findViewById(R.id.fps_btnPosBR);
-        autoPresetSwitch = activity.findViewById(R.id.fpsAutoPresetSwitch);
+        presetIndicator = activity.findViewById(R.id.fps_presetIndicator);
+        btnExportImport = activity.findViewById(R.id.fps_btnExportImport);
     }
 
     private void setupListeners() {
@@ -113,39 +116,6 @@ public class FpsPositionController {
         btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
         btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
         updateOrientationButtons();
-
-        setupGridButton(btnPosTL, 0f, 0f);
-        setupGridButton(btnPosTC, 0.5f, 0f);
-        setupGridButton(btnPosTR, 1f, 0f);
-        setupGridButton(btnPosML, 0f, 0.5f);
-        setupGridButton(btnPosC, 0.5f, 0.5f);
-        setupGridButton(btnPosMR, 1f, 0.5f);
-        setupGridButton(btnPosBL, 0f, 1f);
-        setupGridButton(btnPosBC, 0.5f, 1f);
-        setupGridButton(btnPosBR, 1f, 1f);
-
-        autoWatcher = new AppPresetWatcher(activity, "fps_", (oldPkg, newPkg, savedX, savedY) -> {
-            autoWatcher.saveCurrentForApp(oldPkg, FpsConfig.posX, FpsConfig.posY);
-            if (savedX >= 0 && savedY >= 0) {
-                FpsConfig.posX = savedX;
-                FpsConfig.posY = savedY;
-                syncAll();
-                savePositionToPrefs(currentOrientation);
-                FloatingService.updateFpsPositionStatic();
-            }
-        });
-        autoPresetSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                autoWatcher.setOrientationSuffix("_" + currentOrientation);
-                autoWatcher.start();
-            } else {
-                autoWatcher.stop();
-            }
-        });
-    }
-
-    private void setupGridButton(View btn, float x, float y) {
-        btn.setOnClickListener(v -> onPositionChanged(x, y));
     }
 
     private static float clamp(float val) {
@@ -158,9 +128,6 @@ public class FpsPositionController {
         syncAll();
         savePositionToPrefs(currentOrientation);
         FloatingService.updateFpsPositionStatic();
-        if (autoWatcher != null && autoWatcher.isRunning()) {
-            autoWatcher.saveCurrentForApp(autoWatcher.getCurrentPackage(), x, y);
-        }
     }
 
     private void resetPosition() {
@@ -179,7 +146,6 @@ public class FpsPositionController {
         syncAll();
         FloatingService.updateFpsPositionStatic();
         updateOrientationButtons();
-        if (autoWatcher != null) autoWatcher.setOrientationSuffix("_" + currentOrientation);
     }
 
     private void savePositionToPrefs(String orient) {
@@ -205,7 +171,6 @@ public class FpsPositionController {
         FpsModule.onPositionUpdate = null;
         if (dpad != null) dpad.cleanup();
         if (presetManager != null) presetManager.cleanup();
-        if (autoWatcher != null) autoWatcher.cleanup();
     }
 
     public void refresh() {
@@ -229,5 +194,15 @@ public class FpsPositionController {
             py = Math.round(FpsConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
+    }
+
+    private void updatePresetIndicator() {
+        if (presetIndicator == null) return;
+        String name = presetManager.getActivePresetName();
+        if (name != null) {
+            presetIndicator.setText("Preset: " + name);
+        } else {
+            presetIndicator.setText("");
+        }
     }
 }

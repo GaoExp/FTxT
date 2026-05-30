@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -21,18 +21,18 @@ public class FpsPanelController {
 
     private final MainActivity activity;
 
-    private Switch fpsSwitch;
+    private CheckBox fpsSwitch;
     private SeekBar fpsSizeSeekBar;
     private Button fpsColorButton;
-    private Switch fpsShadowSwitch;
+    private CheckBox fpsShadowSwitch;
     private LinearLayout fpsShadowConfigContainer;
     private Button fpsShadowColorButton;
     private SeekBar fpsShadowBlurSeekBar;
     private SeekBar fpsShadowOffsetXSeekBar;
     private SeekBar fpsShadowOffsetYSeekBar;
-    private Switch fpsLockSwitch;
+    private CheckBox fpsLockSwitch;
     private CheckBox fpsValueOnlyCheck;
-    private Switch fpsBgSwitch;
+    private CheckBox fpsBgSwitch;
     private LinearLayout fpsBgConfigContainer;
     private Button fpsBgColorButton;
     private SeekBar fpsBgPaddingSeekBar;
@@ -99,10 +99,10 @@ public class FpsPanelController {
 
     private void loadConfig() {
         fpsSwitch.setChecked(FpsConfig.enabled);
-        activity.applySwitchTint(fpsSwitch, FpsConfig.enabled);
+        activity.applyCheckboxTint(fpsSwitch, FpsConfig.enabled);
         fpsSizeSeekBar.setProgress((int) FpsConfig.size);
         fpsBgSwitch.setChecked(FpsConfig.bgEnabled);
-        activity.applySwitchTint(fpsBgSwitch, FpsConfig.bgEnabled);
+        activity.applyCheckboxTint(fpsBgSwitch, FpsConfig.bgEnabled);
         fpsBgConfigContainer.setVisibility(FpsConfig.bgEnabled ? View.VISIBLE : View.GONE);
         fpsBgPaddingSeekBar.setProgress(FpsConfig.bgPadding);
         fpsBgOffsetXSeekBar.setProgress(FpsConfig.bgOffsetX + 60);
@@ -110,13 +110,13 @@ public class FpsPanelController {
         fpsBgMarginSeekBar.setProgress(FpsConfig.bgMargin);
         fpsBgRadiusSeekBar.setProgress(FpsConfig.bgRadius);
         fpsShadowSwitch.setChecked(FpsConfig.shadow.enabled);
-        activity.applySwitchTint(fpsShadowSwitch, FpsConfig.shadow.enabled);
+        activity.applyCheckboxTint(fpsShadowSwitch, FpsConfig.shadow.enabled);
         fpsShadowConfigContainer.setVisibility(FpsConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         fpsShadowBlurSeekBar.setProgress((int) FpsConfig.shadow.blur);
         fpsShadowOffsetXSeekBar.setProgress((int) FpsConfig.shadow.offsetX + 60);
         fpsShadowOffsetYSeekBar.setProgress((int) FpsConfig.shadow.offsetY + 60);
         fpsLockSwitch.setChecked(FpsConfig.touchPassthrough);
-        activity.applySwitchTint(fpsLockSwitch, FpsConfig.touchPassthrough);
+        activity.applyCheckboxTint(fpsLockSwitch, FpsConfig.touchPassthrough);
         fpsValueOnlyCheck.setChecked(FpsConfig.showOnlyValue);
         fpsSizeLabel.setText("Ukuran Teks: " + (int) FpsConfig.size);
         fpsBgPaddingLabel.setText("Ukuran Background: " + FpsConfig.bgPadding);
@@ -133,14 +133,14 @@ public class FpsPanelController {
         fpsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
                 fpsSwitch.setChecked(false);
-                activity.applySwitchTint(fpsSwitch, false);
+                activity.applyCheckboxTint(fpsSwitch, false);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putBoolean("fps_enabled", false).apply();
                 return;
             }
 
             FpsConfig.enabled = isChecked;
-            activity.applySwitchTint(fpsSwitch, isChecked);
+            activity.applyCheckboxTint(fpsSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_enabled", isChecked).apply();
 
@@ -181,7 +181,7 @@ public class FpsPanelController {
 
         fpsBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FpsConfig.bgEnabled = isChecked;
-            activity.applySwitchTint(fpsBgSwitch, isChecked);
+            activity.applyCheckboxTint(fpsBgSwitch, isChecked);
             fpsBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_bg_enabled", isChecked).apply();
@@ -262,7 +262,7 @@ public class FpsPanelController {
 
         fpsShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FpsConfig.shadow.enabled = isChecked;
-            activity.applySwitchTint(fpsShadowSwitch, isChecked);
+            activity.applyCheckboxTint(fpsShadowSwitch, isChecked);
             fpsShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_shadow_enabled", isChecked).apply();
@@ -319,7 +319,7 @@ public class FpsPanelController {
 
         fpsLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FpsConfig.touchPassthrough = isChecked;
-            activity.applySwitchTint(fpsLockSwitch, isChecked);
+            activity.applyCheckboxTint(fpsLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_lock", isChecked).apply();
             FloatingService.updateFpsTouchFlagsStatic();

@@ -34,6 +34,7 @@ FTxT/
 │   │   │   │   │   ├── ClockConfig.java
 │   │   │   │   │   └── ClockModule.java
 │   │   │   │   ├── crosshair/   (empty)
+│   │   │   │   ├── cpu/         (empty)
 │   │   │   │   ├── logo/        (empty)
 │   │   │   │   └── watermark/   (empty)
 │   │   │   │
@@ -43,17 +44,17 @@ FTxT/
 │   │   │   │   │   ├── ColorNameResolver.java
 │   │   │   │   │   └── HSVColorPickerView.java
 │   │   │   │   └── ui/
+│   │   │   │       ├── AppPresetWatcher.java
 │   │   │   │       ├── ColorPickerDialog.java
 │   │   │   │       ├── DpadController.java
 │   │   │   │       ├── OverlayDragHandler.java
 │   │   │   │       ├── OverlayShadow.java
 │   │   │   │       ├── PositionPresetManager.java
+│   │   │   │       ├── PresetPreviewView.java
 │   │   │   │       ├── ShadowConfig.java
 │   │   │   │       ├── ShadowTextView.java
-│   │   │   │       ├── SliderPositionController.java
 │   │   │   │       ├── SliderLabelEditor.java
-│   │   │   │       ├── ShadowTextView.java
-│   │   │   │       └── SliderLabelEditor.java
+│   │   │   │       └── SliderPositionController.java
 │   │   │   │
 │   │   │   ├── ui/
 │   │   │   │   ├── TextPanelController.java
@@ -90,7 +91,8 @@ FTxT/
 │   │   │   │   ├── activity_settings.xml
 │   │   │   │   ├── dialog_hsv_color_picker.xml
 │   │   │   │   ├── drawer_content.xml
-│   │   │   │   └── nav_header.xml
+│   │   │   │   ├── nav_header.xml
+│   │   │   │   └── preset_list_item.xml
 │   │   │   ├── drawable/
 │   │   │   │   ├── ic_edit.xml
 │   │   │   │   ├── ic_launcher_background.xml
@@ -140,18 +142,22 @@ FTxT/
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
+| shared/ui/AppPresetWatcher.java | Auto-switch preset berdasarkan orientasi |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper color picker (ARGB) |
 | shared/ui/DpadController.java | Shared D-Pad controller dengan touch repeat |
 | shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
-| shared/ui/PositionPresetManager.java | Shared manager simpan/load/hapus preset posisi |
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
+| shared/ui/PositionPresetManager.java | Shared manager simpan/load/hapus preset posisi |
+| shared/ui/PresetPreviewView.java | Custom View mini-map posisi preset |
 | shared/ui/ShadowConfig.java | Konfigurasi shadow modular |
 | shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
 | shared/ui/SliderLabelEditor.java | Shared utility edit nilai slider via dialog |
+| shared/ui/SliderPositionController.java | Shared controller slider X/Y posisi |
 | _karantina/exp/ftxt/shared/ui/XyPadView.java | Custom View 2D drag area — DIKARANTINA |
 | ui/TextPanelController.java | Controller panel Floating Text |
 | ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/FpsPanelController.java | Controller panel FPS Display |
+| ui/FpsPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) FPS |
 | ui/ClockPanelController.java | Controller panel Jam Digital |
 | ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/BatteryPanelController.java | Controller panel Suhu Baterai |
@@ -163,3 +169,4 @@ FTxT/
 | dialog_hsv_color_picker.xml | Layout dialog color picker |
 | drawer_content.xml | Layout sidebar drawer konten |
 | nav_header.xml | Header navigation drawer |
+| preset_list_item.xml | Layout item daftar preset dengan preview |

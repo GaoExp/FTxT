@@ -168,7 +168,18 @@ public class TextModule {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     () -> savePosition(prefs),
-                    onPositionUpdate));
+                    () -> {
+                        if (params != null) {
+                            DisplayMetrics metrics = new DisplayMetrics();
+                            wm.getDefaultDisplay().getRealMetrics(metrics);
+                            screenWidth = metrics.widthPixels;
+                            screenHeight = metrics.heightPixels;
+                            if (params.y < posCalibrationY) posCalibrationY = params.y;
+                            TextConfig.posX = (float) params.x / screenWidth;
+                            TextConfig.posY = (float)(params.y - posCalibrationY) / screenHeight;
+                        }
+                        if (onPositionUpdate != null) onPositionUpdate.run();
+                    }));
         }
 
         if (wm != null) {

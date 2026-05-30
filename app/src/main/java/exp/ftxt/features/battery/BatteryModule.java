@@ -151,7 +151,13 @@ public class BatteryModule {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     null,
-                    onPositionUpdate));
+                    () -> {
+                        if (params != null) {
+                            BatteryConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
+                            BatteryConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
+                        }
+                        if (onPositionUpdate != null) onPositionUpdate.run();
+                    }));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
@@ -187,10 +193,11 @@ public class BatteryModule {
             if (batteryIntent == null) return "N/A";
             int temp = batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0);
             float celsius = temp / 10f;
+            int celsiusInt = Math.round(celsius);
             if (BatteryConfig.showOnlyValue) {
-                return String.format("%.1f°C", celsius);
+                return String.valueOf(celsiusInt);
             }
-            return String.format("%.1f°C", celsius);
+            return String.format("%d°C", celsiusInt);
         } catch (Exception e) {
             return "ERR";
         }

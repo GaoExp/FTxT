@@ -30,9 +30,9 @@ public class ClockPositionController {
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
+    private TextView presetIndicator;
+    private View btnExportImport;
     private int displayWidth, displayHeight;
-
-    private View btnPosTL, btnPosTC, btnPosTR, btnPosML, btnPosC, btnPosMR, btnPosBL, btnPosBC, btnPosBR;
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -54,9 +54,24 @@ public class ClockPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        ClockModule.onPositionUpdate = this::updateCoordDisplay;
+        ClockModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
+        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
+            @Override
+            public void onPresetLoaded(int idx) {
+                String name = presetManager.getPresetName(idx);
+                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
+            }
+
+            @Override
+            public void onPresetChanged() {
+                updatePresetIndicator();
+            }
+        });
+        if (btnExportImport != null) {
+            btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
+        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.clock_posXSeekBar),
                 activity.findViewById(R.id.clock_posYSeekBar),
@@ -76,15 +91,8 @@ public class ClockPositionController {
         btnPortrait = activity.findViewById(R.id.clock_btnPortrait);
         btnLandscape = activity.findViewById(R.id.clock_btnLandscape);
         coordDisplay = activity.findViewById(R.id.clock_posCoordDisplay);
-        btnPosTL = activity.findViewById(R.id.clock_btnPosTL);
-        btnPosTC = activity.findViewById(R.id.clock_btnPosTC);
-        btnPosTR = activity.findViewById(R.id.clock_btnPosTR);
-        btnPosML = activity.findViewById(R.id.clock_btnPosML);
-        btnPosC = activity.findViewById(R.id.clock_btnPosC);
-        btnPosMR = activity.findViewById(R.id.clock_btnPosMR);
-        btnPosBL = activity.findViewById(R.id.clock_btnPosBL);
-        btnPosBC = activity.findViewById(R.id.clock_btnPosBC);
-        btnPosBR = activity.findViewById(R.id.clock_btnPosBR);
+        presetIndicator = activity.findViewById(R.id.clock_presetIndicator);
+        btnExportImport = activity.findViewById(R.id.clock_btnExportImport);
     }
 
     private void setupListeners() {
@@ -108,20 +116,6 @@ public class ClockPositionController {
         btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
         btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
         updateOrientationButtons();
-
-        setupGridButton(btnPosTL, 0f, 0f);
-        setupGridButton(btnPosTC, 0.5f, 0f);
-        setupGridButton(btnPosTR, 1f, 0f);
-        setupGridButton(btnPosML, 0f, 0.5f);
-        setupGridButton(btnPosC, 0.5f, 0.5f);
-        setupGridButton(btnPosMR, 1f, 0.5f);
-        setupGridButton(btnPosBL, 0f, 1f);
-        setupGridButton(btnPosBC, 0.5f, 1f);
-        setupGridButton(btnPosBR, 1f, 1f);
-    }
-
-    private void setupGridButton(View btn, float x, float y) {
-        btn.setOnClickListener(v -> onPositionChanged(x, y));
     }
 
     private static float clamp(float val) {
@@ -200,5 +194,15 @@ public class ClockPositionController {
             py = Math.round(ClockConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
+    }
+
+    private void updatePresetIndicator() {
+        if (presetIndicator == null) return;
+        String name = presetManager.getActivePresetName();
+        if (name != null) {
+            presetIndicator.setText("Preset: " + name);
+        } else {
+            presetIndicator.setText("");
+        }
     }
 }

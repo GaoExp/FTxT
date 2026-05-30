@@ -152,7 +152,13 @@ public class ClockModule {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     null,
-                    onPositionUpdate));
+                    () -> {
+                        if (params != null) {
+                            ClockConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
+                            ClockConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
+                        }
+                        if (onPositionUpdate != null) onPositionUpdate.run();
+                    }));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }

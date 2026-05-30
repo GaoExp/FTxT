@@ -30,9 +30,9 @@ public class BatteryPositionController {
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
+    private TextView presetIndicator;
+    private View btnExportImport;
     private int displayWidth, displayHeight;
-
-    private View btnPosTL, btnPosTC, btnPosTR, btnPosML, btnPosC, btnPosMR, btnPosBL, btnPosBC, btnPosBR;
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -54,9 +54,24 @@ public class BatteryPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        BatteryModule.onPositionUpdate = this::updateCoordDisplay;
+        BatteryModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
+        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
+            @Override
+            public void onPresetLoaded(int idx) {
+                String name = presetManager.getPresetName(idx);
+                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
+            }
+
+            @Override
+            public void onPresetChanged() {
+                updatePresetIndicator();
+            }
+        });
+        if (btnExportImport != null) {
+            btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
+        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.battery_posXSeekBar),
                 activity.findViewById(R.id.battery_posYSeekBar),
@@ -76,15 +91,8 @@ public class BatteryPositionController {
         btnPortrait = activity.findViewById(R.id.battery_btnPortrait);
         btnLandscape = activity.findViewById(R.id.battery_btnLandscape);
         coordDisplay = activity.findViewById(R.id.battery_posCoordDisplay);
-        btnPosTL = activity.findViewById(R.id.battery_btnPosTL);
-        btnPosTC = activity.findViewById(R.id.battery_btnPosTC);
-        btnPosTR = activity.findViewById(R.id.battery_btnPosTR);
-        btnPosML = activity.findViewById(R.id.battery_btnPosML);
-        btnPosC = activity.findViewById(R.id.battery_btnPosC);
-        btnPosMR = activity.findViewById(R.id.battery_btnPosMR);
-        btnPosBL = activity.findViewById(R.id.battery_btnPosBL);
-        btnPosBC = activity.findViewById(R.id.battery_btnPosBC);
-        btnPosBR = activity.findViewById(R.id.battery_btnPosBR);
+        presetIndicator = activity.findViewById(R.id.battery_presetIndicator);
+        btnExportImport = activity.findViewById(R.id.battery_btnExportImport);
     }
 
     private void setupListeners() {
@@ -108,20 +116,6 @@ public class BatteryPositionController {
         btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
         btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
         updateOrientationButtons();
-
-        setupGridButton(btnPosTL, 0f, 0f);
-        setupGridButton(btnPosTC, 0.5f, 0f);
-        setupGridButton(btnPosTR, 1f, 0f);
-        setupGridButton(btnPosML, 0f, 0.5f);
-        setupGridButton(btnPosC, 0.5f, 0.5f);
-        setupGridButton(btnPosMR, 1f, 0.5f);
-        setupGridButton(btnPosBL, 0f, 1f);
-        setupGridButton(btnPosBC, 0.5f, 1f);
-        setupGridButton(btnPosBR, 1f, 1f);
-    }
-
-    private void setupGridButton(View btn, float x, float y) {
-        btn.setOnClickListener(v -> onPositionChanged(x, y));
     }
 
     private static float clamp(float val) {
@@ -200,5 +194,15 @@ public class BatteryPositionController {
             py = Math.round(BatteryConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
+    }
+
+    private void updatePresetIndicator() {
+        if (presetIndicator == null) return;
+        String name = presetManager.getActivePresetName();
+        if (name != null) {
+            presetIndicator.setText("Preset: " + name);
+        } else {
+            presetIndicator.setText("");
+        }
     }
 }

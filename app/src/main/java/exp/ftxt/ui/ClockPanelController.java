@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -19,17 +19,17 @@ public class ClockPanelController {
 
     private final MainActivity activity;
 
-    private Switch clockSwitch;
+    private CheckBox clockSwitch;
     private SeekBar clockSizeSeekBar;
     private Button clockColorButton;
-    private Switch clockShadowSwitch;
+    private CheckBox clockShadowSwitch;
     private LinearLayout clockShadowConfigContainer;
     private Button clockShadowColorButton;
     private SeekBar clockShadowBlurSeekBar;
     private SeekBar clockShadowOffsetXSeekBar;
     private SeekBar clockShadowOffsetYSeekBar;
-    private Switch clockLockSwitch;
-    private Switch clockBgSwitch;
+    private CheckBox clockLockSwitch;
+    private CheckBox clockBgSwitch;
     private LinearLayout clockBgConfigContainer;
     private Button clockBgColorButton;
     private SeekBar clockBgPaddingSeekBar;
@@ -95,10 +95,10 @@ public class ClockPanelController {
 
     private void loadConfig() {
         clockSwitch.setChecked(ClockConfig.enabled);
-        activity.applySwitchTint(clockSwitch, ClockConfig.enabled);
+        activity.applyCheckboxTint(clockSwitch, ClockConfig.enabled);
         clockSizeSeekBar.setProgress((int) ClockConfig.size);
         clockBgSwitch.setChecked(ClockConfig.bgEnabled);
-        activity.applySwitchTint(clockBgSwitch, ClockConfig.bgEnabled);
+        activity.applyCheckboxTint(clockBgSwitch, ClockConfig.bgEnabled);
         clockBgConfigContainer.setVisibility(ClockConfig.bgEnabled ? View.VISIBLE : View.GONE);
         clockBgPaddingSeekBar.setProgress(ClockConfig.bgPadding);
         clockBgOffsetXSeekBar.setProgress(ClockConfig.bgOffsetX + 60);
@@ -106,13 +106,13 @@ public class ClockPanelController {
         clockBgMarginSeekBar.setProgress(ClockConfig.bgMargin);
         clockBgRadiusSeekBar.setProgress(ClockConfig.bgRadius);
         clockShadowSwitch.setChecked(ClockConfig.shadow.enabled);
-        activity.applySwitchTint(clockShadowSwitch, ClockConfig.shadow.enabled);
+        activity.applyCheckboxTint(clockShadowSwitch, ClockConfig.shadow.enabled);
         clockShadowConfigContainer.setVisibility(ClockConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         clockShadowBlurSeekBar.setProgress((int) ClockConfig.shadow.blur);
         clockShadowOffsetXSeekBar.setProgress((int) ClockConfig.shadow.offsetX + 60);
         clockShadowOffsetYSeekBar.setProgress((int) ClockConfig.shadow.offsetY + 60);
         clockLockSwitch.setChecked(ClockConfig.touchPassthrough);
-        activity.applySwitchTint(clockLockSwitch, ClockConfig.touchPassthrough);
+        activity.applyCheckboxTint(clockLockSwitch, ClockConfig.touchPassthrough);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
         clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bgPadding);
         clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bgOffsetX);
@@ -128,14 +128,14 @@ public class ClockPanelController {
         clockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
                 clockSwitch.setChecked(false);
-                activity.applySwitchTint(clockSwitch, false);
+                activity.applyCheckboxTint(clockSwitch, false);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putBoolean("clock_enabled", false).apply();
                 return;
             }
 
             ClockConfig.enabled = isChecked;
-            activity.applySwitchTint(clockSwitch, isChecked);
+            activity.applyCheckboxTint(clockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_enabled", isChecked).apply();
 
@@ -177,7 +177,7 @@ public class ClockPanelController {
 
         clockBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ClockConfig.bgEnabled = isChecked;
-            activity.applySwitchTint(clockBgSwitch, isChecked);
+            activity.applyCheckboxTint(clockBgSwitch, isChecked);
             clockBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_bg_enabled", isChecked).apply();
@@ -258,7 +258,7 @@ public class ClockPanelController {
 
         clockShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ClockConfig.shadow.enabled = isChecked;
-            activity.applySwitchTint(clockShadowSwitch, isChecked);
+            activity.applyCheckboxTint(clockShadowSwitch, isChecked);
             clockShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_shadow_enabled", isChecked).apply();
@@ -315,7 +315,7 @@ public class ClockPanelController {
 
         clockLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             ClockConfig.touchPassthrough = isChecked;
-            activity.applySwitchTint(clockLockSwitch, isChecked);
+            activity.applyCheckboxTint(clockLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_lock", isChecked).apply();
             FloatingService.updateClockTouchFlagsStatic();

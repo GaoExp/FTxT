@@ -43,44 +43,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- Overlay + Kunci Posisi -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
 
-                    <Switch
+                    <CheckBox
                         android:id="@+id/overlaySwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Overlay"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
+                    <CheckBox
                         android:id="@+id/touchPassthroughSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Kunci Posisi"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                 </LinearLayout>
 
@@ -114,208 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/bgSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Background"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bgConfigText"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/bgColorButton"
-                        android:text="Warna Background"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/bgPaddingLabel"
-                        android:text="Ukuran Background: 25"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/bgPaddingSeekBar"
-                        android:max="80"
-                        android:progress="25"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/bgOffsetXLabel"
-                        android:text="Offset X: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/bgOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/bgOffsetYLabel"
-                        android:text="Offset Y: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/bgOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/bgMarginLabel"
-                        android:text="Margin: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/bgMarginSeekBar"
-                        android:max="30"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/bgRadiusLabel"
-                        android:text="Radius: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/bgRadiusSeekBar"
-                        android:max="50"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/shadowSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Shadow"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/shadowConfigText"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/shadowColorButton"
-                        android:text="Warna Shadow"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/shadowBlurLabel"
-                        android:text="Blur Shadow: 5"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/shadowBlurSeekBar"
-                        android:max="50"
-                        android:progress="5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/shadowOffsetXLabel"
-                        android:text="Shadow X: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/shadowOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/shadowOffsetYLabel"
-                        android:text="Shadow Y: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/shadowOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
+                <!-- Kontrol Posisi -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="16dp"
@@ -463,98 +244,207 @@
 
                 </LinearLayout>
 
-                <!-- Quick Grid Preset -->
-                <TextView
-                    android:text="Grid Posisi"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_marginTop="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
+                    <TextView
+                        android:id="@+id/presetIndicator"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="12sp"
+                        android:textColor="#AAAAAA"
+                        android:gravity="center_vertical"
+                        android:padding="4dp"/>
+
+                    <Button
+                        android:id="@+id/btnExportImport"
+                        android:text="E/I"
+                        android:singleLine="true"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
+                <!-- Shadow -->
+                <CheckBox
+                    android:id="@+id/shadowSwitch"
+                    android:text="Shadow"
                     android:layout_marginTop="8dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/textAutoPresetSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Auto Preset Aplikasi"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
+                    android:layout_height="wrap_content"/>
 
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
+                    android:id="@+id/shadowConfigText"
+                    android:orientation="vertical"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <Button
-                        android:id="@+id/btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
+                        android:id="@+id/shadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/shadowBlurLabel"
+                        android:text="Blur Shadow: 5"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/shadowOffsetXLabel"
+                        android:text="Shadow X: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/shadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/shadowOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Background -->
+                <CheckBox
+                    android:id="@+id/bgSwitch"
+                    android:text="Background"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/bgConfigText"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <Button
-                        android:id="@+id/btnLandscape"
-                        android:text="Lanskap"
-                        android:layout_width="0dp"
+                        android:id="@+id/bgColorButton"
+                        android:text="Warna Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/bgPaddingLabel"
+                        android:text="Ukuran Background: 25"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/bgPaddingSeekBar"
+                        android:max="80"
+                        android:progress="25"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/bgOffsetXLabel"
+                        android:text="Offset X: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/bgOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/bgOffsetYLabel"
+                        android:text="Offset Y: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/bgOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/bgMarginLabel"
+                        android:text="Margin: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/bgMarginSeekBar"
+                        android:max="30"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/bgRadiusLabel"
+                        android:text="Radius: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/bgRadiusSeekBar"
+                        android:max="50"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
@@ -592,38 +482,19 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
 
-                    <Switch
+                    <CheckBox
                         android:id="@+id/fpsSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="FPS Overlay"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
+                    <CheckBox
                         android:id="@+id/fpsLockSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Kunci Posisi"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                 </LinearLayout>
 
@@ -656,208 +527,6 @@
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/fpsBgSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Background"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bgConfigFps"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/fpsBgColorButton"
-                        android:text="Warna Background"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsBgPaddingLabel"
-                        android:text="Ukuran Background: 10"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsBgPaddingSeekBar"
-                        android:max="80"
-                        android:progress="10"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsBgOffsetXLabel"
-                        android:text="Offset X: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsBgOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsBgOffsetYLabel"
-                        android:text="Offset Y: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsBgOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsBgMarginLabel"
-                        android:text="Margin: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsBgMarginSeekBar"
-                        android:max="30"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsBgRadiusLabel"
-                        android:text="Radius: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsBgRadiusSeekBar"
-                        android:max="50"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/fpsShadowSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Shadow"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/shadowConfigFps"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/fpsShadowColorButton"
-                        android:text="Warna Shadow"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsShadowBlurLabel"
-                        android:text="Blur Shadow: 5"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsShadowBlurSeekBar"
-                        android:max="50"
-                        android:progress="5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsShadowOffsetXLabel"
-                        android:text="Shadow X: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsShadowOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/fpsShadowOffsetYLabel"
-                        android:text="Shadow Y: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/fpsShadowOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
 
                 <!-- FPS Position Controls -->
                 <LinearLayout
@@ -1007,74 +676,31 @@
 
                 </LinearLayout>
 
-                <!-- FPS Quick Grid Preset -->
-                <TextView
-                    android:text="Grid Posisi"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_marginTop="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/fps_btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/fps_btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/fps_btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/fps_btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/fpsAutoPresetSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
                     <TextView
-                        android:text="Auto Preset Aplikasi"
-                        android:layout_marginStart="8dp"
+                        android:id="@+id/fps_presetIndicator"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="12sp"
+                        android:textColor="#AAAAAA"
+                        android:gravity="center_vertical"
+                        android:padding="4dp"/>
+
+                    <Button
+                        android:id="@+id/fps_btnExportImport"
+                        android:text="E/I"
+                        android:singleLine="true"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
@@ -1099,6 +725,180 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/fpsShadowSwitch"
+                    android:text="Shadow"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/shadowConfigFps"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/fpsShadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsShadowBlurLabel"
+                        android:text="Blur Shadow: 5"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsShadowOffsetXLabel"
+                        android:text="Shadow X: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsShadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsShadowOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/fpsBgSwitch"
+                    android:text="Background"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/bgConfigFps"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/fpsBgColorButton"
+                        android:text="Warna Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsBgPaddingLabel"
+                        android:text="Ukuran Background: 10"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsBgPaddingSeekBar"
+                        android:max="80"
+                        android:progress="10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsBgOffsetXLabel"
+                        android:text="Offset X: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsBgOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsBgOffsetYLabel"
+                        android:text="Offset Y: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsBgOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsBgMarginLabel"
+                        android:text="Margin: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsBgMarginSeekBar"
+                        android:max="30"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/fpsBgRadiusLabel"
+                        android:text="Radius: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/fpsBgRadiusSeekBar"
+                        android:max="50"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
@@ -1130,47 +930,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- Jam + Kunci Posisi -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
 
-                    <Switch
+                    <CheckBox
                         android:id="@+id/clockSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Jam Digital"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
+                    <CheckBox
                         android:id="@+id/clockLockSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Kunci Posisi"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                 </LinearLayout>
 
+                <!-- Ukuran Teks -->
                 <TextView
                     android:id="@+id/clockSizeLabel"
                     android:text="Ukuran Teks: 48"
@@ -1187,6 +970,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <!-- Pilih Warna -->
                 <Button
                     android:id="@+id/clockColorButton"
                     android:text="Pilih Warna"
@@ -1194,209 +978,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/clockBgSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Background"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bgConfigClock"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/clockBgColorButton"
-                        android:text="Warna Background"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockBgPaddingLabel"
-                        android:text="Ukuran Background: 10"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockBgPaddingSeekBar"
-                        android:max="80"
-                        android:progress="10"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockBgOffsetXLabel"
-                        android:text="Offset X: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockBgOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockBgOffsetYLabel"
-                        android:text="Offset Y: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockBgOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockBgMarginLabel"
-                        android:text="Margin: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockBgMarginSeekBar"
-                        android:max="30"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockBgRadiusLabel"
-                        android:text="Radius: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockBgRadiusSeekBar"
-                        android:max="50"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/clockShadowSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Shadow"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/shadowConfigClock"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/clockShadowColorButton"
-                        android:text="Warna Shadow"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockShadowBlurLabel"
-                        android:text="Blur Shadow: 5"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockShadowBlurSeekBar"
-                        android:max="50"
-                        android:progress="5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockShadowOffsetXLabel"
-                        android:text="Shadow X: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockShadowOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/clockShadowOffsetYLabel"
-                        android:text="Shadow Y: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/clockShadowOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <!-- Clock Position Controls -->
+                <!-- Kontrol Posisi -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="16dp"
@@ -1544,56 +1126,35 @@
 
                 </LinearLayout>
 
-                <!-- Clock Quick Grid Preset -->
-                <TextView
-                    android:text="Grid Posisi"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_marginTop="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
+                    <TextView
+                        android:id="@+id/clock_presetIndicator"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="12sp"
+                        android:textColor="#AAAAAA"
+                        android:gravity="center_vertical"
+                        android:padding="4dp"/>
+
+                    <Button
+                        android:id="@+id/clock_btnExportImport"
+                        android:text="E/I"
+                        android:singleLine="true"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/clock_btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/clock_btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/clock_btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/clock_btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
+                <!-- Potret/Lanskap -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp"
@@ -1615,6 +1176,182 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <!-- Shadow -->
+                <CheckBox
+                    android:id="@+id/clockShadowSwitch"
+                    android:text="Shadow"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/shadowConfigClock"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/clockShadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockShadowBlurLabel"
+                        android:text="Blur Shadow: 5"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockShadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockShadowOffsetXLabel"
+                        android:text="Shadow X: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockShadowOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockShadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockShadowOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Background -->
+                <CheckBox
+                    android:id="@+id/clockBgSwitch"
+                    android:text="Background"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/bgConfigClock"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/clockBgColorButton"
+                        android:text="Warna Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockBgPaddingLabel"
+                        android:text="Ukuran Background: 10"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockBgPaddingSeekBar"
+                        android:max="80"
+                        android:progress="10"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockBgOffsetXLabel"
+                        android:text="Offset X: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockBgOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockBgOffsetYLabel"
+                        android:text="Offset Y: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockBgOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockBgMarginLabel"
+                        android:text="Margin: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockBgMarginSeekBar"
+                        android:max="30"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/clockBgRadiusLabel"
+                        android:text="Radius: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/clockBgRadiusSeekBar"
+                        android:max="50"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
@@ -1646,44 +1383,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <!-- Baterai + Kunci Posisi -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
 
-                    <Switch
+                    <CheckBox
                         android:id="@+id/batterySwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Suhu Baterai"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
+                    <CheckBox
                         android:id="@+id/batteryLockSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
                         android:text="Kunci Posisi"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                 </LinearLayout>
 
@@ -1716,208 +1435,6 @@
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/batteryBgSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Background"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/bgConfigBattery"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/batteryBgColorButton"
-                        android:text="Warna Background"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryBgPaddingLabel"
-                        android:text="Ukuran Background: 8"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryBgPaddingSeekBar"
-                        android:max="80"
-                        android:progress="8"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryBgOffsetXLabel"
-                        android:text="Offset X: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryBgOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryBgOffsetYLabel"
-                        android:text="Offset Y: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryBgOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryBgMarginLabel"
-                        android:text="Margin: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryBgMarginSeekBar"
-                        android:max="30"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryBgRadiusLabel"
-                        android:text="Radius: 0"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryBgRadiusSeekBar"
-                        android:max="50"
-                        android:progress="0"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <Switch
-                        android:id="@+id/batteryShadowSwitch"
-                        android:showText="false"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:text="Shadow"
-                        android:layout_marginStart="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/shadowConfigBattery"
-                    android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/batteryShadowColorButton"
-                        android:text="Warna Shadow"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryShadowBlurLabel"
-                        android:text="Blur Shadow: 5"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryShadowBlurSeekBar"
-                        android:max="50"
-                        android:progress="5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryShadowOffsetXLabel"
-                        android:text="Shadow X: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryShadowOffsetXSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batteryShadowOffsetYLabel"
-                        android:text="Shadow Y: 3"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <SeekBar
-                        android:id="@+id/batteryShadowOffsetYSeekBar"
-                        android:max="120"
-                        android:progress="60"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
 
                 <!-- Battery Position Controls -->
                 <LinearLayout
@@ -2067,56 +1584,35 @@
 
                 </LinearLayout>
 
-                <!-- Battery Quick Grid Preset -->
-                <TextView
-                    android:text="Grid Posisi"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
                     android:layout_marginTop="4dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
+                    <TextView
+                        android:id="@+id/battery_presetIndicator"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textSize="12sp"
+                        android:textColor="#AAAAAA"
+                        android:gravity="center_vertical"
+                        android:padding="4dp"/>
+
+                    <Button
+                        android:id="@+id/battery_btnExportImport"
+                        android:text="E/I"
+                        android:singleLine="true"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/battery_btnPosTL" android:text="TL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosTC" android:text="TC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosTR" android:text="TR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/battery_btnPosML" android:text="ML" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosC"  android:text="C"  android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosMR" android:text="MR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button android:id="@+id/battery_btnPosBL" android:text="BL" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosBC" android:text="BC" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                        <Button android:id="@+id/battery_btnPosBR" android:text="BR" android:layout_width="32dp" android:layout_height="32dp" android:layout_margin="2dp" android:textSize="10sp"/>
-                    </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
+                <!-- Potret/Lanskap -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp"
@@ -2138,6 +1634,182 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <!-- Shadow -->
+                <CheckBox
+                    android:id="@+id/batteryShadowSwitch"
+                    android:text="Shadow"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/shadowConfigBattery"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/batteryShadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryShadowBlurLabel"
+                        android:text="Blur Shadow: 5"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryShadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryShadowOffsetXLabel"
+                        android:text="Shadow X: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryShadowOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryShadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryShadowOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Background -->
+                <CheckBox
+                    android:id="@+id/batteryBgSwitch"
+                    android:text="Background"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/bgConfigBattery"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/batteryBgColorButton"
+                        android:text="Warna Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryBgPaddingLabel"
+                        android:text="Ukuran Background: 8"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryBgPaddingSeekBar"
+                        android:max="80"
+                        android:progress="8"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryBgOffsetXLabel"
+                        android:text="Offset X: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryBgOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryBgOffsetYLabel"
+                        android:text="Offset Y: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryBgOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryBgMarginLabel"
+                        android:text="Margin: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryBgMarginSeekBar"
+                        android:max="30"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batteryBgRadiusLabel"
+                        android:text="Radius: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batteryBgRadiusSeekBar"
+                        android:max="50"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 

@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
@@ -25,15 +25,15 @@ public class TextPanelController {
     private EditText editText;
     private SeekBar seekBar;
     private Button colorButton;
-    private Switch overlaySwitch;
-    private Switch touchPassthroughSwitch;
-    private Switch shadowSwitch;
+    private CheckBox overlaySwitch;
+    private CheckBox touchPassthroughSwitch;
+    private CheckBox shadowSwitch;
     private LinearLayout shadowConfigContainer;
     private Button shadowColorButton;
     private SeekBar shadowBlurSeekBar;
     private SeekBar shadowOffsetXSeekBar;
     private SeekBar shadowOffsetYSeekBar;
-    private Switch bgSwitch;
+    private CheckBox bgSwitch;
     private LinearLayout bgConfigContainer;
     private Button bgColorButton;
     private SeekBar bgPaddingSeekBar;
@@ -171,13 +171,13 @@ public class TextPanelController {
         overlaySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
                 overlaySwitch.setChecked(false);
-                activity.applySwitchTint(overlaySwitch, false);
+                activity.applyCheckboxTint(overlaySwitch, false);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putBoolean("text_overlay_on", false).apply();
                 return;
             }
 
-            activity.applySwitchTint(overlaySwitch, isChecked);
+            activity.applyCheckboxTint(overlaySwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_overlay_on", isChecked).apply();
 
@@ -203,7 +203,7 @@ public class TextPanelController {
         });
 
         touchPassthroughSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            activity.applySwitchTint(touchPassthroughSwitch, isChecked);
+            activity.applyCheckboxTint(touchPassthroughSwitch, isChecked);
             TextConfig.touchPassthrough = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_lock", isChecked).apply();
@@ -211,7 +211,7 @@ public class TextPanelController {
         });
 
         bgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            activity.applySwitchTint(bgSwitch, isChecked);
+            activity.applyCheckboxTint(bgSwitch, isChecked);
             TextConfig.bgEnabled = isChecked;
             bgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -292,7 +292,7 @@ public class TextPanelController {
         });
 
         shadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            activity.applySwitchTint(shadowSwitch, isChecked);
+            activity.applyCheckboxTint(shadowSwitch, isChecked);
             TextConfig.shadow.enabled = isChecked;
             shadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -369,10 +369,10 @@ public class TextPanelController {
     }
 
     private void applyInitialTints() {
-        activity.applySwitchTint(overlaySwitch, overlaySwitch.isChecked());
-        activity.applySwitchTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
-        activity.applySwitchTint(bgSwitch, bgSwitch.isChecked());
-        activity.applySwitchTint(shadowSwitch, shadowSwitch.isChecked());
+        activity.applyCheckboxTint(overlaySwitch, overlaySwitch.isChecked());
+        activity.applyCheckboxTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
+        activity.applyCheckboxTint(bgSwitch, bgSwitch.isChecked());
+        activity.applyCheckboxTint(shadowSwitch, shadowSwitch.isChecked());
     }
 
     private void saveShadowPrefs() {

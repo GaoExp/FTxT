@@ -182,7 +182,18 @@ public class FpsModule {
             params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     this::savePosition,
-                    onPositionUpdate));
+                    () -> {
+                        if (params != null) {
+                            DisplayMetrics metrics = new DisplayMetrics();
+                            wm.getDefaultDisplay().getRealMetrics(metrics);
+                            screenWidth = metrics.widthPixels;
+                            screenHeight = metrics.heightPixels;
+                            if (params.y < posCalibrationY) posCalibrationY = params.y;
+                            FpsConfig.posX = (float) params.x / screenWidth;
+                            FpsConfig.posY = (float)(params.y - posCalibrationY) / screenHeight;
+                        }
+                        if (onPositionUpdate != null) onPositionUpdate.run();
+                    }));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
