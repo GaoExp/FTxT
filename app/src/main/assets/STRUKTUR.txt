@@ -33,6 +33,9 @@ FTxT/
 │   │   │   │   ├── clock/
 │   │   │   │   │   ├── ClockConfig.java
 │   │   │   │   │   └── ClockModule.java
+│   │   │   │   ├── network/
+│   │   │   │   │   ├── NetworkConfig.java
+│   │   │   │   │   └── NetworkModule.java
 │   │   │   │   ├── crosshair/   (empty)
 │   │   │   │   ├── cpu/         (empty)
 │   │   │   │   ├── logo/        (empty)
@@ -64,7 +67,9 @@ FTxT/
 │   │   │   │   ├── ClockPanelController.java
 │   │   │   │   ├── ClockPositionController.java
 │   │   │   │   ├── BatteryPanelController.java
-│   │   │   │   └── BatteryPositionController.java
+│   │   │   │   ├── BatteryPositionController.java
+│   │   │   │   ├── NetworkPanelController.java
+│   │   │   │   └── NetworkPositionController.java
 │   │   │   │
 │   │   │   ├── utils/
 │   │   │   │   └── PermissionHelper.java
@@ -139,6 +144,8 @@ FTxT/
 | features/clock/ClockModule.java | Module logic jam digital (update tiap 1 detik) |
 | features/battery/BatteryConfig.java | Konfigurasi suhu baterai overlay |
 | features/battery/BatteryModule.java | Module logic suhu baterai (update tiap 5 detik) |
+| features/network/NetworkConfig.java | Konfigurasi network speed meter overlay |
+| features/network/NetworkModule.java | Module logic network speed (TrafficStats, polling 1 detik) |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
@@ -162,6 +169,8 @@ FTxT/
 | ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | ui/BatteryPanelController.java | Controller panel Suhu Baterai |
 | ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
+| ui/NetworkPanelController.java | Controller panel Network Speed |
+| ui/NetworkPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |
 | activity_main.xml | Layout utama |

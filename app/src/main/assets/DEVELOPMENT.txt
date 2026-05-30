@@ -43,7 +43,7 @@ Color Change → updateTextColorStatic()
 Text Change  → updateTextStatic()
 Size Change  → updateTextSizeStatic()
 Touch Mode   → updateTouchFlagsStatic()
-Background   → updateTextBackgroundStatic() / updateFpsBackgroundStatic()
+Background   → updateTextBackgroundStatic() / updateFpsBackgroundStatic() / updateNetworkBackgroundStatic()
 Shadow       → updateShadowStatic()
 ```
 

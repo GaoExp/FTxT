@@ -61,7 +61,12 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 ## 10. Orientasi Posisi
 Gunakan tombol [Potret] dan [Lanskap] di bawah kontrol posisi untuk mengatur posisi overlay secara terpisah untuk mode potret dan lanskap. Posisi masing-masing mode disimpan dan dipulihkan otomatis saat orientasi perangkat berubah.
 
-## 11. Shadow Config
+## 11. Network Speed Meter
+Aktifkan switch **Network Speed** di sidebar "Network Stats" untuk menampilkan overlay kecepatan internet real-time.
+- Format: `↓128KB/s ↑128KB/s`, otomatis berubah ke MB/s saat >1024 KB/s.
+- Konfigurasi ukuran, warna, shadow, background, dan kunci posisi tersedia.
+
+## 12. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
 - Atur blur radius (0–50 px)

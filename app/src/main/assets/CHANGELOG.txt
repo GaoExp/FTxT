@@ -3,6 +3,27 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.7.2.53.0] - 2026-05-30
+
+### ✨ Fitur Baru
+
+- **Network Speed Meter Overlay** — Memantau kecepatan internet real-time (↓ upload / ↑ download) dengan format otomatis KB/s ↔ MB/s, polling tiap 1 detik via TrafficStats.
+- **Network Speed Position Controls** — Slider X/Y, D-Pad, preset save/load, orientasi Potret/Lanskap untuk Network Speed overlay.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/features/network/NetworkConfig.java` — Konfigurasi network speed meter.
+- `app/src/main/java/exp/ftxt/features/network/NetworkModule.java` — Modul logic polling TrafficStats + format speed.
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Controller panel UI network speed.
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Controller kontrol posisi (slider, d-pad, preset, orientasi).
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 110→112, versionName 2.7.2.51.0→2.7.2.53.0
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah NetworkModule field, init, start/stop, 8 delegate static methods + setNetworkOrientationSuffixStatic + getNetworkCurrentPosition.
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Integrasi panel network: field, init, nav handler, show/hide, lifecycle.
+- `app/src/main/res/layout/activity_main.xml` — Tambah panel network lengkap (CheckBox switch + lock, SeekBar size, Button color, position controls, Shadow config, Background config).
+
 ## [2.7.2.51.0] - 2026-05-30
 
 ### ♻️ Perubahan Fitur
@@ -10,10 +31,18 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - **Tombol preset jadi satu baris**: Simpan, Muat, dan E/I dalam satu baris horizontal. Reset dihapus.
 - **Ubah teks button**: "Simpan Preset" → "Simpan", "Muat Preset" → "Muat".
 
+### 🔧 Optimasi & Penyesuaian
+
+- **Warna sidebar ikut tema terang/gelap**: Drawer background dan header tidak lagi hardcoded. Pakai `@color/drawer_background` dan `@color/drawer_header_background` dengan variant `values-night/colors.xml` untuk mode gelap.
+
 ### ✏️ File Changed
 
 - `app/build.gradle` — versionCode 109→110, versionName 2.7.2.50.0→2.7.2.51.0
 - `app/src/main/res/layout/activity_main.xml` — restruktur preset buttons di 4 panel
+- `app/src/main/res/values/colors.xml` — tambah `drawer_background`, `drawer_header_background`, `drawer_header_text`
+- `app/src/main/res/values-night/colors.xml` — FILE BARU, warna drawer untuk mode gelap
+- `app/src/main/res/layout/drawer_content.xml` — `#FFFFFF` → `@color/drawer_background`
+- `app/src/main/res/layout/nav_header.xml` — `#222222` → `@color/drawer_header_background`, `#FFFFFF` → `@color/drawer_header_text`
 
 ---
 

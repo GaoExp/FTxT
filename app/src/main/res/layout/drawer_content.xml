@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="280dp"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/drawer_background"
     android:layout_gravity="start">
 
     <include layout="@layout/nav_header"/>

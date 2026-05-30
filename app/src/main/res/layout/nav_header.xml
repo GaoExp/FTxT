@@ -5,14 +5,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#222222"
+    android:background="@color/drawer_header_background"
     android:padding="16dp">
 
     <TextView
         android:id="@+id/navHeaderTitle"
         android:text="FTxT"
         android:textSize="20sp"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/drawer_header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

@@ -14,6 +14,8 @@ import exp.ftxt.features.clock.ClockConfig;
 import exp.ftxt.features.clock.ClockModule;
 import exp.ftxt.features.fps.FpsConfig;
 import exp.ftxt.features.fps.FpsModule;
+import exp.ftxt.features.network.NetworkConfig;
+import exp.ftxt.features.network.NetworkModule;
 import exp.ftxt.features.text.TextConfig;
 import exp.ftxt.features.text.TextModule;
 
@@ -43,6 +45,7 @@ public class FloatingService extends Service {
     private FpsModule fpsModule;
     private ClockModule clockModule;
     private BatteryModule batteryModule;
+    private NetworkModule networkModule;
 
     @Override
     public void onCreate() {
@@ -55,6 +58,7 @@ public class FloatingService extends Service {
         fpsModule = new FpsModule();
         clockModule = new ClockModule();
         batteryModule = new BatteryModule();
+        networkModule = new NetworkModule();
 
         // Notification channel + foreground service
         // Lihat: NotificationHelper → core/NotificationHelper.java
@@ -80,6 +84,11 @@ public class FloatingService extends Service {
             // Start Battery jika diaktifkan
             if (BatteryConfig.enabled) {
                 batteryModule.start(windowManager, this);
+            }
+
+            // Start Network jika diaktifkan
+            if (NetworkConfig.enabled) {
+                networkModule.start(windowManager, this);
             }
 
             // Buat text overlay jika sebelumnya aktif
@@ -312,6 +321,69 @@ public class FloatingService extends Service {
         return null;
     }
 
+    // --- Network Module Delegates ---
+
+    public static void startNetworkStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopNetworkStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.stop();
+        }
+    }
+
+    public static void updateNetworkSizeStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateSize(NetworkConfig.size);
+        }
+    }
+
+    public static void updateNetworkColorStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateColor(NetworkConfig.color);
+        }
+    }
+
+    public static void updateNetworkShadowStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateShadow();
+        }
+    }
+
+    public static void updateNetworkBackgroundStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateBackground();
+        }
+    }
+
+    public static void updateNetworkTouchFlagsStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateNetworkPositionStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updatePosition();
+        }
+    }
+
+    public static void setNetworkOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getNetworkCurrentPosition() {
+        if (instance != null && instance.networkModule != null) {
+            return instance.networkModule.getCurrentPosition();
+        }
+        return null;
+    }
+
     // --- Battery Module Delegates ---
 
     public static void startBatteryStatic() {
@@ -381,6 +453,7 @@ public class FloatingService extends Service {
 
         clockModule.stop();
         batteryModule.stop();
+        networkModule.stop();
         fpsModule.stop();
         textModule.savePosition(prefs);
 
