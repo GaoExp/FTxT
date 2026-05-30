@@ -216,7 +216,7 @@
 
                     <Button
                         android:id="@+id/btnSavePreset"
-                        android:text="Simpan Preset"
+                        android:text="Simpan"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -225,7 +225,7 @@
 
                     <Button
                         android:id="@+id/btnLoadPreset"
-                        android:text="Muat Preset"
+                        android:text="Muat"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -234,41 +234,13 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/btnResetPos"
-                        android:text="Reset"
+                        android:id="@+id/btnExportImport"
+                        android:text="E/I"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/presetIndicator"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="#AAAAAA"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"/>
-
-                    <Button
-                        android:id="@+id/btnExportImport"
-                        android:text="E/I"
-                        android:singleLine="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
@@ -648,7 +620,7 @@
 
                     <Button
                         android:id="@+id/fps_btnSavePreset"
-                        android:text="Simpan Preset"
+                        android:text="Simpan"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -657,7 +629,7 @@
 
                     <Button
                         android:id="@+id/fps_btnLoadPreset"
-                        android:text="Muat Preset"
+                        android:text="Muat"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -666,41 +638,13 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/fps_btnResetPos"
-                        android:text="Reset"
+                        android:id="@+id/fps_btnExportImport"
+                        android:text="E/I"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/fps_presetIndicator"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="#AAAAAA"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"/>
-
-                    <Button
-                        android:id="@+id/fps_btnExportImport"
-                        android:text="E/I"
-                        android:singleLine="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
@@ -1098,7 +1042,7 @@
 
                     <Button
                         android:id="@+id/clock_btnSavePreset"
-                        android:text="Simpan Preset"
+                        android:text="Simpan"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -1107,7 +1051,7 @@
 
                     <Button
                         android:id="@+id/clock_btnLoadPreset"
-                        android:text="Muat Preset"
+                        android:text="Muat"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -1116,41 +1060,13 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/clock_btnResetPos"
-                        android:text="Reset"
+                        android:id="@+id/clock_btnExportImport"
+                        android:text="E/I"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/clock_presetIndicator"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="#AAAAAA"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"/>
-
-                    <Button
-                        android:id="@+id/clock_btnExportImport"
-                        android:text="E/I"
-                        android:singleLine="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:textSize="11sp"/>
 
                 </LinearLayout>
 
@@ -1556,7 +1472,7 @@
 
                     <Button
                         android:id="@+id/battery_btnSavePreset"
-                        android:text="Simpan Preset"
+                        android:text="Simpan"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -1565,7 +1481,7 @@
 
                     <Button
                         android:id="@+id/battery_btnLoadPreset"
-                        android:text="Muat Preset"
+                        android:text="Muat"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -1574,8 +1490,8 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/battery_btnResetPos"
-                        android:text="Reset"
+                        android:id="@+id/battery_btnExportImport"
+                        android:text="E/I"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -1584,35 +1500,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="4dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/battery_presetIndicator"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:textColor="#AAAAAA"
-                        android:gravity="center_vertical"
-                        android:padding="4dp"/>
-
-                    <Button
-                        android:id="@+id/battery_btnExportImport"
-                        android:text="E/I"
-                        android:singleLine="true"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="8dp"
-                        android:paddingEnd="8dp"
-                        android:textSize="11sp"/>
-
-                </LinearLayout>
-
-                <!-- Potret/Lanskap -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp"

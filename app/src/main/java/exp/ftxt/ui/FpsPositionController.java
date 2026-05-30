@@ -30,7 +30,6 @@ public class FpsPositionController {
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private TextView presetIndicator;
     private View btnExportImport;
     private int displayWidth, displayHeight;
 
@@ -57,18 +56,6 @@ public class FpsPositionController {
         FpsModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
-        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
-            @Override
-            public void onPresetLoaded(int idx) {
-                String name = presetManager.getPresetName(idx);
-                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
-            }
-
-            @Override
-            public void onPresetChanged() {
-                updatePresetIndicator();
-            }
-        });
         if (btnExportImport != null) {
             btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
         }
@@ -91,7 +78,6 @@ public class FpsPositionController {
         btnPortrait = activity.findViewById(R.id.fps_btnPortrait);
         btnLandscape = activity.findViewById(R.id.fps_btnLandscape);
         coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
-        presetIndicator = activity.findViewById(R.id.fps_presetIndicator);
         btnExportImport = activity.findViewById(R.id.fps_btnExportImport);
     }
 
@@ -102,15 +88,11 @@ public class FpsPositionController {
 
         View btnSavePreset = activity.findViewById(R.id.fps_btnSavePreset);
         View btnLoadPreset = activity.findViewById(R.id.fps_btnLoadPreset);
-        View btnResetPos = activity.findViewById(R.id.fps_btnResetPos);
         if (btnSavePreset != null) {
             btnSavePreset.setOnClickListener(v -> presetManager.showSavePresetDialog(FpsConfig.posX, FpsConfig.posY));
         }
         if (btnLoadPreset != null) {
             btnLoadPreset.setOnClickListener(v -> presetManager.showLoadPresetDialog());
-        }
-        if (btnResetPos != null) {
-            btnResetPos.setOnClickListener(v -> resetPosition());
         }
 
         btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
@@ -128,10 +110,6 @@ public class FpsPositionController {
         syncAll();
         savePositionToPrefs(currentOrientation);
         FloatingService.updateFpsPositionStatic();
-    }
-
-    private void resetPosition() {
-        onPositionChanged(0.5f, 0.5f);
     }
 
     private void setOrientationMode(String mode) {
@@ -196,13 +174,4 @@ public class FpsPositionController {
         coordDisplay.setText(px + "X" + py);
     }
 
-    private void updatePresetIndicator() {
-        if (presetIndicator == null) return;
-        String name = presetManager.getActivePresetName();
-        if (name != null) {
-            presetIndicator.setText("Preset: " + name);
-        } else {
-            presetIndicator.setText("");
-        }
-    }
 }

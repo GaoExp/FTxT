@@ -29,7 +29,6 @@ public class TextPositionController {
     private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private TextView presetIndicator;
     private View btnExportImport;
     private int displayWidth, displayHeight;
 
@@ -56,18 +55,6 @@ public class TextPositionController {
         TextModule.onPositionUpdate = this::syncAll;
 
         presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
-        presetManager.setOnPresetLoadedListener(new PositionPresetManager.OnPresetLoadedListener() {
-            @Override
-            public void onPresetLoaded(int idx) {
-                String name = presetManager.getPresetName(idx);
-                if (presetIndicator != null) presetIndicator.setText("Preset: " + name);
-            }
-
-            @Override
-            public void onPresetChanged() {
-                updatePresetIndicator();
-            }
-        });
         if (btnExportImport != null) {
             btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
         }
@@ -88,7 +75,6 @@ public class TextPositionController {
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
         coordDisplay = activity.findViewById(R.id.posCoordDisplay);
-        presetIndicator = activity.findViewById(R.id.presetIndicator);
         btnExportImport = activity.findViewById(R.id.btnExportImport);
     }
 
@@ -99,15 +85,11 @@ public class TextPositionController {
 
         View btnSavePreset = activity.findViewById(R.id.btnSavePreset);
         View btnLoadPreset = activity.findViewById(R.id.btnLoadPreset);
-        View btnResetPos = activity.findViewById(R.id.btnResetPos);
         if (btnSavePreset != null) {
             btnSavePreset.setOnClickListener(v -> presetManager.showSavePresetDialog(TextConfig.posX, TextConfig.posY));
         }
         if (btnLoadPreset != null) {
             btnLoadPreset.setOnClickListener(v -> presetManager.showLoadPresetDialog());
-        }
-        if (btnResetPos != null) {
-            btnResetPos.setOnClickListener(v -> resetPosition());
         }
     }
 
@@ -121,10 +103,6 @@ public class TextPositionController {
         syncAll();
         savePositionToPrefs(currentOrientation);
         FloatingService.updateTextPositionStatic();
-    }
-
-    private void resetPosition() {
-        onPositionChanged(0.5f, 0.5f);
     }
 
     // ====================================================================
@@ -189,13 +167,4 @@ public class TextPositionController {
         coordDisplay.setText(px + "X" + py);
     }
 
-    private void updatePresetIndicator() {
-        if (presetIndicator == null) return;
-        String name = presetManager.getActivePresetName();
-        if (name != null) {
-            presetIndicator.setText("Preset: " + name);
-        } else {
-            presetIndicator.setText("");
-        }
-    }
 }

@@ -3,6 +3,20 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.7.2.51.0] - 2026-05-30
+
+### ♻️ Perubahan Fitur
+
+- **Tombol preset jadi satu baris**: Simpan, Muat, dan E/I dalam satu baris horizontal. Reset dihapus.
+- **Ubah teks button**: "Simpan Preset" → "Simpan", "Muat Preset" → "Muat".
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 109→110, versionName 2.7.2.50.0→2.7.2.51.0
+- `app/src/main/res/layout/activity_main.xml` — restruktur preset buttons di 4 panel
+
+---
+
 ## [2.7.2.50.0] - 2026-05-30
 
 ### ♻️ Perubahan Fitur
