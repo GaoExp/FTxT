@@ -1,4 +1,4 @@
-package exp.ftxt.features.text;
+package exp.ftxt.features.floating_text;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,7 +23,7 @@ import exp.ftxt.shared.ui.ShadowTextView;
  *
  * Dipanggil oleh:
  * - FloatingService → core/FloatingService.java (static delegates)
- * - TextConfig      → features/text/TextConfig.java (konfigurasi statis)
+ * - TextConfig      → features/floating_text/TextConfig.java (konfigurasi statis)
  */
 public class TextModule {
 

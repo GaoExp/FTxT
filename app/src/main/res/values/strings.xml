@@ -7,7 +7,7 @@
     <string name="nav_floating_text">Floating Text</string>
     <string name="nav_fps">FPS Display</string>
     <string name="nav_network">Network Stats</string>
-    <string name="nav_battery">Battery Monitor</string>
+    <string name="nav_battery">Battery Temperature</string>
     <string name="nav_clock">Clock Module</string>
     <string name="nav_cpu">CPU Monitor</string>
     <string name="nav_crosshair">Crosshair</string>

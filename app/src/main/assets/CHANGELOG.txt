@@ -3,6 +3,55 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.9.2.57.1] - 2026-05-31
+
+### ♻️ Perubahan Fitur
+
+- **"Battery Monitor" → "Battery Temperature"**: Nama tampilan modul baterai diubah dari "Battery Monitor" menjadi "Battery Temperature" di navigasi drawer, toolbar, dan label modul.
+- **Restrukturisasi folder features**: Semua folder fitur di `features/` diubah namanya agar sesuai dengan label yang ditampilkan di aplikasi:
+  - `features/battery/` → `features/battery_temperature/`
+  - `features/clock/` → `features/clock_module/`
+  - `features/cpu/` → `features/cpu_monitor/`
+  - `features/fps/` → `features/fps_display/`
+  - `features/logo/` → `features/logo_display/`
+  - `features/network/` → `features/network_stats/`
+  - `features/text/` → `features/floating_text/`
+  - `features/crosshair/` — tetap
+  - `features/watermark/` — tetap
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 115→116, versionName 2.9.2.57.0→2.9.2.57.1
+- `app/src/main/res/values/strings.xml` — nav_battery: "Battery Monitor"→"Battery Temperature"
+- `app/src/main/res/layout/drawer_content.xml` — Label navigasi "Battery Monitor"→"Battery Temperature"
+- `app/src/main/java/exp/ftxt/MainActivity.java` — JSON nav entry battery & imports update
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Imports & komentar path fitur
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Imports update
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Imports update
+- `app/src/main/java/exp/ftxt/shared/preset/PresetExampleActivity.java` — Imports update
+- `app/src/main/java/exp/ftxt/features/battery/BatteryConfig.java` — Package + pindah ke features/battery_temperature/
+- `app/src/main/java/exp/ftxt/features/battery/BatteryModule.java` — Package + pindah ke features/battery_temperature/
+- `app/src/main/java/exp/ftxt/features/clock/ClockConfig.java` — Package + pindah ke features/clock_module/
+- `app/src/main/java/exp/ftxt/features/clock/ClockModule.java` — Package + pindah ke features/clock_module/
+- `app/src/main/java/exp/ftxt/features/fps/FpsConfig.java` — Package + pindah ke features/fps_display/
+- `app/src/main/java/exp/ftxt/features/fps/FpsModule.java` — Package + pindah ke features/fps_display/
+- `app/src/main/java/exp/ftxt/features/network/NetworkConfig.java` — Package + pindah ke features/network_stats/
+- `app/src/main/java/exp/ftxt/features/network/NetworkModule.java` — Package + pindah ke features/network_stats/
+- `app/src/main/java/exp/ftxt/features/text/TextConfig.java` — Package + pindah ke features/floating_text/
+- `app/src/main/java/exp/ftxt/features/text/TextModule.java` — Package + pindah ke features/floating_text/
+- `app/src/main/java/exp/ftxt/features/cpu/` — Pindah ke features/cpu_monitor/
+- `app/src/main/java/exp/ftxt/features/logo/` — Pindah ke features/logo_display/
+
+---
+
 ## [2.9.2.57.0] - 2026-05-31
 
 ### ♻️ Perubahan Fitur

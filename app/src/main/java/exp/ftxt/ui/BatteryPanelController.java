@@ -12,7 +12,7 @@ import android.widget.TextView;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.battery.BatteryConfig;
+import exp.ftxt.features.battery_temperature.BatteryConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.utils.PermissionHelper;
 
@@ -157,8 +157,8 @@ public class BatteryPanelController {
                 }
             } else {
                 FloatingService.stopBatteryStatic();
-                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps.FpsConfig.enabled
-                        && !exp.ftxt.features.clock.ClockConfig.enabled) {
+                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
+                        && !exp.ftxt.features.clock_module.ClockConfig.enabled) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }

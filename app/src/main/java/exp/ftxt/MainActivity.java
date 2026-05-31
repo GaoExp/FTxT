@@ -33,11 +33,11 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.battery.BatteryConfig;
-import exp.ftxt.features.clock.ClockConfig;
-import exp.ftxt.features.fps.FpsConfig;
-import exp.ftxt.features.network.NetworkConfig;
-import exp.ftxt.features.text.TextConfig;
+import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.fps_display.FpsConfig;
+import exp.ftxt.features.network_stats.NetworkConfig;
+import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.ui.BatteryPanelController;
 import exp.ftxt.ui.ClockPanelController;
 import exp.ftxt.ui.FpsPanelController;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         "[{\"id\":\"navFloatingText\",\"l\":\"Floating Text\"}," +
         "{\"id\":\"navFps\",\"l\":\"FPS Display\"}," +
         "{\"id\":\"navNetwork\",\"l\":\"Network Stats\"}," +
-        "{\"id\":\"navBattery\",\"l\":\"Battery Monitor\"}," +
+        "{\"id\":\"navBattery\",\"l\":\"Battery Temperature\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
         "{\"id\":\"navCrosshair\",\"l\":\"Crosshair\"}," +
         "{\"id\":\"navWatermark\",\"l\":\"Watermark\"}," +

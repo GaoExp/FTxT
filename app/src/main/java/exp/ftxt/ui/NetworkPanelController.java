@@ -11,7 +11,7 @@ import android.widget.TextView;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.network.NetworkConfig;
+import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.utils.PermissionHelper;
 
@@ -153,9 +153,9 @@ public class NetworkPanelController {
                 }
             } else {
                 FloatingService.stopNetworkStatic();
-                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps.FpsConfig.enabled
-                        && !exp.ftxt.features.clock.ClockConfig.enabled
-                        && !exp.ftxt.features.battery.BatteryConfig.enabled) {
+                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
+                        && !exp.ftxt.features.clock_module.ClockConfig.enabled
+                        && !exp.ftxt.features.battery_temperature.BatteryConfig.enabled) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }

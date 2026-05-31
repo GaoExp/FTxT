@@ -16,8 +16,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.text.TextConfig;
-import exp.ftxt.features.text.TextModule;
+import exp.ftxt.features.floating_text.TextConfig;
+import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;

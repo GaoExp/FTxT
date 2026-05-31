@@ -1,4 +1,4 @@
-package exp.ftxt.features.fps;
+package exp.ftxt.features.fps_display;
 
 import android.content.Context;
 import android.content.SharedPreferences;

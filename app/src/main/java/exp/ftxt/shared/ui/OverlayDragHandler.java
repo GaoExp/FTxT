@@ -10,8 +10,8 @@ import android.view.WindowManager;
  * Menggantikan touchListener duplikat di TextModule dan FpsModule.
  *
  * Dipakai oleh:
- * - TextModule  → features/text/TextModule.java (touchListener field)
- * - FpsModule   → features/fps/FpsModule.java (touchListener field)
+ * - TextModule  → features/floating_text/TextModule.java (touchListener field)
+ * - FpsModule   → features/fps_display/FpsModule.java (touchListener field)
  *
  * Cara pakai:
  *   view.setOnTouchListener(new OverlayDragHandler(params, wm, () -> savePosition()));

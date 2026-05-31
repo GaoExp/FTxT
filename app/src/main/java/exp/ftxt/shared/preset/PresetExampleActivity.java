@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.text.TextConfig;
+import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.shared.ui.ShadowConfig;
 
 /**

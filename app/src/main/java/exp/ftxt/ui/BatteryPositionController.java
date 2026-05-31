@@ -16,8 +16,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.battery.BatteryConfig;
-import exp.ftxt.features.battery.BatteryModule;
+import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.battery_temperature.BatteryModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;

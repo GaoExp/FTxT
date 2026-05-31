@@ -1,18 +1,21 @@
-package exp.ftxt.features.network;
+package exp.ftxt.features.clock_module;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.view.WindowManager;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-public class NetworkModule {
+public class ClockModule {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -20,10 +23,6 @@ public class NetworkModule {
     private Context context;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
-
-    private long lastRxBytes;
-    private long lastTxBytes;
-    private long lastTimestamp;
 
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
@@ -38,15 +37,10 @@ public class NetworkModule {
         context = ctx;
 
         view = new ShadowTextView(ctx);
-        view.setShadowConfig(NetworkConfig.shadow);
-
-        lastRxBytes = TrafficStats.getTotalRxBytes();
-        lastTxBytes = TrafficStats.getTotalTxBytes();
-        lastTimestamp = System.currentTimeMillis();
-
-        view.setText(formatSpeed(0, 0));
-        view.setTextSize(NetworkConfig.size);
-        view.setTextColor(NetworkConfig.color);
+        view.setShadowConfig(ClockConfig.shadow);
+        view.setText(getCurrentTime());
+        view.setTextSize(ClockConfig.size);
+        view.setTextColor(ClockConfig.color);
         applyBackground();
 
         params = new WindowManager.LayoutParams(
@@ -60,10 +54,10 @@ public class NetworkModule {
         );
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = (int)(NetworkConfig.posX * getScreenWidth());
-        params.y = (int)(NetworkConfig.posY * getScreenHeight());
+        params.x = (int)(ClockConfig.posX * getScreenWidth());
+        params.y = (int)(ClockConfig.posY * getScreenHeight());
 
-        OverlayShadow.apply(view, params, wm, NetworkConfig.shadow, 4f);
+        OverlayShadow.apply(view, params, wm, ClockConfig.shadow, 4f);
         updateTouchFlags();
 
         try {
@@ -92,18 +86,18 @@ public class NetworkModule {
     }
 
     public void updateSize(float size) {
-        NetworkConfig.size = size;
+        ClockConfig.size = size;
         if (view != null) view.setTextSize(size);
     }
 
     public void updateColor(int color) {
-        NetworkConfig.color = color;
+        ClockConfig.color = color;
         if (view != null) view.setTextColor(color);
     }
 
     public void updateShadow() {
-        if (view != null) view.setShadowConfig(NetworkConfig.shadow);
-        OverlayShadow.apply(view, params, wm, NetworkConfig.shadow, 4f);
+        if (view != null) view.setShadowConfig(ClockConfig.shadow);
+        OverlayShadow.apply(view, params, wm, ClockConfig.shadow, 4f);
     }
 
     public void updateBackground() {
@@ -112,8 +106,8 @@ public class NetworkModule {
 
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
-            params.x = (int)(NetworkConfig.posX * getScreenWidth());
-            params.y = (int)(NetworkConfig.posY * getScreenHeight());
+            params.x = (int)(ClockConfig.posX * getScreenWidth());
+            params.y = (int)(ClockConfig.posY * getScreenHeight());
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -132,10 +126,26 @@ public class NetworkModule {
         return null;
     }
 
+    private void applyBackground() {
+        if (view == null) return;
+        if (ClockConfig.bgEnabled) {
+            int pad = ClockConfig.bgPadding;
+            view.setPadding(pad, pad, pad, pad);
+        } else {
+            view.setPadding(0, 0, 0, 0);
+        }
+        view.setBgEnabled(ClockConfig.bgEnabled);
+        view.setBgColor(ClockConfig.bgColor);
+        view.setBgOffsetX(ClockConfig.bgOffsetX);
+        view.setBgOffsetY(ClockConfig.bgOffsetY);
+        view.setBgMargin(ClockConfig.bgMargin);
+        view.setBgRadius(ClockConfig.bgRadius);
+    }
+
     public void updateTouchFlags() {
         if (params == null || view == null || wm == null) return;
 
-        if (NetworkConfig.touchPassthrough) {
+        if (ClockConfig.touchPassthrough) {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(null);
         } else {
@@ -144,30 +154,14 @@ public class NetworkModule {
                     null,
                     () -> {
                         if (params != null) {
-                            NetworkConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
-                            NetworkConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
+                            ClockConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
+                            ClockConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
                         }
                         if (onPositionUpdate != null) onPositionUpdate.run();
                     }));
         }
 
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
-    }
-
-    private void applyBackground() {
-        if (view == null) return;
-        if (NetworkConfig.bgEnabled) {
-            int pad = NetworkConfig.bgPadding;
-            view.setPadding(pad, pad, pad, pad);
-        } else {
-            view.setPadding(0, 0, 0, 0);
-        }
-        view.setBgEnabled(NetworkConfig.bgEnabled);
-        view.setBgColor(NetworkConfig.bgColor);
-        view.setBgOffsetX(NetworkConfig.bgOffsetX);
-        view.setBgOffsetY(NetworkConfig.bgOffsetY);
-        view.setBgMargin(NetworkConfig.bgMargin);
-        view.setBgRadius(NetworkConfig.bgRadius);
     }
 
     private int getScreenWidth() {
@@ -186,33 +180,14 @@ public class NetworkModule {
         @Override
         public void run() {
             if (!running) return;
-            long now = System.currentTimeMillis();
-            long rxBytes = TrafficStats.getTotalRxBytes();
-            long txBytes = TrafficStats.getTotalTxBytes();
-
-            long elapsed = now - lastTimestamp;
-            if (elapsed > 0 && view != null) {
-                long rxSpeed = ((rxBytes - lastRxBytes) * 1000) / elapsed;
-                long txSpeed = ((txBytes - lastTxBytes) * 1000) / elapsed;
-                view.setText(formatSpeed(rxSpeed, txSpeed));
+            if (view != null) {
+                view.setText(getCurrentTime());
             }
-
-            lastRxBytes = rxBytes;
-            lastTxBytes = txBytes;
-            lastTimestamp = now;
-
             handler.postDelayed(this, 1000);
         }
     };
 
-    private String formatSpeed(long rxBytesPerSec, long txBytesPerSec) {
-        return "↓" + formatUnit(rxBytesPerSec) + " ↑" + formatUnit(txBytesPerSec);
-    }
-
-    private String formatUnit(long bytesPerSec) {
-        if (bytesPerSec >= 1048576) {
-            return String.format(java.util.Locale.US, "%.2fMB/s", bytesPerSec / 1048576.0);
-        }
-        return (bytesPerSec / 1024) + "KB/s";
+    private String getCurrentTime() {
+        return new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 }

@@ -1,4 +1,4 @@
-package exp.ftxt.features.battery;
+package exp.ftxt.features.battery_temperature;
 
 import android.content.Context;
 import android.content.Intent;

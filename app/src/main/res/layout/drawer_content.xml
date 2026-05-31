@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/navBattery"
-                android:text="Battery Monitor"
+                android:text="Battery Temperature"
                 android:textSize="16sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"

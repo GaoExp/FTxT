@@ -26,25 +26,25 @@ FTxT/
 │   │   │   │   └── WakeLockManager.java
 │   │   │   │
 │   │   │   ├── features/
-│   │   │   │   ├── text/
-│   │   │   │   │   ├── TextConfig.java
-│   │   │   │   │   └── TextModule.java
-│   │   │   │   ├── fps/
-│   │   │   │   │   ├── FpsConfig.java
-│   │   │   │   │   └── FpsModule.java
-│   │   │   │   ├── battery/
-│   │   │   │   │   ├── BatteryConfig.java
-│   │   │   │   │   └── BatteryModule.java
-│   │   │   │   ├── clock/
-│   │   │   │   │   ├── ClockConfig.java
-│   │   │   │   │   └── ClockModule.java
-│   │   │   │   ├── network/
-│   │   │   │   │   ├── NetworkConfig.java
-│   │   │   │   │   └── NetworkModule.java
-│   │   │   │   ├── crosshair/   (empty)
-│   │   │   │   ├── cpu/         (empty)
-│   │   │   │   ├── logo/        (empty)
-│   │   │   │   └── watermark/   (empty)
+│   │   │   │       ├── floating_text/
+│   │   │   │       │   ├── TextConfig.java
+│   │   │   │       │   └── TextModule.java
+│   │   │   │       ├── fps_display/
+│   │   │   │       │   ├── FpsConfig.java
+│   │   │   │       │   └── FpsModule.java
+│   │   │   │       ├── battery_temperature/
+│   │   │   │       │   ├── BatteryConfig.java
+│   │   │   │       │   └── BatteryModule.java
+│   │   │   │       ├── clock_module/
+│   │   │   │       │   ├── ClockConfig.java
+│   │   │   │       │   └── ClockModule.java
+│   │   │   │       ├── network_stats/
+│   │   │   │       │   ├── NetworkConfig.java
+│   │   │   │       │   └── NetworkModule.java
+│   │   │   │       ├── crosshair/   (empty)
+│   │   │   │       ├── cpu_monitor/ (empty)
+│   │   │   │       ├── logo_display/ (empty)
+│   │   │   │       └── watermark/   (empty)
 │   │   │   │
 │   │   │   ├── shared/
 │   │   │   │   ├── color/
@@ -162,16 +162,16 @@ FTxT/
 | core/FloatingService.java | Overlay service, touch handling, persistence |
 | core/NotificationHelper.java | Helper channel & notifikasi foreground |
 | core/WakeLockManager.java | Manajemen partial wake lock |
-| features/text/TextConfig.java | Konfigurasi teks overlay |
-| features/text/TextModule.java | Module logic teks overlay |
-| features/fps/FpsConfig.java | Konfigurasi FPS overlay |
-| features/fps/FpsModule.java | Module logic FPS overlay |
-| features/clock/ClockConfig.java | Konfigurasi jam digital overlay |
-| features/clock/ClockModule.java | Module logic jam digital (update tiap 1 detik) |
-| features/battery/BatteryConfig.java | Konfigurasi suhu baterai overlay |
-| features/battery/BatteryModule.java | Module logic suhu baterai (update tiap 5 detik) |
-| features/network/NetworkConfig.java | Konfigurasi network speed meter overlay |
-| features/network/NetworkModule.java | Module logic network speed (TrafficStats, polling 1 detik) |
+| features/floating_text/TextConfig.java | Konfigurasi teks overlay |
+| features/floating_text/TextModule.java | Module logic teks overlay |
+| features/fps_display/FpsConfig.java | Konfigurasi FPS overlay |
+| features/fps_display/FpsModule.java | Module logic FPS overlay |
+| features/clock_module/ClockConfig.java | Konfigurasi jam digital overlay |
+| features/clock_module/ClockModule.java | Module logic jam digital (update tiap 1 detik) |
+| features/battery_temperature/BatteryConfig.java | Konfigurasi suhu baterai overlay |
+| features/battery_temperature/BatteryModule.java | Module logic suhu baterai (update tiap 5 detik) |
+| features/network_stats/NetworkConfig.java | Konfigurasi network speed meter overlay |
+| features/network_stats/NetworkModule.java | Module logic network speed (TrafficStats, polling 1 detik) |
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
