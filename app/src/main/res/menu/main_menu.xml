@@ -9,6 +9,12 @@
         app:showAsAction="always"/>
 
     <item
+        android:id="@+id/action_orientation"
+        android:icon="@drawable/ic_screen_rotation"
+        android:title="Orientasi Layar"
+        app:showAsAction="always"/>
+
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/ic_settings"
         android:title="Pengaturan"

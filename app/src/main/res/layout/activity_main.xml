@@ -234,31 +234,6 @@
 
                 </LinearLayout>
 
-                <!-- Potret/Lanskap -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/btnLandscape"
-                        android:text="Lanskap"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
                 <!-- Shadow -->
                 <CheckBox
                     android:id="@+id/shadowSwitch"
@@ -653,30 +628,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/fps_btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/fps_btnLandscape"
-                        android:text="Lanskap"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
                 <CheckBox
                     android:id="@+id/fpsShadowSwitch"
                     android:text="Shadow"
@@ -1058,31 +1009,6 @@
                         android:id="@+id/clock_btnExportImport"
                         android:text="E/I"
                         android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
-                <!-- Potret/Lanskap -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/clock_btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/clock_btnLandscape"
-                        android:text="Lanskap"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -1485,30 +1411,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/battery_btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/battery_btnLandscape"
-                        android:text="Lanskap"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
                 <!-- Shadow -->
                 <CheckBox
                     android:id="@+id/batteryShadowSwitch"
@@ -1890,30 +1792,6 @@
                         android:id="@+id/network_btnExportImport"
                         android:text="E/I"
                         android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/network_btnPortrait"
-                        android:text="Potret"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/network_btnLandscape"
-                        android:text="Lanskap"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

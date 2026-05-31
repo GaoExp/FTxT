@@ -30,7 +30,6 @@ public class FpsPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -81,8 +80,6 @@ public class FpsPositionController {
         btnDown = activity.findViewById(R.id.fps_btnDown);
         btnLeft = activity.findViewById(R.id.fps_btnLeft);
         btnRight = activity.findViewById(R.id.fps_btnRight);
-        btnPortrait = activity.findViewById(R.id.fps_btnPortrait);
-        btnLandscape = activity.findViewById(R.id.fps_btnLandscape);
         coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.fps_btnExportImport);
     }
@@ -97,9 +94,6 @@ public class FpsPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
     }
 
     private void showSavePresetDialog() {
@@ -224,20 +218,6 @@ public class FpsPositionController {
         FloatingService.updateFpsPositionStatic();
     }
 
-    private void setOrientationMode(String mode) {
-        if (mode.equals(currentOrientation)) return;
-
-        savePositionToPrefs(currentOrientation);
-
-        currentOrientation = mode;
-        FloatingService.setFpsOrientationSuffixStatic(mode);
-        loadPositionFromPrefs(mode);
-
-        syncAll();
-        FloatingService.updateFpsPositionStatic();
-        updateOrientationButtons();
-    }
-
     private void savePositionToPrefs(String orient) {
         String sfx = "_" + orient;
         prefs.edit()
@@ -250,11 +230,6 @@ public class FpsPositionController {
         String sfx = "_" + orient;
         FpsConfig.posX = prefs.getFloat("fps_pos_x" + sfx, 0.5f);
         FpsConfig.posY = prefs.getFloat("fps_pos_y" + sfx, 0.5f);
-    }
-
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     public void cleanup() {

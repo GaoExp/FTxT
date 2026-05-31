@@ -111,6 +111,7 @@ FTxT/
 │   │   │   │   ├── ic_edit.xml
 │   │   │   │   ├── ic_launcher_background.xml
 │   │   │   │   ├── ic_launcher_foreground.png
+│   │   │   │   ├── ic_screen_rotation.xml
 │   │   │   │   ├── ic_settings.xml
 │   │   │   │   ├── ic_sun.xml
 │   │   │   │   ├── ic_theme.xml

@@ -30,7 +30,6 @@ public class BatteryPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -81,8 +80,6 @@ public class BatteryPositionController {
         btnDown = activity.findViewById(R.id.battery_btnDown);
         btnLeft = activity.findViewById(R.id.battery_btnLeft);
         btnRight = activity.findViewById(R.id.battery_btnRight);
-        btnPortrait = activity.findViewById(R.id.battery_btnPortrait);
-        btnLandscape = activity.findViewById(R.id.battery_btnLandscape);
         coordDisplay = activity.findViewById(R.id.battery_posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.battery_btnExportImport);
     }
@@ -97,9 +94,6 @@ public class BatteryPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
     }
 
     private void showSavePresetDialog() {
@@ -224,20 +218,6 @@ public class BatteryPositionController {
         FloatingService.updateBatteryPositionStatic();
     }
 
-    private void setOrientationMode(String mode) {
-        if (mode.equals(currentOrientation)) return;
-
-        savePositionToPrefs(currentOrientation);
-
-        currentOrientation = mode;
-        FloatingService.setBatteryOrientationSuffixStatic(mode);
-        loadPositionFromPrefs(mode);
-
-        syncAll();
-        FloatingService.updateBatteryPositionStatic();
-        updateOrientationButtons();
-    }
-
     private void savePositionToPrefs(String orient) {
         String sfx = "_" + orient;
         prefs.edit()
@@ -250,11 +230,6 @@ public class BatteryPositionController {
         String sfx = "_" + orient;
         BatteryConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.5f);
         BatteryConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.5f);
-    }
-
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     public void cleanup() {

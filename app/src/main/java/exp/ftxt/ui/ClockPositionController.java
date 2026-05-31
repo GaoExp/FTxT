@@ -30,7 +30,6 @@ public class ClockPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -81,8 +80,6 @@ public class ClockPositionController {
         btnDown = activity.findViewById(R.id.clock_btnDown);
         btnLeft = activity.findViewById(R.id.clock_btnLeft);
         btnRight = activity.findViewById(R.id.clock_btnRight);
-        btnPortrait = activity.findViewById(R.id.clock_btnPortrait);
-        btnLandscape = activity.findViewById(R.id.clock_btnLandscape);
         coordDisplay = activity.findViewById(R.id.clock_posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.clock_btnExportImport);
     }
@@ -97,9 +94,6 @@ public class ClockPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
     }
 
     private void showSavePresetDialog() {
@@ -224,20 +218,6 @@ public class ClockPositionController {
         FloatingService.updateClockPositionStatic();
     }
 
-    private void setOrientationMode(String mode) {
-        if (mode.equals(currentOrientation)) return;
-
-        savePositionToPrefs(currentOrientation);
-
-        currentOrientation = mode;
-        FloatingService.setClockOrientationSuffixStatic(mode);
-        loadPositionFromPrefs(mode);
-
-        syncAll();
-        FloatingService.updateClockPositionStatic();
-        updateOrientationButtons();
-    }
-
     private void savePositionToPrefs(String orient) {
         String sfx = "_" + orient;
         prefs.edit()
@@ -250,11 +230,6 @@ public class ClockPositionController {
         String sfx = "_" + orient;
         ClockConfig.posX = prefs.getFloat("clock_pos_x" + sfx, 0.5f);
         ClockConfig.posY = prefs.getFloat("clock_pos_y" + sfx, 0.5f);
-    }
-
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     public void cleanup() {

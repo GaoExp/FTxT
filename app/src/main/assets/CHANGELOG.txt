@@ -3,6 +3,34 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.9.2.57.0] - 2026-05-31
+
+### ♻️ Perubahan Fitur
+
+- **Tombol Potret/Lanskap dipindah ke toolbar**: Tombol orientasi Potret dan Lanskap dihapus dari panel kontrol posisi (Text, FPS, Clock, Battery, Network) dan digantikan dengan ikon orientasi layar di toolbar samping ikon tema. Ketuk ikon untuk toggle orientasi layar antara potret dan lanskap.
+
+### 🚮️ Fitur Dihapus
+
+- **Tombol Potret/Lanskap per panel**: Button `btnPortrait`/`btnLandscape` dihapus dari kelima panel overlay.
+
+### 🗒️ File Added
+
+- `app/src/main/res/drawable/ic_screen_rotation.xml` — Ikon orientasi layar untuk toolbar.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 114→115, versionName 2.8.2.56.0→2.9.2.57.0
+- `app/src/main/res/menu/main_menu.xml` — Tambah item `action_orientation` dengan ikon screen rotation
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Handler `action_orientation` toggle orientation via `setRequestedOrientation()`
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Hapus btnPortrait/btnLandscape
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Hapus btnPortrait/btnLandscape
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Hapus btnPortrait/btnLandscape
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Hapus btnPortrait/btnLandscape
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Hapus btnPortrait/btnLandscape
+- `app/src/main/res/layout/activity_main.xml` — Hapus blok Potret/Lanskap dari 5 panel
+
+---
+
 ## [2.8.2.56.0] - 2026-05-31
 
 ### ✨ Fitur Baru

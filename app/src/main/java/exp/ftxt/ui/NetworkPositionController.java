@@ -30,7 +30,6 @@ public class NetworkPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -81,8 +80,6 @@ public class NetworkPositionController {
         btnDown = activity.findViewById(R.id.network_btnDown);
         btnLeft = activity.findViewById(R.id.network_btnLeft);
         btnRight = activity.findViewById(R.id.network_btnRight);
-        btnPortrait = activity.findViewById(R.id.network_btnPortrait);
-        btnLandscape = activity.findViewById(R.id.network_btnLandscape);
         coordDisplay = activity.findViewById(R.id.network_posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.network_btnExportImport);
     }
@@ -97,9 +94,6 @@ public class NetworkPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
     }
 
     private void showSavePresetDialog() {
@@ -224,20 +218,6 @@ public class NetworkPositionController {
         FloatingService.updateNetworkPositionStatic();
     }
 
-    private void setOrientationMode(String mode) {
-        if (mode.equals(currentOrientation)) return;
-
-        savePositionToPrefs(currentOrientation);
-
-        currentOrientation = mode;
-        FloatingService.setNetworkOrientationSuffixStatic(mode);
-        loadPositionFromPrefs(mode);
-
-        syncAll();
-        FloatingService.updateNetworkPositionStatic();
-        updateOrientationButtons();
-    }
-
     private void savePositionToPrefs(String orient) {
         String sfx = "_" + orient;
         prefs.edit()
@@ -250,11 +230,6 @@ public class NetworkPositionController {
         String sfx = "_" + orient;
         NetworkConfig.posX = prefs.getFloat("network_pos_x" + sfx, 0.5f);
         NetworkConfig.posY = prefs.getFloat("network_pos_y" + sfx, 0.5f);
-    }
-
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     public void cleanup() {

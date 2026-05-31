@@ -30,7 +30,6 @@ public class TextPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
-    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -81,8 +80,6 @@ public class TextPositionController {
         btnDown = activity.findViewById(R.id.btnDown);
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
-        btnPortrait = activity.findViewById(R.id.btnPortrait);
-        btnLandscape = activity.findViewById(R.id.btnLandscape);
         coordDisplay = activity.findViewById(R.id.posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.btnExportImport);
     }
@@ -97,9 +94,6 @@ public class TextPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
-        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
-        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
-        updateOrientationButtons();
     }
 
     private void showSavePresetDialog() {
@@ -222,29 +216,6 @@ public class TextPositionController {
         syncAll();
         savePositionToPrefs(currentOrientation);
         FloatingService.updateTextPositionStatic();
-    }
-
-    // ====================================================================
-    // Orientation mode — Potret / Lanskap
-    // ====================================================================
-
-    private void setOrientationMode(String mode) {
-        if (mode.equals(currentOrientation)) return;
-
-        savePositionToPrefs(currentOrientation);
-
-        currentOrientation = mode;
-        FloatingService.setTextOrientationSuffixStatic(mode);
-        loadPositionFromPrefs(mode);
-
-        syncAll();
-        FloatingService.updateTextPositionStatic();
-        updateOrientationButtons();
-    }
-
-    private void updateOrientationButtons() {
-        btnPortrait.setSelected("port".equals(currentOrientation));
-        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     private void savePositionToPrefs(String orient) {

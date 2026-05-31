@@ -40,6 +40,7 @@ Overlay hilang, konfigurasi tetap tersimpan.
 ## 7. Toolbar Icons
 Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
+- Orientasi Layar ↔ → Toggle orientasi layar Potret/Lanskap
 - Bulan 🌙 → Toggle tema gelap/terang
 
 Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.33.0") di samping nama aplikasi di navigation drawer header.
@@ -65,15 +66,15 @@ Setiap panel overlay memiliki tombol:
 - **Muat** — Menampilkan daftar preset tersimpan. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
 - **E/I** (Ekspor/Impor) — Ekspor preset ke clipboard sebagai JSON, atau impor dari clipboard.
 
-## 11. Orientasi Posisi
-Gunakan tombol [Potret] dan [Lanskap] di bawah kontrol posisi untuk mengatur posisi overlay secara terpisah untuk mode potret dan lanskap. Posisi masing-masing mode disimpan dan dipulihkan otomatis saat orientasi perangkat berubah.
+## 11. Orientasi Layar
+Ketuk ikon orientasi layar ↔ di toolbar untuk toggle orientasi antara Potret dan Lanskap. Posisi overlay disimpan terpisah per orientasi dan dipulihkan otomatis.
 
-## 11. Network Speed Meter
+## 12. Network Speed Meter
 Aktifkan switch **Network Speed** di sidebar "Network Stats" untuk menampilkan overlay kecepatan internet real-time.
 - Format: `↓128KB/s ↑128KB/s`, otomatis berubah ke MB/s saat >1024 KB/s.
 - Konfigurasi ukuran, warna, shadow, background, dan kunci posisi tersedia.
 
-## 12. Shadow Config
+## 13. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
 - Atur blur radius (0–50 px)

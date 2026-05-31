@@ -3,6 +3,7 @@ package exp.ftxt;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.util.TypedValue;
@@ -10,6 +11,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.DragEvent;
 import android.view.Gravity;
+import android.content.res.Configuration;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -219,6 +221,16 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_settings) {
             showSettingsPopup();
+            return true;
+        }
+
+        if (id == R.id.action_orientation) {
+            int current = getResources().getConfiguration().orientation;
+            if (current == Configuration.ORIENTATION_LANDSCAPE) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
             return true;
         }
 
