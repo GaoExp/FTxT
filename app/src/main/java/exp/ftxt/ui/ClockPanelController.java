@@ -56,6 +56,12 @@ public class ClockPanelController {
         }
     }
 
+    public void showLoadPresetDialog() {
+        if (clockPositionController != null) {
+            clockPositionController.showLoadPresetDialog();
+        }
+    }
+
     public void cleanup() {
         if (clockPositionController != null) {
             clockPositionController.cleanup();

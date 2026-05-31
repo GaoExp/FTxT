@@ -8,11 +8,16 @@ FTxT/
 ├── STRUKTUR.md
 ├── _karantina/
 │   └── exp/ftxt/shared/ui/
-│       └── XyPadView.java
+│       ├── XyPadView.java
+│       └── PositionPresetManager.java
 ├── PANDUAN.md
 ├── DEVELOPMENT.md
 ├── TENTANG.md
+├── settings.gradle
+├── gradle.properties
 ├── app/
+│   ├── proguard-rules.pro
+│   ├── libs/
 │   ├── src/main/
 │   │   ├── java/exp/ftxt/
 │   │   │   ├── core/
@@ -46,13 +51,17 @@ FTxT/
 │   │   │   │   │   ├── ColorMath.java
 │   │   │   │   │   ├── ColorNameResolver.java
 │   │   │   │   │   └── HSVColorPickerView.java
+│   │   │   │   ├── preset/
+│   │   │   │   │   ├── OverlayPreset.java
+│   │   │   │   │   ├── PresetManager.java
+│   │   │   │   │   └── PresetExampleActivity.java
 │   │   │   │   └── ui/
 │   │   │   │       ├── AppPresetWatcher.java
 │   │   │   │       ├── ColorPickerDialog.java
 │   │   │   │       ├── DpadController.java
 │   │   │   │       ├── OverlayDragHandler.java
 │   │   │   │       ├── OverlayShadow.java
-│   │   │   │       ├── PositionPresetManager.java
+
 │   │   │   │       ├── PresetPreviewView.java
 │   │   │   │       ├── ShadowConfig.java
 │   │   │   │       ├── ShadowTextView.java
@@ -116,10 +125,26 @@ FTxT/
 │   │   │   │   ├── strings.xml
 │   │   │   │   ├── styles.xml
 │   │   │   │   └── themes.xml
+│   │   │   ├── values-night/
+│   │   │   │   └── colors.xml
 │   │   │   └── values-v31/
 │   │   │       └── themes.xml
 │   │   │
 │   │   └── AndroidManifest.xml
+│   │
+│   ├── src/test/
+│   │   └── java/exp/
+│   │       ├── ftxt/
+│   │       │   └── ExampleUnitTest.java
+│   │       └── ftxy/
+│   │           └── ExampleUnitTest.java
+│   │
+│   ├── src/androidTest/
+│   │   └── java/exp/
+│   │       ├── ftxt/
+│   │       │   └── ExampleInstrumentedTest.java
+│   │       └── ftxy/
+│   │           └── ExampleInstrumentedTest.java
 │   │
 │   └── build.gradle
 │
@@ -149,12 +174,15 @@ FTxT/
 | shared/color/HSVColorPickerView.java | Custom HSV circular picker |
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
+| shared/preset/OverlayPreset.java | Model data preset overlay (posisi, warna, shadow, background, orientasi) |
+| shared/preset/PresetManager.java | Manager preset CRUD: Save/Load/Rename/Select/Delete/Export/Import via GSON |
+| shared/preset/PresetExampleActivity.java | Contoh implementasi OnClickListener preset di MainActivity |
 | shared/ui/AppPresetWatcher.java | Auto-switch preset berdasarkan orientasi |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper color picker (ARGB) |
 | shared/ui/DpadController.java | Shared D-Pad controller dengan touch repeat |
 | shared/ui/OverlayDragHandler.java | Shared drag-to-move touch listener |
 | shared/ui/OverlayShadow.java | Shared shadow bg + elevation |
-| shared/ui/PositionPresetManager.java | Shared manager simpan/load/hapus preset posisi |
+| _karantina/exp/ftxt/shared/ui/PositionPresetManager.java | Manager preset posisi X/Y lama — dipindah ke _karantina, digantikan oleh PresetManager GSON |
 | shared/ui/PresetPreviewView.java | Custom View mini-map posisi preset |
 | shared/ui/ShadowConfig.java | Konfigurasi shadow modular |
 | shared/ui/ShadowTextView.java | Custom TextView dengan text shadow di onDraw() |
@@ -162,15 +190,11 @@ FTxT/
 | shared/ui/SliderPositionController.java | Shared controller slider X/Y posisi |
 | _karantina/exp/ftxt/shared/ui/XyPadView.java | Custom View 2D drag area — DIKARANTINA |
 | ui/TextPanelController.java | Controller panel Floating Text |
-| ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
-| ui/FpsPanelController.java | Controller panel FPS Display |
-| ui/FpsPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) FPS |
-| ui/ClockPanelController.java | Controller panel Jam Digital |
-| ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
-| ui/BatteryPanelController.java | Controller panel Suhu Baterai |
-| ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
-| ui/NetworkPanelController.java | Controller panel Network Speed |
-| ui/NetworkPositionController.java | Controller kontrol posisi (slider, d-pad, preset, orientasi) |
+| ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
+| ui/FpsPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) FPS |
+| ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
+| ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
+| ui/NetworkPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |
 | activity_main.xml | Layout utama |

@@ -66,6 +66,13 @@ text_pos_y_land   → Posisi Y mode landscape
 shadow_enabled
 ```
 
+### Preset System (GSON)
+Preset full-konfigurasi disimpan sebagai file JSON di `context.getFilesDir()/presets/<nama>.json`.
+
+Setiap preset mencakup seluruh field `OverlayPreset`: posisi X/Y, ukuran teks, warna (ARGB int), shadow (warna, blur, offset X/Y), background (enabled, warna, padding, offset X/Y, margin, radius), dan orientasi.
+
+Manager: `PresetManager` (static methods) — Save, Load, Rename, Delete, DeleteAll, Export (clipboard/file), Import (clipboard/file), ListAll.
+
 ---
 
 ## 🔢 Versioning

@@ -58,7 +58,14 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 - Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
 - Klik label untuk edit nilai manual via dialog input
 
-## 10. Orientasi Posisi
+## 10. Preset Full-Konfigurasi (Simpan/Muat)
+
+Setiap panel overlay memiliki tombol:
+- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi) ke dalam preset GSON.
+- **Muat** — Menampilkan daftar preset tersimpan. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
+- **E/I** (Ekspor/Impor) — Ekspor preset ke clipboard sebagai JSON, atau impor dari clipboard.
+
+## 11. Orientasi Posisi
 Gunakan tombol [Potret] dan [Lanskap] di bawah kontrol posisi untuk mengatur posisi overlay secara terpisah untuk mode potret dan lanskap. Posisi masing-masing mode disimpan dan dipulihkan otomatis saat orientasi perangkat berubah.
 
 ## 11. Network Speed Meter

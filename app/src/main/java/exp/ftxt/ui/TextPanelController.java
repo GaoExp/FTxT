@@ -61,6 +61,12 @@ public class TextPanelController {
         }
     }
 
+    public void showLoadPresetDialog() {
+        if (positionController != null) {
+            positionController.showLoadPresetDialog();
+        }
+    }
+
     public void cleanup() {
         if (positionController != null) {
             positionController.cleanup();

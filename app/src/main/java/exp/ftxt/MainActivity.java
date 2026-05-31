@@ -316,12 +316,25 @@ public class MainActivity extends AppCompatActivity {
     private void showSettingsPopup() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);
+        popup.getMenu().add("Muat Preset");
         popup.getMenu().add("Konfigurasi");
         popup.getMenu().add("Lihat Dokumentasi");
         popup.getMenu().add("Tutup Aplikasi");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
-            if (title.equals("Konfigurasi")) {
+            if (title.equals("Muat Preset")) {
+                if (panelFps.getVisibility() == View.VISIBLE) {
+                    fpsPanel.showLoadPresetDialog();
+                } else if (panelClock.getVisibility() == View.VISIBLE) {
+                    clockPanel.showLoadPresetDialog();
+                } else if (panelBattery.getVisibility() == View.VISIBLE) {
+                    batteryPanel.showLoadPresetDialog();
+                } else if (panelNetwork.getVisibility() == View.VISIBLE) {
+                    networkPanel.showLoadPresetDialog();
+                } else {
+                    textPanel.showLoadPresetDialog();
+                }
+            } else if (title.equals("Konfigurasi")) {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (title.equals("Lihat Dokumentasi")) {
                 startActivity(new Intent(this, DocumentationActivity.class));

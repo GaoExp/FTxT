@@ -7,14 +7,21 @@ import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.text.TextConfig;
 import exp.ftxt.features.text.TextModule;
+import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
-import exp.ftxt.shared.ui.PositionPresetManager;
+import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
 public class TextPositionController {
@@ -23,16 +30,17 @@ public class TextPositionController {
     private final SharedPreferences prefs;
 
     private View btnUp, btnDown, btnLeft, btnRight;
+    private View btnPortrait, btnLandscape;
     private String currentOrientation;
 
     private DpadController dpad;
-    private PositionPresetManager presetManager;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
     private View btnExportImport;
     private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
+    private String activePresetName;
 
     public TextPositionController(Activity activity) {
         this.activity = activity;
@@ -54,9 +62,8 @@ public class TextPositionController {
 
         TextModule.onPositionUpdate = this::syncAll;
 
-        presetManager = new PositionPresetManager(activity, (x, y) -> onPositionChanged(x, y));
         if (btnExportImport != null) {
-            btnExportImport.setOnClickListener(v -> presetManager.showExportImportDialog());
+            btnExportImport.setOnClickListener(v -> showExportImportMenu());
         }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.posXSeekBar),
@@ -74,6 +81,8 @@ public class TextPositionController {
         btnDown = activity.findViewById(R.id.btnDown);
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
+        btnPortrait = activity.findViewById(R.id.btnPortrait);
+        btnLandscape = activity.findViewById(R.id.btnLandscape);
         coordDisplay = activity.findViewById(R.id.posCoordDisplay);
         btnExportImport = activity.findViewById(R.id.btnExportImport);
     }
@@ -84,13 +93,123 @@ public class TextPositionController {
         });
 
         View btnSavePreset = activity.findViewById(R.id.btnSavePreset);
-        View btnLoadPreset = activity.findViewById(R.id.btnLoadPreset);
         if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> presetManager.showSavePresetDialog(TextConfig.posX, TextConfig.posY));
+            btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
-        if (btnLoadPreset != null) {
-            btnLoadPreset.setOnClickListener(v -> presetManager.showLoadPresetDialog());
+
+        btnPortrait.setOnClickListener(v -> setOrientationMode("port"));
+        btnLandscape.setOnClickListener(v -> setOrientationMode("land"));
+        updateOrientationButtons();
+    }
+
+    private void showSavePresetDialog() {
+        EditText input = new EditText(activity);
+        input.setHint("Nama preset");
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Simpan Preset")
+                .setMessage("Simpan konfigurasi overlay saat ini sebagai preset?")
+                .setView(input)
+                .setPositiveButton("Simpan", (d, w) -> {
+                    String name = input.getText().toString().trim();
+                    if (name.isEmpty()) {
+                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    OverlayPreset existing = PresetManager.load(activity, name);
+                    if (existing != null) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("Timpa Preset")
+                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
+                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(name))
+                                .setNegativeButton("Batal", null)
+                                .show();
+                    } else {
+                        doSavePreset(name);
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void doSavePreset(String name) {
+        OverlayPreset preset = new OverlayPreset();
+        preset.posX = TextConfig.posX;
+        preset.posY = TextConfig.posY;
+        preset.size = TextConfig.size;
+        preset.color = TextConfig.color;
+        ShadowConfig sc = TextConfig.shadow;
+        preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
+        preset.bgEnabled = TextConfig.bgEnabled;
+        preset.bgColor = TextConfig.bgColor;
+        preset.bgPadding = TextConfig.bgPadding;
+        preset.bgOffsetX = TextConfig.bgOffsetX;
+        preset.bgOffsetY = TextConfig.bgOffsetY;
+        preset.bgMargin = TextConfig.bgMargin;
+        preset.bgRadius = TextConfig.bgRadius;
+        int orientation = activity.getResources().getConfiguration().orientation;
+        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+
+        PresetManager.save(activity, name, preset);
+        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showLoadPresetDialog() {
+        PresetManager.showLoadPresetDialog(activity, activePresetName, name -> {
+            OverlayPreset preset = PresetManager.load(activity, name);
+            if (preset == null) {
+                Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            activePresetName = name;
+            applyPreset(preset);
+            Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void applyPreset(OverlayPreset preset) {
+        TextConfig.posX = preset.posX;
+        TextConfig.posY = preset.posY;
+        TextConfig.size = preset.size;
+        TextConfig.color = preset.color;
+        if (preset.shadow != null) {
+            TextConfig.shadow.enabled = preset.shadow.enabled;
+            TextConfig.shadow.color = preset.shadow.color;
+            TextConfig.shadow.blur = preset.shadow.blur;
+            TextConfig.shadow.offsetX = preset.shadow.offsetX;
+            TextConfig.shadow.offsetY = preset.shadow.offsetY;
         }
+        TextConfig.bgEnabled = preset.bgEnabled;
+        TextConfig.bgColor = preset.bgColor;
+        TextConfig.bgPadding = preset.bgPadding;
+        TextConfig.bgOffsetX = preset.bgOffsetX;
+        TextConfig.bgOffsetY = preset.bgOffsetY;
+        TextConfig.bgMargin = preset.bgMargin;
+        TextConfig.bgRadius = preset.bgRadius;
+
+        savePositionToPrefs(currentOrientation);
+        syncAll();
+        FloatingService.updateTextPositionStatic();
+        FloatingService.updateTextSizeStatic();
+        FloatingService.updateTextColorStatic();
+        FloatingService.updateShadowStatic();
+        FloatingService.updateTextBackgroundStatic();
+    }
+
+    private void showExportImportMenu() {
+        PopupMenu popup = new PopupMenu(activity, btnExportImport);
+        popup.getMenu().add("Ekspor ke Clipboard");
+        popup.getMenu().add("Impor dari Clipboard");
+        popup.setOnMenuItemClickListener(item -> {
+            String title = item.getTitle().toString();
+            if (title.equals("Ekspor ke Clipboard")) {
+                PresetManager.exportToClipboard(activity);
+            } else {
+                PresetManager.importFromClipboard(activity);
+            }
+            return true;
+        });
+        popup.show();
     }
 
     private static float clamp(float val) {
@@ -120,6 +239,12 @@ public class TextPositionController {
 
         syncAll();
         FloatingService.updateTextPositionStatic();
+        updateOrientationButtons();
+    }
+
+    private void updateOrientationButtons() {
+        btnPortrait.setSelected("port".equals(currentOrientation));
+        btnLandscape.setSelected("land".equals(currentOrientation));
     }
 
     private void savePositionToPrefs(String orient) {
@@ -141,7 +266,6 @@ public class TextPositionController {
     public void cleanup() {
         TextModule.onPositionUpdate = null;
         if (dpad != null) dpad.cleanup();
-        if (presetManager != null) presetManager.cleanup();
     }
 
     public void refresh() {

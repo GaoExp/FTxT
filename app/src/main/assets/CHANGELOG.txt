@@ -3,6 +3,49 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [2.8.2.56.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Sistem Preset Full-Konfigurasi (GSON) terintegrasi ke UI** — Tombol Simpan, Muat, dan E/I pada semua 5 panel (Text, FPS, Clock, Battery, Network) sekarang menyimpan/memuat FULL konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi) via PresetManager+OverlayPreset (GSON), bukan hanya posisi X/Y seperti sebelumnya.
+
+### 🚮️ Fitur Dihapus
+
+- **PositionPresetManager** — Sistem preset posisi X/Y lama digantikan total oleh PresetManager berbasis GSON. File dipindahkan ke `_karantina/` untuk referensi jika diperlukan kembali.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 113→114, versionName 2.7.2.54.0→2.8.2.56.0
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Replace PositionPresetManager → PresetManager+OverlayPreset, Simpan/Muat full config via GSON
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Same replacement
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Same replacement
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Same replacement
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Same replacement
+
+### 🔥 File Removed
+
+- `app/src/main/java/exp/ftxt/shared/ui/PositionPresetManager.java` → dipindah ke `_karantina/exp/ftxt/shared/ui/PositionPresetManager.java`
+
+---
+
+## [2.7.2.54.0] - 2026-05-30
+
+### ✨ Fitur Baru
+
+- **Sistem Manajemen Preset Overlay (GSON)** — Sistem preset baru berbasis GSON yang menyimpan seluruh konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi) dalam format JSON. Mendukung Save, Load, Rename, Select, Delete, Export (clipboard/file), dan Import (clipboard/file).
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Model data preset dengan field posisi, ukuran, warna, shadow, background, orientasi.
+- `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Manager static method CRUD: save, load, rename, getAllNames, delete, deleteAll, exportToJson, exportAllToJson, exportToFile, importFromJson, importManyFromJson, importFromFile, showDeleteConfirmDialog, showPresetListDialog, exportToClipboard, importFromClipboard.
+- `app/src/main/java/exp/ftxt/shared/preset/PresetExampleActivity.java` — Contoh implementasi OnClickListener untuk integrasi di MainActivity.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 112→113, versionName 2.7.2.53.0→2.7.2.54.0, tambah dependensi `com.google.code.gson:gson:2.10.1`.
+
+---
+
 ## [2.7.2.53.0] - 2026-05-30
 
 ### ✨ Fitur Baru

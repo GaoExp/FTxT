@@ -224,19 +224,34 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/btnLoadPreset"
-                        android:text="Muat"
+                        android:id="@+id/btnExportImport"
+                        android:text="E/I"
                         android:singleLine="true"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <!-- Potret/Lanskap -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/btnPortrait"
+                        android:text="Potret"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/btnExportImport"
-                        android:text="E/I"
-                        android:singleLine="true"
+                        android:id="@+id/btnLandscape"
+                        android:text="Lanskap"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -625,16 +640,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/fps_btnLoadPreset"
-                        android:text="Muat"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"/>
 
                     <Button
@@ -1047,16 +1052,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/clock_btnLoadPreset"
-                        android:text="Muat"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"/>
 
                     <Button
@@ -1480,16 +1475,6 @@
                         android:layout_marginEnd="4dp"/>
 
                     <Button
-                        android:id="@+id/battery_btnLoadPreset"
-                        android:text="Muat"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
                         android:id="@+id/battery_btnExportImport"
                         android:text="E/I"
                         android:singleLine="true"
@@ -1899,16 +1884,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/network_btnLoadPreset"
-                        android:text="Muat"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"/>
 
                     <Button

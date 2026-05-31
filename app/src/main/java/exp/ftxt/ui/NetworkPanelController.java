@@ -56,6 +56,12 @@ public class NetworkPanelController {
         }
     }
 
+    public void showLoadPresetDialog() {
+        if (networkPositionController != null) {
+            networkPositionController.showLoadPresetDialog();
+        }
+    }
+
     public void cleanup() {
         if (networkPositionController != null) {
             networkPositionController.cleanup();

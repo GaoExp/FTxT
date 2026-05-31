@@ -59,6 +59,12 @@ public class FpsPanelController {
         }
     }
 
+    public void showLoadPresetDialog() {
+        if (fpsPositionController != null) {
+            fpsPositionController.showLoadPresetDialog();
+        }
+    }
+
     public void cleanup() {
         if (fpsPositionController != null) {
             fpsPositionController.cleanup();

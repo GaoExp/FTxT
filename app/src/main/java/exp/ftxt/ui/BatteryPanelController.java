@@ -58,6 +58,12 @@ public class BatteryPanelController {
         }
     }
 
+    public void showLoadPresetDialog() {
+        if (batteryPositionController != null) {
+            batteryPositionController.showLoadPresetDialog();
+        }
+    }
+
     public void cleanup() {
         if (batteryPositionController != null) {
             batteryPositionController.cleanup();
