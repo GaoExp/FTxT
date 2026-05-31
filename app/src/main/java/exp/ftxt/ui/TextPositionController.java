@@ -229,7 +229,7 @@ public class TextPositionController {
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
         TextConfig.posX = prefs.getFloat("text_pos_x" + sfx, 0.5f);
-        TextConfig.posY = prefs.getFloat("text_pos_y" + sfx, 0.5f);
+        TextConfig.posY = prefs.getFloat("text_pos_y" + sfx, 0.8f);
     }
 
     // ====================================================================

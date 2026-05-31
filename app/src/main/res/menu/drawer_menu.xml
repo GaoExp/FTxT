@@ -36,6 +36,14 @@
             android:title="@string/nav_watermark"/>
 
         <item
+            android:id="@+id/nav_battery_percentage"
+            android:title="@string/nav_battery_percentage"/>
+
+        <item
+            android:id="@+id/nav_battery_current"
+            android:title="@string/nav_battery_current"/>
+
+        <item
             android:id="@+id/nav_logo"
             android:title="@string/nav_logo"/>
 

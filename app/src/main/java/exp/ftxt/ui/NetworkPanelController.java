@@ -29,6 +29,7 @@ public class NetworkPanelController {
     private SeekBar networkShadowOffsetXSeekBar;
     private SeekBar networkShadowOffsetYSeekBar;
     private CheckBox networkLockSwitch;
+    private CheckBox networkSafeArea;
     private CheckBox networkBgSwitch;
     private LinearLayout networkBgConfigContainer;
     private Button networkBgColorButton;
@@ -80,6 +81,7 @@ public class NetworkPanelController {
         networkShadowOffsetXSeekBar = activity.findViewById(R.id.networkShadowOffsetXSeekBar);
         networkShadowOffsetYSeekBar = activity.findViewById(R.id.networkShadowOffsetYSeekBar);
         networkLockSwitch = activity.findViewById(R.id.networkLockSwitch);
+        networkSafeArea = activity.findViewById(R.id.networkSafeArea);
         networkBgSwitch = activity.findViewById(R.id.networkBgSwitch);
         networkBgConfigContainer = activity.findViewById(R.id.bgConfigNetwork);
         networkBgColorButton = activity.findViewById(R.id.networkBgColorButton);
@@ -119,6 +121,7 @@ public class NetworkPanelController {
         networkShadowOffsetYSeekBar.setProgress((int) NetworkConfig.shadow.offsetY + 60);
         networkLockSwitch.setChecked(NetworkConfig.touchPassthrough);
         activity.applyCheckboxTint(networkLockSwitch, NetworkConfig.touchPassthrough);
+        networkSafeArea.setChecked(NetworkConfig.safeArea);
         networkSizeLabel.setText("Ukuran Teks: " + (int) NetworkConfig.size);
         networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bgPadding);
         networkBgOffsetXLabel.setText("Offset X: " + NetworkConfig.bgOffsetX);
@@ -326,6 +329,13 @@ public class NetworkPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_lock", isChecked).apply();
             FloatingService.updateNetworkTouchFlagsStatic();
+        });
+
+        networkSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.safeArea = isChecked;
+            activity.applyCheckboxTint(networkSafeArea, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_safe_area", isChecked).apply();
         });
     }
 

@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/navBattery"
-                android:text="Battery Temperature"
+                android:text="Battery Stats"
                 android:textSize="16sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -108,7 +108,7 @@
 
             <TextView
                 android:id="@+id/navCrosshair"
-                android:text="Crosshair"
+                android:text="Crosshair (coming soon)"
                 android:textSize="16sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -122,7 +122,21 @@
 
             <TextView
                 android:id="@+id/navWatermark"
-                android:text="Watermark"
+                android:text="Watermark (coming soon)"
+                android:textSize="16sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/navBatteryCurrent"
+                android:text="Battery Current"
                 android:textSize="16sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
@@ -136,7 +150,17 @@
 
             <TextView
                 android:id="@+id/navLogo"
-                android:text="Logo Display"
+                android:text="Logo Display (coming soon)"
+                android:textSize="16sp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"/>
                 android:textSize="16sp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"

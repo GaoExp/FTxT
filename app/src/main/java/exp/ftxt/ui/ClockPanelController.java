@@ -29,6 +29,7 @@ public class ClockPanelController {
     private SeekBar clockShadowOffsetXSeekBar;
     private SeekBar clockShadowOffsetYSeekBar;
     private CheckBox clockLockSwitch;
+    private CheckBox clockSafeArea;
     private CheckBox clockBgSwitch;
     private LinearLayout clockBgConfigContainer;
     private Button clockBgColorButton;
@@ -80,6 +81,7 @@ public class ClockPanelController {
         clockShadowOffsetXSeekBar = activity.findViewById(R.id.clockShadowOffsetXSeekBar);
         clockShadowOffsetYSeekBar = activity.findViewById(R.id.clockShadowOffsetYSeekBar);
         clockLockSwitch = activity.findViewById(R.id.clockLockSwitch);
+        clockSafeArea = activity.findViewById(R.id.clockSafeArea);
         clockBgSwitch = activity.findViewById(R.id.clockBgSwitch);
         clockBgConfigContainer = activity.findViewById(R.id.bgConfigClock);
         clockBgColorButton = activity.findViewById(R.id.clockBgColorButton);
@@ -119,6 +121,7 @@ public class ClockPanelController {
         clockShadowOffsetYSeekBar.setProgress((int) ClockConfig.shadow.offsetY + 60);
         clockLockSwitch.setChecked(ClockConfig.touchPassthrough);
         activity.applyCheckboxTint(clockLockSwitch, ClockConfig.touchPassthrough);
+        clockSafeArea.setChecked(ClockConfig.safeArea);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
         clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bgPadding);
         clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bgOffsetX);
@@ -325,6 +328,13 @@ public class ClockPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_lock", isChecked).apply();
             FloatingService.updateClockTouchFlagsStatic();
+        });
+
+        clockSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ClockConfig.safeArea = isChecked;
+            activity.applyCheckboxTint(clockSafeArea, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("clock_safe_area", isChecked).apply();
         });
     }
 

@@ -68,6 +68,7 @@ public class ClockModule {
             return;
         }
 
+        view.post(this::updatePosition);
         running = true;
         handler.post(tickRunnable);
     }
@@ -108,6 +109,12 @@ public class ClockModule {
         if (view != null && params != null && wm != null) {
             params.x = (int)(ClockConfig.posX * getScreenWidth());
             params.y = (int)(ClockConfig.posY * getScreenHeight());
+            if (ClockConfig.safeArea && view.getWidth() > 0 && view.getHeight() > 0) {
+                int maxX = Math.max(0, getScreenWidth() - view.getWidth());
+                int maxY = Math.max(0, getScreenHeight() - view.getHeight());
+                params.x = Math.max(0, Math.min(params.x, maxX));
+                params.y = Math.max(0, Math.min(params.y, maxY));
+            }
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -153,6 +160,10 @@ public class ClockModule {
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     null,
                     () -> {
+                        if (ClockConfig.safeArea && view != null && view.getWidth() > 0 && view.getHeight() > 0) {
+                            params.x = Math.max(0, Math.min(params.x, getScreenWidth() - view.getWidth()));
+                            params.y = Math.max(0, Math.min(params.y, getScreenHeight() - view.getHeight()));
+                        }
                         if (params != null) {
                             ClockConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
                             ClockConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));

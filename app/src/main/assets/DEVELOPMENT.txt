@@ -1,4 +1,4 @@
-# 🛠️ Development — FTxT
+# 🛠️ Development — FTxT (FunText)
 
 ## 💻 Environments
 
@@ -24,7 +24,7 @@ Catatan:
 ## 🎯 Dokumentasi Teknis
 
 ### ARGB Color Model
-FTxT menggunakan model warna ARGB dengan slider.
+FTxT (FunText) menggunakan model warna ARGB dengan slider.
 
 ```
 Alpha (0–255) = Transparansi
@@ -83,7 +83,7 @@ Format:
 major.removed.restored.minor.patch
 ```
 
-Contoh: `1.0.0.12.2`
+Contoh: `3.9.2.62.0`
 
 - major = milestone besar / generasi project
 - removed = histori fitur dihapus
@@ -91,7 +91,7 @@ Contoh: `1.0.0.12.2`
 - minor = feature release counter
 - patch = maintenance / bugfix / optimasi
 
-Lihat [CHANGELOG.md](CHANGELOG.md) untuk riwayat perubahan lengkap.
+Project saat ini dalam fase **Beta** — lihat [CHANGELOG.md](CHANGELOG.md) untuk riwayat perubahan lengkap.
 
 ---
 

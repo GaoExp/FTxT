@@ -1,7 +1,7 @@
-# 📖 Panduan Penggunaan FTxT
+# 📖 Panduan Penggunaan FTxT (FunText)
 
 ## 1. Buka Aplikasi
-Jalankan aplikasi **FTxT**.
+Jalankan aplikasi **FTxT (FunText)**.
 
 ## 2. Edit Teks
 Isi field:
@@ -41,9 +41,9 @@ Overlay hilang, konfigurasi tetap tersimpan.
 Ikon di pojok kanan toolbar:
 - Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
 - Orientasi Layar ↔ → Toggle orientasi layar Potret/Lanskap
-- Bulan 🌙 → Toggle tema gelap/terang
+- Bulan/Matahari 🌙☀️ → Toggle tema gelap/terang (default malam)
 
-Header toolbar juga menampilkan **versi aplikasi** (contoh: "FTxT v2.3.1.33.0") di samping nama aplikasi di navigation drawer header.
+Header toolbar juga menampilkan **versi aplikasi** (contoh: "FunText v3.9.2.62.0 Beta") di navigation drawer header.
 
 ## 8. Navigation Drawer
 Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.

@@ -91,6 +91,7 @@ public class TextModule {
         updateTouchFlags();
 
         wm.addView(view, params);
+        view.post(this::updatePosition);
     }
 
     public void destroyOverlay() {
@@ -129,6 +130,12 @@ public class TextModule {
             screenHeight = metrics.heightPixels;
             params.x = (int)(TextConfig.posX * screenWidth);
             params.y = (int)(TextConfig.posY * screenHeight) + posCalibrationY;
+            if (TextConfig.safeArea && view.getWidth() > 0 && view.getHeight() > 0) {
+                int maxX = Math.max(0, screenWidth - view.getWidth());
+                int maxY = Math.max(0, screenHeight - view.getHeight());
+                params.x = Math.max(0, Math.min(params.x, maxX));
+                params.y = Math.max(0, Math.min(params.y, maxY));
+            }
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -169,6 +176,10 @@ public class TextModule {
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     () -> savePosition(prefs),
                     () -> {
+                        if (TextConfig.safeArea && view != null && view.getWidth() > 0 && view.getHeight() > 0) {
+                            params.x = Math.max(0, Math.min(params.x, screenWidth - view.getWidth()));
+                            params.y = Math.max(0, Math.min(params.y, screenHeight - view.getHeight()));
+                        }
                         if (params != null) {
                             DisplayMetrics metrics = new DisplayMetrics();
                             wm.getDefaultDisplay().getRealMetrics(metrics);
@@ -221,7 +232,7 @@ public class TextModule {
                     .apply();
         } else {
             TextConfig.posX = 0.5f;
-            TextConfig.posY = 0.5f;
+            TextConfig.posY = 0.8f;
         }
         if (params != null) {
             DisplayMetrics metrics = new DisplayMetrics();

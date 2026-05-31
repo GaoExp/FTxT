@@ -16,15 +16,15 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.fps_display.FpsConfig;
-import exp.ftxt.features.fps_display.FpsModule;
+import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
+import exp.ftxt.features.battery_percentage.BatteryPercentageModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
-public class FpsPositionController {
+public class BatteryPercentagePositionController {
 
     private final Activity activity;
     private final SharedPreferences prefs;
@@ -41,7 +41,7 @@ public class FpsPositionController {
     private static final String PREFS_NAME = "ftxt_prefs";
     private String activePresetName;
 
-    public FpsPositionController(Activity activity) {
+    public BatteryPercentagePositionController(Activity activity) {
         this.activity = activity;
         this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -49,7 +49,7 @@ public class FpsPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setFpsOrientationSuffixStatic(currentOrientation);
+        FloatingService.setBatteryPercentageOrientationSuffixStatic(currentOrientation);
 
         bindViews();
 
@@ -59,16 +59,16 @@ public class FpsPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        FpsModule.onPositionUpdate = this::syncAll;
+        BatteryPercentageModule.onPositionUpdate = this::syncAll;
 
         if (btnExportImport != null) {
             btnExportImport.setOnClickListener(v -> showExportImportMenu());
         }
         sliderController = new SliderPositionController(
-                activity.findViewById(R.id.fps_posXSeekBar),
-                activity.findViewById(R.id.fps_posYSeekBar),
-                activity.findViewById(R.id.fps_posXLabel),
-                activity.findViewById(R.id.fps_posYLabel),
+                activity.findViewById(R.id.batPctPosXSeekBar),
+                activity.findViewById(R.id.batPctPosYSeekBar),
+                activity.findViewById(R.id.batPctPosXLabel),
+                activity.findViewById(R.id.batPctPosYLabel),
                 (x, y) -> onPositionChanged(x, y)
         );
         setupListeners();
@@ -76,24 +76,23 @@ public class FpsPositionController {
     }
 
     private void bindViews() {
-        btnUp = activity.findViewById(R.id.fps_btnUp);
-        btnDown = activity.findViewById(R.id.fps_btnDown);
-        btnLeft = activity.findViewById(R.id.fps_btnLeft);
-        btnRight = activity.findViewById(R.id.fps_btnRight);
-        coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
-        btnExportImport = activity.findViewById(R.id.fps_btnExportImport);
+        btnUp = activity.findViewById(R.id.batPctBtnUp);
+        btnDown = activity.findViewById(R.id.batPctBtnDown);
+        btnLeft = activity.findViewById(R.id.batPctBtnLeft);
+        btnRight = activity.findViewById(R.id.batPctBtnRight);
+        coordDisplay = activity.findViewById(R.id.batPctPosCoordDisplay);
+        btnExportImport = activity.findViewById(R.id.batPctBtnExportImport);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
-            onPositionChanged(clamp(FpsConfig.posX + dx), clamp(FpsConfig.posY + dy));
+            onPositionChanged(clamp(BatteryPercentageConfig.posX + dx), clamp(BatteryPercentageConfig.posY + dy));
         });
 
-        View btnSavePreset = activity.findViewById(R.id.fps_btnSavePreset);
+        View btnSavePreset = activity.findViewById(R.id.batPctBtnSavePreset);
         if (btnSavePreset != null) {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
-
     }
 
     private void showSavePresetDialog() {
@@ -102,7 +101,7 @@ public class FpsPositionController {
 
         new AlertDialog.Builder(activity)
                 .setTitle("Simpan Preset")
-                .setMessage("Simpan konfigurasi FPS saat ini sebagai preset?")
+                .setMessage("Simpan konfigurasi Battery % saat ini sebagai preset?")
                 .setView(input)
                 .setPositiveButton("Simpan", (d, w) -> {
                     String name = input.getText().toString().trim();
@@ -128,19 +127,19 @@ public class FpsPositionController {
 
     private void doSavePreset(String name) {
         OverlayPreset preset = new OverlayPreset();
-        preset.posX = FpsConfig.posX;
-        preset.posY = FpsConfig.posY;
-        preset.size = FpsConfig.size;
-        preset.color = FpsConfig.color;
-        ShadowConfig sc = FpsConfig.shadow;
+        preset.posX = BatteryPercentageConfig.posX;
+        preset.posY = BatteryPercentageConfig.posY;
+        preset.size = BatteryPercentageConfig.size;
+        preset.color = BatteryPercentageConfig.color;
+        ShadowConfig sc = BatteryPercentageConfig.shadow;
         preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
-        preset.bgEnabled = FpsConfig.bgEnabled;
-        preset.bgColor = FpsConfig.bgColor;
-        preset.bgPadding = FpsConfig.bgPadding;
-        preset.bgOffsetX = FpsConfig.bgOffsetX;
-        preset.bgOffsetY = FpsConfig.bgOffsetY;
-        preset.bgMargin = FpsConfig.bgMargin;
-        preset.bgRadius = FpsConfig.bgRadius;
+        preset.bgEnabled = BatteryPercentageConfig.bgEnabled;
+        preset.bgColor = BatteryPercentageConfig.bgColor;
+        preset.bgPadding = BatteryPercentageConfig.bgPadding;
+        preset.bgOffsetX = BatteryPercentageConfig.bgOffsetX;
+        preset.bgOffsetY = BatteryPercentageConfig.bgOffsetY;
+        preset.bgMargin = BatteryPercentageConfig.bgMargin;
+        preset.bgRadius = BatteryPercentageConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
 
@@ -162,32 +161,32 @@ public class FpsPositionController {
     }
 
     private void applyPreset(OverlayPreset preset) {
-        FpsConfig.posX = preset.posX;
-        FpsConfig.posY = preset.posY;
-        FpsConfig.size = preset.size;
-        FpsConfig.color = preset.color;
+        BatteryPercentageConfig.posX = preset.posX;
+        BatteryPercentageConfig.posY = preset.posY;
+        BatteryPercentageConfig.size = preset.size;
+        BatteryPercentageConfig.color = preset.color;
         if (preset.shadow != null) {
-            FpsConfig.shadow.enabled = preset.shadow.enabled;
-            FpsConfig.shadow.color = preset.shadow.color;
-            FpsConfig.shadow.blur = preset.shadow.blur;
-            FpsConfig.shadow.offsetX = preset.shadow.offsetX;
-            FpsConfig.shadow.offsetY = preset.shadow.offsetY;
+            BatteryPercentageConfig.shadow.enabled = preset.shadow.enabled;
+            BatteryPercentageConfig.shadow.color = preset.shadow.color;
+            BatteryPercentageConfig.shadow.blur = preset.shadow.blur;
+            BatteryPercentageConfig.shadow.offsetX = preset.shadow.offsetX;
+            BatteryPercentageConfig.shadow.offsetY = preset.shadow.offsetY;
         }
-        FpsConfig.bgEnabled = preset.bgEnabled;
-        FpsConfig.bgColor = preset.bgColor;
-        FpsConfig.bgPadding = preset.bgPadding;
-        FpsConfig.bgOffsetX = preset.bgOffsetX;
-        FpsConfig.bgOffsetY = preset.bgOffsetY;
-        FpsConfig.bgMargin = preset.bgMargin;
-        FpsConfig.bgRadius = preset.bgRadius;
+        BatteryPercentageConfig.bgEnabled = preset.bgEnabled;
+        BatteryPercentageConfig.bgColor = preset.bgColor;
+        BatteryPercentageConfig.bgPadding = preset.bgPadding;
+        BatteryPercentageConfig.bgOffsetX = preset.bgOffsetX;
+        BatteryPercentageConfig.bgOffsetY = preset.bgOffsetY;
+        BatteryPercentageConfig.bgMargin = preset.bgMargin;
+        BatteryPercentageConfig.bgRadius = preset.bgRadius;
 
         savePositionToPrefs(currentOrientation);
         syncAll();
-        FloatingService.updateFpsPositionStatic();
-        FloatingService.updateFpsSizeStatic();
-        FloatingService.updateFpsColorStatic();
-        FloatingService.updateFpsShadowStatic();
-        FloatingService.updateFpsBackgroundStatic();
+        FloatingService.updateBatteryPercentagePositionStatic();
+        FloatingService.updateBatteryPercentageSizeStatic();
+        FloatingService.updateBatteryPercentageColorStatic();
+        FloatingService.updateBatteryPercentageShadowStatic();
+        FloatingService.updateBatteryPercentageBackgroundStatic();
     }
 
     private void showExportImportMenu() {
@@ -211,29 +210,29 @@ public class FpsPositionController {
     }
 
     private void onPositionChanged(float x, float y) {
-        FpsConfig.posX = x;
-        FpsConfig.posY = y;
+        BatteryPercentageConfig.posX = x;
+        BatteryPercentageConfig.posY = y;
         syncAll();
         savePositionToPrefs(currentOrientation);
-        FloatingService.updateFpsPositionStatic();
+        FloatingService.updateBatteryPercentagePositionStatic();
     }
 
     private void savePositionToPrefs(String orient) {
         String sfx = "_" + orient;
         prefs.edit()
-                .putFloat("fps_pos_x" + sfx, FpsConfig.posX)
-                .putFloat("fps_pos_y" + sfx, FpsConfig.posY)
+                .putFloat("battpct_pos_x" + sfx, BatteryPercentageConfig.posX)
+                .putFloat("battpct_pos_y" + sfx, BatteryPercentageConfig.posY)
                 .apply();
     }
 
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
-        FpsConfig.posX = prefs.getFloat("fps_pos_x" + sfx, 0.05f);
-        FpsConfig.posY = prefs.getFloat("fps_pos_y" + sfx, 0.05f);
+        BatteryPercentageConfig.posX = prefs.getFloat("battpct_pos_x" + sfx, 0.5f);
+        BatteryPercentageConfig.posY = prefs.getFloat("battpct_pos_y" + sfx, 0.5f);
     }
 
     public void cleanup() {
-        FpsModule.onPositionUpdate = null;
+        BatteryPercentageModule.onPositionUpdate = null;
         if (dpad != null) dpad.cleanup();
     }
 
@@ -242,22 +241,21 @@ public class FpsPositionController {
     }
 
     public void syncAll() {
-        sliderController.sync(FpsConfig.posX, FpsConfig.posY);
+        sliderController.sync(BatteryPercentageConfig.posX, BatteryPercentageConfig.posY);
         updateCoordDisplay();
     }
 
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getFpsCurrentPosition();
+        int[] pos = FloatingService.getBatteryPercentageCurrentPosition();
         if (pos != null) {
             px = pos[0];
             py = pos[1];
         } else {
-            px = Math.round(FpsConfig.posX * displayWidth);
-            py = Math.round(FpsConfig.posY * displayHeight);
+            px = Math.round(BatteryPercentageConfig.posX * displayWidth);
+            py = Math.round(BatteryPercentageConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
     }
-
 }

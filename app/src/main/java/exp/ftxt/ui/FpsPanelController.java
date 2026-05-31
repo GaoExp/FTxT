@@ -32,6 +32,7 @@ public class FpsPanelController {
     private SeekBar fpsShadowOffsetYSeekBar;
     private CheckBox fpsLockSwitch;
     private CheckBox fpsValueOnlyCheck;
+    private CheckBox fpsSafeArea;
     private CheckBox fpsBgSwitch;
     private LinearLayout fpsBgConfigContainer;
     private Button fpsBgColorButton;
@@ -84,6 +85,7 @@ public class FpsPanelController {
         fpsShadowOffsetYSeekBar = activity.findViewById(R.id.fpsShadowOffsetYSeekBar);
         fpsLockSwitch = activity.findViewById(R.id.fpsLockSwitch);
         fpsValueOnlyCheck = activity.findViewById(R.id.fpsValueOnlyCheck);
+        fpsSafeArea = activity.findViewById(R.id.fpsSafeArea);
         fpsBgSwitch = activity.findViewById(R.id.fpsBgSwitch);
         fpsBgConfigContainer = activity.findViewById(R.id.bgConfigFps);
         fpsBgColorButton = activity.findViewById(R.id.fpsBgColorButton);
@@ -124,6 +126,7 @@ public class FpsPanelController {
         fpsLockSwitch.setChecked(FpsConfig.touchPassthrough);
         activity.applyCheckboxTint(fpsLockSwitch, FpsConfig.touchPassthrough);
         fpsValueOnlyCheck.setChecked(FpsConfig.showOnlyValue);
+        fpsSafeArea.setChecked(FpsConfig.safeArea);
         fpsSizeLabel.setText("Ukuran Teks: " + (int) FpsConfig.size);
         fpsBgPaddingLabel.setText("Ukuran Background: " + FpsConfig.bgPadding);
         fpsBgOffsetXLabel.setText("Offset X: " + FpsConfig.bgOffsetX);
@@ -336,6 +339,13 @@ public class FpsPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_show_only_value", isChecked).apply();
             FloatingService.updateFpsDisplayStatic();
+        });
+
+        fpsSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            FpsConfig.safeArea = isChecked;
+            activity.applyCheckboxTint(fpsSafeArea, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("fps_safe_area", isChecked).apply();
         });
 
         fpsSizeLabel.setOnClickListener(v ->

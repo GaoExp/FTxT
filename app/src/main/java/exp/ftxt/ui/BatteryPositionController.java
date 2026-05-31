@@ -228,8 +228,8 @@ public class BatteryPositionController {
 
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
-        BatteryConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.5f);
-        BatteryConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.5f);
+        BatteryConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
+        BatteryConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
     }
 
     public void cleanup() {

@@ -1,0 +1,385 @@
+package exp.ftxt.ui;
+
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+
+import exp.ftxt.MainActivity;
+import exp.ftxt.R;
+import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.battery_current.BatteryCurrentConfig;
+import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.utils.PermissionHelper;
+
+public class BatteryCurrentPanelController {
+
+    private final MainActivity activity;
+
+    private CheckBox batCurSwitch;
+    private SeekBar batCurSizeSeekBar;
+    private Button batCurColorButton;
+    private CheckBox batCurShadowSwitch;
+    private LinearLayout batCurShadowConfigContainer;
+    private Button batCurShadowColorButton;
+    private SeekBar batCurShadowBlurSeekBar;
+    private SeekBar batCurShadowOffsetXSeekBar;
+    private SeekBar batCurShadowOffsetYSeekBar;
+    private CheckBox batCurLockSwitch;
+    private CheckBox batCurShowVoltage;
+    private CheckBox batCurShowCurrent;
+    private CheckBox batCurShowPower;
+    private CheckBox batCurSafeArea;
+    private CheckBox batCurBgSwitch;
+    private LinearLayout batCurBgConfigContainer;
+    private Button batCurBgColorButton;
+    private SeekBar batCurBgPaddingSeekBar;
+    private SeekBar batCurBgOffsetXSeekBar;
+    private SeekBar batCurBgOffsetYSeekBar;
+    private SeekBar batCurBgMarginSeekBar;
+    private SeekBar batCurBgRadiusSeekBar;
+    private TextView batCurSizeLabel, batCurBgPaddingLabel, batCurBgOffsetXLabel, batCurBgOffsetYLabel;
+    private TextView batCurBgMarginLabel, batCurBgRadiusLabel;
+    private TextView batCurShadowBlurLabel, batCurShadowOffsetXLabel, batCurShadowOffsetYLabel;
+    private BatteryCurrentPositionController batCurPositionController;
+
+    public BatteryCurrentPanelController(MainActivity activity) {
+        this.activity = activity;
+        bindViews();
+        loadConfig();
+        setupListeners();
+        batCurPositionController = new BatteryCurrentPositionController(activity);
+    }
+
+    public void onPanelShown() {
+        if (batCurPositionController != null) {
+            batCurPositionController.refresh();
+        }
+    }
+
+    public void showLoadPresetDialog() {
+        if (batCurPositionController != null) {
+            batCurPositionController.showLoadPresetDialog();
+        }
+    }
+
+    public void cleanup() {
+        if (batCurPositionController != null) {
+            batCurPositionController.cleanup();
+            batCurPositionController = null;
+        }
+    }
+
+    private void bindViews() {
+        batCurSwitch = activity.findViewById(R.id.batCurSwitch);
+        batCurSizeSeekBar = activity.findViewById(R.id.batCurSizeSeekBar);
+        batCurColorButton = activity.findViewById(R.id.batCurColorButton);
+        batCurShadowSwitch = activity.findViewById(R.id.batCurShadowSwitch);
+        batCurShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryCurrent);
+        batCurShadowColorButton = activity.findViewById(R.id.batCurShadowColorButton);
+        batCurShadowBlurSeekBar = activity.findViewById(R.id.batCurShadowBlurSeekBar);
+        batCurShadowOffsetXSeekBar = activity.findViewById(R.id.batCurShadowOffsetXSeekBar);
+        batCurShadowOffsetYSeekBar = activity.findViewById(R.id.batCurShadowOffsetYSeekBar);
+        batCurLockSwitch = activity.findViewById(R.id.batCurLockSwitch);
+        batCurShowVoltage = activity.findViewById(R.id.batCurShowVoltage);
+        batCurShowCurrent = activity.findViewById(R.id.batCurShowCurrent);
+        batCurShowPower = activity.findViewById(R.id.batCurShowPower);
+        batCurSafeArea = activity.findViewById(R.id.batCurSafeArea);
+        batCurBgSwitch = activity.findViewById(R.id.batCurBgSwitch);
+        batCurBgConfigContainer = activity.findViewById(R.id.bgConfigBatteryCurrent);
+        batCurBgColorButton = activity.findViewById(R.id.batCurBgColorButton);
+        batCurBgPaddingSeekBar = activity.findViewById(R.id.batCurBgPaddingSeekBar);
+        batCurBgOffsetXSeekBar = activity.findViewById(R.id.batCurBgOffsetXSeekBar);
+        batCurBgOffsetYSeekBar = activity.findViewById(R.id.batCurBgOffsetYSeekBar);
+        batCurBgMarginSeekBar = activity.findViewById(R.id.batCurBgMarginSeekBar);
+        batCurBgRadiusSeekBar = activity.findViewById(R.id.batCurBgRadiusSeekBar);
+        batCurSizeLabel = activity.findViewById(R.id.batCurSizeLabel);
+        batCurBgPaddingLabel = activity.findViewById(R.id.batCurBgPaddingLabel);
+        batCurBgOffsetXLabel = activity.findViewById(R.id.batCurBgOffsetXLabel);
+        batCurBgOffsetYLabel = activity.findViewById(R.id.batCurBgOffsetYLabel);
+        batCurBgMarginLabel = activity.findViewById(R.id.batCurBgMarginLabel);
+        batCurBgRadiusLabel = activity.findViewById(R.id.batCurBgRadiusLabel);
+        batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
+        batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
+        batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
+    }
+
+    private void loadConfig() {
+        batCurSwitch.setChecked(BatteryCurrentConfig.enabled);
+        activity.applyCheckboxTint(batCurSwitch, BatteryCurrentConfig.enabled);
+        batCurSizeSeekBar.setProgress((int) BatteryCurrentConfig.size);
+        batCurBgSwitch.setChecked(BatteryCurrentConfig.bgEnabled);
+        activity.applyCheckboxTint(batCurBgSwitch, BatteryCurrentConfig.bgEnabled);
+        batCurBgConfigContainer.setVisibility(BatteryCurrentConfig.bgEnabled ? View.VISIBLE : View.GONE);
+        batCurBgPaddingSeekBar.setProgress(BatteryCurrentConfig.bgPadding);
+        batCurBgOffsetXSeekBar.setProgress(BatteryCurrentConfig.bgOffsetX + 60);
+        batCurBgOffsetYSeekBar.setProgress(BatteryCurrentConfig.bgOffsetY + 60);
+        batCurBgMarginSeekBar.setProgress(BatteryCurrentConfig.bgMargin);
+        batCurBgRadiusSeekBar.setProgress(BatteryCurrentConfig.bgRadius);
+        batCurShadowSwitch.setChecked(BatteryCurrentConfig.shadow.enabled);
+        activity.applyCheckboxTint(batCurShadowSwitch, BatteryCurrentConfig.shadow.enabled);
+        batCurShadowConfigContainer.setVisibility(BatteryCurrentConfig.shadow.enabled ? View.VISIBLE : View.GONE);
+        batCurShadowBlurSeekBar.setProgress((int) BatteryCurrentConfig.shadow.blur);
+        batCurShadowOffsetXSeekBar.setProgress((int) BatteryCurrentConfig.shadow.offsetX + 60);
+        batCurShadowOffsetYSeekBar.setProgress((int) BatteryCurrentConfig.shadow.offsetY + 60);
+        batCurLockSwitch.setChecked(BatteryCurrentConfig.touchPassthrough);
+        activity.applyCheckboxTint(batCurLockSwitch, BatteryCurrentConfig.touchPassthrough);
+        batCurShowVoltage.setChecked(BatteryCurrentConfig.showVoltage);
+        activity.applyCheckboxTint(batCurShowVoltage, BatteryCurrentConfig.showVoltage);
+        batCurShowCurrent.setChecked(BatteryCurrentConfig.showCurrent);
+        activity.applyCheckboxTint(batCurShowCurrent, BatteryCurrentConfig.showCurrent);
+        batCurShowPower.setChecked(BatteryCurrentConfig.showPower);
+        activity.applyCheckboxTint(batCurShowPower, BatteryCurrentConfig.showPower);
+        batCurSafeArea.setChecked(BatteryCurrentConfig.safeArea);
+        batCurSizeLabel.setText("Ukuran Teks: " + (int) BatteryCurrentConfig.size);
+        batCurBgPaddingLabel.setText("Ukuran Background: " + BatteryCurrentConfig.bgPadding);
+        batCurBgOffsetXLabel.setText("Offset X: " + BatteryCurrentConfig.bgOffsetX);
+        batCurBgOffsetYLabel.setText("Offset Y: " + BatteryCurrentConfig.bgOffsetY);
+        batCurBgMarginLabel.setText("Margin: " + BatteryCurrentConfig.bgMargin);
+        batCurBgRadiusLabel.setText("Radius: " + BatteryCurrentConfig.bgRadius);
+        batCurShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryCurrentConfig.shadow.blur);
+        batCurShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryCurrentConfig.shadow.offsetX);
+        batCurShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryCurrentConfig.shadow.offsetY);
+    }
+
+    private void setupListeners() {
+        batCurSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && !PermissionHelper.hasOverlayPermission(activity)) {
+                batCurSwitch.setChecked(false);
+                activity.applyCheckboxTint(batCurSwitch, false);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putBoolean("batcur_enabled", false).apply();
+                return;
+            }
+
+            BatteryCurrentConfig.enabled = isChecked;
+            activity.applyCheckboxTint(batCurSwitch, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_enabled", isChecked).apply();
+
+            if (isChecked) {
+                if (FloatingService.instance != null) {
+                    FloatingService.startBatteryCurrentStatic();
+                } else {
+                    activity.startService(new Intent(activity, FloatingService.class));
+                }
+            } else {
+                FloatingService.stopBatteryCurrentStatic();
+                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
+                        && !exp.ftxt.features.clock_module.ClockConfig.enabled
+                        && !exp.ftxt.features.network_stats.NetworkConfig.enabled
+                        && !exp.ftxt.features.battery_temperature.BatteryConfig.enabled
+                        && !exp.ftxt.features.battery_percentage.BatteryPercentageConfig.enabled) {
+                    activity.stopService(new Intent(activity, FloatingService.class));
+                }
+            }
+        });
+
+        batCurSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 5) { progress = 5; sb.setProgress(progress); }
+                if (progress > 140) { progress = 140; sb.setProgress(progress); }
+                BatteryCurrentConfig.size = progress;
+                batCurSizeLabel.setText("Ukuran Teks: " + progress);
+                FloatingService.updateBatteryCurrentSizeStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Pilih Warna Bat Current", BatteryCurrentConfig.color, color -> {
+                BatteryCurrentConfig.color = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_color", color).apply();
+                FloatingService.updateBatteryCurrentColorStatic();
+            });
+        });
+
+        batCurBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.bgEnabled = isChecked;
+            activity.applyCheckboxTint(batCurBgSwitch, isChecked);
+            batCurBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_bg_enabled", isChecked).apply();
+            FloatingService.updateBatteryCurrentBackgroundStatic();
+        });
+
+        batCurBgColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Background Bat Cur", BatteryCurrentConfig.bgColor, color -> {
+                BatteryCurrentConfig.bgColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_color", color).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            });
+        });
+
+        batCurBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 0) progress = 0;
+                BatteryCurrentConfig.bgPadding = progress;
+                batCurBgPaddingLabel.setText("Ukuran Background: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_padding", progress).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int offset = progress - 60;
+                BatteryCurrentConfig.bgOffsetX = offset;
+                batCurBgOffsetXLabel.setText("Offset X: " + offset);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_offset_x", offset).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int offset = progress - 60;
+                BatteryCurrentConfig.bgOffsetY = offset;
+                batCurBgOffsetYLabel.setText("Offset Y: " + offset);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_offset_y", offset).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                BatteryCurrentConfig.bgMargin = progress;
+                batCurBgMarginLabel.setText("Margin: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_margin", progress).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                BatteryCurrentConfig.bgRadius = progress;
+                batCurBgRadiusLabel.setText("Radius: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_bg_radius", progress).apply();
+                FloatingService.updateBatteryCurrentBackgroundStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.shadow.enabled = isChecked;
+            activity.applyCheckboxTint(batCurShadowSwitch, isChecked);
+            batCurShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_shadow_enabled", isChecked).apply();
+            saveBatCurShadowPrefs();
+            FloatingService.updateBatteryCurrentShadowStatic();
+        });
+
+        batCurShadowColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Shadow Bat Cur", BatteryCurrentConfig.shadow.color, color -> {
+                BatteryCurrentConfig.shadow.color = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_shadow_color", color).apply();
+                FloatingService.updateBatteryCurrentShadowStatic();
+            });
+        });
+
+        batCurShadowBlurSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                BatteryCurrentConfig.shadow.blur = progress;
+                batCurShadowBlurLabel.setText("Blur Shadow: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("batcur_shadow_blur", (float) progress).apply();
+                FloatingService.updateBatteryCurrentShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurShadowOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int offset = progress - 60;
+                BatteryCurrentConfig.shadow.offsetX = offset;
+                batCurShadowOffsetXLabel.setText("Shadow X: " + offset);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("batcur_shadow_offset_x", (float) offset).apply();
+                FloatingService.updateBatteryCurrentShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurShadowOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int offset = progress - 60;
+                BatteryCurrentConfig.shadow.offsetY = offset;
+                batCurShadowOffsetYLabel.setText("Shadow Y: " + offset);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("batcur_shadow_offset_y", (float) offset).apply();
+                FloatingService.updateBatteryCurrentShadowStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        batCurLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.touchPassthrough = isChecked;
+            activity.applyCheckboxTint(batCurLockSwitch, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_lock", isChecked).apply();
+            FloatingService.updateBatteryCurrentTouchFlagsStatic();
+        });
+
+        batCurShowVoltage.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.showVoltage = isChecked;
+            activity.applyCheckboxTint(batCurShowVoltage, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_show_voltage", isChecked).apply();
+        });
+
+        batCurShowCurrent.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.showCurrent = isChecked;
+            activity.applyCheckboxTint(batCurShowCurrent, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_show_current", isChecked).apply();
+        });
+
+        batCurShowPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.showPower = isChecked;
+            activity.applyCheckboxTint(batCurShowPower, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_show_power", isChecked).apply();
+        });
+
+        batCurSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.safeArea = isChecked;
+            activity.applyCheckboxTint(batCurSafeArea, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_safe_area", isChecked).apply();
+        });
+    }
+
+    private void saveBatCurShadowPrefs() {
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE).edit()
+                .putInt("batcur_shadow_color", BatteryCurrentConfig.shadow.color)
+                .putFloat("batcur_shadow_blur", BatteryCurrentConfig.shadow.blur)
+                .putFloat("batcur_shadow_offset_x", BatteryCurrentConfig.shadow.offsetX)
+                .putFloat("batcur_shadow_offset_y", BatteryCurrentConfig.shadow.offsetY)
+                .apply();
+    }
+}

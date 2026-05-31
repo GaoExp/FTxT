@@ -27,6 +27,7 @@ public class TextPanelController {
     private Button colorButton;
     private CheckBox overlaySwitch;
     private CheckBox touchPassthroughSwitch;
+    private CheckBox textSafeArea;
     private CheckBox shadowSwitch;
     private LinearLayout shadowConfigContainer;
     private Button shadowColorButton;
@@ -80,7 +81,7 @@ public class TextPanelController {
         if (!overlayOn) return;
 
         TextConfig.text = editText.getText().toString().trim();
-        if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
+        if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
 
         if (FloatingService.instance != null) {
             FloatingService.createTextOverlayStatic();
@@ -95,6 +96,7 @@ public class TextPanelController {
         colorButton = activity.findViewById(R.id.colorButton);
         overlaySwitch = activity.findViewById(R.id.overlaySwitch);
         touchPassthroughSwitch = activity.findViewById(R.id.touchPassthroughSwitch);
+        textSafeArea = activity.findViewById(R.id.textSafeArea);
         shadowSwitch = activity.findViewById(R.id.shadowSwitch);
         shadowConfigContainer = activity.findViewById(R.id.shadowConfigText);
         shadowColorButton = activity.findViewById(R.id.shadowColorButton);
@@ -125,6 +127,7 @@ public class TextPanelController {
                 .getBoolean("text_overlay_on", false);
         overlaySwitch.setChecked(overlayOn);
         touchPassthroughSwitch.setChecked(TextConfig.touchPassthrough);
+        textSafeArea.setChecked(TextConfig.safeArea);
         bgSwitch.setChecked(TextConfig.bgEnabled);
         bgConfigContainer.setVisibility(TextConfig.bgEnabled ? View.VISIBLE : View.GONE);
         bgPaddingSeekBar.setProgress(TextConfig.bgPadding);
@@ -149,7 +152,7 @@ public class TextPanelController {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 TextConfig.text = s.toString().trim();
-                if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
+                if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
                 FloatingService.updateTextStatic();
             }
             @Override public void afterTextChanged(Editable s) {}
@@ -189,7 +192,7 @@ public class TextPanelController {
 
             if (isChecked) {
                 TextConfig.text = editText.getText().toString().trim();
-                if (TextConfig.text.isEmpty()) TextConfig.text = "FTxT AKTIF";
+                if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
 
                 if (FloatingService.instance != null) {
                     FloatingService.createTextOverlayStatic();
@@ -214,6 +217,13 @@ public class TextPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_lock", isChecked).apply();
             FloatingService.updateTouchFlagsStatic();
+        });
+
+        textSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            activity.applyCheckboxTint(textSafeArea, isChecked);
+            TextConfig.safeArea = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("text_safe_area", isChecked).apply();
         });
 
         bgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -377,6 +387,7 @@ public class TextPanelController {
     private void applyInitialTints() {
         activity.applyCheckboxTint(overlaySwitch, overlaySwitch.isChecked());
         activity.applyCheckboxTint(touchPassthroughSwitch, touchPassthroughSwitch.isChecked());
+        activity.applyCheckboxTint(textSafeArea, textSafeArea.isChecked());
         activity.applyCheckboxTint(bgSwitch, bgSwitch.isChecked());
         activity.applyCheckboxTint(shadowSwitch, shadowSwitch.isChecked());
     }

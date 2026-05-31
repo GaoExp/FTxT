@@ -1,4 +1,4 @@
-# 📝 Tentang FTxT
+# 📝 Tentang FTxT (FunText)
 
 ## Lisensi & Klarifikasi
 
@@ -14,7 +14,7 @@ Silakan gunakan, modifikasi, fork, atau kustomisasi sesuai kebutuhan.
 
 Developed by **GaoZhan**.
 
-Android floating text overlay dengan fokus pada customization, real-time updates, dan lightweight overlay behavior.
+Aplikasi overlay teks Android FTxT (FunText) dengan fokus pada customization, real-time updates, dan lightweight overlay behavior.
 
 ---
 

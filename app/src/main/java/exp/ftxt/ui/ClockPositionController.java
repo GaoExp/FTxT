@@ -229,7 +229,7 @@ public class ClockPositionController {
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
         ClockConfig.posX = prefs.getFloat("clock_pos_x" + sfx, 0.5f);
-        ClockConfig.posY = prefs.getFloat("clock_pos_y" + sfx, 0.5f);
+        ClockConfig.posY = prefs.getFloat("clock_pos_y" + sfx, 0.05f);
     }
 
     public void cleanup() {

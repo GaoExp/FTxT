@@ -228,8 +228,8 @@ public class NetworkPositionController {
 
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
-        NetworkConfig.posX = prefs.getFloat("network_pos_x" + sfx, 0.5f);
-        NetworkConfig.posY = prefs.getFloat("network_pos_y" + sfx, 0.5f);
+        NetworkConfig.posX = prefs.getFloat("network_pos_x" + sfx, 0.75f);
+        NetworkConfig.posY = prefs.getFloat("network_pos_y" + sfx, 0.05f);
     }
 
     public void cleanup() {

@@ -8,6 +8,10 @@ import android.os.IBinder;
 import android.view.WindowManager;
 
 import exp.ftxt.R;
+import exp.ftxt.features.battery_current.BatteryCurrentConfig;
+import exp.ftxt.features.battery_current.BatteryCurrentModule;
+import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
+import exp.ftxt.features.battery_percentage.BatteryPercentageModule;
 import exp.ftxt.features.battery_temperature.BatteryConfig;
 import exp.ftxt.features.battery_temperature.BatteryModule;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -45,6 +49,8 @@ public class FloatingService extends Service {
     private FpsModule fpsModule;
     private ClockModule clockModule;
     private BatteryModule batteryModule;
+    private BatteryPercentageModule batteryPercentageModule;
+    private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
 
     @Override
@@ -58,6 +64,8 @@ public class FloatingService extends Service {
         fpsModule = new FpsModule();
         clockModule = new ClockModule();
         batteryModule = new BatteryModule();
+        batteryPercentageModule = new BatteryPercentageModule();
+        batteryCurrentModule = new BatteryCurrentModule();
         networkModule = new NetworkModule();
 
         // Notification channel + foreground service
@@ -84,6 +92,16 @@ public class FloatingService extends Service {
             // Start Battery jika diaktifkan
             if (BatteryConfig.enabled) {
                 batteryModule.start(windowManager, this);
+            }
+
+            // Start Battery Percentage jika diaktifkan
+            if (BatteryPercentageConfig.enabled) {
+                batteryPercentageModule.start(windowManager, this);
+            }
+
+            // Start Battery Current jika diaktifkan
+            if (BatteryCurrentConfig.enabled) {
+                batteryCurrentModule.start(windowManager, this);
             }
 
             // Start Network jika diaktifkan
@@ -384,6 +402,132 @@ public class FloatingService extends Service {
         return null;
     }
 
+    // --- Battery Percentage Module Delegates ---
+
+    public static void startBatteryPercentageStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopBatteryPercentageStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.stop();
+        }
+    }
+
+    public static void updateBatteryPercentageColorStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateColor(BatteryPercentageConfig.color);
+        }
+    }
+
+    public static void updateBatteryPercentageSizeStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateSize(BatteryPercentageConfig.size);
+        }
+    }
+
+    public static void updateBatteryPercentageShadowStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateShadow();
+        }
+    }
+
+    public static void updateBatteryPercentageBackgroundStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateBackground();
+        }
+    }
+
+    public static void updateBatteryPercentageTouchFlagsStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateBatteryPercentagePositionStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updatePosition();
+        }
+    }
+
+    public static void setBatteryPercentageOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getBatteryPercentageCurrentPosition() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            return instance.batteryPercentageModule.getCurrentPosition();
+        }
+        return null;
+    }
+
+    // --- Battery Current Module Delegates ---
+
+    public static void startBatteryCurrentStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopBatteryCurrentStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.stop();
+        }
+    }
+
+    public static void updateBatteryCurrentColorStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateColor(BatteryCurrentConfig.color);
+        }
+    }
+
+    public static void updateBatteryCurrentSizeStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateSize(BatteryCurrentConfig.size);
+        }
+    }
+
+    public static void updateBatteryCurrentShadowStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateShadow();
+        }
+    }
+
+    public static void updateBatteryCurrentBackgroundStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateBackground();
+        }
+    }
+
+    public static void updateBatteryCurrentTouchFlagsStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateBatteryCurrentPositionStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updatePosition();
+        }
+    }
+
+    public static void setBatteryCurrentOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getBatteryCurrentCurrentPosition() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            return instance.batteryCurrentModule.getCurrentPosition();
+        }
+        return null;
+    }
+
     // --- Battery Module Delegates ---
 
     public static void startBatteryStatic() {
@@ -453,6 +597,8 @@ public class FloatingService extends Service {
 
         clockModule.stop();
         batteryModule.stop();
+        batteryPercentageModule.stop();
+        batteryCurrentModule.stop();
         networkModule.stop();
         fpsModule.stop();
         textModule.savePosition(prefs);

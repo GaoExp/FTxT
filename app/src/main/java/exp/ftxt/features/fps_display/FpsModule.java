@@ -92,6 +92,7 @@ public class FpsModule {
             return;
         }
 
+        view.post(this::updatePosition);
         running = true;
         lastFrameTime = 0;
         frameCount = 0;
@@ -139,6 +140,12 @@ public class FpsModule {
             screenHeight = metrics.heightPixels;
             params.x = (int)(FpsConfig.posX * screenWidth);
             params.y = (int)(FpsConfig.posY * screenHeight) + posCalibrationY;
+            if (FpsConfig.safeArea && view.getWidth() > 0 && view.getHeight() > 0) {
+                int maxX = Math.max(0, screenWidth - view.getWidth());
+                int maxY = Math.max(0, screenHeight - view.getHeight());
+                params.x = Math.max(0, Math.min(params.x, maxX));
+                params.y = Math.max(0, Math.min(params.y, maxY));
+            }
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -183,6 +190,10 @@ public class FpsModule {
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     this::savePosition,
                     () -> {
+                        if (FpsConfig.safeArea && view != null && view.getWidth() > 0 && view.getHeight() > 0) {
+                            params.x = Math.max(0, Math.min(params.x, screenWidth - view.getWidth()));
+                            params.y = Math.max(0, Math.min(params.y, screenHeight - view.getHeight()));
+                        }
                         if (params != null) {
                             DisplayMetrics metrics = new DisplayMetrics();
                             wm.getDefaultDisplay().getRealMetrics(metrics);
@@ -232,8 +243,8 @@ public class FpsModule {
                     .remove("fps_y")
                     .apply();
         } else {
-            FpsConfig.posX = 0.5f;
-            FpsConfig.posY = 0.5f;
+            FpsConfig.posX = 0.05f;
+            FpsConfig.posY = 0.05f;
         }
         if (params != null) {
             DisplayMetrics metrics = new DisplayMetrics();

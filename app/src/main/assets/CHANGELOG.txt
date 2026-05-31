@@ -1,5 +1,115 @@
-# Changelog - FTxT (Floating Text)
+# Changelog - FTxT (FunText)
 Dokumen ini mencatat riwayat perubahan project FTxT.
+
+---
+
+## [3.9.2.62.1] - 2026-05-31
+
+### 🐞 Bug Fixes
+
+- **Teks hitam di tema gelap saat pertama buka** — `AppCompatDelegate.setDefaultNightMode()` dipanggil setelah `SplashScreen.installSplashScreen()`, menyebabkan tema gelap tidak diterapkan ke beberapa elemen UI. Diperbaiki dengan memindahkan `setDefaultNightMode()` sebelum `installSplashScreen()`.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 122→123, versionName 3.9.2.62.0→3.9.2.62.1
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Pindah `setDefaultNightMode()` sebelum `installSplashScreen()`
+
+---
+
+## [3.9.2.62.0] - 2026-05-31
+
+### ♻️️ Perubahan Fitur
+
+- **Tema default mode malam** — Tema aplikasi sekarang default ke mode gelap (malam) saat pertama kali dijalankan.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 121→122, versionName 2.9.2.61.0→3.9.2.62.0 (major+1)
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Default theme dark mode (false→true), sidebar label "FTxT v..." → "FunText v... Beta"
+- `app/src/main/res/layout/nav_header.xml` — Placeholder text "FTxT" → "FunText"
+- `README.md` + `README.txt` — Rebranding FTxT (FunText), Beta status, dark mode default
+- `PANDUAN.md` + `PANDUAN.txt` — Rebranding FTxT (FunText), dark mode mention
+- `DEVELOPMENT.md` + `DEVELOPMENT.txt` — Rebranding FTxT (FunText), Beta phase note
+- `TENTANG.md` + `TENTANG.txt` — Rebranding FTxT (FunText)
+
+### 💡 Catatan
+
+- Mulai rilis ini, aplikasi menggunakan label **"FunText"** dan menandai status **Beta**. Seluruh rilis berikutnya akan menggunakan format `FunText vX.X.X.X.X Beta` pada sidebar header.
+
+---
+
+## [2.9.2.60.1] - 2026-05-31
+
+### ♻️️ Perubahan Fitur
+
+- **Placeholder panel Crosshair, Watermark, Logo** — Tiga panel kosong kini menampilkan pesan "Konsep overlay sedang dalam tahap pengerjaan" sebagai pengganti panel Text saat nav item diklik.
+
+### ✨ Fitur Baru
+
+- **Safe Area "Gunakan Area Aman"** — Menambahkan checkbox "Gunakan Area Aman" pada semua 6 panel overlay (Text, FPS, Clock, Battery, Battery Current, Network) untuk mengaktifkan/nonaktifkan pembatasan posisi agar tetap dalam area aman layar.
+- **Auto-request izin saat pertama buka** — Aplikasi otomatis meminta semua izin (Overlay, Notifikasi, Optimasi Baterai) saat pertama kali dijalankan.
+
+### 🗒️ File Added
+
+- `app/src/main/res/layout/activity_main.xml` — Tambah 6 checkbox safeArea + 3 panel placeholder (crosshair, watermark, logo)
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 118→120, versionName 2.9.2.59.0→2.9.2.60.1
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `textSafeArea`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `fpsSafeArea`
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `clockSafeArea`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `networkSafeArea`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `batterySafeArea`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Tambah field, bindViews, loadConfig, listener untuk `batCurSafeArea`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — loadConfig safeArea semua overlay, auto-request izin, placeholder panel crosshair/watermark/logo
+
+---
+
+## [2.9.2.59.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Battery Stats toggles °C / %** — Panel Battery Stats (sebelumnya Battery Temperature) kini memiliki dua checkbox toggle °C dan % untuk mengontrol tampilan suhu dan persentase baterai secara independen. Keduanya bisa aktif bersamaan atau salah satu saja.
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 117→118, versionName 2.9.2.58.0→2.9.2.59.0
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java` — Tambah `showTemperature`, `showPercentage`
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Update `getBatteryTempText()` pakai flags showTemperature/showPercentage
+- `app/src/main/res/layout/activity_main.xml` — Tambah checkbox °C (`batteryShowTempCheck`) dan % (`batteryShowPctCheck`) di panel battery
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Bind + listener untuk checkbox °C/%
+- `app/src/main/java/exp/ftxt/MainActivity.java` — loadConfig prefs `battery_show_temperature`, `battery_show_percentage`
+
+---
+
+## [2.9.2.58.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Battery Percentage Overlay** — Fitur baru untuk menampilkan persentase baterai sebagai overlay. Update tiap 5 detik, mendukung semua konfigurasi: ukuran, warna, shadow, background, kontrol posisi, preset, dan orientasi.
+- **Battery Current Overlay** — Fitur baru untuk menampilkan tegangan (mV), arus (mA), dan daya (W) baterai sebagai overlay. Update tiap 5 detik, mendukung semua konfigurasi: ukuran, warna, shadow, background, kontrol posisi, preset, dan orientasi.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageConfig.java` — Konfigurasi statis modul Battery Percentage
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Module logic overlay persentase baterai
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — Controller panel settings Battery Percentage
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Controller kontrol posisi Battery Percentage
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentConfig.java` — Konfigurasi statis modul Battery Current
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Module logic overlay arus baterai
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Controller panel settings Battery Current
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Controller kontrol posisi Battery Current
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 116→117, versionName 2.9.2.57.1→2.9.2.58.0
+- `app/src/main/res/values/strings.xml` — Tambah `nav_battery_percentage`, `nav_battery_current`
+- `app/src/main/res/menu/drawer_menu.xml` — Tambah item `nav_battery_percentage`, `nav_battery_current`
+- `app/src/main/res/layout/drawer_content.xml` — Tambah `navBatteryPercentage`, `navBatteryCurrent`
+- `app/src/main/res/layout/activity_main.xml` — Tambah panel `panel_battery_percentage`, `panel_battery_current`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Registrasi panel, nav handler, loadConfig, sidebar
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Module + delegates Battery Percentage & Battery Current
 
 ---
 

@@ -33,12 +33,16 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.battery_current.BatteryCurrentConfig;
+import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
 import exp.ftxt.features.battery_temperature.BatteryConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.ui.BatteryPanelController;
+import exp.ftxt.ui.BatteryCurrentPanelController;
+
 import exp.ftxt.ui.ClockPanelController;
 import exp.ftxt.ui.FpsPanelController;
 import exp.ftxt.ui.NetworkPanelController;
@@ -71,12 +75,17 @@ public class MainActivity extends AppCompatActivity {
     View panelFps;
     View panelClock;
     View panelBattery;
+    View panelBatteryCurrent;
     View panelNetwork;
     private TextPanelController textPanel;
     private FpsPanelController fpsPanel;
     private ClockPanelController clockPanel;
     private BatteryPanelController batteryPanel;
+    private BatteryCurrentPanelController batteryCurrentPanel;
     private NetworkPanelController networkPanel;
+    private View panelCrosshair;
+    private View panelWatermark;
+    private View panelLogo;
 
     private LinearLayout navItemContainer;
     private static final String PREFS_SIDEBAR_STATE = "sidebar_state";
@@ -85,24 +94,26 @@ public class MainActivity extends AppCompatActivity {
         "[{\"id\":\"navFloatingText\",\"l\":\"Floating Text\"}," +
         "{\"id\":\"navFps\",\"l\":\"FPS Display\"}," +
         "{\"id\":\"navNetwork\",\"l\":\"Network Stats\"}," +
-        "{\"id\":\"navBattery\",\"l\":\"Battery Temperature\"}," +
+        "{\"id\":\"navBattery\",\"l\":\"Battery Stats\"}," +
+
+        "{\"id\":\"navBatteryCurrent\",\"l\":\"Battery Current\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
-        "{\"id\":\"navCrosshair\",\"l\":\"Crosshair\"}," +
-        "{\"id\":\"navWatermark\",\"l\":\"Watermark\"}," +
-        "{\"id\":\"navLogo\",\"l\":\"Logo Display\"}]";
+        "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
+        "{\"id\":\"navWatermark\",\"l\":\"Watermark (coming soon)\"}," +
+        "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}]";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
-
         boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("theme_dark", false);
+                .getBoolean("theme_dark", true);
 
         if (isDark) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
+
+        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -119,7 +130,11 @@ public class MainActivity extends AppCompatActivity {
         panelFps = findViewById(R.id.panel_fps);
         panelClock = findViewById(R.id.panel_clock);
         panelBattery = findViewById(R.id.panel_battery);
+        panelBatteryCurrent = findViewById(R.id.panel_battery_current);
         panelNetwork = findViewById(R.id.panel_network);
+        panelCrosshair = findViewById(R.id.panel_crosshair);
+        panelWatermark = findViewById(R.id.panel_watermark);
+        panelLogo = findViewById(R.id.panel_logo);
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
         int savedNavItem = prefs.getInt("nav_selected_item", R.id.navFloatingText);
         if (savedNavItem == R.id.navFps) {
@@ -134,6 +149,10 @@ public class MainActivity extends AppCompatActivity {
             panelText.setVisibility(View.GONE);
             panelClock.setVisibility(View.VISIBLE);
             getSupportActionBar().setTitle(R.string.nav_clock);
+        } else if (savedNavItem == R.id.navBatteryCurrent) {
+            panelText.setVisibility(View.GONE);
+            panelBatteryCurrent.setVisibility(View.VISIBLE);
+            getSupportActionBar().setTitle(R.string.nav_battery_current);
         } else if (savedNavItem == R.id.navNetwork) {
             panelText.setVisibility(View.GONE);
             panelNetwork.setVisibility(View.VISIBLE);
@@ -143,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
         TextView navTitle = findViewById(R.id.navHeaderTitle);
         try {
             String v = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-            navTitle.setText("FTxT v" + v);
+            navTitle.setText("FunText v" + v + " Beta");
         } catch (PackageManager.NameNotFoundException e) {
-            navTitle.setText("FTxT");
+            navTitle.setText("FunText Beta");
         }
 
         navItemContainer = findViewById(R.id.navItemContainer);
@@ -158,7 +177,32 @@ public class MainActivity extends AppCompatActivity {
         fpsPanel = new FpsPanelController(this);
         clockPanel = new ClockPanelController(this);
         batteryPanel = new BatteryPanelController(this);
+        batteryCurrentPanel = new BatteryCurrentPanelController(this);
         networkPanel = new NetworkPanelController(this);
+
+        requestAllPermissionsOnFirstLaunch();
+    }
+
+    private void requestAllPermissionsOnFirstLaunch() {
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        if (!prefs.getBoolean("first_launch", true)) return;
+        prefs.edit().putBoolean("first_launch", false).apply();
+
+        boolean needsOverlay = !PermissionHelper.hasOverlayPermission(this);
+        boolean needsNotification = !PermissionHelper.hasNotificationPermission(this);
+        boolean needsBattery = !PermissionHelper.isIgnoringBatteryOptimizations(this);
+
+        if (!needsOverlay && !needsNotification && !needsBattery) return;
+
+        StringBuilder msg = new StringBuilder("Aplikasi membutuhkan izin berikut:");
+        if (needsOverlay) msg.append("\n• Tampilan di atas aplikasi lain");
+        if (needsNotification) msg.append("\n• Notifikasi");
+        if (needsBattery) msg.append("\n• Nonaktifkan optimasi baterai");
+        Toast.makeText(this, msg.toString(), Toast.LENGTH_LONG).show();
+
+        if (needsOverlay) PermissionHelper.requestOverlayPermission(this);
+        if (needsNotification) PermissionHelper.requestNotificationPermission(this);
+        if (needsBattery) PermissionHelper.requestDisableBatteryOptimization(this);
     }
 
     @Override
@@ -176,11 +220,28 @@ public class MainActivity extends AppCompatActivity {
         if (batteryPanel != null && panelBattery.getVisibility() == View.VISIBLE) {
             batteryPanel.onPanelShown();
         }
+        if (batteryCurrentPanel != null && panelBatteryCurrent.getVisibility() == View.VISIBLE) {
+            batteryCurrentPanel.onPanelShown();
+        }
         if (networkPanel != null && panelNetwork.getVisibility() == View.VISIBLE) {
             networkPanel.onPanelShown();
         }
         autoRequestAndStart();
+        requestRemainingPermissions();
         FloatingService.updateTextPositionStatic();
+    }
+
+    private void requestRemainingPermissions() {
+        if (!PermissionHelper.hasOverlayPermission(this)) {
+            PermissionHelper.requestOverlayPermission(this);
+            return;
+        }
+        if (!PermissionHelper.hasNotificationPermission(this)) {
+            PermissionHelper.requestNotificationPermission(this);
+        }
+        if (!PermissionHelper.isIgnoringBatteryOptimizations(this)) {
+            PermissionHelper.requestDisableBatteryOptimization(this);
+        }
     }
 
     private void autoRequestAndStart() {
@@ -209,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("theme_dark", false);
+                .getBoolean("theme_dark", true);
         MenuItem themeItem = menu.findItem(R.id.action_theme);
         themeItem.setIcon(isDark ? R.drawable.ic_theme : R.drawable.ic_sun);
         return true;
@@ -235,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (id == R.id.action_theme) {
-            boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .getBoolean("theme_dark", false);
+        boolean isDark = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getBoolean("theme_dark", true);
             boolean newDark = !isDark;
             getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                     .edit().putBoolean("theme_dark", newDark).apply();
@@ -341,6 +402,8 @@ public class MainActivity extends AppCompatActivity {
                     clockPanel.showLoadPresetDialog();
                 } else if (panelBattery.getVisibility() == View.VISIBLE) {
                     batteryPanel.showLoadPresetDialog();
+                } else if (panelBatteryCurrent.getVisibility() == View.VISIBLE) {
+                    batteryCurrentPanel.showLoadPresetDialog();
                 } else if (panelNetwork.getVisibility() == View.VISIBLE) {
                     networkPanel.showLoadPresetDialog();
                 } else {
@@ -388,6 +451,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
 
         TextConfig.touchPassthrough = prefs.getBoolean("text_lock", true);
+        TextConfig.safeArea = prefs.getBoolean("text_safe_area", true);
 
         TextConfig.shadow.enabled = prefs.getBoolean("shadow_enabled", false);
         TextConfig.shadow.color = prefs.getInt("shadow_color", Color.BLACK);
@@ -400,7 +464,8 @@ public class MainActivity extends AppCompatActivity {
         TextConfig.bgOffsetX = prefs.getInt("text_bg_offset_x", 0);
         TextConfig.bgOffsetY = prefs.getInt("text_bg_offset_y", 0);
         FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
-        FpsConfig.color = prefs.getInt("fps_color", Color.WHITE);
+        FpsConfig.safeArea = prefs.getBoolean("fps_safe_area", true);
+        FpsConfig.color = prefs.getInt("fps_color", Color.GREEN);
 
         FpsConfig.shadow.enabled = prefs.getBoolean("fps_shadow_enabled", false);
         FpsConfig.shadow.color = prefs.getInt("fps_shadow_color", Color.BLACK);
@@ -414,42 +479,63 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
         FpsConfig.bgOffsetX = prefs.getInt("fps_bg_offset_x", 0);
         FpsConfig.bgOffsetY = prefs.getInt("fps_bg_offset_y", 0);
-        FpsConfig.posX = prefs.getFloat("fps_pos_x_port", 0.5f);
-        FpsConfig.posY = prefs.getFloat("fps_pos_y_port", 0.5f);
+        FpsConfig.posX = prefs.getFloat("fps_pos_x_port", 0.05f);
+        FpsConfig.posY = prefs.getFloat("fps_pos_y_port", 0.05f);
 
         ClockConfig.enabled = prefs.getBoolean("clock_enabled", false);
-        ClockConfig.color = prefs.getInt("clock_color", Color.WHITE);
+        ClockConfig.color = prefs.getInt("clock_color", Color.GREEN);
         ClockConfig.shadow.enabled = prefs.getBoolean("clock_shadow_enabled", false);
         ClockConfig.shadow.color = prefs.getInt("clock_shadow_color", Color.BLACK);
         ClockConfig.shadow.blur = prefs.getFloat("clock_shadow_blur", 5f);
         ClockConfig.shadow.offsetX = prefs.getFloat("clock_shadow_offset_x", 3f);
         ClockConfig.shadow.offsetY = prefs.getFloat("clock_shadow_offset_y", 3f);
+        ClockConfig.safeArea = prefs.getBoolean("clock_safe_area", true);
         ClockConfig.touchPassthrough = prefs.getBoolean("clock_lock", true);
         ClockConfig.bgEnabled = prefs.getBoolean("clock_bg_enabled", false);
         ClockConfig.bgColor = prefs.getInt("clock_bg_color", 0xCC000000);
         ClockConfig.bgPadding = prefs.getInt("clock_bg_padding", 10);
 
         NetworkConfig.enabled = prefs.getBoolean("network_enabled", false);
-        NetworkConfig.color = prefs.getInt("network_color", Color.WHITE);
+        NetworkConfig.color = prefs.getInt("network_color", Color.GREEN);
         NetworkConfig.shadow.enabled = prefs.getBoolean("network_shadow_enabled", false);
         NetworkConfig.shadow.color = prefs.getInt("network_shadow_color", Color.BLACK);
         NetworkConfig.shadow.blur = prefs.getFloat("network_shadow_blur", 5f);
         NetworkConfig.shadow.offsetX = prefs.getFloat("network_shadow_offset_x", 3f);
         NetworkConfig.shadow.offsetY = prefs.getFloat("network_shadow_offset_y", 3f);
+        NetworkConfig.safeArea = prefs.getBoolean("network_safe_area", true);
         NetworkConfig.touchPassthrough = prefs.getBoolean("network_lock", true);
         NetworkConfig.bgEnabled = prefs.getBoolean("network_bg_enabled", false);
         NetworkConfig.bgColor = prefs.getInt("network_bg_color", 0xCC000000);
         NetworkConfig.bgPadding = prefs.getInt("network_bg_padding", 8);
 
+        BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
+        BatteryCurrentConfig.color = prefs.getInt("batcur_color", Color.GREEN);
+        BatteryCurrentConfig.shadow.enabled = prefs.getBoolean("batcur_shadow_enabled", false);
+        BatteryCurrentConfig.shadow.color = prefs.getInt("batcur_shadow_color", Color.BLACK);
+        BatteryCurrentConfig.shadow.blur = prefs.getFloat("batcur_shadow_blur", 5f);
+        BatteryCurrentConfig.shadow.offsetX = prefs.getFloat("batcur_shadow_offset_x", 3f);
+        BatteryCurrentConfig.shadow.offsetY = prefs.getFloat("batcur_shadow_offset_y", 3f);
+        BatteryCurrentConfig.safeArea = prefs.getBoolean("batcur_safe_area", true);
+        BatteryCurrentConfig.touchPassthrough = prefs.getBoolean("batcur_lock", true);
+        BatteryCurrentConfig.bgEnabled = prefs.getBoolean("batcur_bg_enabled", false);
+        BatteryCurrentConfig.bgColor = prefs.getInt("batcur_bg_color", 0xCC000000);
+        BatteryCurrentConfig.bgPadding = prefs.getInt("batcur_bg_padding", 8);
+        BatteryCurrentConfig.showVoltage = prefs.getBoolean("batcur_show_voltage", true);
+        BatteryCurrentConfig.showCurrent = prefs.getBoolean("batcur_show_current", true);
+        BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
+
         BatteryConfig.enabled = prefs.getBoolean("battery_enabled", false);
-        BatteryConfig.color = prefs.getInt("battery_color", Color.WHITE);
+        BatteryConfig.color = prefs.getInt("battery_color", Color.GREEN);
         BatteryConfig.shadow.enabled = prefs.getBoolean("battery_shadow_enabled", false);
         BatteryConfig.shadow.color = prefs.getInt("battery_shadow_color", Color.BLACK);
         BatteryConfig.shadow.blur = prefs.getFloat("battery_shadow_blur", 5f);
         BatteryConfig.shadow.offsetX = prefs.getFloat("battery_shadow_offset_x", 3f);
         BatteryConfig.shadow.offsetY = prefs.getFloat("battery_shadow_offset_y", 3f);
+        BatteryConfig.safeArea = prefs.getBoolean("battery_safe_area", true);
         BatteryConfig.touchPassthrough = prefs.getBoolean("battery_lock", true);
         BatteryConfig.showOnlyValue = prefs.getBoolean("battery_show_only_value", false);
+        BatteryConfig.showTemperature = prefs.getBoolean("battery_show_temperature", true);
+        BatteryConfig.showPercentage = prefs.getBoolean("battery_show_percentage", false);
         BatteryConfig.bgEnabled = prefs.getBoolean("battery_bg_enabled", false);
         BatteryConfig.bgColor = prefs.getInt("battery_bg_color", 0xCC000000);
         BatteryConfig.bgPadding = prefs.getInt("battery_bg_padding", 8);
@@ -457,7 +543,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavSelection(int selectedId) {
         int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navClock, R.id.navCrosshair, R.id.navWatermark, R.id.navLogo};
+                R.id.navBatteryCurrent, R.id.navClock, R.id.navCrosshair, R.id.navWatermark, R.id.navLogo};
         for (int id : allIds) {
             View v = findViewById(id);
             if (v != null) {
@@ -663,12 +749,24 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navBattery) {
                 panelBattery.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.nav_battery);
+            } else if (itemId == R.id.navBatteryCurrent) {
+                panelBatteryCurrent.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle(R.string.nav_battery_current);
             } else if (itemId == R.id.navClock) {
                 panelClock.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.nav_clock);
             } else if (itemId == R.id.navNetwork) {
                 panelNetwork.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.nav_network);
+            } else if (itemId == R.id.navCrosshair) {
+                panelCrosshair.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle("Crosshair");
+            } else if (itemId == R.id.navWatermark) {
+                panelWatermark.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle("Watermark");
+            } else if (itemId == R.id.navLogo) {
+                panelLogo.setVisibility(View.VISIBLE);
+                getSupportActionBar().setTitle("Logo Display");
             } else {
                 panelText.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle(R.string.nav_floating_text);
@@ -687,7 +785,11 @@ public class MainActivity extends AppCompatActivity {
         panelFps.setVisibility(View.GONE);
         panelClock.setVisibility(View.GONE);
         panelBattery.setVisibility(View.GONE);
+        panelBatteryCurrent.setVisibility(View.GONE);
         panelNetwork.setVisibility(View.GONE);
+        panelCrosshair.setVisibility(View.GONE);
+        panelWatermark.setVisibility(View.GONE);
+        panelLogo.setVisibility(View.GONE);
     }
 
     @Override
@@ -697,6 +799,7 @@ public class MainActivity extends AppCompatActivity {
         if (fpsPanel != null) fpsPanel.cleanup();
         if (clockPanel != null) clockPanel.cleanup();
         if (batteryPanel != null) batteryPanel.cleanup();
+        if (batteryCurrentPanel != null) batteryCurrentPanel.cleanup();
         if (networkPanel != null) networkPanel.cleanup();
     }
 

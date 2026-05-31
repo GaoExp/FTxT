@@ -1,7 +1,8 @@
-# 📁 Struktur Project FTxT
+# 📁 Struktur Project FTxT (FunText)
 
 ```
 FTxT/
+├── .gitignore
 ├── AGENTS.md
 ├── CHANGELOG.md
 ├── README.md
@@ -15,7 +16,12 @@ FTxT/
 ├── TENTANG.md
 ├── settings.gradle
 ├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── local.properties
+├── gradle/
 ├── app/
+│   ├── .gitignore
 │   ├── proguard-rules.pro
 │   ├── libs/
 │   ├── src/main/
@@ -32,6 +38,12 @@ FTxT/
 │   │   │   │       ├── fps_display/
 │   │   │   │       │   ├── FpsConfig.java
 │   │   │   │       │   └── FpsModule.java
+│   │   │   │       ├── battery_current/
+│   │   │   │       │   ├── BatteryCurrentConfig.java
+│   │   │   │       │   └── BatteryCurrentModule.java
+│   │   │   │       ├── battery_percentage/
+│   │   │   │       │   ├── BatteryPercentageConfig.java
+│   │   │   │       │   └── BatteryPercentageModule.java
 │   │   │   │       ├── battery_temperature/
 │   │   │   │       │   ├── BatteryConfig.java
 │   │   │   │       │   └── BatteryModule.java
@@ -42,8 +54,10 @@ FTxT/
 │   │   │   │       │   ├── NetworkConfig.java
 │   │   │   │       │   └── NetworkModule.java
 │   │   │   │       ├── crosshair/   (empty)
-│   │   │   │       ├── cpu_monitor/ (empty)
-│   │   │   │       ├── logo_display/ (empty)
+│   │   │   │       ├── cpu_monitor/
+│   │   │   │       │   └── cpu/     (empty)
+│   │   │   │       ├── logo_display/
+│   │   │   │       │   └── logo/    (empty)
 │   │   │   │       └── watermark/   (empty)
 │   │   │   │
 │   │   │   ├── shared/
@@ -77,6 +91,10 @@ FTxT/
 │   │   │   │   ├── ClockPositionController.java
 │   │   │   │   ├── BatteryPanelController.java
 │   │   │   │   ├── BatteryPositionController.java
+│   │   │   │   ├── BatteryPercentagePanelController.java
+│   │   │   │   ├── BatteryPercentagePositionController.java
+│   │   │   │   ├── BatteryCurrentPanelController.java
+│   │   │   │   ├── BatteryCurrentPositionController.java
 │   │   │   │   ├── NetworkPanelController.java
 │   │   │   │   └── NetworkPositionController.java
 │   │   │   │
@@ -168,6 +186,8 @@ FTxT/
 | features/fps_display/FpsModule.java | Module logic FPS overlay |
 | features/clock_module/ClockConfig.java | Konfigurasi jam digital overlay |
 | features/clock_module/ClockModule.java | Module logic jam digital (update tiap 1 detik) |
+| features/battery_percentage/BatteryPercentageConfig.java | Konfigurasi persentase baterai overlay |
+| features/battery_percentage/BatteryPercentageModule.java | Module logic persentase baterai (BatteryManager, update tiap 5 detik) |
 | features/battery_temperature/BatteryConfig.java | Konfigurasi suhu baterai overlay |
 | features/battery_temperature/BatteryModule.java | Module logic suhu baterai (update tiap 5 detik) |
 | features/network_stats/NetworkConfig.java | Konfigurasi network speed meter overlay |
@@ -191,10 +211,12 @@ FTxT/
 | shared/ui/SliderPositionController.java | Shared controller slider X/Y posisi |
 | _karantina/exp/ftxt/shared/ui/XyPadView.java | Custom View 2D drag area — DIKARANTINA |
 | ui/TextPanelController.java | Controller panel Floating Text |
+| ui/BatteryPercentagePanelController.java | Controller panel Battery Percentage |
 | ui/TextPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
 | ui/FpsPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) FPS |
 | ui/ClockPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
 | ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
+| ui/BatteryPercentagePositionController.java | Controller kontrol posisi Battery Percentage |
 | ui/NetworkPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |

@@ -31,6 +31,9 @@ public class BatteryPanelController {
     private SeekBar batteryShadowOffsetYSeekBar;
     private CheckBox batteryLockSwitch;
     private CheckBox batteryValueOnlyCheck;
+    private CheckBox batteryShowTempCheck;
+    private CheckBox batteryShowPctCheck;
+    private CheckBox batterySafeArea;
     private CheckBox batteryBgSwitch;
     private LinearLayout batteryBgConfigContainer;
     private Button batteryBgColorButton;
@@ -83,6 +86,9 @@ public class BatteryPanelController {
         batteryShadowOffsetYSeekBar = activity.findViewById(R.id.batteryShadowOffsetYSeekBar);
         batteryLockSwitch = activity.findViewById(R.id.batteryLockSwitch);
         batteryValueOnlyCheck = activity.findViewById(R.id.batteryValueOnlyCheck);
+        batteryShowTempCheck = activity.findViewById(R.id.batteryShowTempCheck);
+        batteryShowPctCheck = activity.findViewById(R.id.batteryShowPctCheck);
+        batterySafeArea = activity.findViewById(R.id.batterySafeArea);
         batteryBgSwitch = activity.findViewById(R.id.batteryBgSwitch);
         batteryBgConfigContainer = activity.findViewById(R.id.bgConfigBattery);
         batteryBgColorButton = activity.findViewById(R.id.batteryBgColorButton);
@@ -123,6 +129,9 @@ public class BatteryPanelController {
         batteryLockSwitch.setChecked(BatteryConfig.touchPassthrough);
         activity.applyCheckboxTint(batteryLockSwitch, BatteryConfig.touchPassthrough);
         batteryValueOnlyCheck.setChecked(BatteryConfig.showOnlyValue);
+        batteryShowTempCheck.setChecked(BatteryConfig.showTemperature);
+        batteryShowPctCheck.setChecked(BatteryConfig.showPercentage);
+        batterySafeArea.setChecked(BatteryConfig.safeArea);
         batterySizeLabel.setText("Ukuran Teks: " + (int) BatteryConfig.size);
         batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryConfig.bgPadding);
         batteryBgOffsetXLabel.setText("Offset X: " + BatteryConfig.bgOffsetX);
@@ -335,6 +344,25 @@ public class BatteryPanelController {
             BatteryConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_show_only_value", isChecked).apply();
+        });
+
+        batteryShowTempCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryConfig.showTemperature = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("battery_show_temperature", isChecked).apply();
+        });
+
+        batteryShowPctCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryConfig.showPercentage = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("battery_show_percentage", isChecked).apply();
+        });
+
+        batterySafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryConfig.safeArea = isChecked;
+            activity.applyCheckboxTint(batterySafeArea, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("battery_safe_area", isChecked).apply();
         });
     }
 
