@@ -3,6 +3,19 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.66.2] - 2026-06-01
+
+### 🐞 Bug Fixes
+
+- **CI build Gagal — AAPT2 not found** — Workflow gagal karena `local.properties` mengarah ke SDK path lokal (`/opt/android_sdk`) yang tidak ada di runner GitHub Actions. Ditambahkan step untuk generate `local.properties` dari `$ANDROID_HOME` sebelum build.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 128→129, versionName 3.9.3.66.1→3.9.3.66.2
+- `.github/workflows/release.yml` — Tambah step "Setup Android SDK" untuk set sdk.dir dari $ANDROID_HOME
+
+---
+
 ## [3.9.3.66.1] - 2026-06-01
 
 ### 🔧 Optimasi & Penyesuaian
