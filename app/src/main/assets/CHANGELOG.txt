@@ -3,6 +3,19 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.66.3] - 2026-06-01
+
+### 🐞 Bug Fixes
+
+- **CI build Gagal — AAPT2 still not found** — Sebelumnya workflow gagal karena `android.aapt2FromMavenOverride=/usr/bin/aapt2` di `gradle.properties` merujuk ke path yang tidak ada di runner GitHub Actions. Dihapus agar Gradle menggunakan AAPT2 dari Maven secara otomatis.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 129→130, versionName 3.9.3.66.2→3.9.3.66.3
+- `gradle.properties` — Hapus `android.aapt2FromMavenOverride`
+
+---
+
 ## [3.9.3.66.2] - 2026-06-01
 
 ### 🐞 Bug Fixes
