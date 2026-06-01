@@ -159,6 +159,8 @@ public class ClockPositionController {
         preset.bgRadius = ClockConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = ClockConfig.touchPassthrough;
+        preset.safeArea = ClockConfig.safeArea;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -196,6 +198,14 @@ public class ClockPositionController {
         ClockConfig.bgOffsetY = preset.bgOffsetY;
         ClockConfig.bgMargin = preset.bgMargin;
         ClockConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            ClockConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("clock_lock", ClockConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            ClockConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("clock_safe_area", ClockConfig.safeArea).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

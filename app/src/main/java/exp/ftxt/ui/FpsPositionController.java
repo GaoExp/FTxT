@@ -159,6 +159,9 @@ public class FpsPositionController {
         preset.bgRadius = FpsConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = FpsConfig.touchPassthrough;
+        preset.safeArea = FpsConfig.safeArea;
+        preset.showOnlyValue = FpsConfig.showOnlyValue;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -196,6 +199,18 @@ public class FpsPositionController {
         FpsConfig.bgOffsetY = preset.bgOffsetY;
         FpsConfig.bgMargin = preset.bgMargin;
         FpsConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            FpsConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("fps_lock", FpsConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            FpsConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("fps_safe_area", FpsConfig.safeArea).apply();
+        }
+        if (preset.showOnlyValue != null) {
+            FpsConfig.showOnlyValue = preset.showOnlyValue;
+            prefs.edit().putBoolean("fps_show_only_value", FpsConfig.showOnlyValue).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

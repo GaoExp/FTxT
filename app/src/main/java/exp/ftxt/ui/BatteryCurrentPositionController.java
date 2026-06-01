@@ -158,6 +158,11 @@ public class BatteryCurrentPositionController {
         preset.bgRadius = BatteryCurrentConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = BatteryCurrentConfig.touchPassthrough;
+        preset.safeArea = BatteryCurrentConfig.safeArea;
+        preset.showVoltage = BatteryCurrentConfig.showVoltage;
+        preset.showCurrent = BatteryCurrentConfig.showCurrent;
+        preset.showPower = BatteryCurrentConfig.showPower;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -195,6 +200,26 @@ public class BatteryCurrentPositionController {
         BatteryCurrentConfig.bgOffsetY = preset.bgOffsetY;
         BatteryCurrentConfig.bgMargin = preset.bgMargin;
         BatteryCurrentConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            BatteryCurrentConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("batcur_lock", BatteryCurrentConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            BatteryCurrentConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("batcur_safe_area", BatteryCurrentConfig.safeArea).apply();
+        }
+        if (preset.showVoltage != null) {
+            BatteryCurrentConfig.showVoltage = preset.showVoltage;
+            prefs.edit().putBoolean("batcur_show_voltage", BatteryCurrentConfig.showVoltage).apply();
+        }
+        if (preset.showCurrent != null) {
+            BatteryCurrentConfig.showCurrent = preset.showCurrent;
+            prefs.edit().putBoolean("batcur_show_current", BatteryCurrentConfig.showCurrent).apply();
+        }
+        if (preset.showPower != null) {
+            BatteryCurrentConfig.showPower = preset.showPower;
+            prefs.edit().putBoolean("batcur_show_power", BatteryCurrentConfig.showPower).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

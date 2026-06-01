@@ -159,6 +159,11 @@ public class BatteryPositionController {
         preset.bgRadius = BatteryConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = BatteryConfig.touchPassthrough;
+        preset.safeArea = BatteryConfig.safeArea;
+        preset.showOnlyValue = BatteryConfig.showOnlyValue;
+        preset.showTemperature = BatteryConfig.showTemperature;
+        preset.showPercentage = BatteryConfig.showPercentage;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -196,6 +201,26 @@ public class BatteryPositionController {
         BatteryConfig.bgOffsetY = preset.bgOffsetY;
         BatteryConfig.bgMargin = preset.bgMargin;
         BatteryConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            BatteryConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("battery_lock", BatteryConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            BatteryConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("battery_safe_area", BatteryConfig.safeArea).apply();
+        }
+        if (preset.showOnlyValue != null) {
+            BatteryConfig.showOnlyValue = preset.showOnlyValue;
+            prefs.edit().putBoolean("battery_show_only_value", BatteryConfig.showOnlyValue).apply();
+        }
+        if (preset.showTemperature != null) {
+            BatteryConfig.showTemperature = preset.showTemperature;
+            prefs.edit().putBoolean("battery_show_temperature", BatteryConfig.showTemperature).apply();
+        }
+        if (preset.showPercentage != null) {
+            BatteryConfig.showPercentage = preset.showPercentage;
+            prefs.edit().putBoolean("battery_show_percentage", BatteryConfig.showPercentage).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

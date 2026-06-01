@@ -159,6 +159,8 @@ public class NetworkPositionController {
         preset.bgRadius = NetworkConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = NetworkConfig.touchPassthrough;
+        preset.safeArea = NetworkConfig.safeArea;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -196,6 +198,14 @@ public class NetworkPositionController {
         NetworkConfig.bgOffsetY = preset.bgOffsetY;
         NetworkConfig.bgMargin = preset.bgMargin;
         NetworkConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            NetworkConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("network_lock", NetworkConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            NetworkConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("network_safe_area", NetworkConfig.safeArea).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

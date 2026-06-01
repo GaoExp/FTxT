@@ -62,7 +62,7 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 ## 10. Preset Full-Konfigurasi (Simpan/Muat/Tagging/Share)
 
 Setiap panel overlay memiliki tombol:
-- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi) ke dalam preset GSON v2.
+- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, dan toggle display spesifik) ke dalam preset GSON v2.
 - **Muat** — Menampilkan daftar preset tersimpan dengan fitur multi-select, rename, reorder (↑↓), hapus, dan tag. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
 - **E/I** (Ekspor/Impor) — Ekspor preset ke file (Downloads), atau impor dari file (file picker).
 - **Bagikan** — Bagikan preset via Android share intent (native).

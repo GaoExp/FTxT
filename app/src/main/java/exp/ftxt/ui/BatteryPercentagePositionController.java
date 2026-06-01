@@ -158,6 +158,7 @@ public class BatteryPercentagePositionController {
         preset.bgRadius = BatteryPercentageConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = BatteryPercentageConfig.touchPassthrough;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -195,6 +196,10 @@ public class BatteryPercentagePositionController {
         BatteryPercentageConfig.bgOffsetY = preset.bgOffsetY;
         BatteryPercentageConfig.bgMargin = preset.bgMargin;
         BatteryPercentageConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            BatteryPercentageConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("battpct_lock", BatteryPercentageConfig.touchPassthrough).apply();
+        }
 
         savePositionToPrefs(currentOrientation);
         syncAll();

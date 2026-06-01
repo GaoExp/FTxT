@@ -3,6 +3,30 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.65.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Preset Full-Konfigurasi** — Preset kini menyimpan SELURUH konfigurasi overlay, bukan hanya styling visual. Setiap preset mencakup: posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, dan toggle display spesifik per modul. Backward compatible: preset lama tetap berfungsi (field baru diabaikan).
+
+### ♻️️ Perubahan Fitur
+
+- **OverlayPreset model diperluas** — 9 field baru ditambahkan ke model data preset: touchPassthrough, safeArea, textContent, showOnlyValue, showTemperature, showPercentage, showVoltage, showCurrent, showPower. Semua menggunakan Boolean wrapper agar null-safe untuk preset lama.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 125→126, versionName 3.9.3.64.0→3.9.3.65.0
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Tambah 9 field baru
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — doSavePreset/applyPreset: text, touchPassthrough, safeArea + updateTextStatic
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — doSavePreset/applyPreset: showOnlyValue, touchPassthrough, safeArea
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — doSavePreset/applyPreset: touchPassthrough, safeArea
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — doSavePreset/applyPreset: showOnlyValue, showTemperature, showPercentage, touchPassthrough, safeArea
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — doSavePreset/applyPreset: touchPassthrough
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — doSavePreset/applyPreset: showVoltage, showCurrent, showPower, touchPassthrough, safeArea
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — doSavePreset/applyPreset: touchPassthrough, safeArea
+
+---
+
 ## [3.9.3.64.0] - 2026-05-31
 
 ### ✨ Fitur Baru

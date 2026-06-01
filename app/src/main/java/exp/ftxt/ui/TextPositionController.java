@@ -159,6 +159,9 @@ public class TextPositionController {
         preset.bgRadius = TextConfig.bgRadius;
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.touchPassthrough = TextConfig.touchPassthrough;
+        preset.safeArea = TextConfig.safeArea;
+        preset.textContent = TextConfig.text;
 
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
@@ -196,8 +199,22 @@ public class TextPositionController {
         TextConfig.bgOffsetY = preset.bgOffsetY;
         TextConfig.bgMargin = preset.bgMargin;
         TextConfig.bgRadius = preset.bgRadius;
+        if (preset.touchPassthrough != null) {
+            TextConfig.touchPassthrough = preset.touchPassthrough;
+            prefs.edit().putBoolean("text_lock", TextConfig.touchPassthrough).apply();
+        }
+        if (preset.safeArea != null) {
+            TextConfig.safeArea = preset.safeArea;
+            prefs.edit().putBoolean("text_safe_area", TextConfig.safeArea).apply();
+        }
+        if (preset.textContent != null && !preset.textContent.isEmpty()) {
+            TextConfig.text = preset.textContent;
+        }
 
         savePositionToPrefs(currentOrientation);
+        if (preset.textContent != null && !preset.textContent.isEmpty()) {
+            FloatingService.updateTextStatic();
+        }
         syncAll();
         FloatingService.updateTextPositionStatic();
         FloatingService.updateTextSizeStatic();

@@ -60,6 +60,37 @@ public class OverlayPreset {
     public String orientation;
 
     // ====================================================================
+    // 6. BEHAVIORAL TOGGLES
+    // ====================================================================
+
+    /** Touch passthrough (kunci posisi) — null = tidak diset */
+    public Boolean touchPassthrough;
+    /** Safe area (batasi posisi dari notch/cutout) — null = tidak diset */
+    public Boolean safeArea;
+
+    // ====================================================================
+    // 7. MODULE-SPECIFIC DISPLAY TOGGLES
+    // ====================================================================
+
+    /** Teks kustom — khusus modul Floating Text */
+    public String textContent;
+
+    /** Tampilkan hanya angka (FPS / Battery Temperature) */
+    public Boolean showOnlyValue;
+
+    /** Tampilkan suhu °C — khusus Battery Temperature */
+    public Boolean showTemperature;
+    /** Tampilkan persentase % — khusus Battery Temperature */
+    public Boolean showPercentage;
+
+    /** Tampilkan tegangan mV — khusus Battery Current */
+    public Boolean showVoltage;
+    /** Tampilkan arus mA — khusus Battery Current */
+    public Boolean showCurrent;
+    /** Tampilkan daya W — khusus Battery Current */
+    public Boolean showPower;
+
+    // ====================================================================
     // CONSTRUCTOR
     // ====================================================================
 
