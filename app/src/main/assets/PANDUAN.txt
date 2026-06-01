@@ -59,12 +59,19 @@ Aktifkan switch Background untuk menampilkan latar belakang overlay:
 - Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
 - Klik label untuk edit nilai manual via dialog input
 
-## 10. Preset Full-Konfigurasi (Simpan/Muat)
+## 10. Preset Full-Konfigurasi (Simpan/Muat/Tagging/Share)
 
 Setiap panel overlay memiliki tombol:
-- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi) ke dalam preset GSON.
-- **Muat** — Menampilkan daftar preset tersimpan. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
-- **E/I** (Ekspor/Impor) — Ekspor preset ke clipboard sebagai JSON, atau impor dari clipboard.
+- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi) ke dalam preset GSON v2.
+- **Muat** — Menampilkan daftar preset tersimpan dengan fitur multi-select, rename, reorder (↑↓), hapus, dan tag. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
+- **E/I** (Ekspor/Impor) — Ekspor preset ke file (Downloads), atau impor dari file (file picker).
+- **Bagikan** — Bagikan preset via Android share intent (native).
+
+Fitur preset v2:
+- Metadata: tags (label cari), favorite flag, timestamp (dibuat/diubah), thumbnail warna.
+- Version history: simpan hingga 10 versi lama, bisa revert ke versi sebelumnya.
+- Pencarian: cari preset berdasarkan nama atau tag.
+- Selective apply: saat muat, pilih opsi apply (posisi saja, warna saja, background saja, dll) untuk merge partial config.
 
 ## 11. Orientasi Layar
 Ketuk ikon orientasi layar ↔ di toolbar untuk toggle orientasi antara Potret dan Lanskap. Posisi overlay disimpan terpisah per orientasi dan dipulihkan otomatis.

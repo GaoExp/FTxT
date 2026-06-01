@@ -3,6 +3,81 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.64.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Toast Feedback Ekspor** — Saat preset berhasil diekspor ke file, aplikasi kini menampilkan Toast "Preset diekspor ke Downloads/" sebagai konfirmasi visual.
+- **File Picker Impor Preset** — Tombol "Impor dari File" kini membuka file picker system (`ActivityResultContracts.OpenDocument`) untuk memilih file preset. Sebelumnya hanya menampilkan Toast dummy.
+- **Bagikan Preset di Semua Panel** — Menu "Bagikan Preset" kini tersedia di semua 7 panel overlay (FPS, Clock, Battery, Battery Percentage, Battery Current, Network), sebelumnya hanya di panel Text.
+
+### 🐞 Bug Fixes
+
+- **Extra brace di TextPositionController** — Brace `}` berlebih di baris 221 menyebabkan class ditutup prematur (28 error kompilasi). Dihapus.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 124→125, versionName 3.9.3.63.0→3.9.3.64.0
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Tambah imports/launcher/Toast, fix extra brace
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Tambah imports/launcher/Toast + menu Bagikan
+
+---
+
+## [3.9.3.63.0] - 2026-05-31
+
+### ✨ Fitur Baru
+
+- **Preset System v2 — UUID-based Index & Metadata** — Sistem penyimpanan preset diupgrade dari name-based keys ke UUID-based storage dengan index metadata yang terurut. Backward compatible: migrasi otomatis dari format lama.
+- **Preset Metadata (Tags, Favorite, Timestamps)** — Setiap preset kini menyimpan tags (list), favorite flag, createdAt, dan updatedAt timestamp. Metadata terpisah dari data preset untuk fleksibilitas.
+- **Thumbnail Generation** — Saat preset disimpan, aplikasi otomatis generate thumbnail bitmap sederhana berdasarkan warna utama preset (64x64px PNG, disimpan di `context.getFilesDir()/presets/`).
+- **Preset Version History** — Setiap preset menyimpan history hingga 10 versi sebelumnya. API `getHistory(name)` dan `revertToHistory(name, index)` untuk restore versi lama.
+- **Partial-Apply API** — Method `mergePreset(base, src, flags...)` untuk merge/apply hanya field tertentu dari preset (posisi saja, warna saja, background saja, dll). Berguna untuk selective apply preset.
+- **Search & Filter** — Method `searchByNameOrTag(query)` untuk cari preset berdasarkan nama atau tag. Tags dapat di-set via `setTags(name, tags)`.
+- **Preset Sharing via Share Intent** — Method `sharePreset(name)` mengekspor preset ke file di Downloads dan membuka native share chooser (Intent ACTION_SEND). Opsi clipboard dihapus (use file-based sharing).
+- **Preset Metadata API** — Method `getIndexMetadata(context)` mengembalikan daftar lengkap metadata semua preset (name, uuid, timestamps, tags, favorite, thumbnail path) tanpa load data OverlayPreset lengkap.
+- **Favorite & Tag Management** — Method `setFavorite(name, bool)` dan `setTags(name, List)` untuk manage metadata preset.
+
+### 🚮️ Fitur Dihapus
+
+- **Clipboard-based Export/Import** — Method `exportToClipboard(activity)` dan `importFromClipboard(activity)` dihapus dari `PresetManager`. Gunakan file-based export/import (`exportToFile`, `importFromFile`, `sharePreset`) sebagai gantinya.
+
+### ♻️️ Perubahan Fitur
+
+- **Export/Import UI Updated** — Semua tombol Export/Import di position controllers (Text, FPS, Clock, Battery, Network, dll) diganti dari "Ekspor/Impor ke Clipboard" menjadi "Ekspor ke File" / "Impor dari File" dengan guidance menggunakan file picker.
+- **Share Menu** — Tambah opsi "Bagikan Preset" di export menu, memanggil `PresetManager.sharePreset(name)` untuk share via native intent.
+
+### 🗒️ File Added
+
+- Tidak ada file baru ditambahkan (perubahan internal di PresetManager)
+
+### ✏️ File Changed
+
+- `app/build.gradle` — versionCode 123→124, versionName 3.9.2.62.1→3.9.3.63.0
+- `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Seluruh refactor storage (UUID index, metadata, history, thumbnail, merge, search, share)
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Replace clipboard calls with file-based export/import; tambah "Bagikan Preset" menu item
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Replace clipboard calls dengan exportToFile
+- `app/src/main/java/exp/ftxt/shared/preset/PresetExampleActivity.java` — Update example methods untuk file-based export/import guidance
+
+### 💡 Catatan
+
+- Backward compatibility: preset lama (name-key based) otomatis dimigrasikan ke UUID index saat diakses pertama kali.
+- Thumbnail di-generate saat `save()` berdasarkan warna overlay (OverlayPreset.color). File .png disimpan relatif ke `context.getFilesDir()`.
+- History capped 10 items per preset; item lama otomatis di-pop saat limit tercapai.
+- Clipboard sharing dihapus untuk mengurangi kompleksitas; file-based sharing lebih reliable di Android 10+.
+- Tags dan Favorite flags disimpan di index metadata (SharedPreferences), bukan di dalam OverlayPreset data.
+
+---
+
 ## [3.9.2.62.1] - 2026-05-31
 
 ### 🐞 Bug Fixes

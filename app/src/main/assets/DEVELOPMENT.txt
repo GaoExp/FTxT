@@ -66,12 +66,46 @@ text_pos_y_land   → Posisi Y mode landscape
 shadow_enabled
 ```
 
-### Preset System (GSON)
-Preset full-konfigurasi disimpan sebagai file JSON di `context.getFilesDir()/presets/<nama>.json`.
+### Preset System (GSON + Metadata v2)
+Preset full-konfigurasi disimpan menggunakan SharedPreferences dengan UUID-based index + metadata.
 
-Setiap preset mencakup seluruh field `OverlayPreset`: posisi X/Y, ukuran teks, warna (ARGB int), shadow (warna, blur, offset X/Y), background (enabled, warna, padding, offset X/Y, margin, radius), dan orientasi.
+Struktur penyimpanan:
+```
+KEY_INDEX         = JSON array of PresetIndexItem (metadata, terurut)
+KEY_PREFIX+uuid   = String JSON dari objek OverlayPreset (data config)
+KEY_HISTORY_<uuid> = JSON array PresetVersion (history hingga 10 items)
+```
 
-Manager: `PresetManager` (static methods) — Save, Load, Rename, Delete, DeleteAll, Export (clipboard/file), Import (clipboard/file), ListAll.
+PresetIndexItem mencakup:
+- uuid (UUID unik)
+- name (editable)
+- createdAt, updatedAt (timestamp)
+- tags (List<String>)
+- favorite (boolean)
+- thumbnailPath (relative to filesDir)
+
+API penting:
+- save(Context, name, OverlayPreset) — simpan/overwrite (UUID auto-generate atau keep existing)
+- load(Context, name) → OverlayPreset
+- rename(Context, oldName, newName)
+- delete(Context, name) / deleteMultiple / deleteAll
+- moveUp/moveDown — reorder list
+- getHistory(Context, name) → List<OverlayPreset>
+- revertToHistory(Context, name, historyIndex)
+- searchByNameOrTag(Context, query) → List<String>
+- setTags(Context, name, tags) / setFavorite(Context, name, bool)
+- getThumbnailPath(Context, name) → path (atau null)
+- getIndexMetadata(Context) → List<Map> (metadata semua preset)
+- mergePreset(base, src, flags) → OverlayPreset (partial apply)
+- exportToJson / exportAllToJson / exportToFile
+- importFromJson / importManyFromJson / importFromFile
+- sharePreset(Activity, name) — export ke file + share via intent
+
+Backward compatibility: format lama (name-key storage) auto-migrate ke UUID index saat diakses pertama.
+
+Thumbnail: 64x64px PNG di-generate saat save berdasarkan OverlayPreset.color, disimpan di filesDir/presets/thumb_<uuid>.png.
+
+History: capped 10 items; item lama di-pop otomatis saat limit tercapai.
 
 ---
 

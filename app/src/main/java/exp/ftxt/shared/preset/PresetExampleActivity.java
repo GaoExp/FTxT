@@ -286,33 +286,7 @@ public class PresetExampleActivity {
     }
 
     // ====================================================================
-    // 5. EKSPOR KE CLIPBOARD — tombol "Ekspor Preset"
-    // ====================================================================
-
-    /**
-     * Mengekspor semua preset ke clipboard sebagai JSON.
-     *
-     * Panggil dari: buttonExport.setOnClickListener(v -> exportPresets());
-     */
-    public static void exportPresets(Activity activity) {
-        PresetManager.exportToClipboard(activity);
-    }
-
-    // ====================================================================
-    // 6. IMPOR DARI CLIPBOARD — tombol "Impor Preset"
-    // ====================================================================
-
-    /**
-     * Mengimpor preset dari clipboard.
-     *
-     * Panggil dari: buttonImport.setOnClickListener(v -> importPresets());
-     */
-    public static void importPresets(Activity activity) {
-        PresetManager.importFromClipboard(activity);
-    }
-
-    // ====================================================================
-    // 7. EKSPOR KE FILE — tombol "Ekspor ke File"
+    // 5. EKSPOR KE FILE — tombol "Ekspor Preset"
     // ====================================================================
 
     /**
@@ -320,10 +294,9 @@ public class PresetExampleActivity {
      *
      * Panggil dari: buttonExportFile.setOnClickListener(v -> exportPresetsToFile());
      */
-    public static void exportPresetsToFile(Activity activity) {
-        // Nama file: ftxt_presets_YYYYMMDD_HHmmss.txt
+    public static void exportPresets(Activity activity) {
+        // use exportToFile example
         String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-
         boolean success = PresetManager.exportToFile(activity, filename);
         if (success) {
             Toast.makeText(activity,
@@ -337,7 +310,7 @@ public class PresetExampleActivity {
     }
 
     // ====================================================================
-    // 8. IMPOR DARI FILE — tombol "Impor dari File"
+    // 6. IMPOR DARI FILE — tombol "Impor dari File"
     // ====================================================================
 
     /**

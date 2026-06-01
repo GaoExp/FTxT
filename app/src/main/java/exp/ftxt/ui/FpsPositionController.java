@@ -2,8 +2,10 @@ package exp.ftxt.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -12,7 +14,10 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
@@ -40,6 +45,7 @@ public class FpsPositionController {
 
     private static final String PREFS_NAME = "ftxt_prefs";
     private String activePresetName;
+    private ActivityResultLauncher<String[]> fileImportLauncher;
 
     public FpsPositionController(Activity activity) {
         this.activity = activity;
@@ -73,6 +79,16 @@ public class FpsPositionController {
         );
         setupListeners();
         syncAll();
+
+        fileImportLauncher = ((AppCompatActivity) activity).registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
+                uri -> {
+                    if (uri != null) {
+                        int count = PresetManager.importFromFile(activity, uri);
+                        Toast.makeText(activity, "Berhasil impor " + count + " preset", Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
     }
 
     private void bindViews() {
@@ -192,14 +208,31 @@ public class FpsPositionController {
 
     private void showExportImportMenu() {
         PopupMenu popup = new PopupMenu(activity, btnExportImport);
-        popup.getMenu().add("Ekspor ke Clipboard");
-        popup.getMenu().add("Impor dari Clipboard");
+        popup.getMenu().add("Ekspor ke File");
+        popup.getMenu().add("Bagikan Preset");
+        popup.getMenu().add("Impor dari File");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
-            if (title.equals("Ekspor ke Clipboard")) {
-                PresetManager.exportToClipboard(activity);
-            } else {
-                PresetManager.importFromClipboard(activity);
+            if (title.equals("Ekspor ke File")) {
+                String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
+                if (PresetManager.exportToFile(activity, filename)) {
+                    Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
+                }
+            } else if (title.equals("Bagikan Preset")) {
+                String toShare = activePresetName;
+                if (toShare == null || toShare.isEmpty()) {
+                    java.util.List<String> names = PresetManager.getAllNames(activity);
+                    if (!names.isEmpty()) toShare = names.get(0);
+                }
+                if (toShare == null || toShare.isEmpty()) {
+                    Toast.makeText(activity, "Tidak ada preset untuk dibagikan", Toast.LENGTH_SHORT).show();
+                } else {
+                    PresetManager.sharePreset(activity, toShare);
+                }
+            } else if (title.equals("Impor dari File")) {
+                fileImportLauncher.launch(new String[]{"text/plain"});
             }
             return true;
         });
