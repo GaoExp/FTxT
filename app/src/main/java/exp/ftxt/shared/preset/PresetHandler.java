@@ -1,0 +1,133 @@
+package exp.ftxt.shared.preset;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.view.View;
+import android.widget.EditText;
+
+import java.util.List;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
+
+import exp.ftxt.shared.ui.ShadowConfig;
+
+public class PresetHandler {
+
+    public interface Delegate {
+        String moduleLabel();
+        String touchPassthroughPrefKey();
+        String safeAreaPrefKey();
+        String posXPrefKey();
+        String posYPrefKey();
+
+        void saveToPreset(OverlayPreset preset);
+        void applyFromPreset(Activity activity, OverlayPreset preset, SharedPreferences prefs);
+        void syncToService();
+    }
+
+    public static void showSavePresetDialog(Activity activity, Delegate delegate) {
+        EditText input = new EditText(activity);
+        input.setHint("Nama preset");
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Simpan Preset")
+                .setMessage("Simpan konfigurasi " + delegate.moduleLabel() + " saat ini sebagai preset?")
+                .setView(input)
+                .setPositiveButton("Simpan", (d, w) -> {
+                    String name = input.getText().toString().trim();
+                    if (name.isEmpty()) {
+                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    OverlayPreset existing = PresetManager.load(activity, name);
+                    if (existing != null) {
+                        new AlertDialog.Builder(activity)
+                                .setTitle("Timpa Preset")
+                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
+                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(activity, name, delegate))
+                                .setNegativeButton("Batal", null)
+                                .show();
+                    } else {
+                        doSavePreset(activity, name, delegate);
+                    }
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private static void doSavePreset(Activity activity, String name, Delegate delegate) {
+        OverlayPreset preset = new OverlayPreset();
+        delegate.saveToPreset(preset);
+        int orientation = activity.getResources().getConfiguration().orientation;
+        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        PresetManager.save(activity, name, preset);
+        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showLoadPresetDialog(Activity activity, Delegate delegate,
+                                            StringHolder activePresetName, Runnable postApply) {
+        if (!(activity instanceof FragmentActivity)) {
+            PresetManager.showLoadPresetDialog(activity, activePresetName.value, name -> {
+                doLoadPreset(activity, name, delegate, activePresetName, postApply);
+            });
+            return;
+        }
+        new PresetBrowserDialog(activity, name -> {
+            doLoadPreset(activity, name, delegate, activePresetName, postApply);
+        }, null).show(((FragmentActivity) activity).getSupportFragmentManager(), "PresetBrowserDialog");
+    }
+
+    private static void doLoadPreset(Activity activity, String name, Delegate delegate,
+                                      StringHolder activePresetName, Runnable postApply) {
+        List<String> names = PresetManager.getAllNames(activity);
+        if (!names.contains(name)) {
+            Toast.makeText(activity, "Preset \"" + name + "\" tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        OverlayPreset preset = PresetManager.load(activity, name);
+        if (preset == null) {
+            Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        activePresetName.value = name;
+        applyPreset(activity, preset, delegate);
+        if (postApply != null) postApply.run();
+        Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
+    }
+
+    private static void applyPreset(Activity activity, OverlayPreset preset, Delegate delegate) {
+        SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+        delegate.applyFromPreset(activity, preset, prefs);
+        savePositionToPrefs(prefs, delegate, getCurrentOrientation(activity), preset.posX, preset.posY);
+        delegate.syncToService();
+    }
+
+    public static void savePositionToPrefs(SharedPreferences prefs, Delegate delegate,
+                                           String orient, float posX, float posY) {
+        String sfx = "_" + orient;
+        prefs.edit()
+                .putFloat(delegate.posXPrefKey() + sfx, posX)
+                .putFloat(delegate.posYPrefKey() + sfx, posY)
+                .apply();
+    }
+
+    public static String getCurrentOrientation(Activity activity) {
+        int orientation = activity.getResources().getConfiguration().orientation;
+        return (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+    }
+
+    public static class StringHolder {
+        public String value;
+        public StringHolder() {}
+        public StringHolder(String value) { this.value = value; }
+    }
+
+    public static ShadowConfig copyShadow(ShadowConfig src) {
+        if (src == null) return new ShadowConfig();
+        return new ShadowConfig(src.enabled, src.color, src.blur, src.offsetX, src.offsetY);
+    }
+}

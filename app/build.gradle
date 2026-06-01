@@ -13,8 +13,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 130
-        versionName "3.9.3.66.3"
+        versionCode 134
+        versionName "3.9.3.67.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,8 +33,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs << "-Xlint:none"
     }
 
 }

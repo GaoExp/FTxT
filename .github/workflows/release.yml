@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -27,6 +29,8 @@ jobs:
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "-> local.properties:"
           cat local.properties
+          echo "-> gradle.properties:"
+          cat gradle.properties
 
       - name: Build APK Release
         run: ./gradlew assembleRelease
@@ -42,5 +46,4 @@ jobs:
         with:
           files: |
             **/build/outputs/apk/release/*.apk
-            **/build/outputs/apk/release/*.apk.idsig
           generate_release_notes: true

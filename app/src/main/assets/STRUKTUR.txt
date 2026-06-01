@@ -67,7 +67,9 @@ FTxT/
 │   │   │   │   │   └── HSVColorPickerView.java
 │   │   │   │   ├── preset/
 │   │   │   │   │   ├── OverlayPreset.java
+│   │   │   │   │   ├── PresetHandler.java
 │   │   │   │   │   ├── PresetManager.java
+│   │   │   │   │   ├── PresetBrowserDialog.java
 │   │   │   │   │   └── PresetExampleActivity.java
 │   │   │   │   └── ui/
 │   │   │   │       ├── AppPresetWatcher.java
@@ -122,8 +124,10 @@ FTxT/
 │   │   │   │   ├── activity_main.xml
 │   │   │   │   ├── activity_settings.xml
 │   │   │   │   ├── dialog_hsv_color_picker.xml
+│   │   │   │   ├── dialog_preset_browser.xml
 │   │   │   │   ├── drawer_content.xml
 │   │   │   │   ├── nav_header.xml
+│   │   │   │   ├── preset_browser_item.xml
 │   │   │   │   └── preset_list_item.xml
 │   │   │   ├── drawable/
 │   │   │   │   ├── ic_edit.xml
@@ -196,7 +200,9 @@ FTxT/
 | shared/color/ColorMath.java | Utilitas HSV color math |
 | shared/color/ColorNameResolver.java | Konversi warna ke nama |
 | shared/preset/OverlayPreset.java | Model data preset overlay (posisi, warna, shadow, background, orientasi) |
+| shared/preset/PresetHandler.java | Handler preset terpusat: dialog save/load/export/import dengan pattern Delegate, menghilangkan duplikasi di 7 PositionController |
 | shared/preset/PresetManager.java | Manager preset CRUD: Save/Load/Rename/Select/Delete/Export/Import via GSON |
+| shared/preset/PresetBrowserDialog.java | DialogFragment browser preset modern dengan search, filter, color thumbnail, favorite, rename, delete, reorder |
 | shared/preset/PresetExampleActivity.java | Contoh implementasi OnClickListener preset di MainActivity |
 | shared/ui/AppPresetWatcher.java | Auto-switch preset berdasarkan orientasi |
 | shared/ui/ColorPickerDialog.java | Dialog wrapper color picker (ARGB) |
@@ -223,6 +229,8 @@ FTxT/
 | activity_main.xml | Layout utama |
 | activity_settings.xml | Layout settings menu |
 | dialog_hsv_color_picker.xml | Layout dialog color picker |
+| dialog_preset_browser.xml | Layout dialog browser preset (search + list + bottom bar) |
 | drawer_content.xml | Layout sidebar drawer konten |
+| preset_browser_item.xml | Layout per-item preset (color thumbnail, nama, tags, star) |
 | nav_header.xml | Header navigation drawer |
 | preset_list_item.xml | Layout item daftar preset dengan preview |

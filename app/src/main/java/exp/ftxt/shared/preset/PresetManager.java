@@ -92,6 +92,7 @@ public class PresetManager {
         long updatedAt;
         List<String> tags;
         boolean favorite;
+        int color;
         String thumbnailPath; // relative to filesDir, e.g. "presets/thumb_<uuid>.png"
 
         PresetIndexItem() {
@@ -244,6 +245,9 @@ public class PresetManager {
         // Serialize OverlayPreset → JSON string (store under uuid)
         String json = gson.toJson(preset);
         prefs.edit().putString(KEY_PREFIX + item.uuid, json).apply();
+
+        // Store color in index for quick access
+        item.color = preset.color;
 
         // Generate simple color thumbnail (fill with preset.color) and save to filesDir
         try {
@@ -749,6 +753,7 @@ public class PresetManager {
             m.put("updatedAt", it.updatedAt);
             m.put("tags", new ArrayList<>(it.tags));
             m.put("favorite", it.favorite);
+            m.put("color", it.color);
             m.put("thumbnail", it.thumbnailPath);
             out.add(m);
         }

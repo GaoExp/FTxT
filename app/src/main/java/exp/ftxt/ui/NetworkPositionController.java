@@ -2,21 +2,16 @@ package exp.ftxt.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
@@ -24,9 +19,9 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.network_stats.NetworkModule;
 import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
-import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
 public class NetworkPositionController {
@@ -40,12 +35,81 @@ public class NetworkPositionController {
     private DpadController dpad;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private View btnExportImport;
+    private TextView activePresetLabel;
     private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
-    private String activePresetName;
-    private ActivityResultLauncher<String[]> fileImportLauncher;
+    private final PresetHandler.StringHolder activePresetName = new PresetHandler.StringHolder();
+
+    private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
+        @Override
+        public String moduleLabel() { return "Network"; }
+        @Override
+        public String touchPassthroughPrefKey() { return "network_lock"; }
+        @Override
+        public String safeAreaPrefKey() { return "network_safe_area"; }
+        @Override
+        public String posXPrefKey() { return "network_pos_x"; }
+        @Override
+        public String posYPrefKey() { return "network_pos_y"; }
+
+        @Override
+        public void saveToPreset(OverlayPreset p) {
+            p.posX = NetworkConfig.posX;
+            p.posY = NetworkConfig.posY;
+            p.size = NetworkConfig.size;
+            p.color = NetworkConfig.color;
+            p.shadow = PresetHandler.copyShadow(NetworkConfig.shadow);
+            p.bgEnabled = NetworkConfig.bgEnabled;
+            p.bgColor = NetworkConfig.bgColor;
+            p.bgPadding = NetworkConfig.bgPadding;
+            p.bgOffsetX = NetworkConfig.bgOffsetX;
+            p.bgOffsetY = NetworkConfig.bgOffsetY;
+            p.bgMargin = NetworkConfig.bgMargin;
+            p.bgRadius = NetworkConfig.bgRadius;
+            p.touchPassthrough = NetworkConfig.touchPassthrough;
+            p.safeArea = NetworkConfig.safeArea;
+        }
+
+        @Override
+        public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
+            NetworkConfig.posX = p.posX;
+            NetworkConfig.posY = p.posY;
+            NetworkConfig.size = p.size;
+            NetworkConfig.color = p.color;
+            if (p.shadow != null) {
+                NetworkConfig.shadow.enabled = p.shadow.enabled;
+                NetworkConfig.shadow.color = p.shadow.color;
+                NetworkConfig.shadow.blur = p.shadow.blur;
+                NetworkConfig.shadow.offsetX = p.shadow.offsetX;
+                NetworkConfig.shadow.offsetY = p.shadow.offsetY;
+            }
+            NetworkConfig.bgEnabled = p.bgEnabled;
+            NetworkConfig.bgColor = p.bgColor;
+            NetworkConfig.bgPadding = p.bgPadding;
+            NetworkConfig.bgOffsetX = p.bgOffsetX;
+            NetworkConfig.bgOffsetY = p.bgOffsetY;
+            NetworkConfig.bgMargin = p.bgMargin;
+            NetworkConfig.bgRadius = p.bgRadius;
+            if (p.touchPassthrough != null) {
+                NetworkConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("network_lock", NetworkConfig.touchPassthrough).apply();
+            }
+            if (p.safeArea != null) {
+                NetworkConfig.safeArea = p.safeArea;
+                prefs.edit().putBoolean("network_safe_area", NetworkConfig.safeArea).apply();
+            }
+        }
+
+        @Override
+        public void syncToService() {
+            FloatingService.updateNetworkPositionStatic();
+            FloatingService.updateNetworkSizeStatic();
+            FloatingService.updateNetworkColorStatic();
+            FloatingService.updateNetworkShadowStatic();
+            FloatingService.updateNetworkBackgroundStatic();
+        }
+    };
 
     public NetworkPositionController(Activity activity) {
         this.activity = activity;
@@ -67,9 +131,6 @@ public class NetworkPositionController {
 
         NetworkModule.onPositionUpdate = this::syncAll;
 
-        if (btnExportImport != null) {
-            btnExportImport.setOnClickListener(v -> showExportImportMenu());
-        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.network_posXSeekBar),
                 activity.findViewById(R.id.network_posYSeekBar),
@@ -79,16 +140,6 @@ public class NetworkPositionController {
         );
         setupListeners();
         syncAll();
-
-        fileImportLauncher = ((AppCompatActivity) activity).registerForActivityResult(
-                new ActivityResultContracts.OpenDocument(),
-                uri -> {
-                    if (uri != null) {
-                        int count = PresetManager.importFromFile(activity, uri);
-                        Toast.makeText(activity, "Berhasil impor " + count + " preset", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
     }
 
     private void bindViews() {
@@ -97,7 +148,7 @@ public class NetworkPositionController {
         btnLeft = activity.findViewById(R.id.network_btnLeft);
         btnRight = activity.findViewById(R.id.network_btnRight);
         coordDisplay = activity.findViewById(R.id.network_posCoordDisplay);
-        btnExportImport = activity.findViewById(R.id.network_btnExportImport);
+        activePresetLabel = activity.findViewById(R.id.network_txtActivePreset);
     }
 
     private void setupListeners() {
@@ -107,151 +158,17 @@ public class NetworkPositionController {
 
         View btnSavePreset = activity.findViewById(R.id.network_btnSavePreset);
         if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
+            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
         }
 
         View btnLoadPreset = activity.findViewById(R.id.network_btnLoadPreset);
         if (btnLoadPreset != null) {
             btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
         }
-
-    }
-
-    private void showSavePresetDialog() {
-        EditText input = new EditText(activity);
-        input.setHint("Nama preset");
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Simpan Preset")
-                .setMessage("Simpan konfigurasi Network saat ini sebagai preset?")
-                .setView(input)
-                .setPositiveButton("Simpan", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    OverlayPreset existing = PresetManager.load(activity, name);
-                    if (existing != null) {
-                        new AlertDialog.Builder(activity)
-                                .setTitle("Timpa Preset")
-                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
-                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(name))
-                                .setNegativeButton("Batal", null)
-                                .show();
-                    } else {
-                        doSavePreset(name);
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
-
-    private void doSavePreset(String name) {
-        OverlayPreset preset = new OverlayPreset();
-        preset.posX = NetworkConfig.posX;
-        preset.posY = NetworkConfig.posY;
-        preset.size = NetworkConfig.size;
-        preset.color = NetworkConfig.color;
-        ShadowConfig sc = NetworkConfig.shadow;
-        preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
-        preset.bgEnabled = NetworkConfig.bgEnabled;
-        preset.bgColor = NetworkConfig.bgColor;
-        preset.bgPadding = NetworkConfig.bgPadding;
-        preset.bgOffsetX = NetworkConfig.bgOffsetX;
-        preset.bgOffsetY = NetworkConfig.bgOffsetY;
-        preset.bgMargin = NetworkConfig.bgMargin;
-        preset.bgRadius = NetworkConfig.bgRadius;
-        int orientation = activity.getResources().getConfiguration().orientation;
-        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
-        preset.touchPassthrough = NetworkConfig.touchPassthrough;
-        preset.safeArea = NetworkConfig.safeArea;
-
-        PresetManager.save(activity, name, preset);
-        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
     }
 
     public void showLoadPresetDialog() {
-        PresetManager.showLoadPresetDialog(activity, activePresetName, name -> {
-            OverlayPreset preset = PresetManager.load(activity, name);
-            if (preset == null) {
-                Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            activePresetName = name;
-            applyPreset(preset);
-            Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void applyPreset(OverlayPreset preset) {
-        NetworkConfig.posX = preset.posX;
-        NetworkConfig.posY = preset.posY;
-        NetworkConfig.size = preset.size;
-        NetworkConfig.color = preset.color;
-        if (preset.shadow != null) {
-            NetworkConfig.shadow.enabled = preset.shadow.enabled;
-            NetworkConfig.shadow.color = preset.shadow.color;
-            NetworkConfig.shadow.blur = preset.shadow.blur;
-            NetworkConfig.shadow.offsetX = preset.shadow.offsetX;
-            NetworkConfig.shadow.offsetY = preset.shadow.offsetY;
-        }
-        NetworkConfig.bgEnabled = preset.bgEnabled;
-        NetworkConfig.bgColor = preset.bgColor;
-        NetworkConfig.bgPadding = preset.bgPadding;
-        NetworkConfig.bgOffsetX = preset.bgOffsetX;
-        NetworkConfig.bgOffsetY = preset.bgOffsetY;
-        NetworkConfig.bgMargin = preset.bgMargin;
-        NetworkConfig.bgRadius = preset.bgRadius;
-        if (preset.touchPassthrough != null) {
-            NetworkConfig.touchPassthrough = preset.touchPassthrough;
-            prefs.edit().putBoolean("network_lock", NetworkConfig.touchPassthrough).apply();
-        }
-        if (preset.safeArea != null) {
-            NetworkConfig.safeArea = preset.safeArea;
-            prefs.edit().putBoolean("network_safe_area", NetworkConfig.safeArea).apply();
-        }
-
-        savePositionToPrefs(currentOrientation);
-        syncAll();
-        FloatingService.updateNetworkPositionStatic();
-        FloatingService.updateNetworkSizeStatic();
-        FloatingService.updateNetworkColorStatic();
-        FloatingService.updateNetworkShadowStatic();
-        FloatingService.updateNetworkBackgroundStatic();
-    }
-
-    private void showExportImportMenu() {
-        PopupMenu popup = new PopupMenu(activity, btnExportImport);
-        popup.getMenu().add("Ekspor ke File");
-        popup.getMenu().add("Bagikan Preset");
-        popup.getMenu().add("Impor dari File");
-        popup.setOnMenuItemClickListener(item -> {
-            String title = item.getTitle().toString();
-            if (title.equals("Ekspor ke File")) {
-                String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-                if (PresetManager.exportToFile(activity, filename)) {
-                    Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
-                }
-            } else if (title.equals("Bagikan Preset")) {
-                String toShare = activePresetName;
-                if (toShare == null || toShare.isEmpty()) {
-                    java.util.List<String> names = PresetManager.getAllNames(activity);
-                    if (!names.isEmpty()) toShare = names.get(0);
-                }
-                if (toShare == null || toShare.isEmpty()) {
-                    Toast.makeText(activity, "Tidak ada preset untuk dibagikan", Toast.LENGTH_SHORT).show();
-                } else {
-                    PresetManager.sharePreset(activity, toShare);
-                }
-            } else if (title.equals("Impor dari File")) {
-                fileImportLauncher.launch(new String[]{"text/plain"});
-            }
-            return true;
-        });
-        popup.show();
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
     }
 
     private static float clamp(float val) {
@@ -262,16 +179,8 @@ public class NetworkPositionController {
         NetworkConfig.posX = x;
         NetworkConfig.posY = y;
         syncAll();
-        savePositionToPrefs(currentOrientation);
+        PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
         FloatingService.updateNetworkPositionStatic();
-    }
-
-    private void savePositionToPrefs(String orient) {
-        String sfx = "_" + orient;
-        prefs.edit()
-                .putFloat("network_pos_x" + sfx, NetworkConfig.posX)
-                .putFloat("network_pos_y" + sfx, NetworkConfig.posY)
-                .apply();
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -292,6 +201,18 @@ public class NetworkPositionController {
     public void syncAll() {
         sliderController.sync(NetworkConfig.posX, NetworkConfig.posY);
         updateCoordDisplay();
+        updateActivePresetLabel();
+    }
+
+    private void updateActivePresetLabel() {
+        if (activePresetLabel == null) return;
+        String name = activePresetName.value;
+        if (name != null && !name.isEmpty()) {
+            activePresetLabel.setText("Aktif: " + name);
+            activePresetLabel.setVisibility(View.VISIBLE);
+        } else {
+            activePresetLabel.setVisibility(View.GONE);
+        }
     }
 
     private void updateCoordDisplay() {
@@ -307,5 +228,4 @@ public class NetworkPositionController {
         }
         coordDisplay.setText(px + "X" + py);
     }
-
 }

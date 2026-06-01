@@ -3,6 +3,63 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.67.0] - 2026-06-01
+
+### ✨ Fitur Baru
+
+- **PresetBrowserDialog** — Dialog browser preset modern dengan search, filter, color thumbnail, favorite, rename, delete, reorder, dan export/import. Menggantikan AlertDialog radio-list lama.
+- **Active Preset Label** — Setiap panel (7 module) menampilkan label preset aktif di atas tombol preset.
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Java 8 → Java 17** — sourceCompatibility/targetCompatibility dinaikkan ke Java 17 menghilangkan deprecation warning dari JDK 21.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — DialogFragment browser preset dengan search, list, favorite, rename, delete, reorder.
+- `app/src/main/res/layout/dialog_preset_browser.xml` — Layout dialog browser preset (search bar + list + bottom bar).
+- `app/src/main/res/layout/preset_browser_item.xml` — Layout per-item preset (color thumbnail + nama + tags + favorite star).
+
+### 🐞 Bug Fixes
+
+- **Import FC di PresetBrowserDialog** — `registerForActivityResult` dipindah ke `onCreate` Fragment lifecycle, bukan lazy di click handler.
+
+### ♻️️ Perubahan Fitur
+
+- **Tombol E/I dihapus** dari 7 panel — fungsi ekspor/impor/bagikan sudah ada di PresetBrowserDialog. Metode `PresetHandler.showExportImportMenu()` dihapus.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 131→134, versionName 3.9.3.66.4→3.9.3.67.0, sourceCompatibility & targetCompatibility VERSION_1_8→VERSION_17
+- `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Tambah `color` di index metadata untuk quick thumbnail.
+- `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — `showLoadPresetDialog()` pakai `PresetBrowserDialog`; hapus `showExportImportMenu`.
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — `importLauncher` pakai `registerForActivityResult` di `onCreate`.
+- `app/src/main/res/layout/activity_main.xml` — Tambah `TextView` active preset label di 7 panel; hapus tombol E/I dari 7 panel.
+- All 7 PositionControllers — Tambah `activePresetLabel`, update di `syncAll()`; hapus `btnExportImport`, `fileImportLauncher`, E/I listener.
+- `README.md` + `README.txt` — Update versi `3.9.3.66.4`→`3.9.3.67.0`
+- `STRUKTUR.md` + `STRUKTUR.txt` — Tambah `PresetBrowserDialog.java`, `dialog_preset_browser.xml`, `preset_browser_item.xml`
+- `DEVELOPMENT.md` + `DEVELOPMENT.txt` — Java requirement 1.8+→17+, "Java 1.8 compatible"→"Java 17 compatible"
+- `.github/workflows/release.yml` — Hapus `android.enableAapt2FromMaven` (obsolete di AGP 8.12)
+
+---
+
+## [3.9.3.66.4] - 2026-06-01
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Ekstrak Logika Preset ke PresetHandler** — `showSavePresetDialog`, `doSavePreset`, `showLoadPresetDialog`, `applyPreset`, dan `showExportImportMenu` diekstrak dari semua 7 PositionController ke `shared/preset/PresetHandler.java` dengan pola Delegate interface. Menghapus ~800 baris kode duplikat.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — Class baru dengan `Delegate` interface + static methods untuk handle semua operasi preset.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 130→131, versionName 3.9.3.66.3→3.9.3.66.4
+- All 7 PositionControllers — hapus preset dialog/export code, gunakan PresetHandler.Delegate
+
+---
+
 ## [3.9.3.66.3] - 2026-06-01
 
 ### 🐞 Bug Fixes

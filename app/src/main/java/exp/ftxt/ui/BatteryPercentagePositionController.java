@@ -2,21 +2,16 @@ package exp.ftxt.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
@@ -24,9 +19,9 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
 import exp.ftxt.features.battery_percentage.BatteryPercentageModule;
 import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
-import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
 public class BatteryPercentagePositionController {
@@ -40,12 +35,76 @@ public class BatteryPercentagePositionController {
     private DpadController dpad;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private View btnExportImport;
+    private TextView activePresetLabel;
     private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
-    private String activePresetName;
-    private ActivityResultLauncher<String[]> fileImportLauncher;
+    private final PresetHandler.StringHolder activePresetName = new PresetHandler.StringHolder();
+
+    private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
+        @Override
+        public String moduleLabel() { return "Battery %"; }
+        @Override
+        public String touchPassthroughPrefKey() { return "battpct_lock"; }
+        @Override
+        public String safeAreaPrefKey() { return null; }
+        @Override
+        public String posXPrefKey() { return "battpct_pos_x"; }
+        @Override
+        public String posYPrefKey() { return "battpct_pos_y"; }
+
+        @Override
+        public void saveToPreset(OverlayPreset p) {
+            p.posX = BatteryPercentageConfig.posX;
+            p.posY = BatteryPercentageConfig.posY;
+            p.size = BatteryPercentageConfig.size;
+            p.color = BatteryPercentageConfig.color;
+            p.shadow = PresetHandler.copyShadow(BatteryPercentageConfig.shadow);
+            p.bgEnabled = BatteryPercentageConfig.bgEnabled;
+            p.bgColor = BatteryPercentageConfig.bgColor;
+            p.bgPadding = BatteryPercentageConfig.bgPadding;
+            p.bgOffsetX = BatteryPercentageConfig.bgOffsetX;
+            p.bgOffsetY = BatteryPercentageConfig.bgOffsetY;
+            p.bgMargin = BatteryPercentageConfig.bgMargin;
+            p.bgRadius = BatteryPercentageConfig.bgRadius;
+            p.touchPassthrough = BatteryPercentageConfig.touchPassthrough;
+        }
+
+        @Override
+        public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
+            BatteryPercentageConfig.posX = p.posX;
+            BatteryPercentageConfig.posY = p.posY;
+            BatteryPercentageConfig.size = p.size;
+            BatteryPercentageConfig.color = p.color;
+            if (p.shadow != null) {
+                BatteryPercentageConfig.shadow.enabled = p.shadow.enabled;
+                BatteryPercentageConfig.shadow.color = p.shadow.color;
+                BatteryPercentageConfig.shadow.blur = p.shadow.blur;
+                BatteryPercentageConfig.shadow.offsetX = p.shadow.offsetX;
+                BatteryPercentageConfig.shadow.offsetY = p.shadow.offsetY;
+            }
+            BatteryPercentageConfig.bgEnabled = p.bgEnabled;
+            BatteryPercentageConfig.bgColor = p.bgColor;
+            BatteryPercentageConfig.bgPadding = p.bgPadding;
+            BatteryPercentageConfig.bgOffsetX = p.bgOffsetX;
+            BatteryPercentageConfig.bgOffsetY = p.bgOffsetY;
+            BatteryPercentageConfig.bgMargin = p.bgMargin;
+            BatteryPercentageConfig.bgRadius = p.bgRadius;
+            if (p.touchPassthrough != null) {
+                BatteryPercentageConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("battpct_lock", BatteryPercentageConfig.touchPassthrough).apply();
+            }
+        }
+
+        @Override
+        public void syncToService() {
+            FloatingService.updateBatteryPercentagePositionStatic();
+            FloatingService.updateBatteryPercentageSizeStatic();
+            FloatingService.updateBatteryPercentageColorStatic();
+            FloatingService.updateBatteryPercentageShadowStatic();
+            FloatingService.updateBatteryPercentageBackgroundStatic();
+        }
+    };
 
     public BatteryPercentagePositionController(Activity activity) {
         this.activity = activity;
@@ -67,9 +126,6 @@ public class BatteryPercentagePositionController {
 
         BatteryPercentageModule.onPositionUpdate = this::syncAll;
 
-        if (btnExportImport != null) {
-            btnExportImport.setOnClickListener(v -> showExportImportMenu());
-        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.batPctPosXSeekBar),
                 activity.findViewById(R.id.batPctPosYSeekBar),
@@ -79,16 +135,6 @@ public class BatteryPercentagePositionController {
         );
         setupListeners();
         syncAll();
-
-        fileImportLauncher = ((AppCompatActivity) activity).registerForActivityResult(
-                new ActivityResultContracts.OpenDocument(),
-                uri -> {
-                    if (uri != null) {
-                        int count = PresetManager.importFromFile(activity, uri);
-                        Toast.makeText(activity, "Berhasil impor " + count + " preset", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
     }
 
     private void bindViews() {
@@ -97,7 +143,7 @@ public class BatteryPercentagePositionController {
         btnLeft = activity.findViewById(R.id.batPctBtnLeft);
         btnRight = activity.findViewById(R.id.batPctBtnRight);
         coordDisplay = activity.findViewById(R.id.batPctPosCoordDisplay);
-        btnExportImport = activity.findViewById(R.id.batPctBtnExportImport);
+        activePresetLabel = activity.findViewById(R.id.batPctTxtActivePreset);
     }
 
     private void setupListeners() {
@@ -107,7 +153,7 @@ public class BatteryPercentagePositionController {
 
         View btnSavePreset = activity.findViewById(R.id.batPctBtnSavePreset);
         if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
+            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
         }
 
         View btnLoadPreset = activity.findViewById(R.id.batPctBtnLoadPreset);
@@ -116,136 +162,8 @@ public class BatteryPercentagePositionController {
         }
     }
 
-    private void showSavePresetDialog() {
-        EditText input = new EditText(activity);
-        input.setHint("Nama preset");
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Simpan Preset")
-                .setMessage("Simpan konfigurasi Battery % saat ini sebagai preset?")
-                .setView(input)
-                .setPositiveButton("Simpan", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    OverlayPreset existing = PresetManager.load(activity, name);
-                    if (existing != null) {
-                        new AlertDialog.Builder(activity)
-                                .setTitle("Timpa Preset")
-                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
-                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(name))
-                                .setNegativeButton("Batal", null)
-                                .show();
-                    } else {
-                        doSavePreset(name);
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
-
-    private void doSavePreset(String name) {
-        OverlayPreset preset = new OverlayPreset();
-        preset.posX = BatteryPercentageConfig.posX;
-        preset.posY = BatteryPercentageConfig.posY;
-        preset.size = BatteryPercentageConfig.size;
-        preset.color = BatteryPercentageConfig.color;
-        ShadowConfig sc = BatteryPercentageConfig.shadow;
-        preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
-        preset.bgEnabled = BatteryPercentageConfig.bgEnabled;
-        preset.bgColor = BatteryPercentageConfig.bgColor;
-        preset.bgPadding = BatteryPercentageConfig.bgPadding;
-        preset.bgOffsetX = BatteryPercentageConfig.bgOffsetX;
-        preset.bgOffsetY = BatteryPercentageConfig.bgOffsetY;
-        preset.bgMargin = BatteryPercentageConfig.bgMargin;
-        preset.bgRadius = BatteryPercentageConfig.bgRadius;
-        int orientation = activity.getResources().getConfiguration().orientation;
-        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
-        preset.touchPassthrough = BatteryPercentageConfig.touchPassthrough;
-
-        PresetManager.save(activity, name, preset);
-        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
-    }
-
     public void showLoadPresetDialog() {
-        PresetManager.showLoadPresetDialog(activity, activePresetName, name -> {
-            OverlayPreset preset = PresetManager.load(activity, name);
-            if (preset == null) {
-                Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            activePresetName = name;
-            applyPreset(preset);
-            Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void applyPreset(OverlayPreset preset) {
-        BatteryPercentageConfig.posX = preset.posX;
-        BatteryPercentageConfig.posY = preset.posY;
-        BatteryPercentageConfig.size = preset.size;
-        BatteryPercentageConfig.color = preset.color;
-        if (preset.shadow != null) {
-            BatteryPercentageConfig.shadow.enabled = preset.shadow.enabled;
-            BatteryPercentageConfig.shadow.color = preset.shadow.color;
-            BatteryPercentageConfig.shadow.blur = preset.shadow.blur;
-            BatteryPercentageConfig.shadow.offsetX = preset.shadow.offsetX;
-            BatteryPercentageConfig.shadow.offsetY = preset.shadow.offsetY;
-        }
-        BatteryPercentageConfig.bgEnabled = preset.bgEnabled;
-        BatteryPercentageConfig.bgColor = preset.bgColor;
-        BatteryPercentageConfig.bgPadding = preset.bgPadding;
-        BatteryPercentageConfig.bgOffsetX = preset.bgOffsetX;
-        BatteryPercentageConfig.bgOffsetY = preset.bgOffsetY;
-        BatteryPercentageConfig.bgMargin = preset.bgMargin;
-        BatteryPercentageConfig.bgRadius = preset.bgRadius;
-        if (preset.touchPassthrough != null) {
-            BatteryPercentageConfig.touchPassthrough = preset.touchPassthrough;
-            prefs.edit().putBoolean("battpct_lock", BatteryPercentageConfig.touchPassthrough).apply();
-        }
-
-        savePositionToPrefs(currentOrientation);
-        syncAll();
-        FloatingService.updateBatteryPercentagePositionStatic();
-        FloatingService.updateBatteryPercentageSizeStatic();
-        FloatingService.updateBatteryPercentageColorStatic();
-        FloatingService.updateBatteryPercentageShadowStatic();
-        FloatingService.updateBatteryPercentageBackgroundStatic();
-    }
-
-    private void showExportImportMenu() {
-        PopupMenu popup = new PopupMenu(activity, btnExportImport);
-        popup.getMenu().add("Ekspor ke File");
-        popup.getMenu().add("Bagikan Preset");
-        popup.getMenu().add("Impor dari File");
-        popup.setOnMenuItemClickListener(item -> {
-            String title = item.getTitle().toString();
-            if (title.equals("Ekspor ke File")) {
-                String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-                if (PresetManager.exportToFile(activity, filename)) {
-                    Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
-                }
-            } else if (title.equals("Bagikan Preset")) {
-                String toShare = activePresetName;
-                if (toShare == null || toShare.isEmpty()) {
-                    java.util.List<String> names = PresetManager.getAllNames(activity);
-                    if (!names.isEmpty()) toShare = names.get(0);
-                }
-                if (toShare == null || toShare.isEmpty()) {
-                    Toast.makeText(activity, "Tidak ada preset untuk dibagikan", Toast.LENGTH_SHORT).show();
-                } else {
-                    PresetManager.sharePreset(activity, toShare);
-                }
-            } else if (title.equals("Impor dari File")) {
-                fileImportLauncher.launch(new String[]{"text/plain"});
-            }
-            return true;
-        });
-        popup.show();
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
     }
 
     private static float clamp(float val) {
@@ -256,16 +174,8 @@ public class BatteryPercentagePositionController {
         BatteryPercentageConfig.posX = x;
         BatteryPercentageConfig.posY = y;
         syncAll();
-        savePositionToPrefs(currentOrientation);
+        PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
         FloatingService.updateBatteryPercentagePositionStatic();
-    }
-
-    private void savePositionToPrefs(String orient) {
-        String sfx = "_" + orient;
-        prefs.edit()
-                .putFloat("battpct_pos_x" + sfx, BatteryPercentageConfig.posX)
-                .putFloat("battpct_pos_y" + sfx, BatteryPercentageConfig.posY)
-                .apply();
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -286,6 +196,18 @@ public class BatteryPercentagePositionController {
     public void syncAll() {
         sliderController.sync(BatteryPercentageConfig.posX, BatteryPercentageConfig.posY);
         updateCoordDisplay();
+        updateActivePresetLabel();
+    }
+
+    private void updateActivePresetLabel() {
+        if (activePresetLabel == null) return;
+        String name = activePresetName.value;
+        if (name != null && !name.isEmpty()) {
+            activePresetLabel.setText("Aktif: " + name);
+            activePresetLabel.setVisibility(View.VISIBLE);
+        } else {
+            activePresetLabel.setVisibility(View.GONE);
+        }
     }
 
     private void updateCoordDisplay() {

@@ -2,21 +2,16 @@ package exp.ftxt.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
@@ -24,9 +19,9 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.clock_module.ClockModule;
 import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
-import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
 public class ClockPositionController {
@@ -40,12 +35,81 @@ public class ClockPositionController {
     private DpadController dpad;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private View btnExportImport;
+    private TextView activePresetLabel;
     private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
-    private String activePresetName;
-    private ActivityResultLauncher<String[]> fileImportLauncher;
+    private final PresetHandler.StringHolder activePresetName = new PresetHandler.StringHolder();
+
+    private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
+        @Override
+        public String moduleLabel() { return "Jam"; }
+        @Override
+        public String touchPassthroughPrefKey() { return "clock_lock"; }
+        @Override
+        public String safeAreaPrefKey() { return "clock_safe_area"; }
+        @Override
+        public String posXPrefKey() { return "clock_pos_x"; }
+        @Override
+        public String posYPrefKey() { return "clock_pos_y"; }
+
+        @Override
+        public void saveToPreset(OverlayPreset p) {
+            p.posX = ClockConfig.posX;
+            p.posY = ClockConfig.posY;
+            p.size = ClockConfig.size;
+            p.color = ClockConfig.color;
+            p.shadow = PresetHandler.copyShadow(ClockConfig.shadow);
+            p.bgEnabled = ClockConfig.bgEnabled;
+            p.bgColor = ClockConfig.bgColor;
+            p.bgPadding = ClockConfig.bgPadding;
+            p.bgOffsetX = ClockConfig.bgOffsetX;
+            p.bgOffsetY = ClockConfig.bgOffsetY;
+            p.bgMargin = ClockConfig.bgMargin;
+            p.bgRadius = ClockConfig.bgRadius;
+            p.touchPassthrough = ClockConfig.touchPassthrough;
+            p.safeArea = ClockConfig.safeArea;
+        }
+
+        @Override
+        public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
+            ClockConfig.posX = p.posX;
+            ClockConfig.posY = p.posY;
+            ClockConfig.size = p.size;
+            ClockConfig.color = p.color;
+            if (p.shadow != null) {
+                ClockConfig.shadow.enabled = p.shadow.enabled;
+                ClockConfig.shadow.color = p.shadow.color;
+                ClockConfig.shadow.blur = p.shadow.blur;
+                ClockConfig.shadow.offsetX = p.shadow.offsetX;
+                ClockConfig.shadow.offsetY = p.shadow.offsetY;
+            }
+            ClockConfig.bgEnabled = p.bgEnabled;
+            ClockConfig.bgColor = p.bgColor;
+            ClockConfig.bgPadding = p.bgPadding;
+            ClockConfig.bgOffsetX = p.bgOffsetX;
+            ClockConfig.bgOffsetY = p.bgOffsetY;
+            ClockConfig.bgMargin = p.bgMargin;
+            ClockConfig.bgRadius = p.bgRadius;
+            if (p.touchPassthrough != null) {
+                ClockConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("clock_lock", ClockConfig.touchPassthrough).apply();
+            }
+            if (p.safeArea != null) {
+                ClockConfig.safeArea = p.safeArea;
+                prefs.edit().putBoolean("clock_safe_area", ClockConfig.safeArea).apply();
+            }
+        }
+
+        @Override
+        public void syncToService() {
+            FloatingService.updateClockPositionStatic();
+            FloatingService.updateClockSizeStatic();
+            FloatingService.updateClockColorStatic();
+            FloatingService.updateClockShadowStatic();
+            FloatingService.updateClockBackgroundStatic();
+        }
+    };
 
     public ClockPositionController(Activity activity) {
         this.activity = activity;
@@ -67,9 +131,6 @@ public class ClockPositionController {
 
         ClockModule.onPositionUpdate = this::syncAll;
 
-        if (btnExportImport != null) {
-            btnExportImport.setOnClickListener(v -> showExportImportMenu());
-        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.clock_posXSeekBar),
                 activity.findViewById(R.id.clock_posYSeekBar),
@@ -79,16 +140,6 @@ public class ClockPositionController {
         );
         setupListeners();
         syncAll();
-
-        fileImportLauncher = ((AppCompatActivity) activity).registerForActivityResult(
-                new ActivityResultContracts.OpenDocument(),
-                uri -> {
-                    if (uri != null) {
-                        int count = PresetManager.importFromFile(activity, uri);
-                        Toast.makeText(activity, "Berhasil impor " + count + " preset", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
     }
 
     private void bindViews() {
@@ -97,7 +148,7 @@ public class ClockPositionController {
         btnLeft = activity.findViewById(R.id.clock_btnLeft);
         btnRight = activity.findViewById(R.id.clock_btnRight);
         coordDisplay = activity.findViewById(R.id.clock_posCoordDisplay);
-        btnExportImport = activity.findViewById(R.id.clock_btnExportImport);
+        activePresetLabel = activity.findViewById(R.id.clock_txtActivePreset);
     }
 
     private void setupListeners() {
@@ -107,151 +158,17 @@ public class ClockPositionController {
 
         View btnSavePreset = activity.findViewById(R.id.clock_btnSavePreset);
         if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
+            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
         }
 
         View btnLoadPreset = activity.findViewById(R.id.clock_btnLoadPreset);
         if (btnLoadPreset != null) {
             btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
         }
-
-    }
-
-    private void showSavePresetDialog() {
-        EditText input = new EditText(activity);
-        input.setHint("Nama preset");
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Simpan Preset")
-                .setMessage("Simpan konfigurasi Jam saat ini sebagai preset?")
-                .setView(input)
-                .setPositiveButton("Simpan", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    OverlayPreset existing = PresetManager.load(activity, name);
-                    if (existing != null) {
-                        new AlertDialog.Builder(activity)
-                                .setTitle("Timpa Preset")
-                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
-                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(name))
-                                .setNegativeButton("Batal", null)
-                                .show();
-                    } else {
-                        doSavePreset(name);
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
-
-    private void doSavePreset(String name) {
-        OverlayPreset preset = new OverlayPreset();
-        preset.posX = ClockConfig.posX;
-        preset.posY = ClockConfig.posY;
-        preset.size = ClockConfig.size;
-        preset.color = ClockConfig.color;
-        ShadowConfig sc = ClockConfig.shadow;
-        preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
-        preset.bgEnabled = ClockConfig.bgEnabled;
-        preset.bgColor = ClockConfig.bgColor;
-        preset.bgPadding = ClockConfig.bgPadding;
-        preset.bgOffsetX = ClockConfig.bgOffsetX;
-        preset.bgOffsetY = ClockConfig.bgOffsetY;
-        preset.bgMargin = ClockConfig.bgMargin;
-        preset.bgRadius = ClockConfig.bgRadius;
-        int orientation = activity.getResources().getConfiguration().orientation;
-        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
-        preset.touchPassthrough = ClockConfig.touchPassthrough;
-        preset.safeArea = ClockConfig.safeArea;
-
-        PresetManager.save(activity, name, preset);
-        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
     }
 
     public void showLoadPresetDialog() {
-        PresetManager.showLoadPresetDialog(activity, activePresetName, name -> {
-            OverlayPreset preset = PresetManager.load(activity, name);
-            if (preset == null) {
-                Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            activePresetName = name;
-            applyPreset(preset);
-            Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void applyPreset(OverlayPreset preset) {
-        ClockConfig.posX = preset.posX;
-        ClockConfig.posY = preset.posY;
-        ClockConfig.size = preset.size;
-        ClockConfig.color = preset.color;
-        if (preset.shadow != null) {
-            ClockConfig.shadow.enabled = preset.shadow.enabled;
-            ClockConfig.shadow.color = preset.shadow.color;
-            ClockConfig.shadow.blur = preset.shadow.blur;
-            ClockConfig.shadow.offsetX = preset.shadow.offsetX;
-            ClockConfig.shadow.offsetY = preset.shadow.offsetY;
-        }
-        ClockConfig.bgEnabled = preset.bgEnabled;
-        ClockConfig.bgColor = preset.bgColor;
-        ClockConfig.bgPadding = preset.bgPadding;
-        ClockConfig.bgOffsetX = preset.bgOffsetX;
-        ClockConfig.bgOffsetY = preset.bgOffsetY;
-        ClockConfig.bgMargin = preset.bgMargin;
-        ClockConfig.bgRadius = preset.bgRadius;
-        if (preset.touchPassthrough != null) {
-            ClockConfig.touchPassthrough = preset.touchPassthrough;
-            prefs.edit().putBoolean("clock_lock", ClockConfig.touchPassthrough).apply();
-        }
-        if (preset.safeArea != null) {
-            ClockConfig.safeArea = preset.safeArea;
-            prefs.edit().putBoolean("clock_safe_area", ClockConfig.safeArea).apply();
-        }
-
-        savePositionToPrefs(currentOrientation);
-        syncAll();
-        FloatingService.updateClockPositionStatic();
-        FloatingService.updateClockSizeStatic();
-        FloatingService.updateClockColorStatic();
-        FloatingService.updateClockShadowStatic();
-        FloatingService.updateClockBackgroundStatic();
-    }
-
-    private void showExportImportMenu() {
-        PopupMenu popup = new PopupMenu(activity, btnExportImport);
-        popup.getMenu().add("Ekspor ke File");
-        popup.getMenu().add("Bagikan Preset");
-        popup.getMenu().add("Impor dari File");
-        popup.setOnMenuItemClickListener(item -> {
-            String title = item.getTitle().toString();
-            if (title.equals("Ekspor ke File")) {
-                String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-                if (PresetManager.exportToFile(activity, filename)) {
-                    Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
-                }
-            } else if (title.equals("Bagikan Preset")) {
-                String toShare = activePresetName;
-                if (toShare == null || toShare.isEmpty()) {
-                    java.util.List<String> names = PresetManager.getAllNames(activity);
-                    if (!names.isEmpty()) toShare = names.get(0);
-                }
-                if (toShare == null || toShare.isEmpty()) {
-                    Toast.makeText(activity, "Tidak ada preset untuk dibagikan", Toast.LENGTH_SHORT).show();
-                } else {
-                    PresetManager.sharePreset(activity, toShare);
-                }
-            } else if (title.equals("Impor dari File")) {
-                fileImportLauncher.launch(new String[]{"text/plain"});
-            }
-            return true;
-        });
-        popup.show();
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
     }
 
     private static float clamp(float val) {
@@ -262,16 +179,8 @@ public class ClockPositionController {
         ClockConfig.posX = x;
         ClockConfig.posY = y;
         syncAll();
-        savePositionToPrefs(currentOrientation);
+        PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
         FloatingService.updateClockPositionStatic();
-    }
-
-    private void savePositionToPrefs(String orient) {
-        String sfx = "_" + orient;
-        prefs.edit()
-                .putFloat("clock_pos_x" + sfx, ClockConfig.posX)
-                .putFloat("clock_pos_y" + sfx, ClockConfig.posY)
-                .apply();
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -292,6 +201,18 @@ public class ClockPositionController {
     public void syncAll() {
         sliderController.sync(ClockConfig.posX, ClockConfig.posY);
         updateCoordDisplay();
+        updateActivePresetLabel();
+    }
+
+    private void updateActivePresetLabel() {
+        if (activePresetLabel == null) return;
+        String name = activePresetName.value;
+        if (name != null && !name.isEmpty()) {
+            activePresetLabel.setText("Aktif: " + name);
+            activePresetLabel.setVisibility(View.VISIBLE);
+        } else {
+            activePresetLabel.setVisibility(View.GONE);
+        }
     }
 
     private void updateCoordDisplay() {
@@ -307,5 +228,4 @@ public class ClockPositionController {
         }
         coordDisplay.setText(px + "X" + py);
     }
-
 }

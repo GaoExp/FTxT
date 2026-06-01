@@ -6,7 +6,7 @@
 - Android 8.0+ (API 26+)
 - Target SDK 35
 - Compile SDK 35
-- Java 1.8+
+- Java 17+
 
 ### Required Permissions
 - `android.permission.SYSTEM_ALERT_WINDOW`
@@ -132,7 +132,7 @@ Project saat ini dalam fase **Beta** — lihat [CHANGELOG.md](CHANGELOG.md) untu
 ## 🛠️ Catatan Development
 
 ### Code Style
-- Java 1.8 compatible
+- Java 17 compatible
 - XML → snake_case
 - Class → CamelCase
 - Method → camelCase

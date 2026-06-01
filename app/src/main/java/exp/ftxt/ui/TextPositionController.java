@@ -2,21 +2,16 @@ package exp.ftxt.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
@@ -24,9 +19,9 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
-import exp.ftxt.shared.ui.ShadowConfig;
 import exp.ftxt.shared.ui.SliderPositionController;
 
 public class TextPositionController {
@@ -40,12 +35,86 @@ public class TextPositionController {
     private DpadController dpad;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
-    private View btnExportImport;
+    private TextView activePresetLabel;
     private int displayWidth, displayHeight;
 
     private static final String PREFS_NAME = "ftxt_prefs";
-    private String activePresetName;
-    private ActivityResultLauncher<String[]> fileImportLauncher;
+    private final PresetHandler.StringHolder activePresetName = new PresetHandler.StringHolder();
+
+    private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
+        @Override
+        public String moduleLabel() { return "teks"; }
+        @Override
+        public String touchPassthroughPrefKey() { return "text_lock"; }
+        @Override
+        public String safeAreaPrefKey() { return "text_safe_area"; }
+        @Override
+        public String posXPrefKey() { return "text_pos_x"; }
+        @Override
+        public String posYPrefKey() { return "text_pos_y"; }
+
+        @Override
+        public void saveToPreset(OverlayPreset p) {
+            p.posX = TextConfig.posX;
+            p.posY = TextConfig.posY;
+            p.size = TextConfig.size;
+            p.color = TextConfig.color;
+            p.shadow = PresetHandler.copyShadow(TextConfig.shadow);
+            p.bgEnabled = TextConfig.bgEnabled;
+            p.bgColor = TextConfig.bgColor;
+            p.bgPadding = TextConfig.bgPadding;
+            p.bgOffsetX = TextConfig.bgOffsetX;
+            p.bgOffsetY = TextConfig.bgOffsetY;
+            p.bgMargin = TextConfig.bgMargin;
+            p.bgRadius = TextConfig.bgRadius;
+            p.touchPassthrough = TextConfig.touchPassthrough;
+            p.safeArea = TextConfig.safeArea;
+            p.textContent = TextConfig.text;
+        }
+
+        @Override
+        public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
+            TextConfig.posX = p.posX;
+            TextConfig.posY = p.posY;
+            TextConfig.size = p.size;
+            TextConfig.color = p.color;
+            if (p.shadow != null) {
+                TextConfig.shadow.enabled = p.shadow.enabled;
+                TextConfig.shadow.color = p.shadow.color;
+                TextConfig.shadow.blur = p.shadow.blur;
+                TextConfig.shadow.offsetX = p.shadow.offsetX;
+                TextConfig.shadow.offsetY = p.shadow.offsetY;
+            }
+            TextConfig.bgEnabled = p.bgEnabled;
+            TextConfig.bgColor = p.bgColor;
+            TextConfig.bgPadding = p.bgPadding;
+            TextConfig.bgOffsetX = p.bgOffsetX;
+            TextConfig.bgOffsetY = p.bgOffsetY;
+            TextConfig.bgMargin = p.bgMargin;
+            TextConfig.bgRadius = p.bgRadius;
+            if (p.touchPassthrough != null) {
+                TextConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("text_lock", TextConfig.touchPassthrough).apply();
+            }
+            if (p.safeArea != null) {
+                TextConfig.safeArea = p.safeArea;
+                prefs.edit().putBoolean("text_safe_area", TextConfig.safeArea).apply();
+            }
+            if (p.textContent != null && !p.textContent.isEmpty()) {
+                TextConfig.text = p.textContent;
+                FloatingService.updateTextStatic();
+            }
+        }
+
+        @Override
+        public void syncToService() {
+            FloatingService.updateTextPositionStatic();
+            FloatingService.updateTextSizeStatic();
+            FloatingService.updateTextColorStatic();
+            FloatingService.updateShadowStatic();
+            FloatingService.updateTextBackgroundStatic();
+        }
+    };
 
     public TextPositionController(Activity activity) {
         this.activity = activity;
@@ -67,9 +136,6 @@ public class TextPositionController {
 
         TextModule.onPositionUpdate = this::syncAll;
 
-        if (btnExportImport != null) {
-            btnExportImport.setOnClickListener(v -> showExportImportMenu());
-        }
         sliderController = new SliderPositionController(
                 activity.findViewById(R.id.posXSeekBar),
                 activity.findViewById(R.id.posYSeekBar),
@@ -79,16 +145,6 @@ public class TextPositionController {
         );
         setupListeners();
         syncAll();
-
-        fileImportLauncher = ((AppCompatActivity) activity).registerForActivityResult(
-                new ActivityResultContracts.OpenDocument(),
-                uri -> {
-                    if (uri != null) {
-                        int count = PresetManager.importFromFile(activity, uri);
-                        Toast.makeText(activity, "Berhasil impor " + count + " preset", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
     }
 
     private void bindViews() {
@@ -97,7 +153,7 @@ public class TextPositionController {
         btnLeft = activity.findViewById(R.id.btnLeft);
         btnRight = activity.findViewById(R.id.btnRight);
         coordDisplay = activity.findViewById(R.id.posCoordDisplay);
-        btnExportImport = activity.findViewById(R.id.btnExportImport);
+        activePresetLabel = activity.findViewById(R.id.txtActivePreset);
     }
 
     private void setupListeners() {
@@ -107,158 +163,17 @@ public class TextPositionController {
 
         View btnSavePreset = activity.findViewById(R.id.btnSavePreset);
         if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
+            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
         }
 
         View btnLoadPreset = activity.findViewById(R.id.btnLoadPreset);
         if (btnLoadPreset != null) {
             btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
         }
-
-    }
-
-    private void showSavePresetDialog() {
-        EditText input = new EditText(activity);
-        input.setHint("Nama preset");
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Simpan Preset")
-                .setMessage("Simpan konfigurasi overlay saat ini sebagai preset?")
-                .setView(input)
-                .setPositiveButton("Simpan", (d, w) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        Toast.makeText(activity, "Nama preset tidak boleh kosong", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    OverlayPreset existing = PresetManager.load(activity, name);
-                    if (existing != null) {
-                        new AlertDialog.Builder(activity)
-                                .setTitle("Timpa Preset")
-                                .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
-                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(name))
-                                .setNegativeButton("Batal", null)
-                                .show();
-                    } else {
-                        doSavePreset(name);
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
-    }
-
-    private void doSavePreset(String name) {
-        OverlayPreset preset = new OverlayPreset();
-        preset.posX = TextConfig.posX;
-        preset.posY = TextConfig.posY;
-        preset.size = TextConfig.size;
-        preset.color = TextConfig.color;
-        ShadowConfig sc = TextConfig.shadow;
-        preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
-        preset.bgEnabled = TextConfig.bgEnabled;
-        preset.bgColor = TextConfig.bgColor;
-        preset.bgPadding = TextConfig.bgPadding;
-        preset.bgOffsetX = TextConfig.bgOffsetX;
-        preset.bgOffsetY = TextConfig.bgOffsetY;
-        preset.bgMargin = TextConfig.bgMargin;
-        preset.bgRadius = TextConfig.bgRadius;
-        int orientation = activity.getResources().getConfiguration().orientation;
-        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
-        preset.touchPassthrough = TextConfig.touchPassthrough;
-        preset.safeArea = TextConfig.safeArea;
-        preset.textContent = TextConfig.text;
-
-        PresetManager.save(activity, name, preset);
-        Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
     }
 
     public void showLoadPresetDialog() {
-        PresetManager.showLoadPresetDialog(activity, activePresetName, name -> {
-            OverlayPreset preset = PresetManager.load(activity, name);
-            if (preset == null) {
-                Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            activePresetName = name;
-            applyPreset(preset);
-            Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void applyPreset(OverlayPreset preset) {
-        TextConfig.posX = preset.posX;
-        TextConfig.posY = preset.posY;
-        TextConfig.size = preset.size;
-        TextConfig.color = preset.color;
-        if (preset.shadow != null) {
-            TextConfig.shadow.enabled = preset.shadow.enabled;
-            TextConfig.shadow.color = preset.shadow.color;
-            TextConfig.shadow.blur = preset.shadow.blur;
-            TextConfig.shadow.offsetX = preset.shadow.offsetX;
-            TextConfig.shadow.offsetY = preset.shadow.offsetY;
-        }
-        TextConfig.bgEnabled = preset.bgEnabled;
-        TextConfig.bgColor = preset.bgColor;
-        TextConfig.bgPadding = preset.bgPadding;
-        TextConfig.bgOffsetX = preset.bgOffsetX;
-        TextConfig.bgOffsetY = preset.bgOffsetY;
-        TextConfig.bgMargin = preset.bgMargin;
-        TextConfig.bgRadius = preset.bgRadius;
-        if (preset.touchPassthrough != null) {
-            TextConfig.touchPassthrough = preset.touchPassthrough;
-            prefs.edit().putBoolean("text_lock", TextConfig.touchPassthrough).apply();
-        }
-        if (preset.safeArea != null) {
-            TextConfig.safeArea = preset.safeArea;
-            prefs.edit().putBoolean("text_safe_area", TextConfig.safeArea).apply();
-        }
-        if (preset.textContent != null && !preset.textContent.isEmpty()) {
-            TextConfig.text = preset.textContent;
-        }
-
-        savePositionToPrefs(currentOrientation);
-        if (preset.textContent != null && !preset.textContent.isEmpty()) {
-            FloatingService.updateTextStatic();
-        }
-        syncAll();
-        FloatingService.updateTextPositionStatic();
-        FloatingService.updateTextSizeStatic();
-        FloatingService.updateTextColorStatic();
-        FloatingService.updateShadowStatic();
-        FloatingService.updateTextBackgroundStatic();
-    }
-
-    private void showExportImportMenu() {
-        PopupMenu popup = new PopupMenu(activity, btnExportImport);
-        popup.getMenu().add("Ekspor ke File");
-        popup.getMenu().add("Bagikan Preset");
-        popup.getMenu().add("Impor dari File");
-        popup.setOnMenuItemClickListener(item -> {
-            String title = item.getTitle().toString();
-            if (title.equals("Ekspor ke File")) {
-                String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-                if (PresetManager.exportToFile(activity, filename)) {
-                    Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
-                }
-            } else if (title.equals("Bagikan Preset")) {
-                String toShare = activePresetName;
-                if (toShare == null || toShare.isEmpty()) {
-                    java.util.List<String> names = PresetManager.getAllNames(activity);
-                    if (!names.isEmpty()) toShare = names.get(0);
-                }
-                if (toShare == null || toShare.isEmpty()) {
-                    Toast.makeText(activity, "Tidak ada preset untuk dibagikan", Toast.LENGTH_SHORT).show();
-                } else {
-                    PresetManager.sharePreset(activity, toShare);
-                }
-            } else if (title.equals("Impor dari File")) {
-                fileImportLauncher.launch(new String[]{"text/plain"});
-            }
-            return true;
-        });
-        popup.show();
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
     }
 
     private static float clamp(float val) {
@@ -269,16 +184,8 @@ public class TextPositionController {
         TextConfig.posX = x;
         TextConfig.posY = y;
         syncAll();
-        savePositionToPrefs(currentOrientation);
+        PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
         FloatingService.updateTextPositionStatic();
-    }
-
-    private void savePositionToPrefs(String orient) {
-        String sfx = "_" + orient;
-        prefs.edit()
-                .putFloat("text_pos_x" + sfx, TextConfig.posX)
-                .putFloat("text_pos_y" + sfx, TextConfig.posY)
-                .apply();
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -286,8 +193,6 @@ public class TextPositionController {
         TextConfig.posX = prefs.getFloat("text_pos_x" + sfx, 0.5f);
         TextConfig.posY = prefs.getFloat("text_pos_y" + sfx, 0.8f);
     }
-
-    // ====================================================================
 
     public void cleanup() {
         TextModule.onPositionUpdate = null;
@@ -301,6 +206,18 @@ public class TextPositionController {
     public void syncAll() {
         sliderController.sync(TextConfig.posX, TextConfig.posY);
         updateCoordDisplay();
+        updateActivePresetLabel();
+    }
+
+    private void updateActivePresetLabel() {
+        if (activePresetLabel == null) return;
+        String name = activePresetName.value;
+        if (name != null && !name.isEmpty()) {
+            activePresetLabel.setText("Aktif: " + name);
+            activePresetLabel.setVisibility(View.VISIBLE);
+        } else {
+            activePresetLabel.setVisibility(View.GONE);
+        }
     }
 
     private void updateCoordDisplay() {
@@ -316,5 +233,4 @@ public class TextPositionController {
         }
         coordDisplay.setText(px + "X" + py);
     }
-
 }
