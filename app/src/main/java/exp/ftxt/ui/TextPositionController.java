@@ -110,6 +110,11 @@ public class TextPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
+        View btnLoadPreset = activity.findViewById(R.id.btnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
+
     }
 
     private void showSavePresetDialog() {

@@ -110,6 +110,11 @@ public class NetworkPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
+        View btnLoadPreset = activity.findViewById(R.id.network_btnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
+
     }
 
     private void showSavePresetDialog() {

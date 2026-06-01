@@ -110,6 +110,11 @@ public class BatteryPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
+        View btnLoadPreset = activity.findViewById(R.id.battery_btnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
+
     }
 
     private void showSavePresetDialog() {

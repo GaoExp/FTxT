@@ -110,6 +110,11 @@ public class FpsPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
+        View btnLoadPreset = activity.findViewById(R.id.fps_btnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
+
     }
 
     private void showSavePresetDialog() {

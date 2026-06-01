@@ -110,6 +110,11 @@ public class ClockPositionController {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
 
+        View btnLoadPreset = activity.findViewById(R.id.clock_btnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
+
     }
 
     private void showSavePresetDialog() {

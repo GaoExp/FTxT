@@ -109,6 +109,11 @@ public class BatteryPercentagePositionController {
         if (btnSavePreset != null) {
             btnSavePreset.setOnClickListener(v -> showSavePresetDialog());
         }
+
+        View btnLoadPreset = activity.findViewById(R.id.batPctBtnLoadPreset);
+        if (btnLoadPreset != null) {
+            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
+        }
     }
 
     private void showSavePresetDialog() {

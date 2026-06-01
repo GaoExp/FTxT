@@ -3,6 +3,20 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.66.0] - 2026-06-01
+
+### ✨ Fitur Baru
+
+- **Tombol Muat di Semua Panel** — Tombol "Muat Preset" (Load) kini muncul sebagai button fisik di layout setiap panel, posisinya di antara Simpan dan E/I. Sebelumnya hanya tersedia di menu popup toolbar (gear icon).
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 126→127, versionName 3.9.3.65.0→3.9.3.66.0
+- `app/src/main/res/layout/activity_main.xml` — Tambah btnLoadPreset di 7 module sections
+- All 7 PositionControllers — setupListeners: +btnLoadPreset onClick → showLoadPresetDialog()
+
+---
+
 ## [3.9.3.65.0] - 2026-05-31
 
 ### ✨ Fitur Baru
