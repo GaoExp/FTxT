@@ -1,4 +1,4 @@
-name: Android Release
+name: Build & Release APK
 
 on:
   push:
@@ -7,11 +7,9 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -21,17 +19,22 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Grant gradlew permission
+      - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Release APK
+      - name: Build APK Release
         run: ./gradlew assembleRelease
 
-      - name: Find APK output
-        run: find . -name "*.apk"
+      - name: Debug — Print APK locations
+        run: |
+          echo "=== Mencari semua file APK ==="
+          find . -type f -name "*.apk" 2>/dev/null
+          echo "=== Selesai ==="
 
-      - name: Upload Release
+      - name: Upload APK to Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            app/build/outputs/**/*.apk
+            **/build/outputs/apk/release/*.apk
+            **/build/outputs/apk/release/*.apk.idsig
+          generate_release_notes: true

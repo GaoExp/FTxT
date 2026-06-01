@@ -3,6 +3,22 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ---
 
+## [3.9.3.66.1] - 2026-06-01
+
+### 🔧 Optimasi & Penyesuaian
+
+- **GitHub Actions Workflow** — Workflow CI/CD untuk build & release APK otomatis saat push tag v*.
+
+### 🗒️ File Added
+
+- `.github/workflows/release.yml` — Workflow: trigger tag v*, Java 17, assembleRelease, debug APK path, upload ke GitHub Release.
+
+### ✏️️ File Changed
+
+- `app/build.gradle` — versionCode 127→128, versionName 3.9.3.66.0→3.9.3.66.1
+
+---
+
 ## [3.9.3.66.0] - 2026-06-01
 
 ### ✨ Fitur Baru
