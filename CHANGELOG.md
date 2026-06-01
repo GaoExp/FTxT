@@ -11,7 +11,6 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 ### ✏️️ File Changed
 
 - `.github/workflows/release.yml` — Tambah step Install SDK components & accept licenses; `local.properties` pakai fallback `ANDROID_HOME`/`ANDROID_SDK_ROOT`; `./gradlew` pakai `--no-daemon`
-- `app/build.gradle` — versionCode 134→135, versionName 3.9.3.67.0→3.9.3.67.1
 
 ### 🔢 Version
 
@@ -53,7 +52,6 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 
 ### ✏️️ File Changed
 
-- `app/build.gradle` — sourceCompatibility & targetCompatibility VERSION_1_8→VERSION_17
 - `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Tambah `color` di index metadata untuk quick thumbnail.
 - `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — `showLoadPresetDialog()` pakai `PresetBrowserDialog`; hapus `showExportImportMenu`.
 - `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — `importLauncher` pakai `registerForActivityResult` di `onCreate`.

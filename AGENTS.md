@@ -220,7 +220,7 @@ WAJIB:
 - semua file yang benar-benar diubah dicatat 
 - update versionCode dicatat 
 - update versionName dicatat 
- 
+- khusus untuk build.gradle, changelog dan readme tidak perlu dicatat (dikecualikan)
  
 JANGAN: 
 - menambah changelog untuk perubahan trivial 
@@ -353,5 +353,4 @@ JANGAN:
 - menjelaskan teori panjang untuk perubahan sederhana 
 - menambahkan rekomendasi besar di luar request 
  
-Jika request sederhana: 
-jawab sederhana.
+Jika request sederhana = jawab sederhana.
