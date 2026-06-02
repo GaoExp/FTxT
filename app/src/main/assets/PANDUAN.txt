@@ -81,7 +81,22 @@ Aktifkan switch **Network Speed** di sidebar "Network Stats" untuk menampilkan o
 - Format: `↓128KB/s ↑128KB/s`, otomatis berubah ke MB/s saat >1024 KB/s.
 - Konfigurasi ukuran, warna, shadow, background, dan kunci posisi tersedia.
 
-## 13. Shadow Config
+## 13. Watermark Overlay
+Aktifkan switch **Watermark** di sidebar "Watermark" untuk menampilkan teks watermark di atas semua aplikasi.
+- Edit teks watermark sesuai keinginan
+- Atur ukuran, warna (default semi-transparan `0x55FFFFFF`)
+- Konfigurasi shadow, background, dan kunci posisi tersedia
+- Posisi default di tengah layar
+
+### Watermark Seal Pattern
+Aktifkan **Mode Segel** di panel Watermark untuk mengubah watermark menjadi pola segel berulang diagonal:
+- Atur **Spasi Horizontal** (50–500px) — jarak antar teks di sumbu horizontal
+- Atur **Spasi Vertikal** (50–500px) — jarak antar teks di sumbu vertikal  
+- Atur **Sudut** (-90° hingga 90°) — rotasi teks, default -30°
+- Kontrol posisi tunggal dan safe area otomatis disembunyikan saat mode segel aktif
+- Teks, ukuran, dan warna tetap bisa diatur seperti mode biasa
+
+## 14. Shadow Config
 Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
 - Pilih warna shadow (dengan alpha/transparansi via color picker)
 - Atur blur radius (0–50 px)

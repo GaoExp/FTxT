@@ -117,7 +117,7 @@ Format:
 major.removed.restored.minor.patch
 ```
 
-Contoh: `3.9.2.62.0`
+Contoh: `3.9.3.69.0`
 
 - major = milestone besar / generasi project
 - removed = histori fitur dihapus

@@ -40,8 +40,10 @@ import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
+import exp.ftxt.features.watermark.WatermarkConfig;
 import exp.ftxt.ui.BatteryPanelController;
 import exp.ftxt.ui.BatteryCurrentPanelController;
+import exp.ftxt.ui.WatermarkPanelController;
 
 import exp.ftxt.ui.ClockPanelController;
 import exp.ftxt.ui.FpsPanelController;
@@ -83,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private BatteryPanelController batteryPanel;
     private BatteryCurrentPanelController batteryCurrentPanel;
     private NetworkPanelController networkPanel;
+    private WatermarkPanelController watermarkPanelController;
     private View panelCrosshair;
     private View panelWatermark;
     private View panelLogo;
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         "{\"id\":\"navBatteryCurrent\",\"l\":\"Battery Current\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
         "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
-        "{\"id\":\"navWatermark\",\"l\":\"Watermark (coming soon)\"}," +
+        "{\"id\":\"navWatermark\",\"l\":\"Watermark\"}," +
         "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}]";
 
     @Override
@@ -179,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         batteryPanel = new BatteryPanelController(this);
         batteryCurrentPanel = new BatteryCurrentPanelController(this);
         networkPanel = new NetworkPanelController(this);
+        watermarkPanelController = new WatermarkPanelController(this);
 
         requestAllPermissionsOnFirstLaunch();
     }
@@ -225,6 +229,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (networkPanel != null && panelNetwork.getVisibility() == View.VISIBLE) {
             networkPanel.onPanelShown();
+        }
+        if (watermarkPanelController != null && panelWatermark.getVisibility() == View.VISIBLE) {
+            watermarkPanelController.onPanelShown();
         }
         autoRequestAndStart();
         requestRemainingPermissions();
@@ -406,6 +413,8 @@ public class MainActivity extends AppCompatActivity {
                     batteryCurrentPanel.showLoadPresetDialog();
                 } else if (panelNetwork.getVisibility() == View.VISIBLE) {
                     networkPanel.showLoadPresetDialog();
+                } else if (panelWatermark.getVisibility() == View.VISIBLE) {
+                    watermarkPanelController.showLoadPresetDialog();
                 } else {
                     textPanel.showLoadPresetDialog();
                 }
@@ -539,6 +548,24 @@ public class MainActivity extends AppCompatActivity {
         BatteryConfig.bgEnabled = prefs.getBoolean("battery_bg_enabled", false);
         BatteryConfig.bgColor = prefs.getInt("battery_bg_color", 0xCC000000);
         BatteryConfig.bgPadding = prefs.getInt("battery_bg_padding", 8);
+
+        WatermarkConfig.enabled = prefs.getBoolean("watermark_enabled", false);
+        WatermarkConfig.text = prefs.getString("watermark_text", "Watermark");
+        WatermarkConfig.color = prefs.getInt("watermark_color", 0x55FFFFFF);
+        WatermarkConfig.shadow.enabled = prefs.getBoolean("watermark_shadow_enabled", false);
+        WatermarkConfig.shadow.color = prefs.getInt("watermark_shadow_color", Color.BLACK);
+        WatermarkConfig.shadow.blur = prefs.getFloat("watermark_shadow_blur", 5f);
+        WatermarkConfig.shadow.offsetX = prefs.getFloat("watermark_shadow_offset_x", 3f);
+        WatermarkConfig.shadow.offsetY = prefs.getFloat("watermark_shadow_offset_y", 3f);
+        WatermarkConfig.safeArea = prefs.getBoolean("watermark_safe_area", true);
+        WatermarkConfig.touchPassthrough = prefs.getBoolean("watermark_lock", true);
+        WatermarkConfig.bgEnabled = prefs.getBoolean("watermark_bg_enabled", false);
+        WatermarkConfig.bgColor = prefs.getInt("watermark_bg_color", 0xCC000000);
+        WatermarkConfig.bgPadding = prefs.getInt("watermark_bg_padding", 10);
+        WatermarkConfig.patternEnabled = prefs.getBoolean("watermark_pattern_enabled", false);
+        WatermarkConfig.patternSpacingH = prefs.getFloat("watermark_pattern_spacing_h", 180f);
+        WatermarkConfig.patternSpacingV = prefs.getFloat("watermark_pattern_spacing_v", 220f);
+        WatermarkConfig.patternAngle = prefs.getFloat("watermark_pattern_angle", -30f);
     }
 
     private void updateNavSelection(int selectedId) {
@@ -764,6 +791,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.navWatermark) {
                 panelWatermark.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle("Watermark");
+                if (watermarkPanelController != null) watermarkPanelController.onPanelShown();
             } else if (itemId == R.id.navLogo) {
                 panelLogo.setVisibility(View.VISIBLE);
                 getSupportActionBar().setTitle("Logo Display");
@@ -801,6 +829,7 @@ public class MainActivity extends AppCompatActivity {
         if (batteryPanel != null) batteryPanel.cleanup();
         if (batteryCurrentPanel != null) batteryCurrentPanel.cleanup();
         if (networkPanel != null) networkPanel.cleanup();
+        if (watermarkPanelController != null) watermarkPanelController.cleanup();
     }
 
     private int dp(float dp) {

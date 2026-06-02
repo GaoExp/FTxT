@@ -58,7 +58,9 @@ FTxT/
 │   │   │   │       │   └── cpu/     (empty)
 │   │   │   │       ├── logo_display/
 │   │   │   │       │   └── logo/    (empty)
-│   │   │   │       └── watermark/   (empty)
+│   │   │   │       ├── watermark/
+│   │   │   │       │   ├── WatermarkConfig.java
+│   │   │   │       │   └── WatermarkModule.java
 │   │   │   │
 │   │   │   ├── shared/
 │   │   │   │   ├── color/
@@ -98,7 +100,9 @@ FTxT/
 │   │   │   │   ├── BatteryCurrentPanelController.java
 │   │   │   │   ├── BatteryCurrentPositionController.java
 │   │   │   │   ├── NetworkPanelController.java
-│   │   │   │   └── NetworkPositionController.java
+│   │   │   │   ├── NetworkPositionController.java
+│   │   │   │   ├── WatermarkPanelController.java
+│   │   │   │   └── WatermarkPositionController.java
 │   │   │   │
 │   │   │   ├── utils/
 │   │   │   │   └── PermissionHelper.java
@@ -224,6 +228,10 @@ FTxT/
 | ui/BatteryPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
 | ui/BatteryPercentagePositionController.java | Controller kontrol posisi Battery Percentage |
 | ui/NetworkPositionController.java | Controller kontrol posisi (slider, d-pad, preset GSON full-config, orientasi) |
+| features/watermark/WatermarkConfig.java | Konfigurasi watermark (teks, ukuran, warna semi-transparan) |
+| features/watermark/WatermarkModule.java | Module logic watermark overlay (ShadowTextView) |
+| ui/WatermarkPanelController.java | Controller panel Watermark |
+| ui/WatermarkPositionController.java | Controller kontrol posisi (slider, d-pad, preset full-config, orientasi) Watermark |
 | utils/PermissionHelper.java | Helper permission overlay/notifikasi/baterai |
 | activity_documentation.xml | Layout halaman dokumentasi |
 | activity_main.xml | Layout utama |

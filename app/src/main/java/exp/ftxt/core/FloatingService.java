@@ -22,6 +22,8 @@ import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.network_stats.NetworkModule;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
+import exp.ftxt.features.watermark.WatermarkConfig;
+import exp.ftxt.features.watermark.WatermarkModule;
 
 /**
  * Foreground service untuk mengelola overlay Floating Text dan FPS Display.
@@ -52,6 +54,7 @@ public class FloatingService extends Service {
     private BatteryPercentageModule batteryPercentageModule;
     private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
+    private WatermarkModule watermarkModule;
 
     @Override
     public void onCreate() {
@@ -67,6 +70,7 @@ public class FloatingService extends Service {
         batteryPercentageModule = new BatteryPercentageModule();
         batteryCurrentModule = new BatteryCurrentModule();
         networkModule = new NetworkModule();
+        watermarkModule = new WatermarkModule();
 
         // Notification channel + foreground service
         // Lihat: NotificationHelper → core/NotificationHelper.java
@@ -107,6 +111,11 @@ public class FloatingService extends Service {
             // Start Network jika diaktifkan
             if (NetworkConfig.enabled) {
                 networkModule.start(windowManager, this);
+            }
+
+            // Start Watermark jika diaktifkan
+            if (WatermarkConfig.enabled) {
+                watermarkModule.start(windowManager, this);
             }
 
             // Buat text overlay jika sebelumnya aktif
@@ -528,6 +537,81 @@ public class FloatingService extends Service {
         return null;
     }
 
+    // --- Watermark Module Delegates ---
+
+    public static void startWatermarkStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.start(instance.windowManager, instance);
+        }
+    }
+
+    public static void stopWatermarkStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.stop();
+        }
+    }
+
+    public static void updateWatermarkTextStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateText(WatermarkConfig.text);
+        }
+    }
+
+    public static void updateWatermarkSizeStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateSize(WatermarkConfig.size);
+        }
+    }
+
+    public static void updateWatermarkColorStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateColor(WatermarkConfig.color);
+        }
+    }
+
+    public static void updateWatermarkShadowStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateShadow();
+        }
+    }
+
+    public static void updateWatermarkBackgroundStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateBackground();
+        }
+    }
+
+    public static void updateWatermarkTouchFlagsStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updateTouchFlags();
+        }
+    }
+
+    public static void updateWatermarkPositionStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updatePosition();
+        }
+    }
+
+    public static void setWatermarkOrientationSuffixStatic(String suffix) {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.setOrientationSuffix(suffix);
+        }
+    }
+
+    public static int[] getWatermarkCurrentPosition() {
+        if (instance != null && instance.watermarkModule != null) {
+            return instance.watermarkModule.getCurrentPosition();
+        }
+        return null;
+    }
+
+    public static void updateWatermarkPatternStatic() {
+        if (instance != null && instance.watermarkModule != null) {
+            instance.watermarkModule.updatePattern();
+        }
+    }
+
     // --- Battery Module Delegates ---
 
     public static void startBatteryStatic() {
@@ -600,6 +684,7 @@ public class FloatingService extends Service {
         batteryPercentageModule.stop();
         batteryCurrentModule.stop();
         networkModule.stop();
+        watermarkModule.stop();
         fpsModule.stop();
         textModule.savePosition(prefs);
 

@@ -1,8 +1,68 @@
-# Changelog - FTxT (FunText)
-Dokumen ini mencatat riwayat perubahan project FTxT.
+## [3.9.3.69.0] - 2026-06-02
 
+### ✨ Fitur Baru
 
-## [3.9.3.67.1] - 2026-06-01
+- **Watermark Seal Pattern** — Mode segel pada watermark: teks diulang diagonal melayar penuh dengan kontrol spasi horizontal, spasi vertikal, dan sudut (angle). Canvas custom view dengan Paint anti-aliased. Aktif via toggle "Mode Segel" di panel watermark.
+
+### ✏️️ File Changed
+
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkConfig.java` — Tambah field pattern (patternEnabled, patternSpacingH, patternSpacingV, patternAngle, patternColor)
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkModule.java` — Tambah SealPatternView inner class, startPattern/startSingle split, updatePattern()
+- `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Tambah kontrol pattern (switch, spacing H/V, angle slider), updatePatternVisibility()
+- `app/src/main/res/layout/activity_main.xml` — Tambah watermarkPositionContainer wrapper, pattern controls UI
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateWatermarkPatternStatic delegate
+- `app/build.gradle` — versionCode 137 → 138, versionName 3.9.3.68.0 → 3.9.3.69.0
+
+## [3.9.3.68.0] - 2026-06-02
+
+### ✨ Fitur Baru
+
+- **Watermark Overlay** — Modul watermark teks baru dengan teks kustom, warna semi-transparan default (0x55FFFFFF), ukuran (5–200sp), shadow, background, kontrol posisi (slider X/Y, D-Pad, preset full-config), touch passthrough, dan safe area. Panel dapat diakses dari sidebar navigasi.
+
+### 🗒️ File Added
+
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkConfig.java` — Konfigurasi watermark (teks, ukuran, warna, shadow, background, posisi)
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkModule.java` — Module overlay watermark (ShadowTextView, WindowManager)
+- `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Panel kontrol UI watermark (switch, text, size, color, shadow, background)
+- `app/src/main/java/exp/ftxt/ui/WatermarkPositionController.java` — Kontrol posisi watermark (slider, D-Pad, preset)
+
+### ✏️️ File Changed
+
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah watermarkModule + 11 static delegate methods (start, stop, updateText, updateSize, updateColor, updateShadow, updateBackground, updateTouchFlags, updatePosition, setOrientationSuffix, getPosition)
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah WatermarkPanelController, init di onCreate, onResume, nav handler, cleanup; tambah load WatermarkConfig di loadShadowConfigs
+- `app/src/main/res/layout/activity_main.xml` — Ganti placeholder "coming soon" dengan panel Watermark lengkap (switch, EditText, size, color, position, shadow, background)
+- `app/src/main/res/layout/drawer_content.xml` — Ubah "Watermark (coming soon)" menjadi "Watermark"
+- `app/build.gradle` — versionCode 136 → 137, versionName 3.9.3.67.2 → 3.9.3.68.0
+
+### 🔢 Version
+
+- versionCode: 136 → 137
+- versionName: 3.9.3.67.2 → 3.9.3.68.0
+
+---
+
+## [3.9.3.67.2] - 2026-06-01
+
+### ♻️️ Perubahan Fitur
+
+- **Tampilan FPS Display diseragamkan** — Hapus gaya neumorphism (neu_bg, DpadButton, FpsActionButton, PresetButton, ClickableLabel dll) pada panel FPS Display agar konsisten dengan panel fitur lainnya. Semua button dan kontrol kini menggunakan gaya default/inline seperti panel Text, Clock, Battery, dll.
+
+### 🔧 Optimasi & Penyesuaian
+
+- **Bersihkan styles & colors** — Hapus 6 style dan 5 color yang tidak terpakai (FpsActionButton, DpadButton, PresetButton, ActivePresetLabel, ClickableLabel, PanelSectionTitle; neu_bg, neu_bg_pressed, neu_shadow_light, neu_shadow_dark, neu_text).
+
+### ✏️️ File Changed
+
+- `app/src/main/res/layout/activity_main.xml` — Hapus `android:background="@color/neu_bg"` dan 20 referensi style neumorphism di panel FPS; ganti dengan inline attributes.
+- `app/src/main/res/values/styles.xml` — Hapus 6 style tidak terpakai.
+- `app/src/main/res/values/colors.xml` — Hapus 5 color neumorphism tidak terpakai.
+
+### 🔢 Version
+
+- versionCode: 135 → 136
+- versionName: 3.9.3.67.1 → 3.9.3.67.2
+
+---
 
 ### 🐞 Bug Fixes
 
@@ -58,7 +118,6 @@ Dokumen ini mencatat riwayat perubahan project FTxT.
 - `app/src/main/res/layout/activity_main.xml` — Tambah `TextView` active preset label di 7 panel; hapus tombol E/I dari 7 panel.
 - All 7 PositionControllers — Tambah `activePresetLabel`, update di `syncAll()`; hapus `btnExportImport`, `fileImportLauncher`, E/I listener; gunakan PresetHandler.Delegate.
 - `gradle.properties` — Hapus `android.aapt2FromMavenOverride`.
-- `README.md` + `README.txt` — Update versi `3.9.3.66.4`→`3.9.3.67.0`
 - `STRUKTUR.md` + `STRUKTUR.txt` — Tambah `PresetBrowserDialog.java`, `dialog_preset_browser.xml`, `preset_browser_item.xml`
 - `DEVELOPMENT.md` + `DEVELOPMENT.txt` — Java requirement 1.8+→17+, "Java 1.8 compatible"→"Java 17 compatible"
 - `.github/workflows/release.yml` — Tambah step "Setup Android SDK"; hapus `android.enableAapt2FromMaven` (obsolete di AGP 8.12)
@@ -558,21 +617,6 @@ Menggabungkan 5 release.
 
 - **FPS tidak tampil**: Service kini bisa start tanpa text overlay (FPS standalone).
 - **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
-
-
-### 💡 Catatan
-
-Mulai sekarang, semua dokumentasi (CHANGELOG, README, AGENTS) diletakkan di folder assets. Update hanya dilakukan di assets, tidak ada duplikasi file lagi.
-```
-```📌
-Entry lama dapat memakai format sebelumnya.
-Tidak wajib dimigrasikan retroaktif.
-```
-
-### 🔢 Version
-
-- versionCode: 33 → 40
-- versionName: 2.3.1.9.4 → 2.3.1.15.0
 
 ---
 
