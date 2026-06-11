@@ -1,3 +1,13 @@
+## [3.9.3.69.4] - 2026-06-11
+### 🐞 Bug Fixes
+- **release.yml dikembalikan ke versi kerja sebelumnya** — Agent AI sebelumnya merusak workflow: mengganti Java 17→21, mengganti secret names, path keystore, dan struktur workflow yang menyebabkan build gagal. Dikembalikan ke versi `sementara/release.yml` yang terbukti berhasil.
+### ✏️ File Changed
+- `.github/workflows/release.yml` — Restore dari `sementara/release.yml` (Java 17, secret names `KEYSTORE_BASE64`/`KEYSTORE_PASSWORD`/`KEY_ALIAS`/`KEY_PASSWORD`, decode ke `app/release.jks`, env variables, extract release notes dari CHANGELOG)
+- `app/build.gradle` — versionCode 141→142, versionName 3.9.3.69.3→3.9.3.69.4
+### 🔢 Version
+versionCode: 142
+versionName: 3.9.3.69.4
+---
 ## [3.9.3.69.3] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **Refactor layout** — Ekstrak semua panel tersisa (Battery Current, Network, Crosshair, Watermark, Logo) dari `activity_main.xml` ke file terpisah menggunakan `<include>`; hapus leftover konten duplikat battery & battery_percentage
@@ -15,7 +25,7 @@
 ### 🔢 Version
 versionCode: 141
 versionName: 3.9.3.69.3
-
+---
 ## [3.9.3.69.2] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **activity_main.xml** — Seragamkan format header collapsible section Shadow & Background di panel Battery Percentage dan Battery Current (bold, 16sp, paddingVertical)
@@ -31,7 +41,7 @@ versionName: 3.9.3.69.3
 ### 🔢 Version
 versionCode: 140
 versionName: 3.9.3.69.2
-
+---
 ## [3.9.3.69.1] - 2026-06-11
 ### ♻️ Perubahan Fitur
 - **CHANGELOG.md** — Tambah entry header [1.3.1.9.0 - 1.0.0.0.0] untuk Catatan Major 1; hapus duplikasi
@@ -80,6 +90,9 @@ versionName: 3.9.3.69.2
 - `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Tambah kontrol pattern (switch, spacing H/V, angle slider), updatePatternVisibility()
 - `app/src/main/res/layout/activity_main.xml` — Tambah watermarkPositionContainer wrapper, pattern controls UI
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateWatermarkPatternStatic delegate
+### 🔢 Version
+- versionCode: 138
+- versionName: 3.9.3.69.0
 ---
 ## [3.9.3.68.0] - 2026-06-02
 ### ✨ Fitur Baru
@@ -197,7 +210,7 @@ Menggabungkan 3 release.
 - Tags dan Favorite flags disimpan di index metadata (SharedPreferences).
 ### 🔢 Version
 - versionCode: 126
-- versionName: 3.9.2.62.1
+- versionName: 3.9.3.63.0
 ---
 ## [3.9.2.62.0 – 2.8.2.56.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
@@ -499,6 +512,9 @@ Menggabungkan 5 release.
 ### 🐞 Bug Fixes
 - **FPS tidak tampil**: Service kini bisa start tanpa text overlay (FPS standalone).
 - **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
+### 🔢 Version
+- versionName: 2.3.1.15.0 (merged entry)
+---
 ## [1.3.1.9.0 - 1.0.0.0.0] - Pra-2026
 ### 💡 Catatan
 - Major 1 kebawah telah dipisahkan dari Project
