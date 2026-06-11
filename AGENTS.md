@@ -219,6 +219,7 @@ WAJIB:
 JANGAN: 
 - membuat entry versi baru
 - menambah changelog untuk perubahan trivial
+- mencatat `app/build.gradle` di `✏️ File Changed` jika hanya bump version — 🔢 Version sudah mewakili
 - mengubah urutan section
 - menulis penjelasan panjang
 
