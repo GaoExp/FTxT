@@ -1,3 +1,12 @@
+## [3.9.3.69.6] - 2026-06-11
+### 🐞 Bug Fixes
+- **APK release tidak signed** — Workflow decode keystore ke `app/release.jks` tapi tidak bikin `keystore.properties`, sehingga signing config di build.gradle tidak aktif. Ditambahkan step generate properties setelah decode.
+### ✏️ File Changed
+- `.github/workflows/release.yml` — Tambah step Generate keystore.properties setelah decode
+### 🔢 Version
+versionCode: 144
+versionName: 3.9.3.69.6
+---
 ## [3.9.3.69.5] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **README.md** — Deskripsi lengkap untuk semua file di struktur project (131 file, 42 direktori)
