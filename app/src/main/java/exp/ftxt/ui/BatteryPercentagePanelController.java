@@ -169,6 +169,8 @@ public class BatteryPercentagePanelController {
                 if (progress > 140) { progress = 140; sb.setProgress(progress); }
                 BatteryPercentageConfig.size = progress;
                 batPctSizeLabel.setText("Ukuran Teks: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("battpct_size", (float) progress).apply();
                 FloatingService.updateBatteryPercentageSizeStatic();
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}

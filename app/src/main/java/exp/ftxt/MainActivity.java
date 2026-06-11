@@ -533,6 +533,23 @@ public class MainActivity extends AppCompatActivity {
         BatteryCurrentConfig.showCurrent = prefs.getBoolean("batcur_show_current", true);
         BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
 
+        BatteryPercentageConfig.enabled = prefs.getBoolean("battpct_enabled", false);
+        BatteryPercentageConfig.size = prefs.getFloat("battpct_size", 12f);
+        BatteryPercentageConfig.color = prefs.getInt("battpct_color", Color.GREEN);
+        BatteryPercentageConfig.shadow.enabled = prefs.getBoolean("battpct_shadow_enabled", false);
+        BatteryPercentageConfig.shadow.color = prefs.getInt("battpct_shadow_color", Color.BLACK);
+        BatteryPercentageConfig.shadow.blur = prefs.getFloat("battpct_shadow_blur", 5f);
+        BatteryPercentageConfig.shadow.offsetX = prefs.getFloat("battpct_shadow_offset_x", 3f);
+        BatteryPercentageConfig.shadow.offsetY = prefs.getFloat("battpct_shadow_offset_y", 3f);
+        BatteryPercentageConfig.touchPassthrough = prefs.getBoolean("battpct_lock", true);
+        BatteryPercentageConfig.bgEnabled = prefs.getBoolean("battpct_bg_enabled", false);
+        BatteryPercentageConfig.bgColor = prefs.getInt("battpct_bg_color", 0xCC000000);
+        BatteryPercentageConfig.bgPadding = prefs.getInt("battpct_bg_padding", 8);
+        BatteryPercentageConfig.bgOffsetX = prefs.getInt("battpct_bg_offset_x", 0);
+        BatteryPercentageConfig.bgOffsetY = prefs.getInt("battpct_bg_offset_y", 0);
+        BatteryPercentageConfig.bgMargin = prefs.getInt("battpct_bg_margin", 0);
+        BatteryPercentageConfig.bgRadius = prefs.getInt("battpct_bg_radius", 0);
+
         BatteryConfig.enabled = prefs.getBoolean("battery_enabled", false);
         BatteryConfig.color = prefs.getInt("battery_color", Color.GREEN);
         BatteryConfig.shadow.enabled = prefs.getBoolean("battery_shadow_enabled", false);

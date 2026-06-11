@@ -68,54 +68,6 @@
                 android:clickable="true"
                 android:focusable="true"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
-
-            <TextView
-                android:id="@+id/docStrukturButton"
-                android:text="STRUKTUR"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
-
-            <TextView
-                android:id="@+id/docDevelopmentButton"
-                android:text="DEVELOPMENT"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
-
-            <TextView
-                android:id="@+id/docTentangButton"
-                android:text="TENTANG"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
-
         </LinearLayout>
 
     </ScrollView>

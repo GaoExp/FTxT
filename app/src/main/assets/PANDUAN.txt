@@ -1,104 +1,155 @@
-# 📖 Panduan Penggunaan FTxT (FunText)
+# Panduan Penggunaan FTxT (FunText)
 
-## 1. Buka Aplikasi
-Jalankan aplikasi **FTxT (FunText)**.
+## Daftar Isi
 
-## 2. Edit Teks
-Isi field:
-`Masukkan teks overlay`
+- [Persyaratan](#persyaratan)
+- [Memulai](#memulai)
+- [Navigasi](#navigasi)
+- [Toolbar](#toolbar)
+- [Fitur Overlay](#fitur-overlay)
+- [Pengaturan](#pengaturan)
+- [Izin](#izin)
 
-## 3. Atur Ukuran Teks
-Gunakan **SeekBar Ukuran Teks**.
-Range:
-`1–150 sp` (Teks) / `5–140 sp` (FPS)
-Perubahan langsung diterapkan jika overlay aktif.
+## Persyaratan
 
-## 4. Pilih Warna
-Tekan tombol:
-`Pilih Warna`
-Dialog akan menampilkan:
-- Nama warna otomatis
-- HEX, HSV, ARGB
-- R, G, B, A slider
+- Android 8.0 (API 26) atau lebih baru
+- Izin overlay aplikasi lain (SYSTEM_ALERT_WINDOW)
 
-Klik:
-- **OK** → Terapkan
-- **Cancel** → Batal
+## Memulai
 
-## 5. Aktifkan Overlay
-Nyalakan switch:
-`Overlay ON`
-Jika permission sudah diberikan, teks akan langsung muncul.
+1. Install APK FTxT (FunText)
+2. Saat pertama dibuka, aplikasi akan meminta izin overlay, notifikasi, dan optimasi baterai
+3. Berikan izin yang diminta
+4. Aplikasi akan otomatis menjalankan overlay teks default
+5. Pilih modul overlay dari navigation drawer
 
-**Catatan:** Aplikasi akan otomatis meminta izin dan menjalankan overlay saat dibuka jika sebelumnya sudah aktif.
+## Navigasi
 
-## 6. Nonaktifkan Overlay
-Matikan switch:
-`Overlay OFF`
-Overlay hilang, konfigurasi tetap tersimpan.
+Aplikasi menggunakan **Navigation Drawer** (sidebar) yang bisa dibuka dengan:
+- Tap ikon hamburger (☰) di kiri toolbar
+- Swipe dari tepi kiri layar
 
-## 7. Toolbar Icons
+Drawer terdiri dari menu berikut:
+
+| Menu | Ikon | Fungsi |
+|------|------|--------|
+| Floating Text | T | Teks overlay kustom |
+| FPS Display | FPS | Counter FPS real-time |
+| Jam Digital | Jam | Waktu real-time 24 jam |
+| Suhu Baterai | °C | Suhu baterai dalam Celsius |
+| Battery Percentage | % | Persentase baterai |
+| Battery Current | V/A | Tegangan, arus, daya baterai |
+| Network Stats | ↓↑ | Kecepatan internet real-time |
+| Watermark | Watermark | Teks watermark transparan |
+| Pengaturan | Gear | Pengaturan & izin aplikasi |
+
+## Toolbar
+
 Ikon di pojok kanan toolbar:
-- Gear ⚙️ → Buka Pengaturan (dokumentasi in-app + toggle izin aplikasi)
-- Orientasi Layar ↔ → Toggle orientasi layar Potret/Lanskap
-- Bulan/Matahari 🌙☀️ → Toggle tema gelap/terang (default malam)
 
-Header toolbar juga menampilkan **versi aplikasi** (contoh: "FunText v3.9.2.62.0 Beta") di navigation drawer header.
+| Ikon | Fungsi |
+|------|--------|
+| Gear ⚙️ | Buka Pengaturan (izin + dokumentasi) |
+| Orientasi ↔ | Toggle layar Potret/Lanskap |
+| Bulan/Matahari 🌙☀️ | Toggle tema gelap/terang |
 
-## 8. Navigation Drawer
-Tap ikon hamburger (☰) di kiri toolbar untuk membuka drawer navigasi.
-- Pilih modul overlay yang diinginkan.
+Header toolbar menampilkan navigasi drawer dan judul modul yang aktif.
 
-## 9. Background Config
-Aktifkan switch Background untuk menampilkan latar belakang overlay:
-- Pilih warna background (dengan alpha/transparansi via color picker)
-- Atur ukuran background (padding dari teks, 0–80 px)
-- Atur offset X/Y background (-60 hingga 60 px)
-- Atur margin background (0–30 px)
-- Atur radius background untuk rounded corner (0–50 px)
-- Background dan Shadow adalah fitur terpisah, dapat dikonfigurasi independent
-- Klik label untuk edit nilai manual via dialog input
+## Fitur Overlay
 
-## 10. Preset Full-Konfigurasi (Simpan/Muat/Tagging/Share)
+### Floating Text
+- Masukkan teks kustom di kolom input
+- Atur ukuran (1–150sp), warna, shadow, background
+- Overlay muncul di atas semua aplikasi
+- Bisa digeser (drag) dan dikunci posisinya
 
-Setiap panel overlay memiliki tombol:
-- **Simpan** — Menyimpan seluruh konfigurasi panel saat ini (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, dan toggle display spesifik) ke dalam preset GSON v2.
-- **Muat** — Menampilkan daftar preset tersimpan dengan fitur multi-select, rename, reorder (↑↓), hapus, dan tag. Pilih salah satu untuk menerapkan seluruh konfigurasi ke panel.
-- **E/I** (Ekspor/Impor) — Ekspor preset ke file (Downloads), atau impor dari file (file picker).
-- **Bagikan** — Bagikan preset via Android share intent (native).
+### FPS Display
+- Menampilkan frame rate real-time
+- Opsi "Hanya Nilai" untuk menyembunyikan label FPS
+- Ukuran 5–140sp, dengan shadow, background, dan kontrol posisi
 
-Fitur preset v2:
-- Metadata: tags (label cari), favorite flag, timestamp (dibuat/diubah), thumbnail warna.
-- Version history: simpan hingga 10 versi lama, bisa revert ke versi sebelumnya.
-- Pencarian: cari preset berdasarkan nama atau tag.
-- Selective apply: saat muat, pilih opsi apply (posisi saja, warna saja, background saja, dll) untuk merge partial config.
+### Jam Digital
+- Format 24 jam `HH:mm:ss`, update tiap 1 detik
+- Ukuran default 48sp, bisa diatur warna, shadow, background
+- Kontrol posisi lengkap (slider, D-Pad, preset)
 
-## 11. Orientasi Layar
-Ketuk ikon orientasi layar ↔ di toolbar untuk toggle orientasi antara Potret dan Lanskap. Posisi overlay disimpan terpisah per orientasi dan dipulihkan otomatis.
+### Suhu Baterai
+- Menampilkan suhu baterai dalam °C, update tiap 5 detik
+- Opsi tampilkan hanya nilai suhu
 
-## 12. Network Speed Meter
-Aktifkan switch **Network Speed** di sidebar "Network Stats" untuk menampilkan overlay kecepatan internet real-time.
-- Format: `↓128KB/s ↑128KB/s`, otomatis berubah ke MB/s saat >1024 KB/s.
-- Konfigurasi ukuran, warna, shadow, background, dan kunci posisi tersedia.
+### Battery Percentage
+- Menampilkan persentase baterai dalam %, update tiap 5 detik
+- Konfigurasi ukuran, warna, shadow, background, kontrol posisi
 
-## 13. Watermark Overlay
-Aktifkan switch **Watermark** di sidebar "Watermark" untuk menampilkan teks watermark di atas semua aplikasi.
-- Edit teks watermark sesuai keinginan
-- Atur ukuran, warna (default semi-transparan `0x55FFFFFF`)
-- Konfigurasi shadow, background, dan kunci posisi tersedia
+### Battery Current
+- Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
+- Update tiap 5 detik
+
+### Network Speed
+- Kecepatan internet real-time format `↓128KB/s ↑128KB/s`
+- Otomatis berubah ke MB/s saat >1024 KB/s
+- Polling tiap 1 detik via TrafficStats
+
+### Watermark
+- Teks watermark kustom dengan opacity semi-transparan
+- Ukuran 5–200sp, warna, shadow, background, kontrol posisi
 - Posisi default di tengah layar
 
-### Watermark Seal Pattern
-Aktifkan **Mode Segel** di panel Watermark untuk mengubah watermark menjadi pola segel berulang diagonal:
-- Atur **Spasi Horizontal** (50–500px) — jarak antar teks di sumbu horizontal
-- Atur **Spasi Vertikal** (50–500px) — jarak antar teks di sumbu vertikal  
+#### Watermark Seal Pattern
+- Aktifkan **Mode Segel** untuk pola teks berulang diagonal
+- Atur **Spasi Horizontal** (50–500px) — jarak antar teks horizontal
+- Atur **Spasi Vertikal** (50–500px) — jarak antar teks vertikal
 - Atur **Sudut** (-90° hingga 90°) — rotasi teks, default -30°
-- Kontrol posisi tunggal dan safe area otomatis disembunyikan saat mode segel aktif
-- Teks, ukuran, dan warna tetap bisa diatur seperti mode biasa
+- Kontrol posisi dan safe area disembunyikan saat mode segel aktif
 
-## 14. Shadow Config
-Aktifkan switch Shadow untuk menampilkan konfigurasi bayangan teks:
-- Pilih warna shadow (dengan alpha/transparansi via color picker)
-- Atur blur radius (0–50 px)
-- Atur offset X, offset Y (-60 hingga 60 px, default 0)
-- Klik label untuk edit nilai manual via dialog input
+### Color Picker
+- Color wheel full disk dengan crosshair
+- Slider ARGB (Alpha, Red, Green, Blue) — 0–255
+- Two-way sync: wheel ↔ slider
+- Nama warna otomatis, HEX 8 digit (#AARRGGBB)
+- Edit HEX manual, klik label ARGB untuk edit numerik
+- Long-press nilai warna untuk salin ke clipboard
+
+### Background & Shadow
+- Background: warna (dengan alpha), ukuran/padding (0–80px), offset X/Y (-60–60px), margin (0–30px), radius rounded corner (0–50px)
+- Shadow: warna (dengan alpha), blur radius (0–50px), offset X/Y (-60–60px, default 0)
+- Background dan Shadow adalah fitur terpisah, bisa diatur independen
+- Klik label slider untuk edit nilai manual via dialog
+
+### Preset System (v2)
+Setiap panel overlay memiliki tombol:
+- **Simpan** — Simpan seluruh konfigurasi panel (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, toggle display)
+- **Muat** — Buka browser preset dengan search, filter, favorite, rename, delete, reorder, selective apply
+- **E/I** — Ekspor ke file (Downloads) / Impor dari file (file picker)
+- **Bagikan** — Bagikan preset via Android share intent
+
+Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 versi.
+
+### Kontrol Posisi
+- **Slider X/Y** — Posisi horizontal dan vertikal (persentase 0.0–1.0)
+- **D-Pad** — Tombol arah ↑↓←→ dengan tahan untuk repeat
+- **Safe Area** — Batasi agar overlay tidak masuk area notch/cutout
+- **Touch Passthrough** — Kunci posisi agar sentuhan tembus ke aplikasi belakang
+- Posisi tersimpan otomatis per orientasi layar
+
+## Pengaturan
+
+- **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
+- **Dokumentasi** — Baca dokumentasi in-app (README, PANDUAN, CHANGELOG)
+- **Tutup Aplikasi** — Hentikan service dan tutup aplikasi sepenuhnya
+
+## Izin
+
+| Izin | Fungsi |
+|------|--------|
+| `SYSTEM_ALERT_WINDOW` | Menampilkan overlay di atas aplikasi lain |
+| `POST_NOTIFICATIONS` (13+) | Notifikasi kontrol foreground service |
+| `FOREGROUND_SERVICE` | Menjalankan service overlay di latar depan |
+| `FOREGROUND_SERVICE_SPECIAL_USE` | Service overlay khusus |
+| `WAKE_LOCK` | Mencegah CPU tidur saat overlay aktif |
+| `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Mencegah overlay dihentikan sistem |
+
+Izin diminta otomatis saat pertama aplikasi dibuka. Kelola izin bisa dilakukan di **Pengaturan > Izin Aplikasi**.
+
+---
+

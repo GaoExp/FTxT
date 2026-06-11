@@ -1,5 +1,14 @@
 apply plugin: 'com.android.application'
 
+// Load keystore properties from the project root (optional; file may not exist on all machines/CI)
+import java.util.Properties
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
 
     namespace = "exp.ftxt"
@@ -13,10 +22,22 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 138
-        versionName "3.9.3.69.0"
+        versionCode 139
+        versionName "3.9.3.69.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // Add signingConfigs that use keystore.properties if present
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
     }
 
     buildTypes {
@@ -29,6 +50,11 @@ android {
                     getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro'
             )
+
+            // Apply the signing config when available so release builds are signed
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
@@ -42,19 +68,6 @@ android {
     }
 
 }
-
-task syncDocs(type: Copy) {
-    from rootProject.file('README.md')
-    from rootProject.file('CHANGELOG.md')
-    from rootProject.file('STRUKTUR.md')
-    from rootProject.file('PANDUAN.md')
-    from rootProject.file('DEVELOPMENT.md')
-    from rootProject.file('TENTANG.md')
-    into file('src/main/assets')
-    rename { name -> name.replace('.md', '.txt') }
-}
-
-preBuild.dependsOn syncDocs
 
 dependencies {
 

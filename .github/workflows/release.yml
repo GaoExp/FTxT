@@ -39,6 +39,14 @@ jobs:
           yes | $SDK_DIR/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
           $SDK_DIR/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" 2>/dev/null || true
 
+      - name: Setup keystore from org secrets
+        run: |
+          echo "${{ secrets.ORG_KEYSTORE_B64 }}" | base64 -d > key/release.jks
+          echo "storeFile=../key/release.jks" > keystore.properties
+          echo "storePassword=${{ secrets.ORG_KEYSTORE_PASSWORD }}" >> keystore.properties
+          echo "keyAlias=${{ secrets.ORG_KEY_ALIAS }}" >> keystore.properties
+          echo "keyPassword=${{ secrets.ORG_KEY_PASSWORD }}" >> keystore.properties
+
       - name: Build APK Release
         run: ./gradlew assembleRelease --no-daemon
 

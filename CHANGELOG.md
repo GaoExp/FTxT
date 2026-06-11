@@ -1,117 +1,96 @@
+## [3.9.3.69.1] - 2026-06-11
+### ♻️ Perubahan Fitur
+- **CHANGELOG.md** — Tambah entry header [1.3.1.9.0 - 1.0.0.0.0] untuk Catatan Major 1; hapus duplikasi
+- **release.yml** — Tambah step decode keystore dari org secrets untuk signing APK di CI
+### 🔧 Optimasi & Penyesuaian
+- **Dokumentasi** — Konsolidasi: STRUKTUR/DEVELOPMENT/TENTANG dihapus, konten di-merge ke README all-in-one
+- **build.gradle** — syncDocs hanya sync 3 file; hapus preBuild.dependsOn (txt dikelola manual)
+- **activity_documentation.xml / DocumentationActivity.java** — Kurangi daftar dokumen dari 6 ke 3
+### 🔥 File Removed
+- `STRUKTUR.md`, `DEVELOPMENT.md`, `TENTANG.md` (root)
+- `app/src/main/assets/STRUKTUR.txt`, `DEVELOPMENT.txt`, `TENTANG.txt`
+- `key/` — 4 sampel dokumentasi
+### ✏️ File Changed
+- `.github/workflows/release.yml` — Tambah step decode keystore dari org secrets
+- `app/build.gradle` — syncDocs: 3 file; hapus preBuild.dependsOn
+- `CHANGELOG.md` — Tambah entry header Catatan; hapus duplikasi
+- `app/src/main/assets/CHANGELOG.txt` — Strip section file; tambah entry header Catatan
+- `app/src/main/res/layout/activity_documentation.xml` — Hapus 3 button
+- `app/src/main/java/exp/ftxt/DocumentationActivity.java` — Hapus 3 referensi
+### 🔢 Version
+- versionCode: 139
+- versionName: 3.9.3.69.1
+---
 ## [3.9.3.69.0] - 2026-06-02
-
 ### ✨ Fitur Baru
-
 - **Watermark Seal Pattern** — Mode segel pada watermark: teks diulang diagonal melayar penuh dengan kontrol spasi horizontal, spasi vertikal, dan sudut (angle). Canvas custom view dengan Paint anti-aliased. Aktif via toggle "Mode Segel" di panel watermark.
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `app/src/main/java/exp/ftxt/features/watermark/WatermarkConfig.java` — Tambah field pattern (patternEnabled, patternSpacingH, patternSpacingV, patternAngle, patternColor)
 - `app/src/main/java/exp/ftxt/features/watermark/WatermarkModule.java` — Tambah SealPatternView inner class, startPattern/startSingle split, updatePattern()
 - `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Tambah kontrol pattern (switch, spacing H/V, angle slider), updatePatternVisibility()
 - `app/src/main/res/layout/activity_main.xml` — Tambah watermarkPositionContainer wrapper, pattern controls UI
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateWatermarkPatternStatic delegate
-- `app/build.gradle` — versionCode 137 → 138, versionName 3.9.3.68.0 → 3.9.3.69.0
-
+---
 ## [3.9.3.68.0] - 2026-06-02
-
 ### ✨ Fitur Baru
-
 - **Watermark Overlay** — Modul watermark teks baru dengan teks kustom, warna semi-transparan default (0x55FFFFFF), ukuran (5–200sp), shadow, background, kontrol posisi (slider X/Y, D-Pad, preset full-config), touch passthrough, dan safe area. Panel dapat diakses dari sidebar navigasi.
-
 ### 🗒️ File Added
-
 - `app/src/main/java/exp/ftxt/features/watermark/WatermarkConfig.java` — Konfigurasi watermark (teks, ukuran, warna, shadow, background, posisi)
 - `app/src/main/java/exp/ftxt/features/watermark/WatermarkModule.java` — Module overlay watermark (ShadowTextView, WindowManager)
 - `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Panel kontrol UI watermark (switch, text, size, color, shadow, background)
 - `app/src/main/java/exp/ftxt/ui/WatermarkPositionController.java` — Kontrol posisi watermark (slider, D-Pad, preset)
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah watermarkModule + 11 static delegate methods (start, stop, updateText, updateSize, updateColor, updateShadow, updateBackground, updateTouchFlags, updatePosition, setOrientationSuffix, getPosition)
 - `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah WatermarkPanelController, init di onCreate, onResume, nav handler, cleanup; tambah load WatermarkConfig di loadShadowConfigs
 - `app/src/main/res/layout/activity_main.xml` — Ganti placeholder "coming soon" dengan panel Watermark lengkap (switch, EditText, size, color, position, shadow, background)
 - `app/src/main/res/layout/drawer_content.xml` — Ubah "Watermark (coming soon)" menjadi "Watermark"
-- `app/build.gradle` — versionCode 136 → 137, versionName 3.9.3.67.2 → 3.9.3.68.0
-
 ### 🔢 Version
-
-- versionCode: 136 → 137
-- versionName: 3.9.3.67.2 → 3.9.3.68.0
-
+- versionCode: 137
+- versionName: 3.9.3.68.0
 ---
-
 ## [3.9.3.67.2] - 2026-06-01
-
-### ♻️️ Perubahan Fitur
-
+### ♻️ Perubahan Fitur
 - **Tampilan FPS Display diseragamkan** — Hapus gaya neumorphism (neu_bg, DpadButton, FpsActionButton, PresetButton, ClickableLabel dll) pada panel FPS Display agar konsisten dengan panel fitur lainnya. Semua button dan kontrol kini menggunakan gaya default/inline seperti panel Text, Clock, Battery, dll.
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Bersihkan styles & colors** — Hapus 6 style dan 5 color yang tidak terpakai (FpsActionButton, DpadButton, PresetButton, ActivePresetLabel, ClickableLabel, PanelSectionTitle; neu_bg, neu_bg_pressed, neu_shadow_light, neu_shadow_dark, neu_text).
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `app/src/main/res/layout/activity_main.xml` — Hapus `android:background="@color/neu_bg"` dan 20 referensi style neumorphism di panel FPS; ganti dengan inline attributes.
 - `app/src/main/res/values/styles.xml` — Hapus 6 style tidak terpakai.
 - `app/src/main/res/values/colors.xml` — Hapus 5 color neumorphism tidak terpakai.
-
 ### 🔢 Version
-
-- versionCode: 135 → 136
-- versionName: 3.9.3.67.1 → 3.9.3.67.2
-
+- versionCode: 136
+- versionName: 3.9.3.67.2
 ---
-
+## [3.9.3.67.1] - 2026-06-01
 ### 🐞 Bug Fixes
-
 - **CI build gagal — SDK license & platform 35** — Workflow release.yml tidak accept SDK licenses dan tidak install platform 35 (compileSdk). Ditambahkan step `sdkmanager --licenses` dan install `platforms;android-35` + `build-tools;35.0.0`. Juga fallback `ANDROID_SDK_ROOT` jika `ANDROID_HOME` tidak diset.
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `.github/workflows/release.yml` — Tambah step Install SDK components & accept licenses; `local.properties` pakai fallback `ANDROID_HOME`/`ANDROID_SDK_ROOT`; `./gradlew` pakai `--no-daemon`
-
 ### 🔢 Version
-
-- versionCode: 134 → 135
-- versionName: 3.9.3.67.0 → 3.9.3.67.1
-
+- versionCode: 135
+- versionName: 3.9.3.67.1
 ---
-
 ## [3.9.3.67.0] - 2026-06-01
-
 ### ✨ Fitur Baru
-
 - **PresetBrowserDialog** — Dialog browser preset modern dengan search, filter, color thumbnail, favorite, rename, delete, reorder, dan export/import. Menggantikan AlertDialog radio-list lama.
 - **Active Preset Label** — Setiap panel (7 module) menampilkan label preset aktif di atas tombol preset.
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Java 8 → Java 17** — sourceCompatibility/targetCompatibility dinaikkan ke Java 17 menghilangkan deprecation warning dari JDK 21.
 - **Ekstrak Logika Preset ke PresetHandler** — `showSavePresetDialog`, `doSavePreset`, `showLoadPresetDialog`, `applyPreset`, dan `showExportImportMenu` diekstrak dari semua 7 PositionController ke `shared/preset/PresetHandler.java` dengan pola Delegate interface. Menghapus ~800 baris kode duplikat.
 - **GitHub Actions Workflow** — Workflow CI/CD untuk build & release APK otomatis saat push tag v\*.
-
 ### 🐞 Bug Fixes
-
 - **Import FC di PresetBrowserDialog** — `registerForActivityResult` dipindah ke `onCreate` Fragment lifecycle, bukan lazy di click handler.
 - **CI build Gagal — AAPT2 not found** — Workflow gagal karena `local.properties` mengarah ke SDK path lokal yang tidak ada di runner. Ditambahkan step generate dari `$ANDROID_HOME`.
 - **CI build Gagal — AAPT2 masih not found** — `android.aapt2FromMavenOverride` di `gradle.properties` merujuk ke path tidak ada. Dihapus.
-
-### ♻️️ Perubahan Fitur
-
+### ♻️ Perubahan Fitur
 - **Tombol E/I dihapus** dari 7 panel — fungsi ekspor/impor/bagikan sudah ada di PresetBrowserDialog. Metode `PresetHandler.showExportImportMenu()` dihapus.
-
 ### 🗒️ File Added
-
 - `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — DialogFragment browser preset dengan search, list, favorite, rename, delete, reorder.
 - `app/src/main/res/layout/dialog_preset_browser.xml` — Layout dialog browser preset (search bar + list + bottom bar).
 - `app/src/main/res/layout/preset_browser_item.xml` — Layout per-item preset (color thumbnail + nama + tags + favorite star).
 - `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — Class baru dengan `Delegate` interface + static methods untuk handle semua operasi preset.
 - `.github/workflows/release.yml` — Workflow: trigger tag v\*, Java 17, assembleRelease, upload ke GitHub Release.
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Tambah `color` di index metadata untuk quick thumbnail.
 - `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — `showLoadPresetDialog()` pakai `PresetBrowserDialog`; hapus `showExportImportMenu`.
 - `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — `importLauncher` pakai `registerForActivityResult` di `onCreate`.
@@ -121,38 +100,23 @@
 - `STRUKTUR.md` + `STRUKTUR.txt` — Tambah `PresetBrowserDialog.java`, `dialog_preset_browser.xml`, `preset_browser_item.xml`
 - `DEVELOPMENT.md` + `DEVELOPMENT.txt` — Java requirement 1.8+→17+, "Java 1.8 compatible"→"Java 17 compatible"
 - `.github/workflows/release.yml` — Tambah step "Setup Android SDK"; hapus `android.enableAapt2FromMaven` (obsolete di AGP 8.12)
-
 ### 🔢 Version
-
-- versionCode: 127 → 134
-- versionName: 3.9.3.66.0 → 3.9.3.67.0
-
+- versionCode: 134
+- versionName: 3.9.3.67.0
 ---
-
 ## [3.9.3.66.0] - 2026-06-01
-
 ### ✨ Fitur Baru
-
 - **Tombol Muat di Semua Panel** — Tombol "Muat Preset" (Load) kini muncul sebagai button fisik di layout setiap panel, posisinya di antara Simpan dan E/I. Sebelumnya hanya tersedia di menu popup toolbar (gear icon).
-
-### ✏️️ File Changed
-
+### ✏️ File Changed
 - `app/src/main/res/layout/activity_main.xml` — Tambah btnLoadPreset di 7 module sections
 - All 7 PositionControllers — setupListeners: +btnLoadPreset onClick → showLoadPresetDialog()
-
 ### 🔢 Version
-
-- versionCode: 126 → 127
-- versionName: 3.9.3.65.0 → 3.9.3.66.0
-
+- versionCode: 127
+- versionName: 3.9.3.66.0
 ---
-
 ## [3.9.3.65.0 – 3.9.3.63.0] - 2026-05-31–06-01
-
 Menggabungkan 3 release.
-
 ### ✨ Fitur Baru
-
 - **Preset System v2 — UUID-based Index & Metadata** — Sistem penyimpanan preset diupgrade dari name-based keys ke UUID-based storage dengan index metadata yang terurut. Backward compatible: migrasi otomatis dari format lama.
 - **Preset Metadata (Tags, Favorite, Timestamps)** — Setiap preset kini menyimpan tags (list), favorite flag, createdAt, dan updatedAt timestamp. Metadata terpisah dari data preset untuk fleksibilitas.
 - **Thumbnail Generation** — Saat preset disimpan, aplikasi otomatis generate thumbnail bitmap sederhana berdasarkan warna utama preset (64x64px PNG, disimpan di `context.getFilesDir()/presets/`).
@@ -166,57 +130,37 @@ Menggabungkan 3 release.
 - **File Picker Impor Preset** — Tombol "Impor dari File" kini membuka file picker system (`ActivityResultContracts.OpenDocument`) untuk memilih file preset.
 - **Bagikan Preset di Semua Panel** — Menu "Bagikan Preset" kini tersedia di semua 7 panel overlay, sebelumnya hanya di panel Text.
 - **Preset Full-Konfigurasi** — Preset kini menyimpan SELURUH konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, toggle display spesifik per modul). Backward compatible.
-
-### ♻️️ Perubahan Fitur
-
+### ♻️ Perubahan Fitur
 - **Export/Import UI Updated** — Semua tombol Export/Import di position controllers diganti dari "Ekspor/Impor ke Clipboard" menjadi "Ekspor ke File" / "Impor dari File".
 - **Share Menu** — Tambah opsi "Bagikan Preset" di export menu, memanggil `PresetManager.sharePreset(name)`.
 - **OverlayPreset model diperluas** — 9 field baru: touchPassthrough, safeArea, textContent, showOnlyValue, showTemperature, showPercentage, showVoltage, showCurrent, showPower.
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Clipboard-based Export/Import** — Method `exportToClipboard(activity)` dan `importFromClipboard(activity)` dihapus.
-
 ### 🐞 Bug Fixes
-
 - **Extra brace di TextPositionController** — Brace `}` berlebih di baris 221 menyebabkan class ditutup prematur (28 error kompilasi).
 - **Teks hitam di tema gelap saat pertama buka** — `AppCompatDelegate.setDefaultNightMode()` dipanggil setelah `SplashScreen`.
-
-### 🔢 Version
-
-- versionCode: 123 → 126 (3 increment)
-- versionName: 3.9.3.65.0 → 3.9.2.62.1
-
 ### 💡 Catatan
-
 - Backward compatibility: preset lama (name-key based) otomatis dimigrasikan ke UUID index.
 - Thumbnail di-generate saat `save()` berdasarkan warna overlay (64x64px PNG).
 - History capped 10 items per preset; item lama otomatis di-pop.
 - Clipboard sharing dihapus; file-based sharing lebih reliable di Android 10+.
 - Tags dan Favorite flags disimpan di index metadata (SharedPreferences).
-
+### 🔢 Version
+- versionCode: 126
+- versionName: 3.9.2.62.1
 ---
-
 ## [3.9.2.62.0 – 2.8.2.56.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Safe Area "Gunakan Area Aman"** — Menambahkan checkbox "Gunakan Area Aman" pada semua 6 panel overlay (Text, FPS, Clock, Battery, Battery Current, Network) untuk mengaktifkan/nonaktifkan pembatasan posisi agar tetap dalam area aman layar.
 - **Auto-request izin saat pertama buka** — Aplikasi otomatis meminta semua izin (Overlay, Notifikasi, Optimasi Baterai) saat pertama kali dijalankan.
 - **Battery Stats toggles °C / %** — Panel Battery Stats (sebelumnya Battery Temperature) kini memiliki dua checkbox toggle °C dan % untuk mengontrol tampilan suhu dan persentase baterai secara independen. Keduanya bisa aktif bersamaan atau salah satu saja.
 - **Battery Percentage Overlay** — Fitur baru untuk menampilkan persentase baterai sebagai overlay. Update tiap 5 detik, mendukung semua konfigurasi: ukuran, warna, shadow, background, kontrol posisi, preset, dan orientasi.
 - **Battery Current Overlay** — Fitur baru untuk menampilkan tegangan (mV), arus (mA), dan daya (W) baterai sebagai overlay. Update tiap 5 detik, mendukung semua konfigurasi: ukuran, warna, shadow, background, kontrol posisi, preset, dan orientasi.
 - **Sistem Preset Full-Konfigurasi (GSON) terintegrasi ke UI** — Tombol Simpan, Muat, dan E/I pada semua 5 panel (Text, FPS, Clock, Battery, Network) sekarang menyimpan/memuat FULL konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi) via PresetManager+OverlayPreset (GSON), bukan hanya posisi X/Y seperti sebelumnya.
-
-### ♻️️ Perubahan Fitur
-
+### ♻️ Perubahan Fitur
 - **Tema default mode malam** — Tema aplikasi sekarang default ke mode gelap (malam) saat pertama kali dijalankan.
 - **Placeholder panel Crosshair, Watermark, Logo** — Tiga panel kosong kini menampilkan pesan "Konsep overlay sedang dalam tahap pengerjaan" sebagai pengganti panel Text saat nav item diklik.
-
-### ♻️ Perubahan Fitur
-
 - **"Battery Monitor" → "Battery Temperature"**: Nama tampilan modul baterai diubah dari "Battery Monitor" menjadi "Battery Temperature" di navigasi drawer, toolbar, dan label modul.
 - **Restrukturisasi folder features**: Semua folder fitur di `features/` diubah namanya agar sesuai dengan label yang ditampilkan di aplikasi:
   - `features/battery/` → `features/battery_temperature/`
@@ -229,69 +173,43 @@ Menggabungkan 5 release.
   - `features/crosshair/` — tetap
   - `features/watermark/` — tetap
 - **Tombol Potret/Lanskap dipindah ke toolbar**: Tombol orientasi Potret dan Lanskap dihapus dari panel kontrol posisi (Text, FPS, Clock, Battery, Network) dan digantikan dengan ikon orientasi layar di toolbar samping ikon tema. Ketuk ikon untuk toggle orientasi layar antara potret dan lanskap.
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Tombol Potret/Lanskap per panel**: Button `btnPortrait`/`btnLandscape` dihapus dari kelima panel overlay.
 - **PositionPresetManager** — Sistem preset posisi X/Y lama digantikan total oleh PresetManager berbasis GSON. File dipindahkan ke `_karantina/` untuk referensi jika diperlukan kembali.
-
 ### 💡 Catatan
-
 - Mulai rilis ini, aplikasi menggunakan label **"FunText"** dan menandai status **Beta**. Seluruh rilis berikutnya akan menggunakan format `FunText vX.X.X.X.X Beta` pada sidebar header.
-
 ### 🔢 Version
-
-- versionCode: 121→122 (5 increment)
-- versionName: 3.9.2.62.0 → 2.8.2.56.0
-
+- versionCode: 122
+- versionName: 2.8.2.56.0
 ---
-
 ## [2.7.2.54.0 – 2.7.2.49.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Sistem Manajemen Preset Overlay (GSON)** — Sistem preset baru berbasis GSON yang menyimpan seluruh konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi) dalam format JSON. Mendukung Save, Load, Rename, Select, Delete, Export (clipboard/file), dan Import (clipboard/file).
 - **Network Speed Meter Overlay** — Memantau kecepatan internet real-time (↓ upload / ↑ download) dengan format otomatis KB/s ↔ MB/s, polling tiap 1 detik via TrafficStats.
 - **Network Speed Position Controls** — Slider X/Y, D-Pad, preset save/load, orientasi Potret/Lanskap untuk Network Speed overlay.
-
 ### ♻️ Perubahan Fitur
-
 - **Tombol preset jadi satu baris**: Simpan, Muat, dan E/I dalam satu baris horizontal. Reset dihapus.
 - **Ubah teks button**: "Simpan Preset" → "Simpan", "Muat Preset" → "Muat".
 - **Semua toggle Switch → CheckBox**: `overlaySwitch`, `touchPassthroughSwitch`, `shadowSwitch`, `bgSwitch` dan varian fps/clock/battery diubah dari Switch menjadi CheckBox di semua 4 panel.
 - **Overlay & Kunci Posisi sejajar horizontal**: Setiap panel kini menampilkan CheckBox overlay dan kunci posisi dalam satu baris horizontal.
 - **Urutan komponen diubah semua panel**: Kontrol Posisi dipindah ke bawah Pilih Warna; Background dipindah ke paling bawah (di bawah Shadow).
 - **Label teks Switch dihapus**: Teks langsung di `android:text` CheckBox, TextView label samping dihapus.
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Grid Posisi 3×3 FPS/Clock/Battery**: Tombol grid 3×3 untuk quick preset posisi dihapus dari panel FPS Display, Jam Digital, dan Suhu Baterai — melanjutkan penghapusan yang sudah dilakukan di panel Floating Text.
 - **Auto Preset Aplikasi FPS**: Fitur auto-switch preset berdasarkan aplikasi di FPS dihapus (sudah dihapus dari Text di release sebelumnya).
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Warna sidebar ikut tema terang/gelap**: Drawer background dan header tidak lagi hardcoded. Pakai `@color/drawer_background` dan `@color/drawer_header_background` dengan variant `values-night/colors.xml` untuk mode gelap.
 - **Gradle namespace syntax**: `namespace "exp.ftxt"` diganti `namespace = "exp.ftxt"` untuk kompatibilitas Gradle 10.
-
 ### 🐞 Bug Fixes
-
 - **TextPositionController crash**: Grid 3×3 buttons (`btnPosTL`–`btnPosBR`), orientation buttons (`btnPortrait`/`btnLandscape`), dan auto-preset switch (`autoPresetSwitch`) dihapus dari layout Text panel di release sebelumnya, tapi kode Java masih mereferensinya — menyebabkan `cannot find symbol` saat kompilasi. Semua referensi dihapus dari `TextPositionController.java`.
-
 ### 🔢 Version
-
-- versionCode: 112→113 (5 increment)
-- versionName: 2.7.2.54.0 → 2.7.2.49.0
-
+- versionCode: 113
+- versionName: 2.7.2.49.0
 ---
-
 ## [2.6.2.48.0 – 2.6.1.43.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Preset Preview**: Tampilan mini-map posisi pada daftar preset saat memuat.
 - **Preset Export/Import**: Ekspor preset ke clipboard (JSON), impor dari clipboard.
 - **More Preset Slots**: Jumlah maksimal preset ditingkatkan dari 10 menjadi 50.
@@ -302,92 +220,60 @@ Menggabungkan 5 release.
 - **Suhu Baterai Overlay**: Overlay suhu baterai dalam Celsius (°C), update tiap 5 detik. Membaca via `BatteryManager.EXTRA_TEMPERATURE`. Opsi tampilkan hanya nilai. Dilengkapi kontrol posisi lengkap (slider X/Y, D-Pad, grid 3×3, preset, orientasi).
 - **Kontrol Posisi FPS Display**: Tambah Slider X/Y, D-Pad, preset posisi, dan tombol orientasi (Potret/Lanskap) pada panel FPS Display — menyamai yang sudah ada di Floating Text. Posisi disimpan terpisah per orientasi dengan sistem normalized 0.0–1.0.
 - **Tampilan Koordinat Posisi Real-time**: Label "Kontrol Posisi" kini menampilkan koordinat pixel sesungguhnya (contoh: `540X1200`) yang berubah langsung saat slider, D-Pad, preset, atau drag overlay — menggunakan `getRealMetrics()` untuk akurasi full screen.
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Grid Posisi 3×3**: Tombol grid 3×3 untuk quick preset posisi dihapus karena kurang berguna. User dapat menggunakan slider X/Y, D-Pad, atau preset system yang lebih flexible.
 - **Auto Preset Aplikasi**: Fitur auto-switch preset berdasarkan orientasi dihapus. Orientasi mode (Potret/Lanskap) masih tersedia melalui kontrol posisi manual.
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Layout Kontrol Posisi**: D-Pad dipindah ke kanan sejajar dengan Slider X/Y dalam satu baris horizontal. Tombol preset (Simpan Preset, Muat Preset, Reset) diberi `singleLine` agar teks tidak wrapping dan sejajar sempurna.
-
 ### 🐞 Bug Fixes
-
 - **Slider Posisi**: Slider X/Y tidak tersinkronisasi saat overlay dipindahkan dengan mode drag. Kini slider mengikuti posisi overlay secara real-time.
 - **Sinkronisasi semua overlay**: Perbaikan untuk Text, FPS, Battery, dan Clock overlay.
 - **Padding Background Mendorong Teks**: `applyBackground()` selalu set padding (`bgPadding=25`) meski background mati, mendorong teks menjauh dari tepi view — menyebabkan gap kecil di X=0, Y=0. Sekarang padding cuma diterapkan saat `bgEnabled=true`.
 - **Hal yang sama diterapkan di `FpsModule.applyBackground()` untuk konsistensi.
-
 ### 🔢 Version
-
-- versionCode: 97 → 106
-- versionName: 2.6.1.42.1 → 2.6.2.48.0
-
+- versionCode: 106
+- versionName: 2.6.2.48.0
 ---
-
 ## [2.6.1.42.0 – 2.4.1.38.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Orientasi Mode Posisi**: Tambah tombol [Potret] [Lanskap] di kontrol posisi untuk mengatur posisi overlay secara terpisah per orientasi. Setiap perubahan posisi otomatis tersimpan ke orientasi yang sedang aktif.
 - **Hapus Preset Posisi**: Tahan preset 2 detik di dialog Muat Preset untuk memunculkan dialog konfirmasi hapus dengan tombol [Ya] [Batal].
 - **Classic Color Wheel (Full Disk)**: Color Picker ARGB Sliders kini dilengkapi Color Wheel penuh dengan indikator crosshair. Saturation mencakup seluruh area wheel (full disk), bukan hanya area dalam.
-
 - **Two-Way Synchronization**: Pergerakan crosshair di Color Wheel otomatis menyesuaikan slider R, G, B secara real-time, dan sebaliknya. Dilengkapi flag `isUpdating` untuk mencegah infinite loop.
 - **Drag Cross-Container**: Item sidebar kini bisa di-drag bebas antar grup (Overly, Fitur, grup kustom). Pindahkan item dari satu grup ke grup lain dengan long-press dan drop.
 - **Mode Hapus**: Tombol "Hapus" di sidebar mengaktifkan mode delete. Setiap item mendapat CheckBox (☐/☑). Pilih item yang ingin dihapus, lalu tekan [Hapus] di footer untuk eksekusi. [Batal] untuk membatalkan.
 - **Penyimpanan State Penuh**: Semua state sidebar (grup built-in + kustom, urutan item, status collapse/expand) disimpan dan dipulihkan sepenuhnya.
-
-### ♻️️ Perubahan Fitur
-
+### ♻️ Perubahan Fitur
 - **PositionController**: Referensi XY Pad dihapus — turun dari 159 ke 153 baris. Sekarang hanya mengelola Slider + D-Pad + Preset + Orientasi.
 - **Penyimpanan Posisi Langsung**: `onPositionChanged()` kini langsung menyimpan posisi ke SharedPreferences, tidak hanya saat drag berhenti.
-- **Tata Letak Kontrol Posisi**: XY Pad diubah menjadi vertikal (250dp, `layout_weight="1"`) dan D-Pad dipindah ke samping kanan dalam satu baris horizontal, mengisi ruang kosong yang sebelumnya terbuang.
 - **Tata Letak Kontrol Posisi**: XY Pad diubah menjadi vertikal (250dp, `layout_weight="1"`) dan D-Pad dipindah ke samping kanan dalam satu baris horizontal, mengisi ruang kosong yang sebelumnya terbuang.
 - **Refactor Package Structure**: Rename folder `modules` → `features` untuk naming yang lebih konsisten dan semantik. Semua import statements dan dokumentasi internal telah diperbarui.
 - **Drag-to-Reorder**: Sekarang mendukung cross-container drag. Item bisa dipindah antar grup manapun.
 - **rebuildSidebar()**: Method baru untuk membangun ulang seluruh sidebar dari state JSON. Dipanggil saat `onCreate()` dan setelah operasi penghapusan.
 - **saveSidebarState() / loadSidebarState()**: Menggantikan `saveCustomGroups()` / `loadCustomGroups()`. Menyimpan state penuh semua grup (built-in + kustom).
 - **Collapse/Expand Built-in**: Grup Overlay dan Fitur kini dapat di-collapse/expand (sebelumnya hanya grup kustom yang bisa).
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Karantina XY Pad**: `XyPadView.java` dipindahkan dari `shared/ui/` ke `_karantina/` untuk diarsipkan. XY Pad tidak lagi aktif di UI. Dapat dipulihkan kembali di masa depan dengan mengembalikan file ke `shared/ui/` dan menghubungkan kembali di `PositionController` + layout.
 - **Hapus Sistem Grup Sidebar**: Navigasi sidebar tidak lagi menggunakan grup (Overlay, Fitur). Semua item ditampilkan flat dalam satu daftar. Tombol "Tambah Grup" dihapus. Grup kustom yang tersimpan otomatis dimigrasi ke format flat.
-
 - **Hapus Tombol "Hapus" Sidebar**: Tombol dan mode hapus item di footer sidebar dihapus untuk menyederhanakan navigasi.
 - **Hapus "Tambah Item" Per-Grup**: Setiap grup kustom tidak lagi memiliki EditText + Button "+" untuk menambah item. Item hanya bisa ditambah melalui mekanisme internal (drag antar grup atau restore state).
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Ekstrak D-Pad ke Shared Component**: Logika D-Pad (touch listener dengan repeat) diekstrak dari `PositionController.java` ke `shared/ui/DpadController.java` — mengurangi duplikasi dan meningkatkan modularitas, mengikuti pola `XyPadView` dan `SliderLabelEditor`.
-
 - **Ekstrak Preset Posisi ke Shared Component**: Sistem preset posisi (simpan/load/hapus dengan long-press) diekstrak dari `PositionController.java` ke `shared/ui/PositionPresetManager.java` — mengurangi kompleksitas `PositionController` dari 350 menjadi 159 baris.
-
 - **Ekstrak Slider X/Y ke Shared Component**: Slider SeekBar posisi X dan Y (dengan label) diekstrak ke `shared/ui/SliderPositionController.java` — masing-masing dengan `isUpdating` guard sendiri untuk mencegah infinite loop saat sinkronisasi.
 - **Auto-Apply Posisi Orientasi**: Posisi overlay kini otomatis diterapkan saat orientasi layar berubah, tanpa perlu menekan tombol [Potret]/[Lanskap] secara manual.
 - **Hapus Entry Dokumentasi dari Sidebar**: Navigasi "Dokumentasi" dihapus dari drawer kiri karena sudah ada akses "Lihat Dokumentasi" melalui popup Pengaturan (ikon gear).
-
 - **Hapus module files deprecated**: Folder `modules/` yang sudah tidak dipakai (digantikan `features/`) dihapus dari filesystem.
-
 ### 🐞 Bug Fixes
-
 - **Overlay Baru Pakai Dimensi Layar Lama**: `TextModule.createOverlay()` menggunakan `screenWidth`/`screenHeight` yang disimpan saat `init()`. Jika overlay dihapus lalu dibuat ulang setelah rotasi layar, posisinya dihitung dengan dimensi lama. Sekarang `createOverlay()` juga refresh dimensi dari `WindowManager`.
 - **Suffix Orientasi Tidak Sinkron**: `TextModule.posSuffix()` selalu membaca orientasi perangkat fisik, sementara `PositionController` bisa dioverride manual (tombol Potret/Lanskap). Akibatnya, drag overlay menyimpan posisi ke key orientasi yang salah. Sekarang `TextModule` punya `orientationSuffix` yang bisa di-set dari `PositionController`, dan di-reset tiap `PositionController` dibuat atau berganti mode.
 - **Posisi Layar Landscape Tidak Akurat**: `screenWidth`/`screenHeight` di `TextModule` menggunakan dimensi layar saat service start (tidak update saat orientasi berubah). Akibatnya slider, D-Pad, dan XY Pad menghitung posisi dengan ukuran layar yang salah. Sekarang `updatePosition()`, `loadPosition()`, dan `savePosition()` selalu mengambil dimensi layar terkini.
 - **XyPad Tidak Bisa Di-drag**: `NestedScrollView` meng-intercept sentuhan pada `XyPadView` sehingga dot tidak bisa digerakkan. Ditambahkan `requestDisallowInterceptTouchEvent(true)` pada ACTION_DOWN dan `false` pada ACTION_UP/CANCEL.
-
 - **Handler Memory Leak**: `Handler` pada `PositionController` (repeatHandler untuk D-pad dan holdHandler untuk long-press hapus preset) tidak pernah dibersihkan saat Activity di-destroy. Ditambahkan metode `cleanup()` yang dipanggil di `MainActivity.onDestroy()`.
-- **Sidebar Tidak Responsif**: Item sidebar yang dibuat ulang secara programmatic oleh `rebuildSidebar()` tidak memiliki `OnClickListener`, sehingga tidak bisa dipilih. Ditambahkan listener yang meng-handle navigasi panel, update title, simpan state, dan tutup drawer.
-
 - **ScrollView pada Panel**: Panel Floating Text dan FPS Display tidak bisa di-scroll saat konten melebihi layar (misal konfigurasi Background/Shadow terbuka). Ditambahkan `ScrollView` dengan `fillViewport="true"` pada kedua panel.
 - **Sidebar Tidak Responsif**: Item sidebar yang dibuat ulang secara programmatic oleh `rebuildSidebar()` tidak memiliki `OnClickListener`, sehingga tidak bisa dipilih. Ditambahkan listener yang meng-handle navigasi panel, update title, simpan state, dan tutup drawer.
-
-### 🔥️ File Removed
-
+### 🔥 File Removed
 - `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` → dipindah ke `_karantina/exp/ftxt/shared/ui/XyPadView.java`
 - app/src/main/java/exp/ftxt/modules/text/TextConfig.java
 - app/src/main/java/exp/ftxt/modules/text/TextModule.java
@@ -397,20 +283,13 @@ Menggabungkan 5 release.
 - app/src/main/java/exp/ftxt/modules/text/TextModule.java (deprecated)
 - app/src/main/java/exp/ftxt/modules/fps/FpsConfig.java (deprecated)
 - app/src/main/java/exp/ftxt/modules/fps/FpsModule.java (deprecated)
-
 ### 🔢 Version
-
-- versionCode: 82 → 96
-- versionName: 2.3.1.37.1 → 2.6.1.42.0
-
+- versionCode: 96
+- versionName: 2.6.1.42.0
 ---
-
 ## [2.3.1.37.0 – 2.3.1.32.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Tambah Grup**: Tombol "+ Tambah Grup" di sidebar untuk membuat grup kustom baru. Setiap grup memiliki header collapsible dan bisa ditambahi item sendiri.
 - **Drag-to-Reorder**: Long-press item sidebar (built-in maupun kustom) lalu drag ke posisi lain untuk mengurutkan ulang.
 - **Penyimpanan Grup**: Grup kustom dan urutannya disimpan otomatis ke SharedPreferences dan dipulihkan saat aplikasi dibuka kembali.
@@ -431,9 +310,7 @@ Menggabungkan 5 release.
 - **Direct Label Edit**: Klik label margin dan radius untuk mengedit nilai langsung via dialog input.
 - **Label Slider Menampilkan Nilai**: Semua label slider di panel Floating Text dan FPS Display kini menampilkan nilai numerik terkini (contoh: "Ukuran Teks: 20", "Offset X: 0").
 - **Edit Nilai Slider Manual**: Klik label slider untuk mengedit nilai numerik langsung via dialog input—slider menyesuaikan otomatis.
-
 ### 🔧 Optimasi & Penyesuaian
-
 - **Tampilan Dokumentasi**: Entry dokumen diubah dari tombol (button) menjadi daftar teks dengan garis pemisah — lebih bersih, seperti daftar.
 - **Toolbar Biru**: Toolbar SettingsActivity dan DocumentationActivity kini menggunakan warna biru `#2196F3` (sama seperti toolbar utama), bukan hitam.
 - **Judul Toolbar**: SettingsActivity berganti judul dari "Pengaturan" menjadi "Konfigurasi".
@@ -455,20 +332,13 @@ Menggabungkan 5 release.
 - **Android SplashScreen API**: Implementasi SplashScreen API resmi Android menggunakan icon launcher aplikasi. Splash screen menampilkan icon app dengan background warna tema, tanpa custom splash activity atau fake loading delay.
 - **Offset Range -60 hingga 60**: Semua offset (Background X/Y dan Shadow X/Y) di panel Floating Text dan FPS Display sekarang memiliki range -60 hingga 60, dengan posisi default 0 di tengah. SeekBar memetakan progress 0-120 ke offset -60..60.
 - **Default Shadow Offset**: Nilai default shadow offset X/Y diubah dari 3 menjadi 0.
-
 ### 🔢 Version
-
-- versionCode: 65 → 81
-- versionName: 2.3.1.31.0 → 2.3.1.37.0
-
+- versionCode: 81
+- versionName: 2.3.1.37.0
 ---
-
 ## [2.3.1.31.0 – 2.3.1.26.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Hanya Tampilkan Nilai FPS**: Tambah toggle di panel FPS untuk menyembunyikan teks "FPS" dan hanya menampilkan angka.
 - **Versi di Sidebar**: Tambah nomor versi terkini di samping nama aplikasi di header navigation drawer (contoh: FTxT v2.3.1.30.0).
 - **Edit HEX Manual**: Tambah ikon sunting di samping nilai HEX untuk mengedit warna secara manual via input teks.
@@ -481,30 +351,19 @@ Menggabungkan 5 release.
   - Izin Notifikasi: minta izin runtime (Android 13+).
   - Optimasi Baterai: buka halaman nonaktifkan optimasi baterai.
   - Status switch otomatis sinkron saat halaman dibuka/kembali.
-
 ### 🐞 Bug Fixes
-
 - **Dokumentasi Color Model**: Perbaiki dokumentasi model warna di README dari HSV (lama) menjadi ARGB sesuai implementasi color picker saat ini.
 - **Switch Modul Tidak Minta Izin Mandiri**: Switch Floating Text dan FPS Display sekarang hanya mati diam-diam tanpa meminta izin overlay. Izin harus dinyalakan dulu lewat Settings > Akses Izin > Izin Overlay.
 - **Overlay Permission Gate**: Switch Floating Text dan FPS Display sekarang menolak menyala jika izin Overlay belum diberikan. Switch otomatis kembali ke OFF dan meminta izin.
-
-### 🔥️ File Removed
-
+### 🔥 File Removed
 - `app/src/main/java/exp/ftxt/modules/temp/`
-
 ### 🔢 Version
-
-- versionCode: 56 → 65
-- versionName: 2.3.1.25.0 → 2.3.1.31.0
-
+- versionCode: 65
+- versionName: 2.3.1.31.0
 ---
-
 ## [2.3.1.25.0 – 2.3.1.21.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Force Close**: Tombol "Tutup Aplikasi" dipindah ke SettingsActivity (di bawah CHANGELOG/README, pojok kiri bawah).
   - Hapus `nav_exit` dari navigation drawer.
   - `forceClose()`: stop service → destroy overlay → `finishAffinity()` → `System.exit(0)`.
@@ -514,7 +373,6 @@ Menggabungkan 5 release.
   - Jika izin overlay sudah diberikan, service langsung start tanpa perlu toggle manual.
   - `FloatingService.onCreate()` restore overlay text dari pref `text_overlay_on`.
   - Kembali dari Settings izin → `onResume()` lanjutkan auto-start.
-
 - **Kunci Posisi Default ON**: `touchPassthrough` sekarang default `true`.
   - `TextConfig.touchPassthrough = true` (sebelumnya `false`).
   - `FpsConfig.touchPassthrough = true` (sebelumnya `false`).
@@ -534,12 +392,9 @@ Menggabungkan 5 release.
   - Kontrol penuh ARGB (Alpha, Red, Green, Blue).
   - Tampilan HEX jadi 8 digit (#AARRGGBB).
   - Tampilan RGB jadi ARGB (Alpha, R, G, B).
-
 - **Kill App Button**: Tambah menu "Tutup Aplikasi" di navigation drawer.
   - Panggil `finishAffinity()` untuk menutup semua aktivitas dan menghentikan proses aplikasi.
-
-### 🚮️ Fitur Dihapus
-
+### 🚮 Fitur Dihapus
 - **Hardcoded Background**: Hapus background hitam otomatis dari `OverlayShadow.apply()`.
   - Background shadow dulu otomatis `0x88000000` saat shadow diaktifkan.
   - Sekarang background dan shadow adalah fitur terpisah.
@@ -549,20 +404,13 @@ Menggabungkan 5 release.
   - `ShadowTextView` pakai `shadowConfig.color` langsung.
   - Seekbar opacity shadow dihapus dari UI (Text & FPS).
   - Pref `shadow_opacity` / `fps_shadow_opacity` tidak lagi dimuat.
-
 ### 🔢 Version
-
-- versionCode: 51 → 56
-- versionName: 2.3.1.20.0 → 2.3.1.25.0
-
+- versionCode: 56
+- versionName: 2.3.1.25.0
 ---
-
 ## [2.3.1.20.0 – 2.3.1.16.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
 - **Shadow Config**: Konfigurasi shadow modular dengan Enable, Warna, Blur, X/Y Offset, Opacity.
   - `ShadowConfig.java` — class konfigurasi shadow reusable untuk semua modul.
   - `OverlayShadow.java` — apply background + elevation (text shadow via `ShadowTextView`).
@@ -575,48 +423,32 @@ Menggabungkan 5 release.
 - **String Resource**: Semua nama modul dipindah ke strings.xml.
 - **FPS Draggable**: FPS overlay bisa digeser (drag) dan dikunci posisinya.
 - Limit SeekBar: min 5 → max 120 (sebelumnya min 10 → max 60).
-
 ### 🔧 Optimasi & Penyesuaian
-
 - Floating Text size range diperluas: 1–150 sp (sebelumnya 5–120).
 - FPS Display size range diperluas: 5–140 sp (sebelumnya 5–120).
 - Padding dialog ditingkatkan 24px → 25dp (density-independent).
 - Ukuran teks dialog ditingkatkan 12sp → 40sp.
-
 ### 🐞 Bug Fixes
-
 - Tombol kembali (back arrow) di SettingsActivity tidak berfungsi — tambah `setNavigationOnClickListener`.
-
 ### 🔢 Version
-
-- versionCode: 40 → 51
-- versionName: 2.3.1.15.0 → 2.3.1.20.0
-
+- versionCode: 51
+- versionName: 2.3.1.20.0
 ---
-
 ## [2.3.1.15.0 – 2.3.1.10.0] - 2026-05-16–06-01
-
 Menggabungkan 5 release.
-
 ### ✨ Fitur Baru
-
-
 - Toggle tema (gelap/terang) via ikon bulan di toolbar kanan.
 - Tema tersimpan dan bertahan setelah app ditutup.
 - Tambah menu pengaturan dengan opsi untuk melihat CHANGELOG dan README dalam dialog scrollable.
 - SettingsActivity membaca langsung dari file assets (single source of truth).
 - Hapus duplikasi file: CHANGELOG.md, README.md, dan AGENTS.md hanya ada di assets folder.
-
 ### 🔧 Optimasi & Penyesuaian
-
 - Persiapan struktur modular untuk module overlay.
 - HSVColorPickerView dipindah ke shared component.
 - Update import package setelah refactor namespace.
-
 ### 🐞 Bug Fixes
-
 - **FPS tidak tampil**: Service kini bisa start tanpa text overlay (FPS standalone).
 - **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
-
----
-
+## [1.3.1.9.0 - 1.0.0.0.0] - Pra-2026
+### 💡 Catatan
+- Major 1 kebawah telah dipisahkan dari Project

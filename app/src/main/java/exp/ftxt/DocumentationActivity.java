@@ -31,9 +31,6 @@ public class DocumentationActivity extends AppCompatActivity {
         findViewById(R.id.docReadmeButton).setOnClickListener(v -> showDoc("README"));
         findViewById(R.id.docChangelogButton).setOnClickListener(v -> showDoc("CHANGELOG"));
         findViewById(R.id.docPanduanButton).setOnClickListener(v -> showDoc("PANDUAN"));
-        findViewById(R.id.docStrukturButton).setOnClickListener(v -> showDoc("STRUKTUR"));
-        findViewById(R.id.docDevelopmentButton).setOnClickListener(v -> showDoc("DEVELOPMENT"));
-        findViewById(R.id.docTentangButton).setOnClickListener(v -> showDoc("TENTANG"));
     }
 
     private void showDoc(String name) {

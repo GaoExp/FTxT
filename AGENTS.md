@@ -1,4 +1,4 @@
-# AGENTS.md — Pedoman AI Project FTxT 
+# AGENTS.md — Pedoman AI Project
  
 Dokumen ini adalah aturan kerja untuk AI agent yang memodifikasi project. 
  
@@ -6,7 +6,7 @@ Gunakan bahasa Indonesia.
  
 Tujuan: 
 - konsistensi versi 
-- konsistensi dokumentasi (CHANGELOG, README, STRUKTUR, PANDUAN, DEVELOPMENT, TENTANG)
+- konsistensi dokumentasi (CHANGELOG, README, STRUKTUR, PANDUAN)
 - mudah dibaca manusia 
 - mengurangi perilaku AI yang terlalu verbose atau over-engineering 
  
@@ -35,21 +35,21 @@ Contoh:
 `1.1.1.15.4`  
    
 ### IMPORTANT  
-     
+      
 Project ini TIDAK menggunakan semantic versioning standar.
-     
+      
 JANGAN menerapkan aturan semantic versioning standar pada project ini.
-     
+      
 Contoh yang VALID:
-     
+      
 `1.1.1.15.4` → `2.1.1.16.0`
-     
+      
 BUKAN:
-     
+      
 `1.1.1.15.4` → `2.0.0.0.0`
- 
+
 ### Arti Komponen 
- 
+
 major: 
 - milestone besar 
 - generasi project 
@@ -58,32 +58,32 @@ major:
 - selalu dianggap sebagai feature release
     
 removed: 
- 
+
 Counter historis fitur yang pernah dihapus, deprecated, dinonaktifkan, atau dipensiunkan. 
- 
+
 NAIK saat: 
 - fitur dihapus 
 - fitur deprecated 
 - fitur disable permanen 
 - fitur diganti total 
- 
+
 TIDAK PERNAH TURUN. 
- 
+
 restored: 
- 
+
 Counter historis fitur yang pernah dikembalikan setelah sebelumnya dihapus atau dinonaktifkan. 
- 
+
 NAIK saat: 
 - fitur lama kembali 
 - fitur deprecated diaktifkan lagi 
 - fitur retired dipulihkan 
- 
+
 TIDAK PERNAH TURUN. 
- 
+
 minor: 
- 
+
 Counter feature release. 
- 
+
 NAIK saat: 
 - fitur baru ditambahkan 
 - fitur besar ditambahkan 
@@ -93,7 +93,7 @@ NAIK saat:
 - perubahan feature-level besar
 
 patch: 
- 
+
 Digunakan untuk: 
 - bugfix 
 - optimization 
@@ -101,64 +101,64 @@ Digunakan untuk:
 - refactor kecil 
 - dependency update 
 - UI cleanup 
- 
+
 ### Aturan 
- 
+
 - patch reset → `0` saat minor naik 
 - minor +1 saat major naik 
 - removed TIDAK reset 
 - restored TIDAK reset 
- 
+
 ### Contoh 
- 
+
 Awal: 
- 
+
 `1.1.1.15.4` 
- 
+
 arti: 
 - major 1 
 - 1 fitur pernah dihapus 
 - 1 fitur pernah dipulihkan 
 - feature release ke-15 
 - patch 4
- 
+
 Tambah fitur: 
- 
+
 `1.1.1.16.0` 
- 
+
 minor +1
 patch reset 
- 
+
 Fitur dihapus: 
- 
+
 `1.2.1.17.0` 
- 
+
 removed +1
 minor +1
 patch reset 
- 
+
 Fitur kembali: 
- 
+
 `1.2.2.18.0` 
- 
+
 restored +1
 minor +1
 patch reset 
- 
+
 Bugfix: 
- 
+
 `1.2.2.18.1` 
- 
+
 patch +1 
- 
+
 Major release: 
- 
+
 `3.2.2.19.0` 
- 
+
 major +1
 minor +1
 patch reset
-     
+    
 ### Algoritma Increment
 
 Feature baru:
@@ -183,174 +183,133 @@ major+1
 minor+1
 patch=0
 ---
- 
-## 2. CHANGELOG.txt 
- 
-CHANGELOG adalah riwayat perubahan release. 
- 
-Entry baru: 
- 
-WAJIB ditaruh di paling atas. 
- 
-Format: 
- 
-```md 
-## [X.X.X.X.X] - YYYY-MM-DD 
-``` 
- 
-Gunakan section sesuai kebutuhan: 
- 
-```md 
-### 🔢 Version 
-### ✨ Fitur Baru 
-### 🚮️ Fitur Dihapus 
-### 📥️ Fitur Dipulihkan
-### ♻️️ Perubahan Fitur 
-### 🗒️ File Added 
-### ✏️️ File Changed 
-### 🔥️ File Removed 
-### 🔧 Optimasi & Penyesuaian 
-### 🐞 Bug Fixes 
-### 💡 Catatan 
-``` 
- 
+
+## 2. CHANGELOG
+
+CHANGELOG adalah riwayat perubahan release.
+
+File:
+- `CHANGELOG.md` (root) — markdown, untuk GitHub
+- `app/src/main/assets/CHANGELOG.txt` — plain text, untuk in-app
+
+Catat perubahan di **entry versi yang sedang berjalan** (bukan entry baru).
+
+Gunakan section sesuai kebutuhan. Urutan section WAJIB mengikuti urutan berikut:
+
+```
+✨ Fitur Baru
+🚮 Fitur Dihapus
+📥 Fitur Dipulihkan
+♻️ Perubahan Fitur
+🔧 Optimasi & Penyesuaian
+🐞 Bug Fixes
+💡 Catatan
+🗒️ File Added
+✏️ File Changed
+🔥 File Removed
+🔢 Version
+```
+
 ### Aturan 
- 
+
 WAJIB: 
-- semua file yang benar-benar diubah dicatat 
-- update versionCode dicatat 
-- update versionName dicatat 
-- khusus untuk build.gradle, changelog dan readme tidak perlu dicatat (dikecualikan)
- 
+- semua file yang diubah dicatat
+- section WAJIB sesuai urutan di atas
+
 JANGAN: 
-- menambah changelog untuk perubahan trivial 
-- menulis penjelasan terlalu panjang 
-- membuat subsection yang tidak perlu 
-- mengulang detail implementasi kecil 
- 
-Ringkas, faktual, langsung ke perubahan. 
- 
---- 
- 
-## 3. Dokumentasi (.md root ↔ .txt assets)
+- membuat entry versi baru
+- menambah changelog untuk perubahan trivial
+- mengubah urutan section
+- menulis penjelasan panjang
 
-Dokumentasi terdiri dari 6 pasang file yang harus disinkronkan secara manual:
+Ringkas, faktual, langsung ke perubahan.
 
-| Root (.md)          | Assets (.txt)             | Isi                              |
-|---------------------|---------------------------|----------------------------------|
-| README.md           | README.txt                | Ringkasan fitur & referensi      |
-| STRUKTUR.md         | STRUKTUR.txt              | Struktur project & deskripsi file|
-| PANDUAN.md          | PANDUAN.txt               | Panduan penggunaan lengkap       |
-| DEVELOPMENT.md      | DEVELOPMENT.txt           | Info teknis, environment, version|
-| TENTANG.md          | TENTANG.txt               | Lisensi, author, support         |
-| CHANGELOG.md        | CHANGELOG.txt             | Riwayat perubahan release        |
+### Khusus CHANGELOG.txt (in-app)
 
-### README / PANDUAN (Dokumentasi pengguna akhir)
-
-JANGAN menambahkan isi: 
-- detail implementasi teknis 
-- cleanup kecil
-
-WAJIB update bila: 
-- ada fitur baru 
-- ada fitur dihapus 
-- ada fitur dipulihkan 
-- ada perubahan struktur project 
-- ada perubahan UI/UX besar 
-- Current Version berubah 
-- Last Updated berubah 
-
-Update hanya jika relevan: 
-- daftar fitur 
-- requirement 
-- permission 
-
-Detail teknis → CHANGELOG / DEVELOPMENT
-
-### STRUKTUR
-
-WAJIB update bila:
-- ada file/direktori baru
-- ada file/direktori dihapus
-- ada perubahan struktur package
-
-### DEVELOPMENT
-
-WAJIB update bila:
-- ada perubahan environment (SDK, permission, dependency)
-- ada perubahan versioning scheme
-- ada perubahan teknis signifikan
-
-### TENTANG
-
-Update hanya jika:
-- ada perubahan author/support info
-- ada perubahan lisensi
-
-### CHANGELOG
-
-Update WAJIB setiap ada perubahan kode.
-Aturan penulisan ada di **Section 2 — CHANGELOG.txt** di atas.
+Section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **PENCATATAN DIKECUALIKAN** — tidak relevan untuk dokumentasi di dalam aplikasi.
  
 --- 
  
-## 4. Workflow AI 
+## 3. Dokumentasi
 
-Sesudah mengedit: 
+Dokumentasi hanya diupdate **saat diperintah user**, dan itu pun dilakukan **sebelum commit**.
 
-1. update kode 
-2. update versionCode 
-3. update versionName 
-4. update `CHANGELOG.md` (root) + `CHANGELOG.txt` (assets)
-5. update pasangan dokumentasi yang relevan (.md root + .txt assets):
-   - `README.md` + `README.txt`
-   - `STRUKTUR.md` + `STRUKTUR.txt`
-   - `PANDUAN.md` + `PANDUAN.txt`
-   - `DEVELOPMENT.md` + `DEVELOPMENT.txt`
-   - `TENTANG.md` + `TENTANG.txt`
+Tidak perlu update dokumentasi setiap kali ada perubahan kode — bisa ditumpuk sekaligus nanti.
+
+--- 
+ 
+## 4. Workflow
+
+### 1. Edit Biasa (looping)
+
+1. update kode
+2. catat perubahan di `CHANGELOG.md` entry versi berjalan
+3. **JANGAN** commit / tag / push
+4. ulang sampai user perintah **commit & tag**
+
+### 2. Pre-release (sebelum commit & tag)
+
+1. periksa semua dokumen (README, STRUKTUR, PANDUAN, CHANGELOG)
+2. update revisi / perbaiki jika ada yang tidak sinkron
+3. pastikan semua sudah sesuai
+4. beri tahu user bahwa siap di-commit & tag
+
+### 3. Rilis (hanya saat diperintahkan)
+
+1. `git add -A && git commit`
+2. `git tag vX.X.X.X.X`
+3. **JANGAN** push — user yang akan push sendiri
+
+### 4. Setelah Push (entry versi baru)
+
+Saat user sudah push dan mulai mengerjakan perubahan baru:
+
+1. update versionCode (+1)
+2. update versionName sesuai Algoritma Increment (Section 1)
+3. buat entry CHANGELOG baru (paling atas) dengan versi baru
+4. kembali ke **Edit Biasa**
  
 --- 
  
 ## 5. Perilaku AI 
- 
+
 Penerapan berlaku kepada semua Agent AI yang terlibat dalam pengerjaan Project, terutama untuk model Agent GitHub CoPilot (important) 
 Kerjakan hanya sesuai request user. 
- 
+
 JANGAN: 
 - melakukan refactor tanpa diminta 
 - mengubah file di luar scope request 
 - mengaudit seluruh project tanpa diminta 
-- membuat checklist panjang maupun singkat untuk request sederhana (important) 
-- memberi penjelasan panjang bila tidak diminta 
-- melakukan over-engineering 
- 
+- membuat checklist panjang maupun singkat untuk request sederhana (IMPORTANT) 
+- memberi penjelasan panjang bila tidak diminta (IMPORTANT)
+
 Utamakan: 
 - perubahan minimal 
 - perubahan terfokus 
 - jawaban singkat 
 - edit seperlunya 
 - solusi langsung bisa dipakai 
- 
+
 Default behavior: 
- 
+
 jangan terlalu rajin. 
- 
+
 Jika user meminta perubahan kecil, 
 kerjakan perubahan kecil. 
- 
-JANGAN memperluas scope sendiri. 
- 
+
 ### Chat Response Rules 
- 
+
 Default response style: 
 - singkat 
 - fokus 
 - actionable 
- 
+- tulis ulang chat di file talkhere.txt jika user melaporkan chat terpotong / terputus
+- dalam talkhere.txt letakkan entry chat baru di atas, biarkan chat lama berada di bawah
+
 JANGAN: 
 - menjelaskan langkah yang tidak dilakukan 
 - membuat audit project tanpa diminta 
 - menjelaskan teori panjang untuk perubahan sederhana 
-- menambahkan rekomendasi besar di luar request 
- 
+- menambahkan rekomendasi besar di luar request tanpa diminta
+
 Jika request sederhana = jawab sederhana.
