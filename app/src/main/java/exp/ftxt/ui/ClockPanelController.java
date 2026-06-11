@@ -173,8 +173,7 @@ public class ClockPanelController {
                 }
             } else {
                 FloatingService.stopClockStatic();
-                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
-                        && !exp.ftxt.features.battery_temperature.BatteryConfig.enabled) {
+                if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }

@@ -185,11 +185,7 @@ public class BatteryCurrentPanelController {
                 }
             } else {
                 FloatingService.stopBatteryCurrentStatic();
-                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
-                        && !exp.ftxt.features.clock_module.ClockConfig.enabled
-                        && !exp.ftxt.features.network_stats.NetworkConfig.enabled
-                        && !exp.ftxt.features.battery_temperature.BatteryConfig.enabled
-                        && !exp.ftxt.features.battery_percentage.BatteryPercentageConfig.enabled) {
+                if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }

@@ -1,3 +1,40 @@
+## [3.9.3.70.0] - 2026-06-11
+### ✨ Fitur Baru
+- **Kontrol Interval Update Battery Stats** — Tambah tombol - dan + di panel Battery Stats untuk mengatur interval update dari 1-10 detik. Label menampilkan interval aktif (contoh: "Update: 5s"). Interval disimpan di SharedPreferences dan diaplikasikan langsung.
+### 🔧 Optimasi & Penyesuaian
+- **BatteryModule update interval dinamis** — tickRunnable kini menggunakan `BatteryConfig.updateInterval * 1000L` daripada hardcoded 5000ms.
+### 🗒️ File Added
+- UI kontrol interval di `app/src/main/res/layout/panel_battery.xml`
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java` — Tambah field `updateInterval` (default 5)
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Update tickRunnable untuk gunakan `BatteryConfig.updateInterval`
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah method `updateBatteryUpdateIntervalStatic()`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Load `battery_update_interval` dari SharedPreferences di `loadShadowConfigs()`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Tambah fields, binding, loadConfig, listener untuk interval buttons + setup method
+- `app/src/main/res/layout/panel_battery.xml` — Tambah LinearLayout dengan tombol -, label interval, dan tombol + setelah color button
+### 🔢 Version
+versionCode: 147
+versionName: 3.9.3.69.9
+---
+## [3.9.3.69.8] - 2026-06-11
+### 🐞 Bug Fixes
+- **Semua modul ikut ter-nonaktifkan saat satu modul dimatikan** — Logic di semua panel controller hanya check 1-2 modul lainnya sebelum stop service, menyebabkan modul aktif lainnya ikut mati. Diperbaiki dengan helper function `isAnyModuleActive()` di MainActivity yang check SEMUA 7 modul (Text overlay, FPS, Clock, Battery, Battery%, Battery Current, Network, Watermark).
+### 🔧 Optimasi & Penyesuaian
+- **Centralized module state check** — Ekstrak logic cek modul aktif dari 8 panel controller ke method `isAnyModuleActive()` di MainActivity untuk consistency dan maintainability.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah method `isAnyModuleActive()` yang check semua 7 modul
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Ganti logic check 1 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Ganti logic check 1 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Ganti logic check 3 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Ganti logic check 3 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — Ganti logic check 5 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Ganti logic check 6 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Ganti logic check 3 modul dengan `isAnyModuleActive()`
+- `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Ganti logic check 7 modul dengan `isAnyModuleActive()`
+### 🔢 Version
+versionCode: 146
+versionName: 3.9.3.69.8
+---
 ## [3.9.3.69.7] - 2026-06-11
 ### 🐞 Bug Fixes
 - **CI: signing path dobel `app/app/`** — `storeFile=app/release.jks` di keystore.properties, tapi build.gradle resolve path relatif ke direktori `app/`. Diubah jadi `storeFile=release.jks`.

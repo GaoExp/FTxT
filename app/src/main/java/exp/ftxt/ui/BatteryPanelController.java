@@ -47,6 +47,9 @@ public class BatteryPanelController {
     private TextView batteryBgMarginLabel, batteryBgRadiusLabel;
     private TextView batteryShadowBlurLabel, batteryShadowOffsetXLabel, batteryShadowOffsetYLabel;
     private BatteryPositionController batteryPositionController;
+    private Button batteryIntervalMinus;
+    private Button batteryIntervalPlus;
+    private TextView batteryIntervalLabel;
 
     public BatteryPanelController(MainActivity activity) {
         this.activity = activity;
@@ -107,6 +110,9 @@ public class BatteryPanelController {
         batteryShadowBlurLabel = activity.findViewById(R.id.batteryShadowBlurLabel);
         batteryShadowOffsetXLabel = activity.findViewById(R.id.batteryShadowOffsetXLabel);
         batteryShadowOffsetYLabel = activity.findViewById(R.id.batteryShadowOffsetYLabel);
+        batteryIntervalMinus = activity.findViewById(R.id.batteryIntervalMinus);
+        batteryIntervalPlus = activity.findViewById(R.id.batteryIntervalPlus);
+        batteryIntervalLabel = activity.findViewById(R.id.batteryIntervalLabel);
 
         View sectionDisplay = activity.findViewById(R.id.battery_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.battery_sectionDisplayHeader);
@@ -158,6 +164,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
+        batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
     }
 
     private void setupListeners() {
@@ -183,8 +190,7 @@ public class BatteryPanelController {
                 }
             } else {
                 FloatingService.stopBatteryStatic();
-                if (!activity.isTextOverlayOn() && !exp.ftxt.features.fps_display.FpsConfig.enabled
-                        && !exp.ftxt.features.clock_module.ClockConfig.enabled) {
+                if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }
@@ -381,6 +387,8 @@ public class BatteryPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_safe_area", isChecked).apply();
         });
+
+        setupIntervalListeners();
     }
 
     private void saveBatteryShadowPrefs() {
@@ -390,5 +398,27 @@ public class BatteryPanelController {
                 .putFloat("battery_shadow_offset_x", BatteryConfig.shadow.offsetX)
                 .putFloat("battery_shadow_offset_y", BatteryConfig.shadow.offsetY)
                 .apply();
+    }
+
+    private void setupIntervalListeners() {
+        batteryIntervalMinus.setOnClickListener(v -> {
+            if (BatteryConfig.updateInterval > 1) {
+                BatteryConfig.updateInterval--;
+                batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("battery_update_interval", BatteryConfig.updateInterval).apply();
+                FloatingService.updateBatteryUpdateIntervalStatic();
+            }
+        });
+
+        batteryIntervalPlus.setOnClickListener(v -> {
+            if (BatteryConfig.updateInterval < 10) {
+                BatteryConfig.updateInterval++;
+                batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("battery_update_interval", BatteryConfig.updateInterval).apply();
+                FloatingService.updateBatteryUpdateIntervalStatic();
+            }
+        });
     }
 }

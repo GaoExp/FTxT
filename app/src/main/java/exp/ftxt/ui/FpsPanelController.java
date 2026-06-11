@@ -178,7 +178,7 @@ public class FpsPanelController {
                 }
             } else {
                 FloatingService.stopFpsStatic();
-                if (!activity.isTextOverlayOn()) {
+                if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }

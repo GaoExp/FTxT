@@ -222,7 +222,7 @@ public class TextPanelController {
                 activity.startService(new android.content.Intent(activity, FloatingService.class));
             } else {
                 FloatingService.destroyTextOverlayStatic();
-                if (!FpsConfig.enabled) {
+                if (!activity.isAnyModuleActive()) {
                     activity.stopService(new android.content.Intent(activity, FloatingService.class));
                 }
             }

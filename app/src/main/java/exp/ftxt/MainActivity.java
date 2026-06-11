@@ -386,6 +386,28 @@ public class MainActivity extends AppCompatActivity {
                 .getBoolean("text_overlay_on", false);
     }
 
+    /**
+     * Cek apakah ADA modul overlay yang sedang aktif.
+     * Jika tidak ada, service bisa di-stop.
+     */
+    public boolean isAnyModuleActive() {
+        // Cek Text overlay
+        if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE).getBoolean("text_overlay_on", false)) {
+            return true;
+        }
+        
+        // Cek FPS, Clock, Battery, Battery%, Battery Current, Network, Watermark
+        if (FpsConfig.enabled) return true;
+        if (ClockConfig.enabled) return true;
+        if (BatteryConfig.enabled) return true;
+        if (BatteryPercentageConfig.enabled) return true;
+        if (BatteryCurrentConfig.enabled) return true;
+        if (NetworkConfig.enabled) return true;
+        if (WatermarkConfig.enabled) return true;
+        
+        return false;
+    }
+
     // ========================================================================
     // Shadow config loading — dipanggil saat onCreate
     // ========================================================================
@@ -565,6 +587,7 @@ public class MainActivity extends AppCompatActivity {
         BatteryConfig.bgEnabled = prefs.getBoolean("battery_bg_enabled", false);
         BatteryConfig.bgColor = prefs.getInt("battery_bg_color", 0xCC000000);
         BatteryConfig.bgPadding = prefs.getInt("battery_bg_padding", 8);
+        BatteryConfig.updateInterval = prefs.getInt("battery_update_interval", 5);
 
         WatermarkConfig.enabled = prefs.getBoolean("watermark_enabled", false);
         WatermarkConfig.text = prefs.getString("watermark_text", "Watermark");

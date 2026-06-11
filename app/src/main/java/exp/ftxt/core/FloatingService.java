@@ -668,6 +668,13 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateBatteryUpdateIntervalStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.stop();
+            instance.batteryModule.start(instance.windowManager, instance);
+        }
+    }
+
     public static int[] getBatteryCurrentPosition() {
         if (instance != null && instance.batteryModule != null) {
             return instance.batteryModule.getCurrentPosition();
