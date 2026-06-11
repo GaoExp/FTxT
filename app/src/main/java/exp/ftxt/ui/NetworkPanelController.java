@@ -13,6 +13,7 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.utils.PermissionHelper;
 
 public class NetworkPanelController {
@@ -99,6 +100,22 @@ public class NetworkPanelController {
         networkShadowBlurLabel = activity.findViewById(R.id.networkShadowBlurLabel);
         networkShadowOffsetXLabel = activity.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = activity.findViewById(R.id.networkShadowOffsetYLabel);
+
+        View sectionDisplay = activity.findViewById(R.id.network_sectionDisplay);
+        TextView sectionDisplayHeader = activity.findViewById(R.id.network_sectionDisplayHeader);
+        SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
+
+        View sectionPosition = activity.findViewById(R.id.network_sectionPosition);
+        TextView sectionPositionHeader = activity.findViewById(R.id.network_sectionPositionHeader);
+        SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
+
+        View sectionShadow = activity.findViewById(R.id.network_sectionShadow);
+        TextView sectionShadowHeader = activity.findViewById(R.id.network_sectionShadowHeader);
+        SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
+
+        View sectionBackground = activity.findViewById(R.id.network_sectionBackground);
+        TextView sectionBackgroundHeader = activity.findViewById(R.id.network_sectionBackgroundHeader);
+        SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 
     private void loadConfig() {

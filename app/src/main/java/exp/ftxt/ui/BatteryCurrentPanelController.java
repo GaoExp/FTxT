@@ -13,6 +13,7 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.utils.PermissionHelper;
 
 public class BatteryCurrentPanelController {
@@ -105,6 +106,22 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
         batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
         batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
+
+        View sectionDisplay = activity.findViewById(R.id.batCur_sectionDisplay);
+        TextView sectionDisplayHeader = activity.findViewById(R.id.batCur_sectionDisplayHeader);
+        SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
+
+        View sectionPosition = activity.findViewById(R.id.batCur_sectionPosition);
+        TextView sectionPositionHeader = activity.findViewById(R.id.batCur_sectionPositionHeader);
+        SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
+
+        View sectionShadow = activity.findViewById(R.id.batCur_sectionShadow);
+        TextView sectionShadowHeader = activity.findViewById(R.id.batCur_sectionShadowHeader);
+        SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
+
+        View sectionBackground = activity.findViewById(R.id.batCur_sectionBackground);
+        TextView sectionBackgroundHeader = activity.findViewById(R.id.batCur_sectionBackgroundHeader);
+        SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 
     private void loadConfig() {

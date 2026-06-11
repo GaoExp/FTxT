@@ -1,22 +1,54 @@
+## [3.9.3.69.2] - 2026-06-11
+### 🔧 Optimasi & Penyesuaian
+- **activity_main.xml** — Seragamkan format header collapsible section Shadow & Background di panel Battery Percentage dan Battery Current (bold, 16sp, paddingVertical)
+- **Refactor layout** — Ekstrak 3 panel pertama (Text, FPS, Clock) dari `activity_main.xml` ke file terpisah (`panel_text.xml`, `panel_fps.xml`, `panel_clock.xml`) menggunakan `<include>` untuk mempercepat build AAPT2
+- **PANDUAN.txt, README.txt** — Konversi dari markdown ke plain text untuk in-app display
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 139→140, versionName 3.9.3.69.1→3.9.3.69.2
+- `app/src/main/res/layout/activity_main.xml` — Seragamkan 4 header shadow/background batPct & batCur; ekstrak panel Text, FPS, Clock ke file terpisah (2706 baris, -1504 baris)
+### 🗒️ File Added
+- `app/src/main/res/layout/panel_text.xml`
+- `app/src/main/res/layout/panel_fps.xml`
+- `app/src/main/res/layout/panel_clock.xml`
+### 🔢 Version
+versionCode: 140
+versionName: 3.9.3.69.2
+
 ## [3.9.3.69.1] - 2026-06-11
 ### ♻️ Perubahan Fitur
 - **CHANGELOG.md** — Tambah entry header [1.3.1.9.0 - 1.0.0.0.0] untuk Catatan Major 1; hapus duplikasi
-- **release.yml** — Tambah step decode keystore dari org secrets untuk signing APK di CI
+- **release.yml** — Tambah step decode keystore dari org secrets; tambah `mkdir -p key` untuk buat folder di CI runner
 ### 🔧 Optimasi & Penyesuaian
 - **Dokumentasi** — Konsolidasi: STRUKTUR/DEVELOPMENT/TENTANG dihapus, konten di-merge ke README all-in-one
 - **build.gradle** — syncDocs hanya sync 3 file; hapus preBuild.dependsOn (txt dikelola manual)
 - **activity_documentation.xml / DocumentationActivity.java** — Kurangi daftar dokumen dari 6 ke 3
+- **.gitignore** — Hapus `/key`, tambah gitignore spesifik untuk file sensitif di `key/`
+- **key/.gitkeep** — File baru agar folder key tetap ter-track walau kosong
+- **Refinemen UI — Collapsible Section Grouping** — Semua 8 panel overlay kini dikelompokkan dalam section collapsible (Tampilan, Posisi, Shadow, Background) dengan header clickable ▾/▸. Divider antar section untuk pemisahan visual yang jelas. SectionHelper utility untuk setup reusable.
 ### 🔥 File Removed
 - `STRUKTUR.md`, `DEVELOPMENT.md`, `TENTANG.md` (root)
 - `app/src/main/assets/STRUKTUR.txt`, `DEVELOPMENT.txt`, `TENTANG.txt`
 - `key/` — 4 sampel dokumentasi
+### 🗒️ File Added
+- `key/.gitkeep` — Agar folder key tetap ter-track di git
+- `app/src/main/java/exp/ftxt/shared/ui/SectionHelper.java` — Utility setup collapsible section header dengan toggle ▾/▸
 ### ✏️ File Changed
-- `.github/workflows/release.yml` — Tambah step decode keystore dari org secrets
-- `app/build.gradle` — syncDocs: 3 file; hapus preBuild.dependsOn
+- `.github/workflows/release.yml` — Tambah step decode keystore; tambah `mkdir -p key`
+- `.gitignore` — Hapus `/key`, tambah gitignore spesifik untuk file sensitif
 - `CHANGELOG.md` — Tambah entry header Catatan; hapus duplikasi
 - `app/src/main/assets/CHANGELOG.txt` — Strip section file; tambah entry header Catatan
 - `app/src/main/res/layout/activity_documentation.xml` — Hapus 3 button
 - `app/src/main/java/exp/ftxt/DocumentationActivity.java` — Hapus 3 referensi
+- `app/build.gradle` — syncDocs: 3 file; hapus preBuild.dependsOn
+- `app/src/main/res/layout/activity_main.xml` — Tambah section headers collapsible + wrapper container Tampilan, Posisi, Shadow, Background + divider di 8 panel
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Tambah setup collapsible section
+- `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — Tambah setup collapsible section
 ### 🔢 Version
 - versionCode: 139
 - versionName: 3.9.3.69.1

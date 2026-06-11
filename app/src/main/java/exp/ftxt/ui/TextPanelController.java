@@ -15,6 +15,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
@@ -120,6 +121,22 @@ public class TextPanelController {
         shadowBlurLabel = activity.findViewById(R.id.shadowBlurLabel);
         shadowOffsetXLabel = activity.findViewById(R.id.shadowOffsetXLabel);
         shadowOffsetYLabel = activity.findViewById(R.id.shadowOffsetYLabel);
+
+        View sectionDisplay = activity.findViewById(R.id.text_sectionDisplay);
+        TextView sectionDisplayHeader = activity.findViewById(R.id.text_sectionDisplayHeader);
+        SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
+
+        View sectionPosition = activity.findViewById(R.id.text_sectionPosition);
+        TextView sectionPositionHeader = activity.findViewById(R.id.text_sectionPositionHeader);
+        SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
+
+        View sectionShadow = activity.findViewById(R.id.text_sectionShadow);
+        TextView sectionShadowHeader = activity.findViewById(R.id.text_sectionShadowHeader);
+        SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
+
+        View sectionBackground = activity.findViewById(R.id.text_sectionBackground);
+        TextView sectionBackgroundHeader = activity.findViewById(R.id.text_sectionBackgroundHeader);
+        SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 
     private void loadConfig() {

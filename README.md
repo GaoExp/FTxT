@@ -1,7 +1,7 @@
 # FTxT (FunText) — Floating Text Overlay
 
-**Current Release:** `3.9.3.69.0` **Beta**
-**Last Updated:** `2026-06-02`
+**Current Release:** `3.9.3.69.1` **Beta**
+**Last Updated:** `2026-06-11`
 
 FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -31,6 +31,7 @@ FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilka
 - **Slider Label Edit** — Klik label slider untuk edit nilai via dialog
 - **Screen Orientation Toggle** — Ikon orientasi layar di toolbar, toggle Potret/Lanskap sekali ketuk
 - **Dark/Light Theme** — Toggle tema (default malam), tersimpan otomatis
+- **Collapsible Panel Sections** — Setiap panel overlay dikelompokkan dalam section collapsible: Tampilan, Posisi, Shadow, Background. Klik header ▾/▸ untuk toggle
 - **Overlay Toggle** — Auto-start, permission handling, WakeLock, foreground service
 - **Android SplashScreen** — SplashScreen API resmi tanpa fake loading
 
@@ -298,13 +299,16 @@ FTxT/
             │   ├── ic_theme.xml
             │   └── splash_screen.xml
             ├── layout/
+            │   ├── activity_documentation.xml
             │   ├── activity_main.xml
             │   ├── activity_settings.xml
-            │   ├── activity_documentation.xml
             │   ├── dialog_hsv_color_picker.xml
             │   ├── dialog_preset_browser.xml
             │   ├── drawer_content.xml
             │   ├── nav_header.xml
+            │   ├── panel_clock.xml
+            │   ├── panel_fps.xml
+            │   ├── panel_text.xml
             │   ├── preset_browser_item.xml
             │   └── preset_list_item.xml
             ├── menu/
@@ -328,7 +332,7 @@ FTxT/
 | Kategori | Jumlah |
 |----------|-------:|
 | Java source | 42 |
-| Layout XML | 9 |
+| Layout XML | 12 |
 | Drawable XML | 8 |
 | Values XML | 6 |
 | Mipmap XML | 1 |
@@ -339,5 +343,5 @@ FTxT/
 | Root dokumen | 4 |
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
-| **Total file** | **~90** |
+| **Total file** | **~93** |
 | **Total direktori** | **~35** |

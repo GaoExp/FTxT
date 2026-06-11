@@ -9,7 +9,10 @@
 /build
 /captures
 .externalNativeBuild
-/key
 /sementara
 keystore.properties
 talkhere.txt
+
+# key/ — folder untuk keystore CI, file sensitif diabaikan
+/key/*.jks
+/key/alias-key

@@ -16,6 +16,7 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.watermark.WatermarkConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.utils.PermissionHelper;
 
 public class WatermarkPanelController {
@@ -123,6 +124,23 @@ public class WatermarkPanelController {
         watermarkPatternAngleLabel = activity.findViewById(R.id.watermarkPatternAngleLabel);
         watermarkPatternContainer = activity.findViewById(R.id.watermarkPatternContainer);
         watermarkPositionContainer = activity.findViewById(R.id.watermarkPositionContainer);
+
+        View sectionDisplay = activity.findViewById(R.id.watermark_sectionDisplay);
+        TextView sectionDisplayHeader = activity.findViewById(R.id.watermark_sectionDisplayHeader);
+        SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
+
+        // watermarkPositionContainer already exists, reuse it for position section
+        View sectionPosition = activity.findViewById(R.id.watermarkPositionContainer);
+        TextView sectionPositionHeader = activity.findViewById(R.id.watermark_sectionPositionHeader);
+        SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
+
+        View sectionShadow = activity.findViewById(R.id.watermark_sectionShadow);
+        TextView sectionShadowHeader = activity.findViewById(R.id.watermark_sectionShadowHeader);
+        SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
+
+        View sectionBackground = activity.findViewById(R.id.watermark_sectionBackground);
+        TextView sectionBackgroundHeader = activity.findViewById(R.id.watermark_sectionBackgroundHeader);
+        SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 
     private void loadConfig() {

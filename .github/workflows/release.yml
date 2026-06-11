@@ -41,6 +41,7 @@ jobs:
 
       - name: Setup keystore from org secrets
         run: |
+          mkdir -p key
           echo "${{ secrets.ORG_KEYSTORE_B64 }}" | base64 -d > key/release.jks
           echo "storeFile=../key/release.jks" > keystore.properties
           echo "storePassword=${{ secrets.ORG_KEYSTORE_PASSWORD }}" >> keystore.properties

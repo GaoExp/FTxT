@@ -57,6 +57,14 @@ Header toolbar menampilkan navigasi drawer dan judul modul yang aktif.
 
 ## Fitur Overlay
 
+Setiap panel overlay memiliki pengaturan yang dikelompokkan dalam **section collapsible**:
+- **▾ Tampilan** — Ukuran teks, warna, dan opsi tampilan
+- **▾ Posisi** — Kontrol posisi (slider X/Y, D-Pad, preset, safe area)
+- **▾ Shadow** — Konfigurasi shadow (toggle, warna, blur, offset)
+- **▾ Background** — Konfigurasi background (toggle, warna, padding, offset, margin, radius)
+
+Klik header section untuk membuka/tutup grup. Semua section terbuka secara default.
+
 ### Floating Text
 - Masukkan teks kustom di kolom input
 - Atur ukuran (1–150sp), warna, shadow, background
