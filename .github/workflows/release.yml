@@ -46,12 +46,13 @@ jobs:
             exit 1
           fi
 
-          echo "Decoding keystore to app/release.jks (content suppressed)"
-          printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > app/release.jks || { echo "Failed to decode KEYSTORE_BASE64"; exit 1; }
+          mkdir -p key
+          echo "Decoding keystore to key/audiplay-release-key.jks (content suppressed)"
+          printf '%s' "$KEYSTORE_BASE64" | tr -d '[:space:]' | base64 --decode > key/audiplay-release-key.jks || { echo "Failed to decode KEYSTORE_BASE64"; exit 1; }
 
           echo "Keystore decoded. File info:"
-          ls -l app/release.jks || true
-          file app/release.jks || true
+          ls -l key/audiplay-release-key.jks || true
+          file key/audiplay-release-key.jks || true
 
       - name: Generate keystore.properties for signing
         env:
@@ -60,7 +61,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cat > keystore.properties << EOF
-          storeFile=app/release.jks
+          storeFile=../key/audiplay-release-key.jks
           storePassword=$KEYSTORE_PASSWORD
           keyAlias=$KEY_ALIAS
           keyPassword=$KEY_PASSWORD

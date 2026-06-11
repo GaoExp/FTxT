@@ -1,3 +1,12 @@
+## [3.9.3.69.7] - 2026-06-11
+### 🐞 Bug Fixes
+- **CI: signing path dobel `app/app/`** — `storeFile=app/release.jks` di keystore.properties, tapi build.gradle resolve path relatif ke direktori `app/`. Diubah jadi `storeFile=release.jks`.
+### ✏️ File Changed
+- `.github/workflows/release.yml` — storeFile path: `app/release.jks` → `release.jks`
+### 🔢 Version
+versionCode: 145
+versionName: 3.9.3.69.7
+---
 ## [3.9.3.69.6] - 2026-06-11
 ### 🐞 Bug Fixes
 - **APK release tidak signed** — Workflow decode keystore ke `app/release.jks` tapi tidak bikin `keystore.properties`, sehingga signing config di build.gradle tidak aktif. Ditambahkan step generate properties setelah decode.
