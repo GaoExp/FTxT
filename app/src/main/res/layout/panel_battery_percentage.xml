@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="utf-8"?>
+            <!-- Battery Percentage Panel -->
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/panel_battery_percentage"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <CheckBox
+                        android:id="@+id/batPctSwitch"
+                        android:text="Battery %"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <CheckBox
+                        android:id="@+id/batPctLockSwitch"
+                        android:text="Kunci Posisi"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/batPct_sectionDisplayHeader"
+                    android:text="▾ Tampilan"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/batPct_sectionDisplay"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/batPctSizeLabel"
+                    android:text="Ukuran Teks: 24"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <SeekBar
+                    android:id="@+id/batPctSizeSeekBar"
+                    android:max="140"
+                    android:progress="24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <Button
+                    android:id="@+id/batPctColorButton"
+                    android:text="Pilih Warna"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_height="1dp"
+                    android:background="#CCC"
+                    android:layout_marginVertical="8dp"
+                    android:layout_width="match_parent"/>
+
+                <TextView
+                    android:id="@+id/batPct_sectionPositionHeader"
+                    android:text="▾ Posisi"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/batPct_sectionPosition"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <!-- Battery Percentage Position Controls -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Kontrol Posisi"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctPosCoordDisplay"
+                        android:text="540X1200"
+                        android:layout_marginStart="8dp"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/batPctPosXLabel"
+                            android:text="X: 0.50"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/batPctPosXSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/batPctPosYLabel"
+                            android:text="Y: 0.50"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/batPctPosYSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/batPctBtnUp"
+                            android:text="↑"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <Button
+                                android:id="@+id/batPctBtnLeft"
+                                android:text="←"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                            <Space
+                                android:layout_width="60dp"
+                                android:layout_height="0dp"/>
+
+                            <Button
+                                android:id="@+id/batPctBtnRight"
+                                android:text="→"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/batPctBtnDown"
+                            android:text="↓"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/batPctTxtActivePreset"
+                    android:text="Aktif: -"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/batPctBtnSavePreset"
+                        android:text="Simpan"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/batPctBtnLoadPreset"
+                        android:text="Muat"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/batPct_sectionShadowHeader"
+                    android:text="▾ Shadow"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/batPct_sectionShadow"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <!-- Shadow -->
+                <CheckBox
+                    android:id="@+id/batPctShadowSwitch"
+                    android:text="Shadow"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/shadowConfigBatteryPercentage"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/batPctShadowColorButton"
+                        android:text="Warna Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctShadowBlurLabel"
+                        android:text="Blur Shadow: 5"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctShadowBlurSeekBar"
+                        android:max="50"
+                        android:progress="5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctShadowOffsetXLabel"
+                        android:text="Shadow X: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctShadowOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctShadowOffsetYLabel"
+                        android:text="Shadow Y: 3"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctShadowOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_height="1dp"
+                    android:background="#CCC"
+                    android:layout_marginVertical="8dp"
+                    android:layout_width="match_parent"/>
+
+                <TextView
+                    android:id="@+id/batPct_sectionBackgroundHeader"
+                    android:text="▾ Background"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/batPct_sectionBackground"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <!-- Background -->
+                <CheckBox
+                    android:id="@+id/batPctBgSwitch"
+                    android:text="Background"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/bgConfigBatteryPercentage"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/batPctBgColorButton"
+                        android:text="Warna Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctBgPaddingLabel"
+                        android:text="Ukuran Background: 8"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctBgPaddingSeekBar"
+                        android:max="80"
+                        android:progress="8"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctBgOffsetXLabel"
+                        android:text="Offset X: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctBgOffsetXSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctBgOffsetYLabel"
+                        android:text="Offset Y: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctBgOffsetYSeekBar"
+                        android:max="120"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctBgMarginLabel"
+                        android:text="Margin: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctBgMarginSeekBar"
+                        android:max="30"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/batPctBgRadiusLabel"
+                        android:text="Radius: 0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/batPctBgRadiusSeekBar"
+                        android:max="50"
+                        android:progress="0"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            </LinearLayout>

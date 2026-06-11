@@ -1,6 +1,6 @@
 # FTxT (FunText) — Floating Text Overlay
 
-**Current Release:** `3.9.3.69.1` **Beta**
+**Current Release:** `3.9.3.69.3` **Beta**
 **Last Updated:** `2026-06-11`
 
 FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -305,10 +305,17 @@ FTxT/
             │   ├── dialog_hsv_color_picker.xml
             │   ├── dialog_preset_browser.xml
             │   ├── drawer_content.xml
-            │   ├── nav_header.xml
-            │   ├── panel_clock.xml
-            │   ├── panel_fps.xml
-            │   ├── panel_text.xml
+             │   ├── nav_header.xml
+             │   ├── panel_battery.xml
+             │   ├── panel_battery_current.xml
+             │   ├── panel_battery_percentage.xml
+             │   ├── panel_clock.xml
+             │   ├── panel_crosshair.xml
+             │   ├── panel_fps.xml
+             │   ├── panel_logo.xml
+             │   ├── panel_network.xml
+             │   ├── panel_text.xml
+             │   ├── panel_watermark.xml
             │   ├── preset_browser_item.xml
             │   └── preset_list_item.xml
             ├── menu/
@@ -331,8 +338,8 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 42 |
-| Layout XML | 12 |
+| Java source | 57 |
+| Layout XML | 19 |
 | Drawable XML | 8 |
 | Values XML | 6 |
 | Mipmap XML | 1 |
@@ -343,5 +350,5 @@ FTxT/
 | Root dokumen | 4 |
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
-| **Total file** | **~93** |
-| **Total direktori** | **~35** |
+| **Total file** | **~120** |
+| **Total direktori** | **~38** |

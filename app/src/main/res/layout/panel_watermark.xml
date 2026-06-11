@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+            <!-- Watermark Panel -->
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/panel_watermark"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- Watermark + Kunci Posisi -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <CheckBox
+                        android:id="@+id/watermarkSwitch"
+                        android:text="Watermark"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <CheckBox
+                        android:id="@+id/watermarkLockSwitch"
+                        android:text="Kunci Posisi"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/watermark_sectionDisplayHeader"
+                    android:text="▾ Tampilan"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/watermark_sectionDisplay"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/watermarkEditText"
+                    android:text="Watermark"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- Ukuran Teks -->
+                <TextView
+                    android:id="@+id/watermarkSizeLabel"
+                    android:text="Ukuran Teks: 24"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <SeekBar
+                    android:id="@+id/watermarkSizeSeekBar"
+                    android:max="200"
+                    android:progress="24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- Pilih Warna -->
+                <Button
+                    android:id="@+id/watermarkColorButton"
+                    android:text="Pilih Warna"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_height="1dp"
+                    android:background="#CCC"
+                    android:layout_marginVertical="8dp"
+                    android:layout_width="match_parent"/>
+
+                <TextView
+                    android:id="@+id/watermark_sectionPositionHeader"
+                    android:text="▾ Posisi"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- Position Controls Container (hidden in pattern mode) -->
+                <LinearLayout
+                    android:id="@+id/watermarkPositionContainer"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <!-- Kontrol Posisi -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Kontrol Posisi"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/watermark_posCoordDisplay"
+                        android:text="540X1200"
+                        android:layout_marginStart="8dp"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="12dp">
+
+                        <TextView
+                            android:id="@+id/watermark_posXLabel"
+                            android:text="X: 0.50"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/watermark_posXSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermark_posYLabel"
+                            android:text="Y: 0.50"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/watermark_posYSeekBar"
+                            android:max="1000"
+                            android:progress="500"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/watermark_btnUp"
+                            android:text="↑"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <Button
+                                android:id="@+id/watermark_btnLeft"
+                                android:text="←"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                            <Space
+                                android:layout_width="60dp"
+                                android:layout_height="0dp"/>
+
+                            <Button
+                                android:id="@+id/watermark_btnRight"
+                                android:text="→"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"/>
+
+                        </LinearLayout>
+
+                        <Button
+                            android:id="@+id/watermark_btnDown"
+                            android:text="↓"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/watermark_txtActivePreset"
+                    android:text="Aktif: -"
+                    android:textSize="12sp"
+                    android:textColor="#999999"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/watermark_btnSavePreset"
+                        android:text="Simpan"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"/>
+
+                    <Button
+                        android:id="@+id/watermark_btnLoadPreset"
+                        android:text="Muat"
+                        android:singleLine="true"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+                <CheckBox
+                    android:id="@+id/watermarkSafeArea"
+                    android:text="Gunakan Area Aman"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <!-- Seal Pattern Mode -->
+                <CheckBox
+                    android:id="@+id/watermarkPatternSwitch"
+                    android:text="Mode Segel"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/watermarkPatternContainer"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/watermarkPatternSpacingHLabel"
+                        android:text="Spasi Horizontal: 180"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/watermarkPatternSpacingH"
+                        android:max="500"
+                        android:progress="180"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/watermarkPatternSpacingVLabel"
+                        android:text="Spasi Vertikal: 220"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/watermarkPatternSpacingV"
+                        android:max="500"
+                        android:progress="220"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/watermarkPatternAngleLabel"
+                        android:text="Sudut: -30\u00B0"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/watermarkPatternAngle"
+                        android:max="180"
+                        android:progress="60"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/watermark_sectionShadowHeader"
+                    android:text="▾ Shadow"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/watermark_sectionShadow"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Shadow -->
+                    <CheckBox
+                        android:id="@+id/watermarkShadowSwitch"
+                        android:text="Shadow"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:id="@+id/shadowConfigWatermark"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/watermarkShadowColorButton"
+                            android:text="Warna Shadow"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkShadowBlurLabel"
+                            android:text="Blur Shadow: 5"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkShadowBlurSeekBar"
+                            android:max="50"
+                            android:progress="5"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkShadowOffsetXLabel"
+                            android:text="Shadow X: 3"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkShadowOffsetXSeekBar"
+                            android:max="120"
+                            android:progress="60"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkShadowOffsetYLabel"
+                            android:text="Shadow Y: 3"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkShadowOffsetYSeekBar"
+                            android:max="120"
+                            android:progress="60"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_height="1dp"
+                    android:background="#CCC"
+                    android:layout_marginVertical="8dp"
+                    android:layout_width="match_parent"/>
+
+                <TextView
+                    android:id="@+id/watermark_sectionBackgroundHeader"
+                    android:text="▾ Background"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:id="@+id/watermark_sectionBackground"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Background -->
+                    <CheckBox
+                        android:id="@+id/watermarkBgSwitch"
+                        android:text="Background"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:id="@+id/bgConfigWatermark"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <Button
+                            android:id="@+id/watermarkBgColorButton"
+                            android:text="Warna Background"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkBgPaddingLabel"
+                            android:text="Ukuran Background: 10"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkBgPaddingSeekBar"
+                            android:max="80"
+                            android:progress="10"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkBgOffsetXLabel"
+                            android:text="Offset X: 0"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkBgOffsetXSeekBar"
+                            android:max="120"
+                            android:progress="60"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkBgOffsetYLabel"
+                            android:text="Offset Y: 0"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkBgOffsetYSeekBar"
+                            android:max="120"
+                            android:progress="60"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkBgMarginLabel"
+                            android:text="Margin: 0"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkBgMarginSeekBar"
+                            android:max="30"
+                            android:progress="0"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/watermarkBgRadiusLabel"
+                            android:text="Radius: 0"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <SeekBar
+                            android:id="@+id/watermarkBgRadiusSeekBar"
+                            android:max="50"
+                            android:progress="0"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            </LinearLayout>

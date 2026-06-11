@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+            <!-- Logo Display Panel (coming soon) -->
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/panel_logo"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="20dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Konsep overlay sedang dalam tahap pengerjaan"
+                    android:textSize="16sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Penerapan akan segera diluncurkan."
+                    android:textSize="16sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:gravity="center"/>
+
+            </LinearLayout>

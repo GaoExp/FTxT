@@ -1,3 +1,21 @@
+## [3.9.3.69.3] - 2026-06-11
+### 🔧 Optimasi & Penyesuaian
+- **Refactor layout** — Ekstrak semua panel tersisa (Battery Current, Network, Crosshair, Watermark, Logo) dari `activity_main.xml` ke file terpisah menggunakan `<include>`; hapus leftover konten duplikat battery & battery_percentage
+- **release.yml** — Upgrade Java 17→21 untuk kompatibilitas keystore (Tag number over 30)
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 140→141, versionName 3.9.3.69.2→3.9.3.69.3
+- `.github/workflows/release.yml` — Java 17→21
+- `app/src/main/res/layout/activity_main.xml` — Ekstrak semua panel ke file terpisah; hapus inline content (2620 baris → 41 baris)
+### 🗒️ File Added
+- `app/src/main/res/layout/panel_battery_current.xml`
+- `app/src/main/res/layout/panel_network.xml`
+- `app/src/main/res/layout/panel_crosshair.xml`
+- `app/src/main/res/layout/panel_watermark.xml`
+- `app/src/main/res/layout/panel_logo.xml`
+### 🔢 Version
+versionCode: 141
+versionName: 3.9.3.69.3
+
 ## [3.9.3.69.2] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **activity_main.xml** — Seragamkan format header collapsible section Shadow & Background di panel Battery Percentage dan Battery Current (bold, 16sp, paddingVertical)

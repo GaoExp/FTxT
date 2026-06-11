@@ -1,3 +1,25 @@
+[3.9.3.69.3] - 2026-06-11
+🔧 Optimasi & Penyesuaian
+---------------------------
+- Refactor layout — Ekstrak semua panel tersisa (Battery Current, Network, Crosshair, Watermark, Logo) ke file terpisah via <include>
+- release.yml — Upgrade Java 17 ke 21 untuk kompatibilitas keystore
+✏️ File Changed
+-------------------
+- app/build.gradle — versionCode 140→141, versionName 3.9.3.69.2→3.9.3.69.3
+- .github/workflows/release.yml — Java 17 ke 21
+- app/src/main/res/layout/activity_main.xml — Ekstrak semua panel (2620 baris → 41 baris)
+🗒️ File Added
+----------------
+- panel_battery_current.xml
+- panel_network.xml
+- panel_crosshair.xml
+- panel_watermark.xml
+- panel_logo.xml
+🔢 Version
+------------
+versionCode: 141
+versionName: 3.9.3.69.3
+
 [3.9.3.69.2] - 2026-06-11
 🔧 Optimasi & Penyesuaian
 ---------------------------
