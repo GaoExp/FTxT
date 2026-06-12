@@ -1,3 +1,14 @@
+## [3.9.3.75.0] - 2026-06-12
+### ✨ Fitur Baru
+- **148 CSS Color Names** — ColorNameResolver di-upgrade dengan 148 warna CSS standar. Pencocokan warna menggunakan Euclidean distance untuk hasil yang lebih akurat.
+- **254 Material Design Colors** — ColorNameResolver diperluas dengan 254 warna Material Design (Red, Pink, Purple, Deep Purple, Indigo, Blue, Light Blue, Cyan, Teal, Green, Light Green, Lime, Yellow, Amber, Orange, Deep Orange, Brown, Grey, Blue Grey) masing-masing dengan shade 50–900 + accent A100–A700.
+- **949 XKCD Color Survey Colors** — ColorNameResolver diperluas dengan 949 warna dari survei warna XKCD. Total warna yang dikenali: 1.351 (148 CSS + 254 Material + 949 XKCD).
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/shared/color/ColorNameResolver.java` — Restruktur: CSS colors dipisah ke `loadCssColors()`, Material colors via `loadMaterialColors()`, XKCD colors via `loadXkcdColors()`; total 1.351 warna (148 CSS + 254 Material + 949 XKCD)
+### 🔢 Version
+versionCode: 157
+versionName: 3.9.3.75.0
+
 ## [3.9.3.74.2] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Tutup Aplikasi pindah ke navigation drawer** — Tombol Kill Service dipindahkan dari popup settings (gear) ke bagian paling bawah navigation drawer, dengan ikon close di sebelah kiri.

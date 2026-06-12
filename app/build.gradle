@@ -5,6 +5,7 @@ import java.util.Properties
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
+
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -12,23 +13,20 @@ if (keystorePropertiesFile.exists()) {
 android {
 
     namespace = "exp.ftxt"
-
     compileSdk 35
 
     defaultConfig {
-
         applicationId "exp.ftxt"
 
         minSdk 26
         targetSdk 35
 
-        versionCode 156
-        versionName "3.9.3.74.2"
+        versionCode 157
+        versionName "3.9.3.75.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Add signingConfigs that use keystore.properties if present
     signingConfigs {
         release {
             if (keystorePropertiesFile.exists()) {
@@ -42,8 +40,11 @@ android {
 
     buildTypes {
 
-        release {
+        debug {
+            applicationIdSuffix ".debug"
+        }
 
+        release {
             minifyEnabled false
 
             proguardFiles(
@@ -51,10 +52,20 @@ android {
                     'proguard-rules.pro'
             )
 
-            // Apply the signing config when available so release builds are signed
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
+        }
+    }
+
+    // Rename APK output automatically
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def appName = "FTxT"
+            def version = variant.versionName
+            def buildType = variant.buildType.name
+
+            outputFileName = "${appName}-${buildType}-v${version}.apk"
         }
     }
 
@@ -66,7 +77,6 @@ android {
     tasks.withType(JavaCompile).configureEach {
         options.compilerArgs << "-Xlint:none"
     }
-
 }
 
 dependencies {
