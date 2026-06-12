@@ -1,3 +1,17 @@
+[3.9.3.74.2] - 2026-06-12
+♻️ Perubahan Fitur
+- Tutup Aplikasi pindah ke navigation drawer — Tombol Kill Service dipindahkan dari popup settings (gear) ke bagian paling bawah navigation drawer, dengan ikon close di sebelah kiri.
+- Konfirmasi Keluar jadi default — Checkbox Konfirmasi Keluar di Konfigurasi dihapus. Behavior ketuk dua kali untuk keluar sekarang aktif secara default tanpa perlu toggle.
+- Tombol Keluar di navigation drawer — Keluar (kanan, exit icon) tutup UI aja, overlay tetap jalan. Kill Service (kiri, close icon) force close semua.
+- Section "Lainnya" di Konfigurasi dihapus karena isinya hanya Konfirmasi Keluar.
+🐞 Bug Fixes
+- Fix overlay tidak otomatis hidup setelah Kill Service — autoRequestAndStart() sekarang pakai isAnyModuleActive() yang ngecek semua modul.
+🔢 Version
+versionCode: 156
+versionName: 3.9.3.74.2
+
+════════════════════════════════════════════════
+
 [3.9.3.74.1] - 2026-06-12
 ♻️ Perubahan Fitur
 - Semua preview warna dalam satu baris horizontal — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata.

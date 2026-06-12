@@ -40,12 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
         overlaySwitch = findViewById(R.id.overlayPermissionSwitch);
         notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
         batterySwitch = findViewById(R.id.batteryPermissionSwitch);
-        CheckBox confirmExitCheck = findViewById(R.id.confirmExitCheck);
 
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-        confirmExitCheck.setChecked(prefs.getBoolean("confirm_exit", false));
-        confirmExitCheck.setOnCheckedChangeListener((buttonView, isChecked) ->
-                prefs.edit().putBoolean("confirm_exit", isChecked).apply());
 
         updatePermissionSwitches();
 

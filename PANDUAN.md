@@ -42,6 +42,8 @@ Drawer terdiri dari menu berikut:
 | Network Stats | ↓↑ | Kecepatan internet real-time |
 | Watermark | Watermark | Teks watermark transparan |
 | Pengaturan | Gear | Pengaturan & izin aplikasi |
+| Kill Service | X | Hentikan semua layanan overlay + tutup app |
+| Keluar | → | Tutup UI aplikasi, overlay tetap berjalan |
 
 ## Toolbar
 
@@ -152,7 +154,6 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 
 - **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
 - **Dokumentasi** — Baca dokumentasi in-app (README, PANDUAN, CHANGELOG)
-- **Tutup Aplikasi** — Hentikan service dan tutup aplikasi sepenuhnya
 
 ## Izin
 

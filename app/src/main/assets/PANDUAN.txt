@@ -39,6 +39,8 @@ Drawer terdiri dari menu berikut:
 - Network Stats (ikon panah) - Kecepatan internet real-time
 - Watermark (ikon Watermark) - Teks watermark transparan
 - Pengaturan (ikon Gear) - Pengaturan dan izin aplikasi
+- Kill Service (ikon X) - Hentikan semua layanan overlay + tutup app
+- Keluar (ikon ->) - Tutup UI aplikasi, overlay tetap berjalan
 
 Toolbar
 
@@ -147,7 +149,6 @@ Pengaturan
 
 - Izin Aplikasi - Kelola izin overlay, notifikasi, dan optimasi baterai
 - Dokumentasi - Baca dokumentasi in-app (README, PANDUAN, CHANGELOG)
-- Tutup Aplikasi - Hentikan service dan tutup aplikasi sepenuhnya
 
 Izin
 

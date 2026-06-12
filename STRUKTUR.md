@@ -131,8 +131,10 @@ FTxT/
     │       │   ├── settings_popup_enter.xml — Animasi masuk popup settings
     │       │   └── settings_popup_exit.xml  — Animasi keluar popup settings
     │       ├── drawable/
+    │       │   ├── ic_close.xml             — Ikon close/X untuk Kill Service
     │       │   ├── ic_dots_vertical.xml     — Ikon tiga titik vertikal (overflow menu)
     │       │   ├── ic_edit.xml              — Ikon pensil untuk edit HEX/nilai
+    │       │   ├── ic_exit.xml              — Ikon exit/keluar untuk tombol Keluar
     │       │   ├── ic_launcher_background.xml   — Background launcher adaptive icon
     │       │   ├── ic_launcher_foreground.png   — Foreground launcher adaptive icon
     │       │   ├── ic_screen_rotation.xml   — Ikon orientasi layar (toolbar)
@@ -190,7 +192,7 @@ FTxT/
 |----------|-------:|
 | Java source | 67 |
 | Layout XML | 20 |
-| Drawable XML | 11 |
+| Drawable XML | 13 |
 | Values XML | 6 |
 | Mipmap XML | 1 |
 | Menu XML | 2 |
@@ -201,5 +203,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~134** |
+| **Total file** | **~136** |
 | **Total direktori** | **~42** |

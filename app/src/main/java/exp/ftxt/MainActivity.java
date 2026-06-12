@@ -174,6 +174,9 @@ public class MainActivity extends AppCompatActivity {
 
         rebuildSidebar();
 
+        findViewById(R.id.navTutupAplikasi).setOnClickListener(v -> forceClose());
+        findViewById(R.id.navKeluar).setOnClickListener(v -> finishAffinity());
+
         loadShadowConfigs();
 
         textPanel = new TextPanelController(this);
@@ -252,9 +255,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void autoRequestAndStart() {
-        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-        boolean wasOverlayOn = prefs.getBoolean("text_overlay_on", false);
-        if (!wasOverlayOn && !FpsConfig.enabled) return;
+        if (!isAnyModuleActive()) return;
         if (FloatingService.instance != null) return;
 
         if (!PermissionHelper.hasOverlayPermission(this)) {
@@ -421,7 +422,6 @@ public class MainActivity extends AppCompatActivity {
         popup.getMenu().add("Muat Preset");
         popup.getMenu().add("Konfigurasi");
         popup.getMenu().add("Lihat Dokumentasi");
-        popup.getMenu().add("Tutup Aplikasi");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if (title.equals("Muat Preset")) {
@@ -444,8 +444,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (title.equals("Lihat Dokumentasi")) {
                 startActivity(new Intent(this, DocumentationActivity.class));
-            } else if (title.equals("Tutup Aplikasi")) {
-                forceClose();
             }
             return true;
         });
@@ -456,24 +454,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        boolean confirmExit = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                .getBoolean("confirm_exit", false);
-        if (confirmExit) {
-            if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                super.onBackPressed();
-            } else {
-                backPressedTime = System.currentTimeMillis();
-                Toast.makeText(this, "Tekan kembali lagi untuk keluar", Toast.LENGTH_SHORT).show();
-            }
-        } else {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
             super.onBackPressed();
+        } else {
+            backPressedTime = System.currentTimeMillis();
+            Toast.makeText(this, "Tekan kembali lagi untuk keluar", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void killService() {
+        if (FloatingService.instance != null) {
+            stopService(new Intent(this, FloatingService.class));
         }
     }
 
     private void forceClose() {
-        if (FloatingService.instance != null) {
-            stopService(new Intent(this, FloatingService.class));
-        }
+        killService();
         finishAffinity();
         System.exit(0);
     }

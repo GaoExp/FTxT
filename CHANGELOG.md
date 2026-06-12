@@ -1,3 +1,23 @@
+## [3.9.3.74.2] - 2026-06-12
+### ♻️ Perubahan Fitur
+- **Tutup Aplikasi pindah ke navigation drawer** — Tombol Kill Service dipindahkan dari popup settings (gear) ke bagian paling bawah navigation drawer, dengan ikon close di sebelah kiri.
+- **Konfirmasi Keluar jadi default** — Checkbox Konfirmasi Keluar di Konfigurasi dihapus. Behavior ketuk dua kali untuk keluar sekarang aktif secara default tanpa perlu toggle.
+- **Tombol Keluar di navigation drawer** — Tambah tombol Keluar (kanan, ikon exit) — hanya tutup UI Activity, overlay tetap berjalan. Kill Service (kiri, ikon close) — force close semua layanan + app.
+### 🐞 Bug Fixes
+- **Fix overlay tidak otomatis hidup setelah Kill Service** — `autoRequestAndStart()` sekarang pakai `isAnyModuleActive()` yang ngecek semua modul (bukan cuma text+FPS), jadi overlay otomatis restart saat aplikasi dibuka kembali.
+### ✏️ File Changed
+- `app/src/main/res/layout/drawer_content.xml` — Tambah View divider + row horizontal berisi Kill Service (kiri) dan Keluar (kanan) dengan ikon exit
+- `app/src/main/res/drawable/ic_close.xml` — Vector drawable ikon close/X baru
+- `app/src/main/res/drawable/ic_exit.xml` — Vector drawable ikon exit (arrow keluar)
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah listener navTutupAplikasi→killService() dan navKeluar→forceClose(); hapus Tutup Aplikasi dari settings popup; hapus conditional confirm_exit dari onBackPressed (double-tap jadi default); ekstrak method killService() dari forceClose()
+- `app/src/main/java/exp/ftxt/SettingsActivity.java` — Hapus referensi confirmExitCheck
+- `app/src/main/res/layout/activity_settings.xml` — Hapus CheckBox Konfirmasi Keluar
+- `app/src/main/res/values/strings.xml` — Hapus string confirm_exit_title, confirm_exit_summary
+- `app/src/main/res/layout/activity_settings.xml` — Hapus section "Lainnya" (kosong)
+### 🔢 Version
+versionCode: 156
+versionName: 3.9.3.74.2
+
 ## [3.9.3.74.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Semua preview warna dalam satu baris horizontal** — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata. Shadow/bg preview dipindahkan dari section Shadow/Background ke section Display.
