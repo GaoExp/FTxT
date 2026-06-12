@@ -26,6 +26,7 @@ public class BatteryCurrentPanelController {
     private final MainActivity activity;
 
     private CheckBox batCurSwitch;
+    private CheckBox batCurValueOnlyCheck;
     private SeekBar batCurSizeSeekBar;
     private View batCurColorPreview;
     private View batCurLabelColorPreview;
@@ -84,6 +85,7 @@ public class BatteryCurrentPanelController {
 
     private void bindViews() {
         batCurSwitch = activity.findViewById(R.id.batCurSwitch);
+        batCurValueOnlyCheck = activity.findViewById(R.id.batCurValueOnlyCheck);
         batCurSizeSeekBar = activity.findViewById(R.id.batCurSizeSeekBar);
         batCurColorPreview = activity.findViewById(R.id.batCurColorPreview);
         batCurLabelColorPreview = activity.findViewById(R.id.batCurLabelColorPreview);
@@ -137,6 +139,7 @@ public class BatteryCurrentPanelController {
     private void loadConfig() {
         batCurSwitch.setChecked(BatteryCurrentConfig.enabled);
         activity.applyCheckboxTint(batCurSwitch, BatteryCurrentConfig.enabled);
+        batCurValueOnlyCheck.setChecked(BatteryCurrentConfig.showOnlyValue);
         batCurSizeSeekBar.setProgress((int) BatteryCurrentConfig.size);
         batCurColorPreview.setBackgroundColor(BatteryCurrentConfig.color);
         batCurLabelColorPreview.setBackgroundColor(BatteryCurrentConfig.labelColor);
@@ -202,6 +205,13 @@ public class BatteryCurrentPanelController {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }
+        });
+
+        batCurValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryCurrentConfig.showOnlyValue = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("batcur_show_only_value", isChecked).apply();
+            FloatingService.updateBatteryCurrentColorStatic();
         });
 
         batCurSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -387,6 +397,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowVoltage, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_voltage", isChecked).apply();
+            FloatingService.updateBatteryCurrentColorStatic();
         });
 
         batCurShowCurrent.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -394,6 +405,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowCurrent, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_current", isChecked).apply();
+            FloatingService.updateBatteryCurrentColorStatic();
         });
 
         batCurShowPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -401,6 +413,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowPower, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_power", isChecked).apply();
+            FloatingService.updateBatteryCurrentColorStatic();
         });
 
         batCurSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {

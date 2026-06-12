@@ -197,17 +197,22 @@ public class BatteryCurrentModule {
 
     private void updateDisplay() {
         if (view == null) return;
-        String text = getBatteryCurrentText();
-        view.setTextColor(BatteryCurrentConfig.color);
-        SpannableString spannable = new SpannableString(text);
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == 'm' || c == 'V' || c == 'A' || c == 'W') {
-                spannable.setSpan(new ForegroundColorSpan(BatteryCurrentConfig.labelColor),
-                        i, i + 1, 0);
+        if (BatteryCurrentConfig.showOnlyValue) {
+            view.setTextColor(BatteryCurrentConfig.color);
+            view.setText(getBatteryCurrentValueOnly());
+        } else {
+            String text = getBatteryCurrentText();
+            view.setTextColor(BatteryCurrentConfig.color);
+            SpannableString spannable = new SpannableString(text);
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                if (c == 'm' || c == 'V' || c == 'A' || c == 'W') {
+                    spannable.setSpan(new ForegroundColorSpan(BatteryCurrentConfig.labelColor),
+                            i, i + 1, 0);
+                }
             }
+            view.setText(spannable);
         }
-        view.setText(spannable);
     }
 
     private final Runnable tickRunnable = new Runnable() {
@@ -218,6 +223,67 @@ public class BatteryCurrentModule {
             handler.postDelayed(this, (long)(BatteryCurrentConfig.updateInterval * 1000));
         }
     };
+
+    private String getBatteryCurrentValueOnly() {
+        int voltage = 0;
+        int current = 0;
+
+        try {
+            Intent batteryIntent = context.registerReceiver(null,
+                    new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            if (batteryIntent != null) {
+                voltage = batteryIntent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
+                try {
+                    Field field = BatteryManager.class.getField("EXTRA_CURRENT_NOW");
+                    String extra = (String) field.get(null);
+                    current = batteryIntent.getIntExtra(extra, 0);
+                } catch (Exception ignored) {}
+            }
+        } catch (Exception ignored) {}
+
+        if (current == 0 && Build.VERSION.SDK_INT >= 28) {
+            try {
+                BatteryManager bm = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
+                long c = bm.getLongProperty(2);
+                if (c != 0) current = (int) (c / 1000);
+            } catch (Exception ignored) {}
+        }
+
+        if (voltage == 0) {
+            voltage = readSysfs("voltage_now", 1000);
+        }
+        if (current == 0) {
+            current = readSysfs("current_now", 1000);
+        }
+
+        String sign = "";
+        int mA = current;
+        if (current > 0) {
+            sign = "+";
+        } else if (current < 0) {
+            sign = "-";
+            mA = -current;
+        }
+
+        double powerW = 0;
+        if (voltage > 0 && mA > 0) {
+            powerW = (voltage / 1000.0) * (mA / 1000.0);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (BatteryCurrentConfig.showVoltage) {
+            sb.append(String.format("%.1f", voltage / 1000.0));
+        }
+        if (BatteryCurrentConfig.showCurrent) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(String.format("%s%d", sign, mA));
+        }
+        if (BatteryCurrentConfig.showPower) {
+            if (sb.length() > 0) sb.append(" ");
+            sb.append(String.format("%.1f", powerW));
+        }
+        return sb.length() > 0 ? sb.toString() : "N/A";
+    }
 
     private String getBatteryCurrentText() {
         int voltage = 0;
@@ -270,7 +336,7 @@ public class BatteryCurrentModule {
 
         StringBuilder sb = new StringBuilder();
         if (BatteryCurrentConfig.showVoltage) {
-            sb.append(String.format("%dmV", voltage));
+            sb.append(String.format("%.1fV", voltage / 1000.0));
         }
         if (BatteryCurrentConfig.showCurrent) {
             if (sb.length() > 0) sb.append(" ");

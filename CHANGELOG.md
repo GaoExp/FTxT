@@ -1,3 +1,23 @@
+## [3.9.3.74.0] - 2026-06-12
+### ✨ Fitur Baru
+- **Sembunyikan Label untuk Battery Current** — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.
+### ♻️ Perubahan Fitur
+- **Layout ulang panel Battery Current** — Urutan kontrol di section Tampilan: Sembunyikan Label+Interval → V/mA/W → Ukuran Teks → Warna/Label.
+- **Ubah satuan voltase mV→V** — Tampilan voltase diubah dari `3900mV` ke `3.9V` (mode normal) dan `3.9` (mode value-only) agar konsisten dan tidak ambigu dengan daya (W).
+### 🐞 Bug Fixes
+- **Fix duplicate ID XML** — Hapus duplikasi `batCurIntervalValue` yang menyebabkan crash findViewById.
+- **Fix checkbox V/mA/W tidak refresh overlay** — Setiap toggle sekarang memanggil `FloatingService.updateBatteryCurrentColorStatic()`.
+- **Fix Network showOnlyValue** — Refactor pakai `FloatingService.updateNetworkColorStatic()` ganti inline null check.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentConfig.java` — Tambah field `showOnlyValue`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah method `getBatteryCurrentValueOnly()`; update `updateDisplay()`; ubah format voltase ke V
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Tambah handler checkbox Sembunyikan Label; tambah call refresh untuk V/mA/W toggle
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Refactor panggil `FloatingService.updateNetworkColorStatic()`
+- `app/src/main/res/layout/panel_battery_current.xml` — Tambah checkbox Sembunyikan Label + interval inline; reorder kontrol Display; ubah label mV→V
+### 🔢 Version
+versionCode: 154
+versionName: 3.9.3.74.0
+
 ## [3.9.3.73.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Network Stats** — Opsi baru "Sembunyikan Label" di panel Network Stats untuk menyembunyikan label ↓↑MB/s dan hanya menampilkan angka kecepatan.

@@ -1,3 +1,19 @@
+[3.9.3.74.0] - 2026-06-12
+✨ Fitur Baru
+- Sembunyikan Label untuk Battery Current — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.
+♻️ Perubahan Fitur
+- Layout ulang panel Battery Current — Urutan kontrol di section Tampilan: Sembunyikan Label+Interval → V/mA/W → Ukuran Teks → Warna/Label.
+- Ubah satuan voltase mV→V — Tampilan voltase diubah dari 3900mV ke 3.9V (mode normal) dan 3.9 (mode value-only) agar konsisten.
+🐞 Bug Fixes
+- Fix duplicate ID XML — Hapus duplikasi batCurIntervalValue yang menyebabkan crash findViewById.
+- Fix checkbox V/mA/W tidak refresh overlay — Setiap toggle sekarang memanggil update display langsung.
+- Fix Network showOnlyValue — Refactor gunakan method static yang sudah ada.
+🔢 Version
+versionCode: 154
+versionName: 3.9.3.74.0
+
+════════════════════════════════════════════════
+
 [3.9.3.73.0] - 2026-06-12
 ✨ Fitur Baru
 - Sembunyikan Label untuk Network Stats — Opsi baru "Sembunyikan Label" di panel Network Stats untuk menyembunyikan label dan hanya menampilkan angka kecepatan.

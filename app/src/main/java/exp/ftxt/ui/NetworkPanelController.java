@@ -383,9 +383,7 @@ public class NetworkPanelController {
             NetworkConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_show_only_value", isChecked).apply();
-            if (FloatingService.instance != null && FloatingService.instance.networkModule != null) {
-                FloatingService.instance.networkModule.updateColor(NetworkConfig.color);
-            }
+            FloatingService.updateNetworkColorStatic();
         });
 
         networkSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
