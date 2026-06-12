@@ -22,10 +22,10 @@ public class ClockPanelController {
 
     private CheckBox clockSwitch;
     private SeekBar clockSizeSeekBar;
-    private Button clockColorButton;
+    private View clockColorPreview;
     private CheckBox clockShadowSwitch;
     private LinearLayout clockShadowConfigContainer;
-    private Button clockShadowColorButton;
+    private View clockShadowColorPreview;
     private SeekBar clockShadowBlurSeekBar;
     private SeekBar clockShadowOffsetXSeekBar;
     private SeekBar clockShadowOffsetYSeekBar;
@@ -33,7 +33,7 @@ public class ClockPanelController {
     private CheckBox clockSafeArea;
     private CheckBox clockBgSwitch;
     private LinearLayout clockBgConfigContainer;
-    private Button clockBgColorButton;
+    private View clockBgColorPreview;
     private SeekBar clockBgPaddingSeekBar;
     private SeekBar clockBgOffsetXSeekBar;
     private SeekBar clockBgOffsetYSeekBar;
@@ -74,10 +74,10 @@ public class ClockPanelController {
     private void bindViews() {
         clockSwitch = activity.findViewById(R.id.clockSwitch);
         clockSizeSeekBar = activity.findViewById(R.id.clockSizeSeekBar);
-        clockColorButton = activity.findViewById(R.id.clockColorButton);
+        clockColorPreview = activity.findViewById(R.id.clockColorPreview);
         clockShadowSwitch = activity.findViewById(R.id.clockShadowSwitch);
         clockShadowConfigContainer = activity.findViewById(R.id.shadowConfigClock);
-        clockShadowColorButton = activity.findViewById(R.id.clockShadowColorButton);
+        clockShadowColorPreview = activity.findViewById(R.id.clockShadowColorPreview);
         clockShadowBlurSeekBar = activity.findViewById(R.id.clockShadowBlurSeekBar);
         clockShadowOffsetXSeekBar = activity.findViewById(R.id.clockShadowOffsetXSeekBar);
         clockShadowOffsetYSeekBar = activity.findViewById(R.id.clockShadowOffsetYSeekBar);
@@ -85,7 +85,7 @@ public class ClockPanelController {
         clockSafeArea = activity.findViewById(R.id.clockSafeArea);
         clockBgSwitch = activity.findViewById(R.id.clockBgSwitch);
         clockBgConfigContainer = activity.findViewById(R.id.bgConfigClock);
-        clockBgColorButton = activity.findViewById(R.id.clockBgColorButton);
+        clockBgColorPreview = activity.findViewById(R.id.clockBgColorPreview);
         clockBgPaddingSeekBar = activity.findViewById(R.id.clockBgPaddingSeekBar);
         clockBgOffsetXSeekBar = activity.findViewById(R.id.clockBgOffsetXSeekBar);
         clockBgOffsetYSeekBar = activity.findViewById(R.id.clockBgOffsetYSeekBar);
@@ -140,14 +140,17 @@ public class ClockPanelController {
         activity.applyCheckboxTint(clockLockSwitch, ClockConfig.touchPassthrough);
         clockSafeArea.setChecked(ClockConfig.safeArea);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
+        clockColorPreview.setBackgroundColor(ClockConfig.color);
         clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bg.padding);
         clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bg.offsetX);
         clockBgOffsetYLabel.setText("Offset Y: " + ClockConfig.bg.offsetY);
+        clockBgColorPreview.setBackgroundColor(ClockConfig.bg.color);
         clockBgMarginLabel.setText("Margin: " + ClockConfig.bg.margin);
         clockBgRadiusLabel.setText("Radius: " + ClockConfig.bg.radius);
         clockShadowBlurLabel.setText("Blur Shadow: " + (int) ClockConfig.shadow.blur);
         clockShadowOffsetXLabel.setText("Shadow X: " + (int) ClockConfig.shadow.offsetX);
         clockShadowOffsetYLabel.setText("Shadow Y: " + (int) ClockConfig.shadow.offsetY);
+        clockShadowColorPreview.setBackgroundColor(ClockConfig.shadow.color);
     }
 
     private void setupListeners() {
@@ -191,9 +194,10 @@ public class ClockPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        clockColorButton.setOnClickListener(v -> {
+        clockColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Jam", ClockConfig.color, color -> {
                 ClockConfig.color = color;
+                clockColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_color", color).apply();
                 FloatingService.updateClockColorStatic();
@@ -209,9 +213,10 @@ public class ClockPanelController {
             FloatingService.updateClockBackgroundStatic();
         });
 
-        clockBgColorButton.setOnClickListener(v -> {
+        clockBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background Jam", ClockConfig.bg.color, color -> {
                 ClockConfig.bg.color = color;
+                clockBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_color", color).apply();
                 FloatingService.updateClockBackgroundStatic();
@@ -291,9 +296,10 @@ public class ClockPanelController {
             FloatingService.updateClockShadowStatic();
         });
 
-        clockShadowColorButton.setOnClickListener(v -> {
+        clockShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow Jam", ClockConfig.shadow.color, color -> {
                 ClockConfig.shadow.color = color;
+                clockShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_shadow_color", color).apply();
                 FloatingService.updateClockShadowStatic();

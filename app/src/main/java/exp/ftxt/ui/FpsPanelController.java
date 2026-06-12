@@ -33,7 +33,7 @@ public class FpsPanelController {
     private View fpsLabelColorPreview;
     private CheckBox fpsShadowSwitch;
     private LinearLayout fpsShadowConfigContainer;
-    private Button fpsShadowColorButton;
+    private View fpsShadowColorPreview;
     private SeekBar fpsShadowBlurSeekBar;
     private SeekBar fpsShadowOffsetXSeekBar;
     private SeekBar fpsShadowOffsetYSeekBar;
@@ -42,7 +42,7 @@ public class FpsPanelController {
     private CheckBox fpsSafeArea;
     private CheckBox fpsBgSwitch;
     private LinearLayout fpsBgConfigContainer;
-    private Button fpsBgColorButton;
+    private View fpsBgColorPreview;
     private SeekBar fpsBgPaddingSeekBar;
     private SeekBar fpsBgOffsetXSeekBar;
     private SeekBar fpsBgOffsetYSeekBar;
@@ -89,7 +89,7 @@ public class FpsPanelController {
         fpsLabelColorPreview = activity.findViewById(R.id.fpsLabelColorPreview);
         fpsShadowSwitch = activity.findViewById(R.id.fpsShadowSwitch);
         fpsShadowConfigContainer = activity.findViewById(R.id.shadowConfigFps);
-        fpsShadowColorButton = activity.findViewById(R.id.fpsShadowColorButton);
+        fpsShadowColorPreview = activity.findViewById(R.id.fpsShadowColorPreview);
         fpsShadowBlurSeekBar = activity.findViewById(R.id.fpsShadowBlurSeekBar);
         fpsShadowOffsetXSeekBar = activity.findViewById(R.id.fpsShadowOffsetXSeekBar);
         fpsShadowOffsetYSeekBar = activity.findViewById(R.id.fpsShadowOffsetYSeekBar);
@@ -98,7 +98,7 @@ public class FpsPanelController {
         fpsSafeArea = activity.findViewById(R.id.fpsSafeArea);
         fpsBgSwitch = activity.findViewById(R.id.fpsBgSwitch);
         fpsBgConfigContainer = activity.findViewById(R.id.bgConfigFps);
-        fpsBgColorButton = activity.findViewById(R.id.fpsBgColorButton);
+        fpsBgColorPreview = activity.findViewById(R.id.fpsBgColorPreview);
         fpsBgPaddingSeekBar = activity.findViewById(R.id.fpsBgPaddingSeekBar);
         fpsBgOffsetXSeekBar = activity.findViewById(R.id.fpsBgOffsetXSeekBar);
         fpsBgOffsetYSeekBar = activity.findViewById(R.id.fpsBgOffsetYSeekBar);
@@ -160,11 +160,13 @@ public class FpsPanelController {
         fpsBgPaddingLabel.setText("Ukuran Background: " + FpsConfig.bg.padding);
         fpsBgOffsetXLabel.setText("Offset X: " + FpsConfig.bg.offsetX);
         fpsBgOffsetYLabel.setText("Offset Y: " + FpsConfig.bg.offsetY);
+        fpsBgColorPreview.setBackgroundColor(FpsConfig.bg.color);
         fpsBgMarginLabel.setText("Margin: " + FpsConfig.bg.margin);
         fpsBgRadiusLabel.setText("Radius: " + FpsConfig.bg.radius);
         fpsShadowBlurLabel.setText("Blur Shadow: " + (int) FpsConfig.shadow.blur);
         fpsShadowOffsetXLabel.setText("Shadow X: " + (int) FpsConfig.shadow.offsetX);
         fpsShadowOffsetYLabel.setText("Shadow Y: " + (int) FpsConfig.shadow.offsetY);
+        fpsShadowColorPreview.setBackgroundColor(FpsConfig.shadow.color);
         fpsIntervalValue.setText(formatIntervalValue(FpsConfig.updateInterval));
     }
 
@@ -238,9 +240,10 @@ public class FpsPanelController {
             FloatingService.updateFpsBackgroundStatic();
         });
 
-        fpsBgColorButton.setOnClickListener(v -> {
+        fpsBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background FPS", FpsConfig.bg.color, color -> {
                 FpsConfig.bg.color = color;
+                fpsBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_color", color).apply();
                 FloatingService.updateFpsBackgroundStatic();
@@ -320,9 +323,10 @@ public class FpsPanelController {
             FloatingService.updateFpsShadowStatic();
         });
 
-        fpsShadowColorButton.setOnClickListener(v -> {
+        fpsShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow FPS", FpsConfig.shadow.color, color -> {
                 FpsConfig.shadow.color = color;
+                fpsShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_shadow_color", color).apply();
                 FloatingService.updateFpsShadowStatic();

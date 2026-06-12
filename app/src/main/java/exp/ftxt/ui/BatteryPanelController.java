@@ -31,7 +31,7 @@ public class BatteryPanelController {
     private View batteryLabelColorPreview;
     private CheckBox batteryShadowSwitch;
     private LinearLayout batteryShadowConfigContainer;
-    private Button batteryShadowColorButton;
+    private View batteryShadowColorPreview;
     private SeekBar batteryShadowBlurSeekBar;
     private SeekBar batteryShadowOffsetXSeekBar;
     private SeekBar batteryShadowOffsetYSeekBar;
@@ -42,7 +42,7 @@ public class BatteryPanelController {
     private CheckBox batterySafeArea;
     private CheckBox batteryBgSwitch;
     private LinearLayout batteryBgConfigContainer;
-    private Button batteryBgColorButton;
+    private View batteryBgColorPreview;
     private SeekBar batteryBgPaddingSeekBar;
     private SeekBar batteryBgOffsetXSeekBar;
     private SeekBar batteryBgOffsetYSeekBar;
@@ -89,7 +89,7 @@ public class BatteryPanelController {
         batteryLabelColorPreview = activity.findViewById(R.id.batteryLabelColorPreview);
         batteryShadowSwitch = activity.findViewById(R.id.batteryShadowSwitch);
         batteryShadowConfigContainer = activity.findViewById(R.id.shadowConfigBattery);
-        batteryShadowColorButton = activity.findViewById(R.id.batteryShadowColorButton);
+        batteryShadowColorPreview = activity.findViewById(R.id.batteryShadowColorPreview);
         batteryShadowBlurSeekBar = activity.findViewById(R.id.batteryShadowBlurSeekBar);
         batteryShadowOffsetXSeekBar = activity.findViewById(R.id.batteryShadowOffsetXSeekBar);
         batteryShadowOffsetYSeekBar = activity.findViewById(R.id.batteryShadowOffsetYSeekBar);
@@ -100,7 +100,7 @@ public class BatteryPanelController {
         batterySafeArea = activity.findViewById(R.id.batterySafeArea);
         batteryBgSwitch = activity.findViewById(R.id.batteryBgSwitch);
         batteryBgConfigContainer = activity.findViewById(R.id.bgConfigBattery);
-        batteryBgColorButton = activity.findViewById(R.id.batteryBgColorButton);
+        batteryBgColorPreview = activity.findViewById(R.id.batteryBgColorPreview);
         batteryBgPaddingSeekBar = activity.findViewById(R.id.batteryBgPaddingSeekBar);
         batteryBgOffsetXSeekBar = activity.findViewById(R.id.batteryBgOffsetXSeekBar);
         batteryBgOffsetYSeekBar = activity.findViewById(R.id.batteryBgOffsetYSeekBar);
@@ -164,11 +164,13 @@ public class BatteryPanelController {
         batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryConfig.bg.padding);
         batteryBgOffsetXLabel.setText("Offset X: " + BatteryConfig.bg.offsetX);
         batteryBgOffsetYLabel.setText("Offset Y: " + BatteryConfig.bg.offsetY);
+        batteryBgColorPreview.setBackgroundColor(BatteryConfig.bg.color);
         batteryBgMarginLabel.setText("Margin: " + BatteryConfig.bg.margin);
         batteryBgRadiusLabel.setText("Radius: " + BatteryConfig.bg.radius);
         batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
+        batteryShadowColorPreview.setBackgroundColor(BatteryConfig.shadow.color);
         batteryIntervalValue.setText(formatIntervalValue(BatteryConfig.updateInterval));
     }
 
@@ -242,9 +244,10 @@ public class BatteryPanelController {
             FloatingService.updateBatteryBackgroundStatic();
         });
 
-        batteryBgColorButton.setOnClickListener(v -> {
+        batteryBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background Baterai", BatteryConfig.bg.color, color -> {
                 BatteryConfig.bg.color = color;
+                batteryBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_color", color).apply();
                 FloatingService.updateBatteryBackgroundStatic();
@@ -324,9 +327,10 @@ public class BatteryPanelController {
             FloatingService.updateBatteryShadowStatic();
         });
 
-        batteryShadowColorButton.setOnClickListener(v -> {
+        batteryShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow Baterai", BatteryConfig.shadow.color, color -> {
                 BatteryConfig.shadow.color = color;
+                batteryShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_shadow_color", color).apply();
                 FloatingService.updateBatteryShadowStatic();

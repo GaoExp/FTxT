@@ -32,7 +32,7 @@ public class NetworkPanelController {
     private View networkLabelColorPreview;
     private CheckBox networkShadowSwitch;
     private LinearLayout networkShadowConfigContainer;
-    private Button networkShadowColorButton;
+    private View networkShadowColorPreview;
     private SeekBar networkShadowBlurSeekBar;
     private SeekBar networkShadowOffsetXSeekBar;
     private SeekBar networkShadowOffsetYSeekBar;
@@ -40,7 +40,7 @@ public class NetworkPanelController {
     private CheckBox networkSafeArea;
     private CheckBox networkBgSwitch;
     private LinearLayout networkBgConfigContainer;
-    private Button networkBgColorButton;
+    private View networkBgColorPreview;
     private SeekBar networkBgPaddingSeekBar;
     private SeekBar networkBgOffsetXSeekBar;
     private SeekBar networkBgOffsetYSeekBar;
@@ -88,7 +88,7 @@ public class NetworkPanelController {
         networkLabelColorPreview = activity.findViewById(R.id.networkLabelColorPreview);
         networkShadowSwitch = activity.findViewById(R.id.networkShadowSwitch);
         networkShadowConfigContainer = activity.findViewById(R.id.shadowConfigNetwork);
-        networkShadowColorButton = activity.findViewById(R.id.networkShadowColorButton);
+        networkShadowColorPreview = activity.findViewById(R.id.networkShadowColorPreview);
         networkShadowBlurSeekBar = activity.findViewById(R.id.networkShadowBlurSeekBar);
         networkShadowOffsetXSeekBar = activity.findViewById(R.id.networkShadowOffsetXSeekBar);
         networkShadowOffsetYSeekBar = activity.findViewById(R.id.networkShadowOffsetYSeekBar);
@@ -96,7 +96,7 @@ public class NetworkPanelController {
         networkSafeArea = activity.findViewById(R.id.networkSafeArea);
         networkBgSwitch = activity.findViewById(R.id.networkBgSwitch);
         networkBgConfigContainer = activity.findViewById(R.id.bgConfigNetwork);
-        networkBgColorButton = activity.findViewById(R.id.networkBgColorButton);
+        networkBgColorPreview = activity.findViewById(R.id.networkBgColorPreview);
         networkBgPaddingSeekBar = activity.findViewById(R.id.networkBgPaddingSeekBar);
         networkBgOffsetXSeekBar = activity.findViewById(R.id.networkBgOffsetXSeekBar);
         networkBgOffsetYSeekBar = activity.findViewById(R.id.networkBgOffsetYSeekBar);
@@ -158,11 +158,13 @@ public class NetworkPanelController {
         networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bg.padding);
         networkBgOffsetXLabel.setText("Offset X: " + NetworkConfig.bg.offsetX);
         networkBgOffsetYLabel.setText("Offset Y: " + NetworkConfig.bg.offsetY);
+        networkBgColorPreview.setBackgroundColor(NetworkConfig.bg.color);
         networkBgMarginLabel.setText("Margin: " + NetworkConfig.bg.margin);
         networkBgRadiusLabel.setText("Radius: " + NetworkConfig.bg.radius);
         networkShadowBlurLabel.setText("Blur Shadow: " + (int) NetworkConfig.shadow.blur);
         networkShadowOffsetXLabel.setText("Shadow X: " + (int) NetworkConfig.shadow.offsetX);
         networkShadowOffsetYLabel.setText("Shadow Y: " + (int) NetworkConfig.shadow.offsetY);
+        networkShadowColorPreview.setBackgroundColor(NetworkConfig.shadow.color);
         networkIntervalValue.setText(formatIntervalValue(NetworkConfig.updateInterval));
     }
 
@@ -242,9 +244,10 @@ public class NetworkPanelController {
             FloatingService.updateNetworkBackgroundStatic();
         });
 
-        networkBgColorButton.setOnClickListener(v -> {
+        networkBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background", NetworkConfig.bg.color, color -> {
                 NetworkConfig.bg.color = color;
+                networkBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_color", color).apply();
                 FloatingService.updateNetworkBackgroundStatic();
@@ -324,9 +327,10 @@ public class NetworkPanelController {
             FloatingService.updateNetworkShadowStatic();
         });
 
-        networkShadowColorButton.setOnClickListener(v -> {
+        networkShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow", NetworkConfig.shadow.color, color -> {
                 NetworkConfig.shadow.color = color;
+                networkShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_shadow_color", color).apply();
                 FloatingService.updateNetworkShadowStatic();

@@ -32,7 +32,7 @@ public class BatteryCurrentPanelController {
     private View batCurLabelColorPreview;
     private CheckBox batCurShadowSwitch;
     private LinearLayout batCurShadowConfigContainer;
-    private Button batCurShadowColorButton;
+    private View batCurShadowColorPreview;
     private SeekBar batCurShadowBlurSeekBar;
     private SeekBar batCurShadowOffsetXSeekBar;
     private SeekBar batCurShadowOffsetYSeekBar;
@@ -43,7 +43,7 @@ public class BatteryCurrentPanelController {
     private CheckBox batCurSafeArea;
     private CheckBox batCurBgSwitch;
     private LinearLayout batCurBgConfigContainer;
-    private Button batCurBgColorButton;
+    private View batCurBgColorPreview;
     private SeekBar batCurBgPaddingSeekBar;
     private SeekBar batCurBgOffsetXSeekBar;
     private SeekBar batCurBgOffsetYSeekBar;
@@ -91,7 +91,7 @@ public class BatteryCurrentPanelController {
         batCurLabelColorPreview = activity.findViewById(R.id.batCurLabelColorPreview);
         batCurShadowSwitch = activity.findViewById(R.id.batCurShadowSwitch);
         batCurShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryCurrent);
-        batCurShadowColorButton = activity.findViewById(R.id.batCurShadowColorButton);
+        batCurShadowColorPreview = activity.findViewById(R.id.batCurShadowColorPreview);
         batCurShadowBlurSeekBar = activity.findViewById(R.id.batCurShadowBlurSeekBar);
         batCurShadowOffsetXSeekBar = activity.findViewById(R.id.batCurShadowOffsetXSeekBar);
         batCurShadowOffsetYSeekBar = activity.findViewById(R.id.batCurShadowOffsetYSeekBar);
@@ -102,7 +102,7 @@ public class BatteryCurrentPanelController {
         batCurSafeArea = activity.findViewById(R.id.batCurSafeArea);
         batCurBgSwitch = activity.findViewById(R.id.batCurBgSwitch);
         batCurBgConfigContainer = activity.findViewById(R.id.bgConfigBatteryCurrent);
-        batCurBgColorButton = activity.findViewById(R.id.batCurBgColorButton);
+        batCurBgColorPreview = activity.findViewById(R.id.batCurBgColorPreview);
         batCurBgPaddingSeekBar = activity.findViewById(R.id.batCurBgPaddingSeekBar);
         batCurBgOffsetXSeekBar = activity.findViewById(R.id.batCurBgOffsetXSeekBar);
         batCurBgOffsetYSeekBar = activity.findViewById(R.id.batCurBgOffsetYSeekBar);
@@ -170,11 +170,13 @@ public class BatteryCurrentPanelController {
         batCurBgPaddingLabel.setText("Ukuran Background: " + BatteryCurrentConfig.bg.padding);
         batCurBgOffsetXLabel.setText("Offset X: " + BatteryCurrentConfig.bg.offsetX);
         batCurBgOffsetYLabel.setText("Offset Y: " + BatteryCurrentConfig.bg.offsetY);
+        batCurBgColorPreview.setBackgroundColor(BatteryCurrentConfig.bg.color);
         batCurBgMarginLabel.setText("Margin: " + BatteryCurrentConfig.bg.margin);
         batCurBgRadiusLabel.setText("Radius: " + BatteryCurrentConfig.bg.radius);
         batCurShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryCurrentConfig.shadow.blur);
         batCurShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryCurrentConfig.shadow.offsetX);
         batCurShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryCurrentConfig.shadow.offsetY);
+        batCurShadowColorPreview.setBackgroundColor(BatteryCurrentConfig.shadow.color);
         batCurIntervalValue.setText(formatIntervalValue(BatteryCurrentConfig.updateInterval));
     }
 
@@ -255,9 +257,10 @@ public class BatteryCurrentPanelController {
             FloatingService.updateBatteryCurrentBackgroundStatic();
         });
 
-        batCurBgColorButton.setOnClickListener(v -> {
+        batCurBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background Bat Cur", BatteryCurrentConfig.bg.color, color -> {
                 BatteryCurrentConfig.bg.color = color;
+                batCurBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_color", color).apply();
                 FloatingService.updateBatteryCurrentBackgroundStatic();
@@ -337,9 +340,10 @@ public class BatteryCurrentPanelController {
             FloatingService.updateBatteryCurrentShadowStatic();
         });
 
-        batCurShadowColorButton.setOnClickListener(v -> {
+        batCurShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow Bat Cur", BatteryCurrentConfig.shadow.color, color -> {
                 BatteryCurrentConfig.shadow.color = color;
+                batCurShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_shadow_color", color).apply();
                 FloatingService.updateBatteryCurrentShadowStatic();

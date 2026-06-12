@@ -1,6 +1,6 @@
 # FTxT (FunText) — Floating Text Overlay
 
-**Current Release:** `3.9.3.72.0` **Beta**
+**Current Release:** `3.9.3.74.1` **Beta**
 **Last Updated:** `2026-06-12`
 
 FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.

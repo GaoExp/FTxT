@@ -1,3 +1,22 @@
+## [3.9.3.74.1] - 2026-06-12
+### ♻️ Perubahan Fitur
+- **Semua preview warna dalam satu baris horizontal** — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata. Shadow/bg preview dipindahkan dari section Shadow/Background ke section Display.
+- **Semua tombol warna jadi preview kotak 30×30** — Tombol Pilih Warna, Warna Label, Shadow, dan Background di semua 8 panel diganti preview kotak 30×30. Tap preview → color picker.
+- **Preview warna 40dp→30dp** — Ukuran preview yang sebelumnya 40×40 diperkecil ke 30×30.
+### ✏️ File Changed
+- `app/src/main/res/layout/panel_text.xml` — Semua color button jadi preview; susun 1 baris: Warna|Shadow|Background
+- `app/src/main/res/layout/panel_fps.xml` — Susun 1 baris: Warna|Label|Shadow|Background; preview 40→30dp
+- `app/src/main/res/layout/panel_clock.xml` — Semua color button jadi preview; susun 1 baris: Warna|Shadow|Background
+- `app/src/main/res/layout/panel_battery.xml` — Susun 1 baris: Warna|Label|Shadow|Background; preview 40→30dp
+- `app/src/main/res/layout/panel_battery_percentage.xml` — Semua color button jadi preview; susun 1 baris: Warna|Label|Shadow|Background
+- `app/src/main/res/layout/panel_battery_current.xml` — Susun 1 baris: Warna|Label|Shadow|Background; preview 40→30dp
+- `app/src/main/res/layout/panel_network.xml` — Susun 1 baris: Warna|Label|Shadow|Background; preview 40→30dp
+- `app/src/main/res/layout/panel_watermark.xml` — Semua color button jadi preview; susun 1 baris: Warna|Shadow|Background
+- Semua 8 controller Java — Field Button→View; setBackgroundColor di loadConfig & callback color picker
+### 🔢 Version
+versionCode: 155
+versionName: 3.9.3.74.1
+
 ## [3.9.3.74.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Battery Current** — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.

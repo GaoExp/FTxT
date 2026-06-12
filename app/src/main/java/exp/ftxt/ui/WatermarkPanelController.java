@@ -26,10 +26,10 @@ public class WatermarkPanelController {
     private CheckBox watermarkSwitch;
     private EditText watermarkEditText;
     private SeekBar watermarkSizeSeekBar;
-    private Button watermarkColorButton;
+    private View watermarkColorPreview;
     private CheckBox watermarkShadowSwitch;
     private LinearLayout watermarkShadowConfigContainer;
-    private Button watermarkShadowColorButton;
+    private View watermarkShadowColorPreview;
     private SeekBar watermarkShadowBlurSeekBar;
     private SeekBar watermarkShadowOffsetXSeekBar;
     private SeekBar watermarkShadowOffsetYSeekBar;
@@ -37,7 +37,7 @@ public class WatermarkPanelController {
     private CheckBox watermarkSafeArea;
     private CheckBox watermarkBgSwitch;
     private LinearLayout watermarkBgConfigContainer;
-    private Button watermarkBgColorButton;
+    private View watermarkBgColorPreview;
     private SeekBar watermarkBgPaddingSeekBar;
     private SeekBar watermarkBgOffsetXSeekBar;
     private SeekBar watermarkBgOffsetYSeekBar;
@@ -89,10 +89,10 @@ public class WatermarkPanelController {
         watermarkSwitch = activity.findViewById(R.id.watermarkSwitch);
         watermarkEditText = activity.findViewById(R.id.watermarkEditText);
         watermarkSizeSeekBar = activity.findViewById(R.id.watermarkSizeSeekBar);
-        watermarkColorButton = activity.findViewById(R.id.watermarkColorButton);
+        watermarkColorPreview = activity.findViewById(R.id.watermarkColorPreview);
         watermarkShadowSwitch = activity.findViewById(R.id.watermarkShadowSwitch);
         watermarkShadowConfigContainer = activity.findViewById(R.id.shadowConfigWatermark);
-        watermarkShadowColorButton = activity.findViewById(R.id.watermarkShadowColorButton);
+        watermarkShadowColorPreview = activity.findViewById(R.id.watermarkShadowColorPreview);
         watermarkShadowBlurSeekBar = activity.findViewById(R.id.watermarkShadowBlurSeekBar);
         watermarkShadowOffsetXSeekBar = activity.findViewById(R.id.watermarkShadowOffsetXSeekBar);
         watermarkShadowOffsetYSeekBar = activity.findViewById(R.id.watermarkShadowOffsetYSeekBar);
@@ -100,7 +100,7 @@ public class WatermarkPanelController {
         watermarkSafeArea = activity.findViewById(R.id.watermarkSafeArea);
         watermarkBgSwitch = activity.findViewById(R.id.watermarkBgSwitch);
         watermarkBgConfigContainer = activity.findViewById(R.id.bgConfigWatermark);
-        watermarkBgColorButton = activity.findViewById(R.id.watermarkBgColorButton);
+        watermarkBgColorPreview = activity.findViewById(R.id.watermarkBgColorPreview);
         watermarkBgPaddingSeekBar = activity.findViewById(R.id.watermarkBgPaddingSeekBar);
         watermarkBgOffsetXSeekBar = activity.findViewById(R.id.watermarkBgOffsetXSeekBar);
         watermarkBgOffsetYSeekBar = activity.findViewById(R.id.watermarkBgOffsetYSeekBar);
@@ -166,14 +166,17 @@ public class WatermarkPanelController {
         activity.applyCheckboxTint(watermarkLockSwitch, WatermarkConfig.touchPassthrough);
         watermarkSafeArea.setChecked(WatermarkConfig.safeArea);
         watermarkSizeLabel.setText("Ukuran Teks: " + (int) WatermarkConfig.size);
+        watermarkColorPreview.setBackgroundColor(WatermarkConfig.color);
         watermarkBgPaddingLabel.setText("Ukuran Background: " + WatermarkConfig.bg.padding);
         watermarkBgOffsetXLabel.setText("Offset X: " + WatermarkConfig.bg.offsetX);
         watermarkBgOffsetYLabel.setText("Offset Y: " + WatermarkConfig.bg.offsetY);
+        watermarkBgColorPreview.setBackgroundColor(WatermarkConfig.bg.color);
         watermarkBgMarginLabel.setText("Margin: " + WatermarkConfig.bg.margin);
         watermarkBgRadiusLabel.setText("Radius: " + WatermarkConfig.bg.radius);
         watermarkShadowBlurLabel.setText("Blur Shadow: " + (int) WatermarkConfig.shadow.blur);
         watermarkShadowOffsetXLabel.setText("Shadow X: " + (int) WatermarkConfig.shadow.offsetX);
         watermarkShadowOffsetYLabel.setText("Shadow Y: " + (int) WatermarkConfig.shadow.offsetY);
+        watermarkShadowColorPreview.setBackgroundColor(WatermarkConfig.shadow.color);
 
         watermarkPatternSwitch.setChecked(WatermarkConfig.patternEnabled);
         activity.applyCheckboxTint(watermarkPatternSwitch, WatermarkConfig.patternEnabled);
@@ -239,9 +242,10 @@ public class WatermarkPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        watermarkColorButton.setOnClickListener(v -> {
+        watermarkColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Watermark", WatermarkConfig.color, color -> {
                 WatermarkConfig.color = color;
+                watermarkColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_color", color).apply();
                 FloatingService.updateWatermarkColorStatic();
@@ -257,9 +261,10 @@ public class WatermarkPanelController {
             FloatingService.updateWatermarkBackgroundStatic();
         });
 
-        watermarkBgColorButton.setOnClickListener(v -> {
+        watermarkBgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background Watermark", WatermarkConfig.bg.color, color -> {
                 WatermarkConfig.bg.color = color;
+                watermarkBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_color", color).apply();
                 FloatingService.updateWatermarkBackgroundStatic();
@@ -339,9 +344,10 @@ public class WatermarkPanelController {
             FloatingService.updateWatermarkShadowStatic();
         });
 
-        watermarkShadowColorButton.setOnClickListener(v -> {
+        watermarkShadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow Watermark", WatermarkConfig.shadow.color, color -> {
                 WatermarkConfig.shadow.color = color;
+                watermarkShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_shadow_color", color).apply();
                 FloatingService.updateWatermarkShadowStatic();

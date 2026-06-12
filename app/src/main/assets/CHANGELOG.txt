@@ -1,3 +1,14 @@
+[3.9.3.74.1] - 2026-06-12
+♻️ Perubahan Fitur
+- Semua preview warna dalam satu baris horizontal — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata.
+- Semua tombol warna jadi preview kotak 30×30 — Tombol Pilih Warna, Warna Label, Shadow, dan Background di semua 8 panel diganti preview kotak 30×30.
+- Preview warna 40dp→30dp — Ukuran preview yang sebelumnya 40×40 diperkecil ke 30×30.
+🔢 Version
+versionCode: 155
+versionName: 3.9.3.74.1
+
+════════════════════════════════════════════════
+
 [3.9.3.74.0] - 2026-06-12
 ✨ Fitur Baru
 - Sembunyikan Label untuk Battery Current — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.

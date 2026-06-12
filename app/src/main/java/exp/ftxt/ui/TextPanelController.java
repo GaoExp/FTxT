@@ -25,19 +25,19 @@ public class TextPanelController {
 
     private EditText editText;
     private SeekBar seekBar;
-    private Button colorButton;
+    private View colorPreview;
     private CheckBox overlaySwitch;
     private CheckBox touchPassthroughSwitch;
     private CheckBox textSafeArea;
     private CheckBox shadowSwitch;
     private LinearLayout shadowConfigContainer;
-    private Button shadowColorButton;
+    private View shadowColorPreview;
     private SeekBar shadowBlurSeekBar;
     private SeekBar shadowOffsetXSeekBar;
     private SeekBar shadowOffsetYSeekBar;
     private CheckBox bgSwitch;
     private LinearLayout bgConfigContainer;
-    private Button bgColorButton;
+    private View bgColorPreview;
     private SeekBar bgPaddingSeekBar;
     private SeekBar bgOffsetXSeekBar;
     private SeekBar bgOffsetYSeekBar;
@@ -94,19 +94,19 @@ public class TextPanelController {
     private void bindViews() {
         editText = activity.findViewById(R.id.editText);
         seekBar = activity.findViewById(R.id.textSizeSeekBar);
-        colorButton = activity.findViewById(R.id.colorButton);
+        colorPreview = activity.findViewById(R.id.colorPreview);
         overlaySwitch = activity.findViewById(R.id.overlaySwitch);
         touchPassthroughSwitch = activity.findViewById(R.id.touchPassthroughSwitch);
         textSafeArea = activity.findViewById(R.id.textSafeArea);
         shadowSwitch = activity.findViewById(R.id.shadowSwitch);
         shadowConfigContainer = activity.findViewById(R.id.shadowConfigText);
-        shadowColorButton = activity.findViewById(R.id.shadowColorButton);
+        shadowColorPreview = activity.findViewById(R.id.shadowColorPreview);
         shadowBlurSeekBar = activity.findViewById(R.id.shadowBlurSeekBar);
         shadowOffsetXSeekBar = activity.findViewById(R.id.shadowOffsetXSeekBar);
         shadowOffsetYSeekBar = activity.findViewById(R.id.shadowOffsetYSeekBar);
         bgSwitch = activity.findViewById(R.id.bgSwitch);
         bgConfigContainer = activity.findViewById(R.id.bgConfigText);
-        bgColorButton = activity.findViewById(R.id.bgColorButton);
+        bgColorPreview = activity.findViewById(R.id.bgColorPreview);
         bgPaddingSeekBar = activity.findViewById(R.id.bgPaddingSeekBar);
         bgOffsetXSeekBar = activity.findViewById(R.id.bgOffsetXSeekBar);
         bgOffsetYSeekBar = activity.findViewById(R.id.bgOffsetYSeekBar);
@@ -156,12 +156,15 @@ public class TextPanelController {
         shadowOffsetXSeekBar.setProgress((int) TextConfig.shadow.offsetX + 60);
         shadowOffsetYSeekBar.setProgress((int) TextConfig.shadow.offsetY + 60);
         textSizeLabel.setText("Ukuran Teks: " + (int) TextConfig.size);
+        colorPreview.setBackgroundColor(TextConfig.color);
         bgPaddingLabel.setText("Ukuran Background: " + TextConfig.bg.padding);
         bgOffsetXLabel.setText("Offset X: " + TextConfig.bg.offsetX);
         bgOffsetYLabel.setText("Offset Y: " + TextConfig.bg.offsetY);
+        bgColorPreview.setBackgroundColor(TextConfig.bg.color);
         shadowBlurLabel.setText("Blur Shadow: " + (int) TextConfig.shadow.blur);
         shadowOffsetXLabel.setText("Shadow X: " + (int) TextConfig.shadow.offsetX);
         shadowOffsetYLabel.setText("Shadow Y: " + (int) TextConfig.shadow.offsetY);
+        shadowColorPreview.setBackgroundColor(TextConfig.shadow.color);
     }
 
     private void setupListeners() {
@@ -187,9 +190,10 @@ public class TextPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        colorButton.setOnClickListener(v -> {
+        colorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna", TextConfig.color, color -> {
                 TextConfig.color = color;
+                colorPreview.setBackgroundColor(color);
                 FloatingService.updateTextColorStatic();
             });
         });
@@ -252,9 +256,10 @@ public class TextPanelController {
             FloatingService.updateTextBackgroundStatic();
         });
 
-        bgColorButton.setOnClickListener(v -> {
+        bgColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Background", TextConfig.bg.color, color -> {
                 TextConfig.bg.color = color;
+                bgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_color", color).apply();
                 FloatingService.updateTextBackgroundStatic();
@@ -334,9 +339,10 @@ public class TextPanelController {
             FloatingService.updateShadowStatic();
         });
 
-        shadowColorButton.setOnClickListener(v -> {
+        shadowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Shadow", TextConfig.shadow.color, color -> {
                 TextConfig.shadow.color = color;
+                shadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("shadow_color", color).apply();
                 FloatingService.updateShadowStatic();
