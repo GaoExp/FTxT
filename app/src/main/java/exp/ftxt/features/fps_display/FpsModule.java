@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.view.Choreographer;
 import android.view.Gravity;
@@ -62,10 +64,9 @@ public class FpsModule {
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(FpsConfig.shadow);
-        view.setText(FpsConfig.showOnlyValue ? "0.0" : "0.0 FPS");
         view.setTextSize(FpsConfig.size);
-        view.setTextColor(FpsConfig.color);
         applyBackground();
+        updateDisplay();
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -120,7 +121,12 @@ public class FpsModule {
 
     public void updateColor(int color) {
         FpsConfig.color = color;
-        if (view != null) view.setTextColor(color);
+        updateDisplay();
+    }
+
+    public void updateLabelColor(int color) {
+        FpsConfig.labelColor = color;
+        updateDisplay();
     }
 
     public void updateShadow() {
@@ -157,26 +163,37 @@ public class FpsModule {
 
     public void updateDisplay() {
         if (view != null) {
-            view.setText(FpsConfig.showOnlyValue
-                    ? String.format("%.1f", fpsValue)
-                    : String.format("%.1f FPS", fpsValue));
+            if (FpsConfig.showOnlyValue) {
+                view.setTextColor(FpsConfig.color);
+                view.setText(String.format("%.1f", fpsValue));
+            } else {
+                view.setTextColor(FpsConfig.color);
+                String text = String.format("%.1f FPS", fpsValue);
+                SpannableString spannable = new SpannableString(text);
+                int labelStart = text.indexOf(" FPS");
+                if (labelStart > 0) {
+                    spannable.setSpan(new ForegroundColorSpan(FpsConfig.labelColor),
+                            labelStart, text.length(), 0);
+                }
+                view.setText(spannable);
+            }
         }
     }
 
     private void applyBackground() {
         if (view == null) return;
-        if (FpsConfig.bgEnabled) {
-            int pad = FpsConfig.bgPadding;
+        if (FpsConfig.bg.enabled) {
+            int pad = FpsConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(FpsConfig.bgEnabled);
-        view.setBgColor(FpsConfig.bgColor);
-        view.setBgOffsetX(FpsConfig.bgOffsetX);
-        view.setBgOffsetY(FpsConfig.bgOffsetY);
-        view.setBgMargin(FpsConfig.bgMargin);
-        view.setBgRadius(FpsConfig.bgRadius);
+        view.setBgEnabled(FpsConfig.bg.enabled);
+        view.setBgColor(FpsConfig.bg.color);
+        view.setBgOffsetX(FpsConfig.bg.offsetX);
+        view.setBgOffsetY(FpsConfig.bg.offsetY);
+        view.setBgMargin(FpsConfig.bg.margin);
+        view.setBgRadius(FpsConfig.bg.radius);
     }
 
     public void updateTouchFlags() {
@@ -285,11 +302,7 @@ public class FpsModule {
                 fpsValue = (float) frameCount * 1000 / elapsed;
                 frameCount = 0;
                 lastFrameTime = frameTimeNanos;
-                if (view != null) {
-                    view.setText(FpsConfig.showOnlyValue
-                            ? String.format("%.1f", fpsValue)
-                            : String.format("%.1f FPS", fpsValue));
-                }
+                updateDisplay();
             }
             if (running && FpsConfig.enabled) {
                 choreographer.postFrameCallback(frameCallback);

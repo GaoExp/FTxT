@@ -23,6 +23,7 @@ public class NetworkPanelController {
     private CheckBox networkSwitch;
     private SeekBar networkSizeSeekBar;
     private Button networkColorButton;
+    private Button networkLabelColorButton;
     private CheckBox networkShadowSwitch;
     private LinearLayout networkShadowConfigContainer;
     private Button networkShadowColorButton;
@@ -78,6 +79,7 @@ public class NetworkPanelController {
         networkSwitch = activity.findViewById(R.id.networkSwitch);
         networkSizeSeekBar = activity.findViewById(R.id.networkSizeSeekBar);
         networkColorButton = activity.findViewById(R.id.networkColorButton);
+        networkLabelColorButton = activity.findViewById(R.id.networkLabelColorButton);
         networkShadowSwitch = activity.findViewById(R.id.networkShadowSwitch);
         networkShadowConfigContainer = activity.findViewById(R.id.shadowConfigNetwork);
         networkShadowColorButton = activity.findViewById(R.id.networkShadowColorButton);
@@ -128,14 +130,14 @@ public class NetworkPanelController {
         networkSwitch.setChecked(NetworkConfig.enabled);
         activity.applyCheckboxTint(networkSwitch, NetworkConfig.enabled);
         networkSizeSeekBar.setProgress((int) NetworkConfig.size);
-        networkBgSwitch.setChecked(NetworkConfig.bgEnabled);
-        activity.applyCheckboxTint(networkBgSwitch, NetworkConfig.bgEnabled);
-        networkBgConfigContainer.setVisibility(NetworkConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        networkBgPaddingSeekBar.setProgress(NetworkConfig.bgPadding);
-        networkBgOffsetXSeekBar.setProgress(NetworkConfig.bgOffsetX + 60);
-        networkBgOffsetYSeekBar.setProgress(NetworkConfig.bgOffsetY + 60);
-        networkBgMarginSeekBar.setProgress(NetworkConfig.bgMargin);
-        networkBgRadiusSeekBar.setProgress(NetworkConfig.bgRadius);
+        networkBgSwitch.setChecked(NetworkConfig.bg.enabled);
+        activity.applyCheckboxTint(networkBgSwitch, NetworkConfig.bg.enabled);
+        networkBgConfigContainer.setVisibility(NetworkConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        networkBgPaddingSeekBar.setProgress(NetworkConfig.bg.padding);
+        networkBgOffsetXSeekBar.setProgress(NetworkConfig.bg.offsetX + 60);
+        networkBgOffsetYSeekBar.setProgress(NetworkConfig.bg.offsetY + 60);
+        networkBgMarginSeekBar.setProgress(NetworkConfig.bg.margin);
+        networkBgRadiusSeekBar.setProgress(NetworkConfig.bg.radius);
         networkShadowSwitch.setChecked(NetworkConfig.shadow.enabled);
         activity.applyCheckboxTint(networkShadowSwitch, NetworkConfig.shadow.enabled);
         networkShadowConfigContainer.setVisibility(NetworkConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -146,11 +148,11 @@ public class NetworkPanelController {
         activity.applyCheckboxTint(networkLockSwitch, NetworkConfig.touchPassthrough);
         networkSafeArea.setChecked(NetworkConfig.safeArea);
         networkSizeLabel.setText("Ukuran Teks: " + (int) NetworkConfig.size);
-        networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bgPadding);
-        networkBgOffsetXLabel.setText("Offset X: " + NetworkConfig.bgOffsetX);
-        networkBgOffsetYLabel.setText("Offset Y: " + NetworkConfig.bgOffsetY);
-        networkBgMarginLabel.setText("Margin: " + NetworkConfig.bgMargin);
-        networkBgRadiusLabel.setText("Radius: " + NetworkConfig.bgRadius);
+        networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bg.padding);
+        networkBgOffsetXLabel.setText("Offset X: " + NetworkConfig.bg.offsetX);
+        networkBgOffsetYLabel.setText("Offset Y: " + NetworkConfig.bg.offsetY);
+        networkBgMarginLabel.setText("Margin: " + NetworkConfig.bg.margin);
+        networkBgRadiusLabel.setText("Radius: " + NetworkConfig.bg.radius);
         networkShadowBlurLabel.setText("Blur Shadow: " + (int) NetworkConfig.shadow.blur);
         networkShadowOffsetXLabel.setText("Shadow X: " + (int) NetworkConfig.shadow.offsetX);
         networkShadowOffsetYLabel.setText("Shadow Y: " + (int) NetworkConfig.shadow.offsetY);
@@ -213,8 +215,17 @@ public class NetworkPanelController {
             });
         });
 
+        networkLabelColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Label", NetworkConfig.labelColor, color -> {
+                NetworkConfig.labelColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("network_label_color", color).apply();
+                FloatingService.updateNetworkLabelColorStatic();
+            });
+        });
+
         networkBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            NetworkConfig.bgEnabled = isChecked;
+            NetworkConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(networkBgSwitch, isChecked);
             networkBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -223,8 +234,8 @@ public class NetworkPanelController {
         });
 
         networkBgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background", NetworkConfig.bgColor, color -> {
-                NetworkConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background", NetworkConfig.bg.color, color -> {
+                NetworkConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_color", color).apply();
                 FloatingService.updateNetworkBackgroundStatic();
@@ -234,7 +245,7 @@ public class NetworkPanelController {
         networkBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                NetworkConfig.bgPadding = progress;
+                NetworkConfig.bg.padding = progress;
                 networkBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_padding", progress).apply();
@@ -247,7 +258,7 @@ public class NetworkPanelController {
         networkBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                NetworkConfig.bgOffsetX = offset;
+                NetworkConfig.bg.offsetX = offset;
                 networkBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_offset_x", offset).apply();
@@ -260,7 +271,7 @@ public class NetworkPanelController {
         networkBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                NetworkConfig.bgOffsetY = offset;
+                NetworkConfig.bg.offsetY = offset;
                 networkBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_offset_y", offset).apply();
@@ -272,7 +283,7 @@ public class NetworkPanelController {
 
         networkBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                NetworkConfig.bgMargin = progress;
+                NetworkConfig.bg.margin = progress;
                 networkBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_margin", progress).apply();
@@ -284,7 +295,7 @@ public class NetworkPanelController {
 
         networkBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                NetworkConfig.bgRadius = progress;
+                NetworkConfig.bg.radius = progress;
                 networkBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_radius", progress).apply();

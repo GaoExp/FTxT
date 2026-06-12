@@ -213,11 +213,12 @@ Gunakan section sesuai kebutuhan. Urutan section WAJIB mengikuti urutan berikut:
 ### Aturan 
 
 WAJIB: 
+- periksa selalu agent.md agar pencatatan tidak keliru
+- periksa git log apakah commit sudah di push atau belum
 - semua file yang diubah dicatat
 - section WAJIB sesuai urutan di atas
-
 JANGAN: 
-- membuat entry versi baru
+- membuat entry versi baru sebelum commit di push
 - menambah changelog untuk perubahan trivial
 - mencatat `app/build.gradle` di `✏️ File Changed` jika hanya bump version — 🔢 Version sudah mewakili
 - mengubah urutan section
@@ -233,7 +234,7 @@ Section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **PENCA
  
 ## 3. Dokumentasi
 
-Dokumentasi hanya diupdate **saat diperintah user**, dan itu pun dilakukan **sebelum commit**.
+Dokumentasi hanya diupdate **saat diperintah user**, dan itu pun dilakukan **sebelum commit ataupun push**.
 
 Tidak perlu update dokumentasi setiap kali ada perubahan kode — bisa ditumpuk sekaligus nanti.
 
@@ -257,7 +258,7 @@ Tidak perlu update dokumentasi setiap kali ada perubahan kode — bisa ditumpuk 
 
 ### 3. Rilis (hanya saat diperintahkan)
 
-1. `git add -A && git commit`
+1. `git add -A && git commit` (vX.X.X.X.X deskripsi singkat)
 2. `git tag vX.X.X.X.X`
 3. **JANGAN** push — user yang akan push sendiri
 
@@ -293,7 +294,9 @@ Utamakan:
 
 Default behavior: 
 
-jangan terlalu rajin. 
+selalu lihat agents.md (wajib)
+
+jangan terlalu rajin membuat ringkasan dan penjelasan.
 
 Jika user meminta perubahan kecil, 
 kerjakan perubahan kecil. 

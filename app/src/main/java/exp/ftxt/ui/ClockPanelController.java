@@ -122,14 +122,14 @@ public class ClockPanelController {
         clockSwitch.setChecked(ClockConfig.enabled);
         activity.applyCheckboxTint(clockSwitch, ClockConfig.enabled);
         clockSizeSeekBar.setProgress((int) ClockConfig.size);
-        clockBgSwitch.setChecked(ClockConfig.bgEnabled);
-        activity.applyCheckboxTint(clockBgSwitch, ClockConfig.bgEnabled);
-        clockBgConfigContainer.setVisibility(ClockConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        clockBgPaddingSeekBar.setProgress(ClockConfig.bgPadding);
-        clockBgOffsetXSeekBar.setProgress(ClockConfig.bgOffsetX + 60);
-        clockBgOffsetYSeekBar.setProgress(ClockConfig.bgOffsetY + 60);
-        clockBgMarginSeekBar.setProgress(ClockConfig.bgMargin);
-        clockBgRadiusSeekBar.setProgress(ClockConfig.bgRadius);
+        clockBgSwitch.setChecked(ClockConfig.bg.enabled);
+        activity.applyCheckboxTint(clockBgSwitch, ClockConfig.bg.enabled);
+        clockBgConfigContainer.setVisibility(ClockConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        clockBgPaddingSeekBar.setProgress(ClockConfig.bg.padding);
+        clockBgOffsetXSeekBar.setProgress(ClockConfig.bg.offsetX + 60);
+        clockBgOffsetYSeekBar.setProgress(ClockConfig.bg.offsetY + 60);
+        clockBgMarginSeekBar.setProgress(ClockConfig.bg.margin);
+        clockBgRadiusSeekBar.setProgress(ClockConfig.bg.radius);
         clockShadowSwitch.setChecked(ClockConfig.shadow.enabled);
         activity.applyCheckboxTint(clockShadowSwitch, ClockConfig.shadow.enabled);
         clockShadowConfigContainer.setVisibility(ClockConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -140,11 +140,11 @@ public class ClockPanelController {
         activity.applyCheckboxTint(clockLockSwitch, ClockConfig.touchPassthrough);
         clockSafeArea.setChecked(ClockConfig.safeArea);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
-        clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bgPadding);
-        clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bgOffsetX);
-        clockBgOffsetYLabel.setText("Offset Y: " + ClockConfig.bgOffsetY);
-        clockBgMarginLabel.setText("Margin: " + ClockConfig.bgMargin);
-        clockBgRadiusLabel.setText("Radius: " + ClockConfig.bgRadius);
+        clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bg.padding);
+        clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bg.offsetX);
+        clockBgOffsetYLabel.setText("Offset Y: " + ClockConfig.bg.offsetY);
+        clockBgMarginLabel.setText("Margin: " + ClockConfig.bg.margin);
+        clockBgRadiusLabel.setText("Radius: " + ClockConfig.bg.radius);
         clockShadowBlurLabel.setText("Blur Shadow: " + (int) ClockConfig.shadow.blur);
         clockShadowOffsetXLabel.setText("Shadow X: " + (int) ClockConfig.shadow.offsetX);
         clockShadowOffsetYLabel.setText("Shadow Y: " + (int) ClockConfig.shadow.offsetY);
@@ -201,7 +201,7 @@ public class ClockPanelController {
         });
 
         clockBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            ClockConfig.bgEnabled = isChecked;
+            ClockConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(clockBgSwitch, isChecked);
             clockBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -210,8 +210,8 @@ public class ClockPanelController {
         });
 
         clockBgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background Jam", ClockConfig.bgColor, color -> {
-                ClockConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background Jam", ClockConfig.bg.color, color -> {
+                ClockConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_color", color).apply();
                 FloatingService.updateClockBackgroundStatic();
@@ -221,7 +221,7 @@ public class ClockPanelController {
         clockBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                ClockConfig.bgPadding = progress;
+                ClockConfig.bg.padding = progress;
                 clockBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_padding", progress).apply();
@@ -234,7 +234,7 @@ public class ClockPanelController {
         clockBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                ClockConfig.bgOffsetX = offset;
+                ClockConfig.bg.offsetX = offset;
                 clockBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_offset_x", offset).apply();
@@ -247,7 +247,7 @@ public class ClockPanelController {
         clockBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                ClockConfig.bgOffsetY = offset;
+                ClockConfig.bg.offsetY = offset;
                 clockBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_offset_y", offset).apply();
@@ -259,7 +259,7 @@ public class ClockPanelController {
 
         clockBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                ClockConfig.bgMargin = progress;
+                ClockConfig.bg.margin = progress;
                 clockBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_margin", progress).apply();
@@ -271,7 +271,7 @@ public class ClockPanelController {
 
         clockBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                ClockConfig.bgRadius = progress;
+                ClockConfig.bg.radius = progress;
                 clockBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_radius", progress).apply();

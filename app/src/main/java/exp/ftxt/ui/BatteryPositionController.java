@@ -60,16 +60,17 @@ public class BatteryPositionController {
             p.size = BatteryConfig.size;
             p.color = BatteryConfig.color;
             p.shadow = PresetHandler.copyShadow(BatteryConfig.shadow);
-            p.bgEnabled = BatteryConfig.bgEnabled;
-            p.bgColor = BatteryConfig.bgColor;
-            p.bgPadding = BatteryConfig.bgPadding;
-            p.bgOffsetX = BatteryConfig.bgOffsetX;
-            p.bgOffsetY = BatteryConfig.bgOffsetY;
-            p.bgMargin = BatteryConfig.bgMargin;
-            p.bgRadius = BatteryConfig.bgRadius;
+            p.bgEnabled = BatteryConfig.bg.enabled;
+            p.bgColor = BatteryConfig.bg.color;
+            p.bgPadding = BatteryConfig.bg.padding;
+            p.bgOffsetX = BatteryConfig.bg.offsetX;
+            p.bgOffsetY = BatteryConfig.bg.offsetY;
+            p.bgMargin = BatteryConfig.bg.margin;
+            p.bgRadius = BatteryConfig.bg.radius;
             p.touchPassthrough = BatteryConfig.touchPassthrough;
             p.safeArea = BatteryConfig.safeArea;
             p.showOnlyValue = BatteryConfig.showOnlyValue;
+            p.labelColor = BatteryConfig.labelColor;
             p.showTemperature = BatteryConfig.showTemperature;
             p.showPercentage = BatteryConfig.showPercentage;
         }
@@ -87,13 +88,13 @@ public class BatteryPositionController {
                 BatteryConfig.shadow.offsetX = p.shadow.offsetX;
                 BatteryConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            BatteryConfig.bgEnabled = p.bgEnabled;
-            BatteryConfig.bgColor = p.bgColor;
-            BatteryConfig.bgPadding = p.bgPadding;
-            BatteryConfig.bgOffsetX = p.bgOffsetX;
-            BatteryConfig.bgOffsetY = p.bgOffsetY;
-            BatteryConfig.bgMargin = p.bgMargin;
-            BatteryConfig.bgRadius = p.bgRadius;
+            BatteryConfig.bg.enabled = p.bgEnabled;
+            BatteryConfig.bg.color = p.bgColor;
+            BatteryConfig.bg.padding = p.bgPadding;
+            BatteryConfig.bg.offsetX = p.bgOffsetX;
+            BatteryConfig.bg.offsetY = p.bgOffsetY;
+            BatteryConfig.bg.margin = p.bgMargin;
+            BatteryConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
                 BatteryConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("battery_lock", BatteryConfig.touchPassthrough).apply();
@@ -105,6 +106,10 @@ public class BatteryPositionController {
             if (p.showOnlyValue != null) {
                 BatteryConfig.showOnlyValue = p.showOnlyValue;
                 prefs.edit().putBoolean("battery_show_only_value", BatteryConfig.showOnlyValue).apply();
+            }
+            if (p.labelColor != null) {
+                BatteryConfig.labelColor = p.labelColor;
+                prefs.edit().putInt("battery_label_color", BatteryConfig.labelColor).apply();
             }
             if (p.showTemperature != null) {
                 BatteryConfig.showTemperature = p.showTemperature;
@@ -121,6 +126,7 @@ public class BatteryPositionController {
             FloatingService.updateBatteryPositionStatic();
             FloatingService.updateBatterySizeStatic();
             FloatingService.updateBatteryColorStatic();
+            FloatingService.updateBatteryLabelColorStatic();
             FloatingService.updateBatteryShadowStatic();
             FloatingService.updateBatteryBackgroundStatic();
         }

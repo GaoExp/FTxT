@@ -75,6 +75,9 @@ public class OverlayPreset {
     /** Teks kustom — khusus modul Floating Text */
     public String textContent;
 
+    /** Warna teks label — khusus FPS (membedakan nilai dan label "FPS") */
+    public Integer labelColor;
+
     /** Tampilkan hanya angka (FPS / Battery Temperature) */
     public Boolean showOnlyValue;
 

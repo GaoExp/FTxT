@@ -1,0 +1,201 @@
+Struktur Project FTxT
+
+FTxT/
+├── .gitignore                    - Git ignore rules (build, gradle, local)
+├── AGENTS.md                     - Pedoman AI agent
+├── CHANGELOG.md                  - Riwayat perubahan per release
+├── PANDUAN.md                    - Panduan penggunaan lengkap
+├── README.md                     - Ringkasan project & fitur
+├── STRUKTUR.md                   - Struktur project (file ini)
+├── build.gradle                  - Root Gradle (AGP 8.12.0)
+├── gradle.properties             - Gradle: AndroidX, JVM args
+├── gradlew / gradlew.bat         - Gradle wrapper scripts
+├── settings.gradle               - Settings Gradle (include :app)
+├── keystore.properties           - Konfigurasi signing release
+├── local.properties              - Local SDK/NDK path
+│
+├── _karantina/                   - File deprecated/arsip
+│   └── exp/ftxt/shared/ui/
+│       ├── XyPadView.java        - XY Pad 2D drag (diganti Slider + D-Pad)
+│       └── PositionPresetManager.java  - Preset posisi lama (diganti PresetManager GSON)
+│
+├── .github/workflows/
+│   └── release.yml               - GitHub Actions CI: build APK & GitHub Release
+│
+├── gradle/wrapper/
+│   └── gradle-wrapper.properties - Versi Gradle wrapper
+│
+├── key/
+│   └── audiplay-release-key.jks  - Keystore signing release
+│
+└── app/
+    ├── build.gradle              - Module: minSdk 26, compileSdk/targetSdk 35, Java 17
+    ├── proguard-rules.pro        - Aturan ProGuard (custom rules)
+    │
+    ├── src/main/
+    │   ├── AndroidManifest.xml   - Permission: overlay, notif, baterai, wake lock
+    │   │
+    │   ├── assets/
+    │   │   ├── CHANGELOG.txt     - Riwayat perubahan (in-app display)
+    │   │   ├── PANDUAN.txt       - Panduan penggunaan (in-app display)
+    │   │   ├── README.txt        - Ringkasan project (in-app display)
+    │   │   └── STRUKTUR.txt      - Struktur project (in-app display)
+    │   │
+    │   ├── java/exp/ftxt/
+    │   │   ├── core/
+    │   │   │   ├── FloatingService.java     - Foreground service: kelola semua overlay
+    │   │   │   ├── NotificationHelper.java  - Notifikasi foreground service
+    │   │   │   └── WakeLockManager.java     - Partial wake lock biar CPU tetap aktif
+    │   │   │
+    │   │   ├── features/
+    │   │   │   ├── floating_text/
+    │   │   │   │   ├── TextConfig.java      - Konfigurasi statis Text overlay
+    │   │   │   │   └── TextModule.java      - Buat/hapus/update Text overlay window
+    │   │   │   ├── fps_display/
+    │   │   │   │   ├── FpsConfig.java       - Konfigurasi statis FPS overlay
+    │   │   │   │   └── FpsModule.java       - FPS counter via Choreographer
+    │   │   │   ├── clock_module/
+    │   │   │   │   ├── ClockConfig.java     - Konfigurasi statis Clock overlay
+    │   │   │   │   └── ClockModule.java     - Jam real-time HH:mm:ss, update 1 detik
+    │   │   │   ├── battery_temperature/
+    │   │   │   │   ├── BatteryConfig.java   - Konfigurasi statis Battery overlay
+    │   │   │   │   └── BatteryModule.java   - Suhu baterai C + %, baca sticky broadcast
+    │   │   │   ├── battery_percentage/
+    │   │   │   │   ├── BatteryPercentageConfig.java  - Konfigurasi Battery % overlay
+    │   │   │   │   └── BatteryPercentageModule.java  - Persentase baterai, update 5 detik
+    │   │   │   ├── battery_current/
+    │   │   │   │   ├── BatteryCurrentConfig.java     - Konfigurasi Battery Current overlay
+    │   │   │   │   └── BatteryCurrentModule.java     - Tegangan/arus/daya baterai
+    │   │   │   ├── network_stats/
+    │   │   │   │   ├── NetworkConfig.java  - Konfigurasi statis Network overlay
+    │   │   │   │   └── NetworkModule.java  - Kecepatan internet turun/naik via TrafficStats
+    │   │   │   ├── watermark/
+    │   │   │   │   ├── WatermarkConfig.java      - Konfigurasi Watermark + pattern mode
+    │   │   │   │   └── WatermarkModule.java      - Watermark teks / pattern segel diagonal
+    │   │   │   ├── crosshair/      (placeholder - coming soon)
+    │   │   │   ├── cpu_monitor/    (placeholder - coming soon)
+    │   │   │   └── logo_display/   (placeholder - coming soon)
+    │   │   │
+    │   │   ├── shared/
+    │   │   │   ├── color/
+    │   │   │   │   ├── ColorMath.java         - Operasi matematika HSV
+    │   │   │   │   ├── ColorNameResolver.java - Deteksi nama warna dari RGB
+    │   │   │   │   └── HSVColorPickerView.java- Custom View: color wheel HSV + crosshair
+    │   │   │   ├── preset/
+    │   │   │   │   ├── OverlayPreset.java     - Model data preset dengan UUID
+    │   │   │   │   ├── PresetManager.java     - CRUD preset: simpan/muat/cari/ekspor
+    │   │   │   │   ├── PresetHandler.java     - Delegate save/load dialog per modul
+    │   │   │   │   ├── PresetBrowserDialog.java   - DialogFragment browser preset
+    │   │   │   │   └── PresetExampleActivity.java - Contoh integrasi preset
+    │   │   │   └── ui/
+    │   │   │       ├── BackgroundConfig.java      - Model data background
+    │   │   │       ├── ShadowConfig.java          - Model data shadow
+    │   │   │       ├── ShadowTextView.java        - Custom TextView shadow + background
+    │   │   │       ├── OverlayDragHandler.java    - Touch listener untuk drag overlay
+    │   │   │       ├── OverlayShadow.java         - Apply elevation shadow ke overlay
+    │   │   │       ├── ColorPickerDialog.java     - Dialog color picker
+    │   │   │       ├── DpadController.java        - Kontrol D-Pad dengan repeat
+    │   │   │       ├── SliderPositionController.java  - Slider X/Y posisi
+    │   │   │       ├── SliderLabelEditor.java     - Dialog edit nilai slider
+    │   │   │       ├── SectionHelper.java         - Collapsible section toggle
+    │   │   │       └── PresetPreviewView.java     - Preview posisi overlay di grid
+    │   │   │
+    │   │   ├── ui/
+    │   │   │   ├── TextPanelController.java            - UI panel Text
+    │   │   │   ├── TextPositionController.java         - Kontrol posisi Text
+    │   │   │   ├── FpsPanelController.java             - UI panel FPS
+    │   │   │   ├── FpsPositionController.java          - Kontrol posisi FPS
+    │   │   │   ├── ClockPanelController.java           - UI panel Clock
+    │   │   │   ├── ClockPositionController.java        - Kontrol posisi Clock
+    │   │   │   ├── BatteryPanelController.java         - UI panel Battery
+    │   │   │   ├── BatteryPositionController.java      - Kontrol posisi Battery
+    │   │   │   ├── BatteryPercentagePanelController.java   - UI panel Battery %
+    │   │   │   ├── BatteryPercentagePositionController.java- Kontrol posisi Battery %
+    │   │   │   ├── BatteryCurrentPanelController.java      - UI panel Battery Current
+    │   │   │   ├── BatteryCurrentPositionController.java   - Kontrol posisi Battery Current
+    │   │   │   ├── NetworkPanelController.java             - UI panel Network
+    │   │   │   ├── NetworkPositionController.java          - Kontrol posisi Network
+    │   │   │   ├── WatermarkPanelController.java           - UI panel Watermark
+    │   │   │   └── WatermarkPositionController.java        - Kontrol posisi Watermark
+    │   │   │
+    │   │   ├── utils/
+    │   │   │   └── PermissionHelper.java    - Helper izin: overlay, notifikasi, baterai
+    │   │   │
+    │   │   ├── MainActivity.java           - Activity utama
+    │   │   ├── SettingsActivity.java        - Manajemen izin
+    │   │   └── DocumentationActivity.java   - Dokumentasi in-app
+    │   │
+    │   └── res/
+    │       ├── anim/
+    │       │   ├── settings_popup_enter.xml - Animasi masuk popup settings
+    │       │   └── settings_popup_exit.xml  - Animasi keluar popup settings
+    │       ├── drawable/
+    │       │   ├── ic_dots_vertical.xml     - Ikon tiga titik vertikal
+    │       │   ├── ic_edit.xml              - Ikon pensil edit
+    │       │   ├── ic_launcher_background.xml   - Background launcher
+    │       │   ├── ic_launcher_foreground.png   - Foreground launcher
+    │       │   ├── ic_screen_rotation.xml   - Ikon orientasi layar
+    │       │   ├── ic_settings.xml          - Ikon gear
+    │       │   ├── ic_star_filled.xml       - Ikon bintang solid
+    │       │   ├── ic_star_outline.xml      - Ikon bintang outline
+    │       │   ├── ic_sun.xml               - Ikon matahari
+    │       │   ├── ic_theme.xml             - Ikon tema
+    │       │   └── splash_screen.xml        - Splash screen drawable
+    │       ├── layout/
+    │       │   ├── activity_main.xml            - Layout utama
+    │       │   ├── activity_settings.xml        - Layout pengaturan izin
+    │       │   ├── activity_documentation.xml   - Layout dokumentasi
+    │       │   ├── dialog_hsv_color_picker.xml  - Dialog color picker
+    │       │   ├── dialog_preset_browser.xml    - Dialog browser preset
+    │       │   ├── drawer_content.xml           - Konten navigation drawer
+    │       │   ├── nav_header.xml               - Header navigation drawer
+    │       │   ├── panel_text.xml               - Panel Floating Text
+    │       │   ├── panel_fps.xml                - Panel FPS Display
+    │       │   ├── panel_clock.xml              - Panel Jam Digital
+    │       │   ├── panel_battery.xml            - Panel Suhu Baterai
+    │       │   ├── panel_battery_percentage.xml - Panel Battery Percentage
+    │       │   ├── panel_battery_current.xml    - Panel Battery Current
+    │       │   ├── panel_network.xml            - Panel Network Speed
+    │       │   ├── panel_watermark.xml          - Panel Watermark
+    │       │   ├── panel_crosshair.xml          - Placeholder Crosshair
+    │       │   ├── panel_logo.xml               - Placeholder Logo Display
+    │       │   ├── preset_browser_item.xml      - Item daftar preset
+    │       │   └── preset_list_item.xml         - Item list preset alternate
+    │       ├── menu/
+    │       │   ├── drawer_menu.xml   - Menu navigation drawer
+    │       │   └── main_menu.xml     - Menu toolbar
+    │       ├── mipmap-anydpi-v26/
+    │       │   └── ic_launcher.xml   - Adaptive icon launcher
+    │       ├── values/
+    │       │   ├── colors.xml        - Warna: primary, accent, drawer, bg
+    │       │   ├── strings.xml       - Semua string UI Bahasa Indonesia
+    │       │   ├── styles.xml        - Style: AppTheme, popup menu
+    │       │   └── themes.xml        - Theme: SplashScreen
+    │       ├── values-night/
+    │       │   └── colors.xml        - Warna mode gelap
+    │       └── values-v31/
+    │           └── themes.xml        - SplashScreen theme untuk API 31+
+    │
+    ├── src/test/java/exp/ftxt/
+    │   └── ExampleUnitTest.java      - Contoh unit test (JVM)
+    │
+    └── src/androidTest/java/exp/ftxt/
+        └── ExampleInstrumentedTest.java  - Contoh instrumented test (Android)
+
+Statistik Project:
+
+  Java source         : 67
+  Layout XML          : 20
+  Drawable XML        : 11
+  Values XML          : 6
+  Mipmap XML          : 1
+  Menu XML            : 2
+  Anim XML            : 2
+  XML lainnya         : 2
+  Assets (txt)        : 4
+  Root dokumen        : 6
+  Root konfigurasi    : 7
+  Gradle & wrapper    : 5
+  CI/CD               : 1
+  Total file          : ~134
+  Total direktori     : ~42

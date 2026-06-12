@@ -74,6 +74,7 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 ### FPS Display
 - Menampilkan frame rate real-time
 - Opsi "Hanya Nilai" untuk menyembunyikan label FPS
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna teks "FPS", sementara "Pilih Warna" untuk nilai angka
 - Ukuran 5–140sp, dengan shadow, background, dan kontrol posisi
 - Interval update bisa diatur 0.2–10 detik (default 1d)
 
@@ -83,21 +84,25 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
 ### Suhu Baterai
-- Menampilkan suhu baterai dalam °C
+- Menampilkan suhu baterai dalam °C dan/atau persentase
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan °C/% terpisah dari nilai angka
 - Opsi tampilkan hanya nilai suhu, persentase
 - Interval update bisa diatur 0.2–10 detik (default 5d)
 
 ### Battery Percentage
-- Menampilkan persentase baterai dalam %, update tiap 5 detik
+- Menampilkan persentase baterai dalam %
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna label % terpisah dari nilai angka
 - Konfigurasi ukuran, warna, shadow, background, kontrol posisi
 
 ### Battery Current
 - Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan mV/mA/W terpisah dari nilai angka
 - Opsi tampilkan mV, mA, W (toggle)
 - Interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Network Speed
 - Kecepatan internet real-time format `↓128KB/s ↑128KB/s`
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna indikator ↓↑ dan satuan KB/MB/s terpisah dari nilai angka
 - Otomatis berubah ke MB/s saat >1024 KB/s
 - Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
 

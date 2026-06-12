@@ -1,21 +1,21 @@
 FTxT (FunText) - Floating Text Overlay
 
-Current Release: 3.9.3.69.7 Beta
-Last Updated: 2026-06-11
+Current Release: 3.9.3.72.0 Beta
+Last Updated: 2026-06-12
 
 FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
 Fitur Utama
 
 - Floating Text Overlay - Teks custom di atas semua aplikasi, real-time update
-- FPS Display Overlay - FPS counter draggable dengan opsi hanya angka
+- FPS Display Overlay - FPS counter draggable dengan warna nilai dan label terpisah
 - Jam Digital Overlay - Waktu real-time 24 jam HH:mm:ss, update tiap 1 detik
-- Suhu Baterai Overlay - Suhu baterai dalam C, update tiap 5 detik
-- Battery Percentage Overlay - Persentase baterai dalam %, update tiap 5 detik
-- Battery Current Overlay - Tegangan (mV), arus (mA), dan daya (W) baterai, update tiap 5 detik
+- Suhu Baterai Overlay - Suhu baterai dalam C dengan warna nilai dan satuan terpisah
+- Battery Percentage Overlay - Persentase baterai dalam % dengan warna nilai dan label terpisah
+- Battery Current Overlay - Tegangan (mV), arus (mA), dan daya (W) dengan warna nilai dan satuan terpisah
 - Watermark Overlay - Teks watermark kustom dengan opacity default semi-transparan, ukuran 5-200sp, warna, shadow, background, dan kontrol posisi lengkap
 - Watermark Seal Pattern - Mode segel: teks diulang diagonal melayar penuh dengan kontrol spasi horizontal, spasi vertikal, dan sudut (angle)
-- Network Speed Meter Overlay - Kecepatan internet real-time (↓ ↑) KB/s MB/s, polling tiap 1 detik
+- Network Speed Meter Overlay - Kecepatan internet real-time (↓ ↑) dengan warna nilai dan label terpisah
 - Classic Color Wheel + ARGB Sliders - Full disk color wheel dengan crosshair, ARGB slider, two-way sync, color name auto-detection, HEX edit manual
 - Safe Area - Batasi posisi overlay agar tidak masuk area notch/cutout
 - Touch Passthrough - Kunci posisi agar sentuhan tembus ke aplikasi belakang (default ON)
@@ -27,6 +27,7 @@ Fitur Utama
 - Configurable Background - Warna, ukuran, offset, margin, radius (independen dari shadow)
 - Configurable Shadow - Warna, blur, offset X/Y per modul
 - Slider Label Edit - Klik label slider untuk edit nilai via dialog
+- Collapsible Panel Sections - Setiap panel dikelompokkan dalam section collapsible: Tampilan, Posisi, Shadow, Background
 - Screen Orientation Toggle - Ikon orientasi layar di toolbar, toggle Potret/Lanskap sekali ketuk
 - Dark/Light Theme - Toggle tema (default malam), tersimpan otomatis
 - Overlay Toggle - Auto-start, permission handling, WakeLock, foreground service
@@ -36,6 +37,7 @@ Dokumentasi Terkait
 
 - PANDUAN.txt - Panduan penggunaan lengkap
 - CHANGELOG.txt - Riwayat perubahan lengkap
+- STRUKTUR.txt - Struktur project lengkap
 
 Dokumentasi juga tersedia di dalam aplikasi melalui Pengaturan > tombol dokumentasi.
 
@@ -84,6 +86,20 @@ Aturan:
 - patch reset ke 0 saat minor naik
 - minor +1 saat major, removed, atau restored naik
 
+Section Changelog:
+
+- Fitur Baru - Fitur baru ditambahkan
+- Fitur Dihapus - Fitur dihapus/dinonaktifkan
+- Fitur Dipulihkan - Fitur lama dikembalikan
+- Perubahan Fitur - Perubahan fitur existing
+- Optimasi dan Penyesuaian - Optimasi, refactor, maintenance
+- Bug Fixes - Perbaikan bug
+- Catatan - Informasi tambahan
+- File Added - File baru
+- File Changed - File diubah
+- File Removed - File dihapus
+- Version - versionCode dan versionName
+
 Dependencies:
 - AndroidX AppCompat 1.7.1 - UI compatibility
 - Material Design 1.12.0 - Material 3 components
@@ -120,3 +136,7 @@ Dideklarasikan di AndroidManifest.xml:
 - REQUEST_IGNORE_BATTERY_OPTIMIZATIONS - Nonaktifkan optimasi baterai
 
 Izin diminta otomatis saat pertama aplikasi dibuka. Pengguna juga bisa mengelola izin melalui menu Pengaturan.
+
+Struktur Project:
+
+Lihat STRUKTUR.txt untuk struktur project lengkap beserta statistik.

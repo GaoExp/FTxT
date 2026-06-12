@@ -148,14 +148,14 @@ public class WatermarkPanelController {
         activity.applyCheckboxTint(watermarkSwitch, WatermarkConfig.enabled);
         watermarkEditText.setText(WatermarkConfig.text);
         watermarkSizeSeekBar.setProgress((int) WatermarkConfig.size);
-        watermarkBgSwitch.setChecked(WatermarkConfig.bgEnabled);
-        activity.applyCheckboxTint(watermarkBgSwitch, WatermarkConfig.bgEnabled);
-        watermarkBgConfigContainer.setVisibility(WatermarkConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        watermarkBgPaddingSeekBar.setProgress(WatermarkConfig.bgPadding);
-        watermarkBgOffsetXSeekBar.setProgress(WatermarkConfig.bgOffsetX + 60);
-        watermarkBgOffsetYSeekBar.setProgress(WatermarkConfig.bgOffsetY + 60);
-        watermarkBgMarginSeekBar.setProgress(WatermarkConfig.bgMargin);
-        watermarkBgRadiusSeekBar.setProgress(WatermarkConfig.bgRadius);
+        watermarkBgSwitch.setChecked(WatermarkConfig.bg.enabled);
+        activity.applyCheckboxTint(watermarkBgSwitch, WatermarkConfig.bg.enabled);
+        watermarkBgConfigContainer.setVisibility(WatermarkConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        watermarkBgPaddingSeekBar.setProgress(WatermarkConfig.bg.padding);
+        watermarkBgOffsetXSeekBar.setProgress(WatermarkConfig.bg.offsetX + 60);
+        watermarkBgOffsetYSeekBar.setProgress(WatermarkConfig.bg.offsetY + 60);
+        watermarkBgMarginSeekBar.setProgress(WatermarkConfig.bg.margin);
+        watermarkBgRadiusSeekBar.setProgress(WatermarkConfig.bg.radius);
         watermarkShadowSwitch.setChecked(WatermarkConfig.shadow.enabled);
         activity.applyCheckboxTint(watermarkShadowSwitch, WatermarkConfig.shadow.enabled);
         watermarkShadowConfigContainer.setVisibility(WatermarkConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -166,11 +166,11 @@ public class WatermarkPanelController {
         activity.applyCheckboxTint(watermarkLockSwitch, WatermarkConfig.touchPassthrough);
         watermarkSafeArea.setChecked(WatermarkConfig.safeArea);
         watermarkSizeLabel.setText("Ukuran Teks: " + (int) WatermarkConfig.size);
-        watermarkBgPaddingLabel.setText("Ukuran Background: " + WatermarkConfig.bgPadding);
-        watermarkBgOffsetXLabel.setText("Offset X: " + WatermarkConfig.bgOffsetX);
-        watermarkBgOffsetYLabel.setText("Offset Y: " + WatermarkConfig.bgOffsetY);
-        watermarkBgMarginLabel.setText("Margin: " + WatermarkConfig.bgMargin);
-        watermarkBgRadiusLabel.setText("Radius: " + WatermarkConfig.bgRadius);
+        watermarkBgPaddingLabel.setText("Ukuran Background: " + WatermarkConfig.bg.padding);
+        watermarkBgOffsetXLabel.setText("Offset X: " + WatermarkConfig.bg.offsetX);
+        watermarkBgOffsetYLabel.setText("Offset Y: " + WatermarkConfig.bg.offsetY);
+        watermarkBgMarginLabel.setText("Margin: " + WatermarkConfig.bg.margin);
+        watermarkBgRadiusLabel.setText("Radius: " + WatermarkConfig.bg.radius);
         watermarkShadowBlurLabel.setText("Blur Shadow: " + (int) WatermarkConfig.shadow.blur);
         watermarkShadowOffsetXLabel.setText("Shadow X: " + (int) WatermarkConfig.shadow.offsetX);
         watermarkShadowOffsetYLabel.setText("Shadow Y: " + (int) WatermarkConfig.shadow.offsetY);
@@ -249,7 +249,7 @@ public class WatermarkPanelController {
         });
 
         watermarkBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            WatermarkConfig.bgEnabled = isChecked;
+            WatermarkConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(watermarkBgSwitch, isChecked);
             watermarkBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -258,8 +258,8 @@ public class WatermarkPanelController {
         });
 
         watermarkBgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background Watermark", WatermarkConfig.bgColor, color -> {
-                WatermarkConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background Watermark", WatermarkConfig.bg.color, color -> {
+                WatermarkConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_color", color).apply();
                 FloatingService.updateWatermarkBackgroundStatic();
@@ -269,7 +269,7 @@ public class WatermarkPanelController {
         watermarkBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                WatermarkConfig.bgPadding = progress;
+                WatermarkConfig.bg.padding = progress;
                 watermarkBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_padding", progress).apply();
@@ -282,7 +282,7 @@ public class WatermarkPanelController {
         watermarkBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                WatermarkConfig.bgOffsetX = offset;
+                WatermarkConfig.bg.offsetX = offset;
                 watermarkBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_offset_x", offset).apply();
@@ -295,7 +295,7 @@ public class WatermarkPanelController {
         watermarkBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                WatermarkConfig.bgOffsetY = offset;
+                WatermarkConfig.bg.offsetY = offset;
                 watermarkBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_offset_y", offset).apply();
@@ -307,7 +307,7 @@ public class WatermarkPanelController {
 
         watermarkBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                WatermarkConfig.bgMargin = progress;
+                WatermarkConfig.bg.margin = progress;
                 watermarkBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_margin", progress).apply();
@@ -319,7 +319,7 @@ public class WatermarkPanelController {
 
         watermarkBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                WatermarkConfig.bgRadius = progress;
+                WatermarkConfig.bg.radius = progress;
                 watermarkBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("watermark_bg_radius", progress).apply();

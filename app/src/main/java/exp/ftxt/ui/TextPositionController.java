@@ -60,13 +60,13 @@ public class TextPositionController {
             p.size = TextConfig.size;
             p.color = TextConfig.color;
             p.shadow = PresetHandler.copyShadow(TextConfig.shadow);
-            p.bgEnabled = TextConfig.bgEnabled;
-            p.bgColor = TextConfig.bgColor;
-            p.bgPadding = TextConfig.bgPadding;
-            p.bgOffsetX = TextConfig.bgOffsetX;
-            p.bgOffsetY = TextConfig.bgOffsetY;
-            p.bgMargin = TextConfig.bgMargin;
-            p.bgRadius = TextConfig.bgRadius;
+            p.bgEnabled = TextConfig.bg.enabled;
+            p.bgColor = TextConfig.bg.color;
+            p.bgPadding = TextConfig.bg.padding;
+            p.bgOffsetX = TextConfig.bg.offsetX;
+            p.bgOffsetY = TextConfig.bg.offsetY;
+            p.bgMargin = TextConfig.bg.margin;
+            p.bgRadius = TextConfig.bg.radius;
             p.touchPassthrough = TextConfig.touchPassthrough;
             p.safeArea = TextConfig.safeArea;
             p.textContent = TextConfig.text;
@@ -85,13 +85,13 @@ public class TextPositionController {
                 TextConfig.shadow.offsetX = p.shadow.offsetX;
                 TextConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            TextConfig.bgEnabled = p.bgEnabled;
-            TextConfig.bgColor = p.bgColor;
-            TextConfig.bgPadding = p.bgPadding;
-            TextConfig.bgOffsetX = p.bgOffsetX;
-            TextConfig.bgOffsetY = p.bgOffsetY;
-            TextConfig.bgMargin = p.bgMargin;
-            TextConfig.bgRadius = p.bgRadius;
+            TextConfig.bg.enabled = p.bgEnabled;
+            TextConfig.bg.color = p.bgColor;
+            TextConfig.bg.padding = p.bgPadding;
+            TextConfig.bg.offsetX = p.bgOffsetX;
+            TextConfig.bg.offsetY = p.bgOffsetY;
+            TextConfig.bg.margin = p.bgMargin;
+            TextConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
                 TextConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("text_lock", TextConfig.touchPassthrough).apply();

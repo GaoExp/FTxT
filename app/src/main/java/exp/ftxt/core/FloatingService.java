@@ -236,6 +236,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateFpsLabelColorStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.updateLabelColor(FpsConfig.labelColor);
+        }
+    }
+
     public static void updateFpsSizeStatic() {
         if (instance != null && instance.fpsModule != null) {
             instance.fpsModule.updateSize(FpsConfig.size);
@@ -381,6 +387,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateNetworkLabelColorStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.updateLabelColor(NetworkConfig.labelColor);
+        }
+    }
+
     public static void updateNetworkShadowStatic() {
         if (instance != null && instance.networkModule != null) {
             instance.networkModule.updateShadow();
@@ -445,6 +457,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateBatteryPercentageLabelColorStatic() {
+        if (instance != null && instance.batteryPercentageModule != null) {
+            instance.batteryPercentageModule.updateLabelColor(BatteryPercentageConfig.labelColor);
+        }
+    }
+
     public static void updateBatteryPercentageSizeStatic() {
         if (instance != null && instance.batteryPercentageModule != null) {
             instance.batteryPercentageModule.updateSize(BatteryPercentageConfig.size);
@@ -505,6 +523,12 @@ public class FloatingService extends Service {
     public static void updateBatteryCurrentColorStatic() {
         if (instance != null && instance.batteryCurrentModule != null) {
             instance.batteryCurrentModule.updateColor(BatteryCurrentConfig.color);
+        }
+    }
+
+    public static void updateBatteryCurrentLabelColorStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.updateLabelColor(BatteryCurrentConfig.labelColor);
         }
     }
 
@@ -650,6 +674,12 @@ public class FloatingService extends Service {
     public static void updateBatteryColorStatic() {
         if (instance != null && instance.batteryModule != null) {
             instance.batteryModule.updateColor(BatteryConfig.color);
+        }
+    }
+
+    public static void updateBatteryLabelColorStatic() {
+        if (instance != null && instance.batteryModule != null) {
+            instance.batteryModule.updateLabelColor(BatteryConfig.labelColor);
         }
     }
 

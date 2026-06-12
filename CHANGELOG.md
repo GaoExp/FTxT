@@ -1,3 +1,68 @@
+## [3.9.3.72.0] - 2026-06-12
+### ✨ Fitur Baru
+- **Warna Label FPS Terpisah** — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `fps_label_color`).
+- **Warna Label Battery Temperature Terpisah** — Nilai suhu dan satuan °C/% bisa diwarnai berbeda. Button "Warna Label" di panel Battery Temperature. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `battery_label_color`).
+- **Warna Label Battery Percentage Terpisah** — Nilai persen dan label % bisa diwarnai berbeda. Button "Warna Label" di panel Battery Percentage. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `battpct_label_color`).
+- **Warna Label Battery Current Terpisah** — Nilai tegangan/arus/daya dan satuan mV/mA/W bisa diwarnai berbeda. Button "Warna Label" di panel Battery Current. Menggunakan SpannableString dengan ForegroundColorSpan per karakter label (`m`/`V`/`A`/`W`). Disimpan di preset dan SharedPreferences (key: `batcur_label_color`).
+- **Warna Label Network Stats Terpisah** — Nilai kecepatan dan label ↓↑MB/KB/s bisa diwarnai berbeda. Button "Warna Label" di panel Network Stats. Menggunakan SpannableString dengan ForegroundColorSpan per karakter label (`↓`/`↑`/`M`/`B`/`K`/`/`/`s`). Disimpan di preset dan SharedPreferences (key: `network_label_color`).
+### 🐞 Bug Fixes
+- **Battery Temperature labelColor span kelebihan** — Sebelumnya `setSpan(i, text.length())` dari karakter label pertama sampai akhir string, menyebabkan angka kedua (persentase) ikut kena labelColor. Diperbaiki jadi `setSpan(i, i+1)` per karakter label (`°`/`C`/`%`).
+### 🔧 Optimasi & Penyesuaian
+- **BackgroundConfig.java** — Pisahkan konfigurasi background ke file sendiri (`shared/ui/BackgroundConfig.java`) seperti pola ShadowConfig. Semua module (8 module) ganti inline bg fields dengan `BackgroundConfig bg = new BackgroundConfig(padding)`.
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/shared/ui/BackgroundConfig.java`
+- `STRUKTUR.md`
+- `app/src/main/assets/STRUKTUR.txt`
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsConfig.java` — Tambah `labelColor`; ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — `updateDisplay()` base color + SpannableString; `updateLabelColor()`; `start()` panggil `updateDisplay()`
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah `updateFpsLabelColorStatic()`, `updateBatteryLabelColorStatic()`, `updateBatteryPercentageLabelColorStatic()`, `updateBatteryCurrentLabelColorStatic()`, `updateNetworkLabelColorStatic()`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Load `fps_label_color`, `battery_label_color`, `battpct_label_color`, `batcur_label_color`, `network_label_color`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — `fpsLabelColorButton`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — `labelColor` di preset; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Tambah field `labelColor`
+- `app/src/main/res/layout/panel_fps.xml` — Tombol "Warna Label"
+- `app/src/main/res/layout/panel_battery.xml` — Tombol "Warna Label"
+- `app/src/main/res/layout/panel_battery_percentage.xml` — Tombol "Warna Label"
+- `app/src/main/res/layout/panel_battery_current.xml` — Tombol "Warna Label"
+- `app/src/main/res/layout/panel_network.xml` — Tombol "Warna Label"
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java` — Tambah `labelColor`; ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — `updateDisplay()` base color + SpannableString; `updateLabelColor()`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — `batteryLabelColorButton`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — `labelColor` di preset; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageConfig.java` — Tambah `labelColor`; ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — `updateDisplay()` base color + SpannableString; `updateLabelColor()`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — `batPctLabelColorButton`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — `labelColor` di preset; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/floating_text/TextConfig.java` — Ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockConfig.java` — Ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkConfig.java` — Tambah `labelColor`; ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentConfig.java` — Tambah `labelColor`; ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkConfig.java` — Ganti inline bg fields dgn `BackgroundConfig`
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — `updateDisplay()` SpannableString per label char; `updateLabelColor()`; `start()`/`tickRunnable` pakai `updateDisplay()`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — `updateDisplay()` SpannableString per label char; `updateLabelColor()`; `start()`/`tickRunnable` pakai `updateDisplay()`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/features/watermark/WatermarkModule.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — `networkLabelColorButton`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — `batCurLabelColorButton`; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/WatermarkPanelController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — `labelColor` di preset; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — `labelColor` di preset; bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/ui/WatermarkPositionController.java` — bg field access via `Config.bg.field`
+- `app/src/main/java/exp/ftxt/shared/preset/PresetExampleActivity.java` — bg field access via `Config.bg.field`
+- `README.md` — Pindahkan struktur project ke `STRUKTUR.md` terpisah; tambah link ke STRUKTUR.md
+- `README.txt` — Pindahkan struktur project ke `STRUKTUR.txt` terpisah; tambah link ke STRUKTUR.txt
+- `PANDUAN.md` — Tambah info label color dan collapsible sections
+- `PANDUAN.txt` — Sinkronkan dengan PANDUAN.md; tambah label color dan collapsible sections
+### 🔢 Version
+versionCode: 151
+versionName: 3.9.3.72.0
+---
 ## [3.9.3.71.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Kontrol Interval Update (float, 0.2-10s)** — Semua modul (FPS, Network, Battery Current, Battery Temperature) kini mendukung interval update float dengan step: 0.2s, 0.5s, 0.75s, 1-10s. Tombol -/+ di panel masing-masing.

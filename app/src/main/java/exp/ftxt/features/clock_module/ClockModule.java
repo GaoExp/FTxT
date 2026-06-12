@@ -135,18 +135,18 @@ public class ClockModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (ClockConfig.bgEnabled) {
-            int pad = ClockConfig.bgPadding;
+        if (ClockConfig.bg.enabled) {
+            int pad = ClockConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(ClockConfig.bgEnabled);
-        view.setBgColor(ClockConfig.bgColor);
-        view.setBgOffsetX(ClockConfig.bgOffsetX);
-        view.setBgOffsetY(ClockConfig.bgOffsetY);
-        view.setBgMargin(ClockConfig.bgMargin);
-        view.setBgRadius(ClockConfig.bgRadius);
+        view.setBgEnabled(ClockConfig.bg.enabled);
+        view.setBgColor(ClockConfig.bg.color);
+        view.setBgOffsetX(ClockConfig.bg.offsetX);
+        view.setBgOffsetY(ClockConfig.bg.offsetY);
+        view.setBgMargin(ClockConfig.bg.margin);
+        view.setBgRadius(ClockConfig.bg.radius);
     }
 
     public void updateTouchFlags() {

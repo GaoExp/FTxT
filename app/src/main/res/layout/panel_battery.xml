@@ -115,6 +115,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <Button
+                    android:id="@+id/batteryLabelColorButton"
+                    android:text="Warna Label"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="12dp"

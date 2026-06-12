@@ -7,6 +7,8 @@ import android.graphics.PixelFormat;
 import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -37,10 +39,9 @@ public class BatteryPercentageModule {
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(BatteryPercentageConfig.shadow);
-        view.setText(getBatteryPercentText());
         view.setTextSize(BatteryPercentageConfig.size);
-        view.setTextColor(BatteryPercentageConfig.color);
         applyBackground();
+        updateDisplay();
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -91,7 +92,12 @@ public class BatteryPercentageModule {
 
     public void updateColor(int color) {
         BatteryPercentageConfig.color = color;
-        if (view != null) view.setTextColor(color);
+        updateDisplay();
+    }
+
+    public void updateLabelColor(int color) {
+        BatteryPercentageConfig.labelColor = color;
+        updateDisplay();
     }
 
     public void updateShadow() {
@@ -127,18 +133,18 @@ public class BatteryPercentageModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (BatteryPercentageConfig.bgEnabled) {
-            int pad = BatteryPercentageConfig.bgPadding;
+        if (BatteryPercentageConfig.bg.enabled) {
+            int pad = BatteryPercentageConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(BatteryPercentageConfig.bgEnabled);
-        view.setBgColor(BatteryPercentageConfig.bgColor);
-        view.setBgOffsetX(BatteryPercentageConfig.bgOffsetX);
-        view.setBgOffsetY(BatteryPercentageConfig.bgOffsetY);
-        view.setBgMargin(BatteryPercentageConfig.bgMargin);
-        view.setBgRadius(BatteryPercentageConfig.bgRadius);
+        view.setBgEnabled(BatteryPercentageConfig.bg.enabled);
+        view.setBgColor(BatteryPercentageConfig.bg.color);
+        view.setBgOffsetX(BatteryPercentageConfig.bg.offsetX);
+        view.setBgOffsetY(BatteryPercentageConfig.bg.offsetY);
+        view.setBgMargin(BatteryPercentageConfig.bg.margin);
+        view.setBgRadius(BatteryPercentageConfig.bg.radius);
     }
 
     public void updateTouchFlags() {
@@ -175,13 +181,24 @@ public class BatteryPercentageModule {
         return metrics.heightPixels;
     }
 
+    private void updateDisplay() {
+        if (view == null) return;
+        String text = getBatteryPercentText();
+        view.setTextColor(BatteryPercentageConfig.color);
+        SpannableString spannable = new SpannableString(text);
+        int pctIndex = text.indexOf('%');
+        if (pctIndex > 0) {
+            spannable.setSpan(new ForegroundColorSpan(BatteryPercentageConfig.labelColor),
+                    pctIndex, text.length(), 0);
+        }
+        view.setText(spannable);
+    }
+
     private final Runnable tickRunnable = new Runnable() {
         @Override
         public void run() {
             if (!running) return;
-            if (view != null) {
-                view.setText(getBatteryPercentText());
-            }
+            updateDisplay();
             handler.postDelayed(this, 5000);
         }
     };

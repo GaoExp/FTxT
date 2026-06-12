@@ -52,6 +52,14 @@ Header toolbar menampilkan navigasi drawer dan judul modul yang aktif.
 
 Fitur Overlay
 
+Setiap panel overlay memiliki pengaturan yang dikelompokkan dalam section collapsible:
+- Tampilan - Ukuran teks, warna, dan opsi tampilan
+- Posisi - Kontrol posisi (slider X/Y, D-Pad, preset, safe area)
+- Shadow - Konfigurasi shadow (toggle, warna, blur, offset)
+- Background - Konfigurasi background (toggle, warna, padding, offset, margin, radius)
+
+Klik header section untuk membuka/tutup grup.
+
 Floating Text
 - Masukkan teks kustom di kolom input
 - Atur ukuran (1-150sp), warna, shadow, background
@@ -61,6 +69,7 @@ Floating Text
 FPS Display
 - Menampilkan frame rate real-time
 - Opsi "Hanya Nilai" untuk menyembunyikan label FPS
+- Warna Label Terpisah - Tombol "Warna Label" untuk warna teks "FPS", sementara "Pilih Warna" untuk nilai angka
 - Ukuran 5-140sp, dengan shadow, background, dan kontrol posisi
 
 Jam Digital
@@ -69,19 +78,23 @@ Jam Digital
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
 Suhu Baterai
-- Menampilkan suhu baterai dalam C, update tiap 5 detik
-- Opsi tampilkan hanya nilai suhu
+- Menampilkan suhu baterai dalam C dan/atau persentase
+- Warna Label Terpisah - Tombol "Warna Label" untuk warna satuan C/% terpisah dari nilai angka
+- Opsi tampilkan hanya nilai suhu, persentase
 
 Battery Percentage
-- Menampilkan persentase baterai dalam %, update tiap 5 detik
+- Menampilkan persentase baterai dalam %
+- Warna Label Terpisah - Tombol "Warna Label" untuk warna label % terpisah dari nilai angka
 - Konfigurasi ukuran, warna, shadow, background, kontrol posisi
 
 Battery Current
 - Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
-- Update tiap 5 detik
+- Warna Label Terpisah - Tombol "Warna Label" untuk warna satuan mV/mA/W terpisah dari nilai angka
+- Opsi tampilkan mV, mA, W (toggle)
 
 Network Speed
 - Kecepatan internet real-time format ↓128KB/s ↑128KB/s
+- Warna Label Terpisah - Tombol "Warna Label" untuk warna indikator turun/naik dan satuan KB/MB/s terpisah dari nilai angka
 - Otomatis berubah ke MB/s saat >1024 KB/s
 - Polling tiap 1 detik via TrafficStats
 

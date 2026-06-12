@@ -1,3 +1,21 @@
+[3.9.3.72.0] - 2026-06-12
+✨ Fitur Baru
+- Warna Label FPS Terpisah — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences.
+- Warna Label Battery Temperature Terpisah — Nilai suhu dan satuan °C/% bisa diwarnai berbeda. Button "Warna Label" di panel Battery Temperature. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences.
+- Warna Label Battery Percentage Terpisah — Nilai persen dan label % bisa diwarnai berbeda. Button "Warna Label" di panel Battery Percentage. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences.
+- Warna Label Battery Current Terpisah — Nilai tegangan/arus/daya dan satuan mV/mA/W bisa diwarnai berbeda. Button "Warna Label" di panel Battery Current. Menggunakan SpannableString dengan ForegroundColorSpan per karakter label. Disimpan di preset dan SharedPreferences.
+- Warna Label Network Stats Terpisah — Nilai kecepatan dan label ↓↑MB/KB/s bisa diwarnai berbeda. Button "Warna Label" di panel Network Stats. Menggunakan SpannableString dengan ForegroundColorSpan per karakter label. Disimpan di preset dan SharedPreferences.
+🐞 Bug Fixes
+- Battery Temperature labelColor span kelebihan — Perbaiki setSpan dari (i, length) ke (i, i+1) per karakter label (°/C/%) agar angka kedua tidak ikut kena labelColor.
+🔧 Optimasi & Penyesuaian
+- BackgroundConfig.java — Pisahkan konfigurasi background ke file sendiri (shared/ui/BackgroundConfig.java) seperti pola ShadowConfig. Semua module ganti inline bg fields dengan BackgroundConfig.
+- Pisahkan struktur project dari README ke file terpisah STRUKTUR.md dan STRUKTUR.txt.
+🔢 Version
+versionCode: 151
+versionName: 3.9.3.72.0
+
+══════════════════════════════════════════════
+
 [3.9.3.71.0] - 2026-06-12
 ✨ Fitur Baru
 - Kontrol Interval Update (float, 0.2-10s) — Semua modul (FPS, Network, Battery Current, Battery Temperature) kini mendukung interval update float dengan step: 0.2s, 0.5s, 0.75s, 1-10s. Tombol -/+ di panel masing-masing.

@@ -145,20 +145,20 @@ public class TextPanelController {
         overlaySwitch.setChecked(overlayOn);
         touchPassthroughSwitch.setChecked(TextConfig.touchPassthrough);
         textSafeArea.setChecked(TextConfig.safeArea);
-        bgSwitch.setChecked(TextConfig.bgEnabled);
-        bgConfigContainer.setVisibility(TextConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        bgPaddingSeekBar.setProgress(TextConfig.bgPadding);
-        bgOffsetXSeekBar.setProgress(TextConfig.bgOffsetX + 60);
-        bgOffsetYSeekBar.setProgress(TextConfig.bgOffsetY + 60);
+        bgSwitch.setChecked(TextConfig.bg.enabled);
+        bgConfigContainer.setVisibility(TextConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        bgPaddingSeekBar.setProgress(TextConfig.bg.padding);
+        bgOffsetXSeekBar.setProgress(TextConfig.bg.offsetX + 60);
+        bgOffsetYSeekBar.setProgress(TextConfig.bg.offsetY + 60);
         shadowSwitch.setChecked(TextConfig.shadow.enabled);
         shadowConfigContainer.setVisibility(TextConfig.shadow.enabled ? View.VISIBLE : View.GONE);
         shadowBlurSeekBar.setProgress((int) TextConfig.shadow.blur);
         shadowOffsetXSeekBar.setProgress((int) TextConfig.shadow.offsetX + 60);
         shadowOffsetYSeekBar.setProgress((int) TextConfig.shadow.offsetY + 60);
         textSizeLabel.setText("Ukuran Teks: " + (int) TextConfig.size);
-        bgPaddingLabel.setText("Ukuran Background: " + TextConfig.bgPadding);
-        bgOffsetXLabel.setText("Offset X: " + TextConfig.bgOffsetX);
-        bgOffsetYLabel.setText("Offset Y: " + TextConfig.bgOffsetY);
+        bgPaddingLabel.setText("Ukuran Background: " + TextConfig.bg.padding);
+        bgOffsetXLabel.setText("Offset X: " + TextConfig.bg.offsetX);
+        bgOffsetYLabel.setText("Offset Y: " + TextConfig.bg.offsetY);
         shadowBlurLabel.setText("Blur Shadow: " + (int) TextConfig.shadow.blur);
         shadowOffsetXLabel.setText("Shadow X: " + (int) TextConfig.shadow.offsetX);
         shadowOffsetYLabel.setText("Shadow Y: " + (int) TextConfig.shadow.offsetY);
@@ -245,7 +245,7 @@ public class TextPanelController {
 
         bgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             activity.applyCheckboxTint(bgSwitch, isChecked);
-            TextConfig.bgEnabled = isChecked;
+            TextConfig.bg.enabled = isChecked;
             bgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_bg_enabled", isChecked).apply();
@@ -253,8 +253,8 @@ public class TextPanelController {
         });
 
         bgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background", TextConfig.bgColor, color -> {
-                TextConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background", TextConfig.bg.color, color -> {
+                TextConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_color", color).apply();
                 FloatingService.updateTextBackgroundStatic();
@@ -264,7 +264,7 @@ public class TextPanelController {
         bgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                TextConfig.bgPadding = progress;
+                TextConfig.bg.padding = progress;
                 bgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_padding", progress).apply();
@@ -277,7 +277,7 @@ public class TextPanelController {
         bgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                TextConfig.bgOffsetX = offset;
+                TextConfig.bg.offsetX = offset;
                 bgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_offset_x", offset).apply();
@@ -290,7 +290,7 @@ public class TextPanelController {
         bgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                TextConfig.bgOffsetY = offset;
+                TextConfig.bg.offsetY = offset;
                 bgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_offset_y", offset).apply();
@@ -302,7 +302,7 @@ public class TextPanelController {
 
         bgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.bgMargin = progress;
+                TextConfig.bg.margin = progress;
                 bgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_margin", progress).apply();
@@ -314,7 +314,7 @@ public class TextPanelController {
 
         bgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                TextConfig.bgRadius = progress;
+                TextConfig.bg.radius = progress;
                 bgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_radius", progress).apply();

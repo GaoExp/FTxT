@@ -5,6 +5,8 @@ import android.graphics.PixelFormat;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -44,10 +46,9 @@ public class NetworkModule {
         lastTxBytes = TrafficStats.getTotalTxBytes();
         lastTimestamp = System.currentTimeMillis();
 
-        view.setText(formatSpeed(0, 0));
         view.setTextSize(NetworkConfig.size);
-        view.setTextColor(NetworkConfig.color);
         applyBackground();
+        updateDisplay();
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -99,7 +100,12 @@ public class NetworkModule {
 
     public void updateColor(int color) {
         NetworkConfig.color = color;
-        if (view != null) view.setTextColor(color);
+        updateDisplay();
+    }
+
+    public void updateLabelColor(int color) {
+        NetworkConfig.labelColor = color;
+        updateDisplay();
     }
 
     public void updateShadow() {
@@ -167,18 +173,18 @@ public class NetworkModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (NetworkConfig.bgEnabled) {
-            int pad = NetworkConfig.bgPadding;
+        if (NetworkConfig.bg.enabled) {
+            int pad = NetworkConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(NetworkConfig.bgEnabled);
-        view.setBgColor(NetworkConfig.bgColor);
-        view.setBgOffsetX(NetworkConfig.bgOffsetX);
-        view.setBgOffsetY(NetworkConfig.bgOffsetY);
-        view.setBgMargin(NetworkConfig.bgMargin);
-        view.setBgRadius(NetworkConfig.bgRadius);
+        view.setBgEnabled(NetworkConfig.bg.enabled);
+        view.setBgColor(NetworkConfig.bg.color);
+        view.setBgOffsetX(NetworkConfig.bg.offsetX);
+        view.setBgOffsetY(NetworkConfig.bg.offsetY);
+        view.setBgMargin(NetworkConfig.bg.margin);
+        view.setBgRadius(NetworkConfig.bg.radius);
     }
 
     private int getScreenWidth() {
@@ -193,6 +199,21 @@ public class NetworkModule {
         return metrics.heightPixels;
     }
 
+    private void updateDisplay() {
+        if (view == null) return;
+        String text = getCurrentSpeedText();
+        view.setTextColor(NetworkConfig.color);
+        SpannableString spannable = new SpannableString(text);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
+                spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
+                        i, i + 1, 0);
+            }
+        }
+        view.setText(spannable);
+    }
+
     private final Runnable tickRunnable = new Runnable() {
         @Override
         public void run() {
@@ -202,10 +223,12 @@ public class NetworkModule {
             long txBytes = TrafficStats.getTotalTxBytes();
 
             long elapsed = now - lastTimestamp;
-            if (elapsed > 0 && view != null) {
+            if (elapsed > 0) {
                 long rxSpeed = ((rxBytes - lastRxBytes) * 1000) / elapsed;
                 long txSpeed = ((txBytes - lastTxBytes) * 1000) / elapsed;
-                view.setText(formatSpeed(rxSpeed, txSpeed));
+                lastRxSpeed = rxSpeed;
+                lastTxSpeed = txSpeed;
+                updateDisplay();
             }
 
             lastRxBytes = rxBytes;
@@ -215,6 +238,13 @@ public class NetworkModule {
             handler.postDelayed(this, (long)(NetworkConfig.updateInterval * 1000));
         }
     };
+
+    private long lastRxSpeed;
+    private long lastTxSpeed;
+
+    private String getCurrentSpeedText() {
+        return formatSpeed(lastRxSpeed, lastTxSpeed);
+    }
 
     private String formatSpeed(long rxBytesPerSec, long txBytesPerSec) {
         return "↓" + formatUnit(rxBytesPerSec) + " ↑" + formatUnit(txBytesPerSec);

@@ -124,13 +124,13 @@ public class PresetExampleActivity {
         preset.shadow = new ShadowConfig(sc.enabled, sc.color, sc.blur, sc.offsetX, sc.offsetY);
 
         // 4. Background
-        preset.bgEnabled = TextConfig.bgEnabled;
-        preset.bgColor = TextConfig.bgColor;
-        preset.bgPadding = TextConfig.bgPadding;
-        preset.bgOffsetX = TextConfig.bgOffsetX;
-        preset.bgOffsetY = TextConfig.bgOffsetY;
-        preset.bgMargin = TextConfig.bgMargin;
-        preset.bgRadius = TextConfig.bgRadius;
+        preset.bgEnabled = TextConfig.bg.enabled;
+        preset.bgColor = TextConfig.bg.color;
+        preset.bgPadding = TextConfig.bg.padding;
+        preset.bgOffsetX = TextConfig.bg.offsetX;
+        preset.bgOffsetY = TextConfig.bg.offsetY;
+        preset.bgMargin = TextConfig.bg.margin;
+        preset.bgRadius = TextConfig.bg.radius;
 
         // 5. Orientasi — deteksi orientasi perangkat
         int orientation = activity.getResources().getConfiguration().orientation;
@@ -202,13 +202,13 @@ public class PresetExampleActivity {
         }
 
         // Background
-        TextConfig.bgEnabled = preset.bgEnabled;
-        TextConfig.bgColor = preset.bgColor;
-        TextConfig.bgPadding = preset.bgPadding;
-        TextConfig.bgOffsetX = preset.bgOffsetX;
-        TextConfig.bgOffsetY = preset.bgOffsetY;
-        TextConfig.bgMargin = preset.bgMargin;
-        TextConfig.bgRadius = preset.bgRadius;
+        TextConfig.bg.enabled = preset.bgEnabled;
+        TextConfig.bg.color = preset.bgColor;
+        TextConfig.bg.padding = preset.bgPadding;
+        TextConfig.bg.offsetX = preset.bgOffsetX;
+        TextConfig.bg.offsetY = preset.bgOffsetY;
+        TextConfig.bg.margin = preset.bgMargin;
+        TextConfig.bg.radius = preset.bgRadius;
     }
 
     /**

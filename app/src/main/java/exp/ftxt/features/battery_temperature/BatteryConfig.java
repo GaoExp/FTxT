@@ -2,6 +2,7 @@ package exp.ftxt.features.battery_temperature;
 
 import android.graphics.Color;
 
+import exp.ftxt.shared.ui.BackgroundConfig;
 import exp.ftxt.shared.ui.ShadowConfig;
 
 public class BatteryConfig {
@@ -9,16 +10,11 @@ public class BatteryConfig {
     public static float size = 12f;
     public static int color = Color.GREEN;
     public static ShadowConfig shadow = new ShadowConfig();
+    public static BackgroundConfig bg = new BackgroundConfig();
     public static boolean touchPassthrough = true;
     public static boolean safeArea = true;
-    public static boolean bgEnabled = false;
-    public static int bgColor = 0xCC000000;
-    public static int bgPadding = 8;
-    public static int bgOffsetX = 0;
-    public static int bgOffsetY = 0;
-    public static int bgMargin = 0;
-    public static int bgRadius = 0;
     public static boolean showOnlyValue = false;
+    public static int labelColor = Color.CYAN;
     public static boolean showTemperature = true;
     public static boolean showPercentage = false;
     public static float posX = 0.05f;

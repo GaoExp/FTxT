@@ -24,6 +24,7 @@ public class BatteryPercentagePanelController {
     private CheckBox batPctSwitch;
     private SeekBar batPctSizeSeekBar;
     private Button batPctColorButton;
+    private Button batPctLabelColorButton;
     private CheckBox batPctShadowSwitch;
     private LinearLayout batPctShadowConfigContainer;
     private Button batPctShadowColorButton;
@@ -75,6 +76,7 @@ public class BatteryPercentagePanelController {
         batPctSwitch = activity.findViewById(R.id.batPctSwitch);
         batPctSizeSeekBar = activity.findViewById(R.id.batPctSizeSeekBar);
         batPctColorButton = activity.findViewById(R.id.batPctColorButton);
+        batPctLabelColorButton = activity.findViewById(R.id.batPctLabelColorButton);
         batPctShadowSwitch = activity.findViewById(R.id.batPctShadowSwitch);
         batPctShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryPercentage);
         batPctShadowColorButton = activity.findViewById(R.id.batPctShadowColorButton);
@@ -121,14 +123,14 @@ public class BatteryPercentagePanelController {
         batPctSwitch.setChecked(BatteryPercentageConfig.enabled);
         activity.applyCheckboxTint(batPctSwitch, BatteryPercentageConfig.enabled);
         batPctSizeSeekBar.setProgress((int) BatteryPercentageConfig.size);
-        batPctBgSwitch.setChecked(BatteryPercentageConfig.bgEnabled);
-        activity.applyCheckboxTint(batPctBgSwitch, BatteryPercentageConfig.bgEnabled);
-        batPctBgConfigContainer.setVisibility(BatteryPercentageConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        batPctBgPaddingSeekBar.setProgress(BatteryPercentageConfig.bgPadding);
-        batPctBgOffsetXSeekBar.setProgress(BatteryPercentageConfig.bgOffsetX + 60);
-        batPctBgOffsetYSeekBar.setProgress(BatteryPercentageConfig.bgOffsetY + 60);
-        batPctBgMarginSeekBar.setProgress(BatteryPercentageConfig.bgMargin);
-        batPctBgRadiusSeekBar.setProgress(BatteryPercentageConfig.bgRadius);
+        batPctBgSwitch.setChecked(BatteryPercentageConfig.bg.enabled);
+        activity.applyCheckboxTint(batPctBgSwitch, BatteryPercentageConfig.bg.enabled);
+        batPctBgConfigContainer.setVisibility(BatteryPercentageConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        batPctBgPaddingSeekBar.setProgress(BatteryPercentageConfig.bg.padding);
+        batPctBgOffsetXSeekBar.setProgress(BatteryPercentageConfig.bg.offsetX + 60);
+        batPctBgOffsetYSeekBar.setProgress(BatteryPercentageConfig.bg.offsetY + 60);
+        batPctBgMarginSeekBar.setProgress(BatteryPercentageConfig.bg.margin);
+        batPctBgRadiusSeekBar.setProgress(BatteryPercentageConfig.bg.radius);
         batPctShadowSwitch.setChecked(BatteryPercentageConfig.shadow.enabled);
         activity.applyCheckboxTint(batPctShadowSwitch, BatteryPercentageConfig.shadow.enabled);
         batPctShadowConfigContainer.setVisibility(BatteryPercentageConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -138,11 +140,11 @@ public class BatteryPercentagePanelController {
         batPctLockSwitch.setChecked(BatteryPercentageConfig.touchPassthrough);
         activity.applyCheckboxTint(batPctLockSwitch, BatteryPercentageConfig.touchPassthrough);
         batPctSizeLabel.setText("Ukuran Teks: " + (int) BatteryPercentageConfig.size);
-        batPctBgPaddingLabel.setText("Ukuran Background: " + BatteryPercentageConfig.bgPadding);
-        batPctBgOffsetXLabel.setText("Offset X: " + BatteryPercentageConfig.bgOffsetX);
-        batPctBgOffsetYLabel.setText("Offset Y: " + BatteryPercentageConfig.bgOffsetY);
-        batPctBgMarginLabel.setText("Margin: " + BatteryPercentageConfig.bgMargin);
-        batPctBgRadiusLabel.setText("Radius: " + BatteryPercentageConfig.bgRadius);
+        batPctBgPaddingLabel.setText("Ukuran Background: " + BatteryPercentageConfig.bg.padding);
+        batPctBgOffsetXLabel.setText("Offset X: " + BatteryPercentageConfig.bg.offsetX);
+        batPctBgOffsetYLabel.setText("Offset Y: " + BatteryPercentageConfig.bg.offsetY);
+        batPctBgMarginLabel.setText("Margin: " + BatteryPercentageConfig.bg.margin);
+        batPctBgRadiusLabel.setText("Radius: " + BatteryPercentageConfig.bg.radius);
         batPctShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryPercentageConfig.shadow.blur);
         batPctShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryPercentageConfig.shadow.offsetX);
         batPctShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryPercentageConfig.shadow.offsetY);
@@ -200,8 +202,17 @@ public class BatteryPercentagePanelController {
             });
         });
 
+        batPctLabelColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Pilih Warna Label", BatteryPercentageConfig.labelColor, color -> {
+                BatteryPercentageConfig.labelColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("battpct_label_color", color).apply();
+                FloatingService.updateBatteryPercentageLabelColorStatic();
+            });
+        });
+
         batPctBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryPercentageConfig.bgEnabled = isChecked;
+            BatteryPercentageConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(batPctBgSwitch, isChecked);
             batPctBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -210,8 +221,8 @@ public class BatteryPercentagePanelController {
         });
 
         batPctBgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background Bat %", BatteryPercentageConfig.bgColor, color -> {
-                BatteryPercentageConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background Bat %", BatteryPercentageConfig.bg.color, color -> {
+                BatteryPercentageConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_color", color).apply();
                 FloatingService.updateBatteryPercentageBackgroundStatic();
@@ -221,7 +232,7 @@ public class BatteryPercentagePanelController {
         batPctBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                BatteryPercentageConfig.bgPadding = progress;
+                BatteryPercentageConfig.bg.padding = progress;
                 batPctBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_padding", progress).apply();
@@ -234,7 +245,7 @@ public class BatteryPercentagePanelController {
         batPctBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryPercentageConfig.bgOffsetX = offset;
+                BatteryPercentageConfig.bg.offsetX = offset;
                 batPctBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_offset_x", offset).apply();
@@ -247,7 +258,7 @@ public class BatteryPercentagePanelController {
         batPctBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryPercentageConfig.bgOffsetY = offset;
+                BatteryPercentageConfig.bg.offsetY = offset;
                 batPctBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_offset_y", offset).apply();
@@ -259,7 +270,7 @@ public class BatteryPercentagePanelController {
 
         batPctBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                BatteryPercentageConfig.bgMargin = progress;
+                BatteryPercentageConfig.bg.margin = progress;
                 batPctBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_margin", progress).apply();
@@ -271,7 +282,7 @@ public class BatteryPercentagePanelController {
 
         batPctBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                BatteryPercentageConfig.bgRadius = progress;
+                BatteryPercentageConfig.bg.radius = progress;
                 batPctBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_radius", progress).apply();

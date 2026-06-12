@@ -60,13 +60,14 @@ public class NetworkPositionController {
             p.size = NetworkConfig.size;
             p.color = NetworkConfig.color;
             p.shadow = PresetHandler.copyShadow(NetworkConfig.shadow);
-            p.bgEnabled = NetworkConfig.bgEnabled;
-            p.bgColor = NetworkConfig.bgColor;
-            p.bgPadding = NetworkConfig.bgPadding;
-            p.bgOffsetX = NetworkConfig.bgOffsetX;
-            p.bgOffsetY = NetworkConfig.bgOffsetY;
-            p.bgMargin = NetworkConfig.bgMargin;
-            p.bgRadius = NetworkConfig.bgRadius;
+            p.bgEnabled = NetworkConfig.bg.enabled;
+            p.bgColor = NetworkConfig.bg.color;
+            p.bgPadding = NetworkConfig.bg.padding;
+            p.bgOffsetX = NetworkConfig.bg.offsetX;
+            p.bgOffsetY = NetworkConfig.bg.offsetY;
+            p.bgMargin = NetworkConfig.bg.margin;
+            p.bgRadius = NetworkConfig.bg.radius;
+            p.labelColor = NetworkConfig.labelColor;
             p.touchPassthrough = NetworkConfig.touchPassthrough;
             p.safeArea = NetworkConfig.safeArea;
         }
@@ -84,13 +85,17 @@ public class NetworkPositionController {
                 NetworkConfig.shadow.offsetX = p.shadow.offsetX;
                 NetworkConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            NetworkConfig.bgEnabled = p.bgEnabled;
-            NetworkConfig.bgColor = p.bgColor;
-            NetworkConfig.bgPadding = p.bgPadding;
-            NetworkConfig.bgOffsetX = p.bgOffsetX;
-            NetworkConfig.bgOffsetY = p.bgOffsetY;
-            NetworkConfig.bgMargin = p.bgMargin;
-            NetworkConfig.bgRadius = p.bgRadius;
+            NetworkConfig.bg.enabled = p.bgEnabled;
+            NetworkConfig.bg.color = p.bgColor;
+            NetworkConfig.bg.padding = p.bgPadding;
+            NetworkConfig.bg.offsetX = p.bgOffsetX;
+            NetworkConfig.bg.offsetY = p.bgOffsetY;
+            NetworkConfig.bg.margin = p.bgMargin;
+            NetworkConfig.bg.radius = p.bgRadius;
+            if (p.labelColor != null) {
+                NetworkConfig.labelColor = p.labelColor;
+                prefs.edit().putInt("network_label_color", NetworkConfig.labelColor).apply();
+            }
             if (p.touchPassthrough != null) {
                 NetworkConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("network_lock", NetworkConfig.touchPassthrough).apply();
@@ -106,6 +111,7 @@ public class NetworkPositionController {
             FloatingService.updateNetworkPositionStatic();
             FloatingService.updateNetworkSizeStatic();
             FloatingService.updateNetworkColorStatic();
+            FloatingService.updateNetworkLabelColorStatic();
             FloatingService.updateNetworkShadowStatic();
             FloatingService.updateNetworkBackgroundStatic();
         }

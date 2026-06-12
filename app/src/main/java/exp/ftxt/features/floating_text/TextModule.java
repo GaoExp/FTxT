@@ -151,18 +151,18 @@ public class TextModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (TextConfig.bgEnabled) {
-            int pad = TextConfig.bgPadding;
+        if (TextConfig.bg.enabled) {
+            int pad = TextConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(TextConfig.bgEnabled);
-        view.setBgColor(TextConfig.bgColor);
-        view.setBgOffsetX(TextConfig.bgOffsetX);
-        view.setBgOffsetY(TextConfig.bgOffsetY);
-        view.setBgMargin(TextConfig.bgMargin);
-        view.setBgRadius(TextConfig.bgRadius);
+        view.setBgEnabled(TextConfig.bg.enabled);
+        view.setBgColor(TextConfig.bg.color);
+        view.setBgOffsetX(TextConfig.bg.offsetX);
+        view.setBgOffsetY(TextConfig.bg.offsetY);
+        view.setBgMargin(TextConfig.bg.margin);
+        view.setBgRadius(TextConfig.bg.radius);
     }
 
     public void updateTouchFlags() {

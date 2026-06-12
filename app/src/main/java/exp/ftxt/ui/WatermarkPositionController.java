@@ -54,13 +54,13 @@ public class WatermarkPositionController {
             p.size = WatermarkConfig.size;
             p.color = WatermarkConfig.color;
             p.shadow = PresetHandler.copyShadow(WatermarkConfig.shadow);
-            p.bgEnabled = WatermarkConfig.bgEnabled;
-            p.bgColor = WatermarkConfig.bgColor;
-            p.bgPadding = WatermarkConfig.bgPadding;
-            p.bgOffsetX = WatermarkConfig.bgOffsetX;
-            p.bgOffsetY = WatermarkConfig.bgOffsetY;
-            p.bgMargin = WatermarkConfig.bgMargin;
-            p.bgRadius = WatermarkConfig.bgRadius;
+            p.bgEnabled = WatermarkConfig.bg.enabled;
+            p.bgColor = WatermarkConfig.bg.color;
+            p.bgPadding = WatermarkConfig.bg.padding;
+            p.bgOffsetX = WatermarkConfig.bg.offsetX;
+            p.bgOffsetY = WatermarkConfig.bg.offsetY;
+            p.bgMargin = WatermarkConfig.bg.margin;
+            p.bgRadius = WatermarkConfig.bg.radius;
             p.touchPassthrough = WatermarkConfig.touchPassthrough;
             p.safeArea = WatermarkConfig.safeArea;
             p.textContent = WatermarkConfig.text;
@@ -79,13 +79,13 @@ public class WatermarkPositionController {
                 WatermarkConfig.shadow.offsetX = p.shadow.offsetX;
                 WatermarkConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            WatermarkConfig.bgEnabled = p.bgEnabled;
-            WatermarkConfig.bgColor = p.bgColor;
-            WatermarkConfig.bgPadding = p.bgPadding;
-            WatermarkConfig.bgOffsetX = p.bgOffsetX;
-            WatermarkConfig.bgOffsetY = p.bgOffsetY;
-            WatermarkConfig.bgMargin = p.bgMargin;
-            WatermarkConfig.bgRadius = p.bgRadius;
+            WatermarkConfig.bg.enabled = p.bgEnabled;
+            WatermarkConfig.bg.color = p.bgColor;
+            WatermarkConfig.bg.padding = p.bgPadding;
+            WatermarkConfig.bg.offsetX = p.bgOffsetX;
+            WatermarkConfig.bg.offsetY = p.bgOffsetY;
+            WatermarkConfig.bg.margin = p.bgMargin;
+            WatermarkConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
                 WatermarkConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("watermark_lock", WatermarkConfig.touchPassthrough).apply();

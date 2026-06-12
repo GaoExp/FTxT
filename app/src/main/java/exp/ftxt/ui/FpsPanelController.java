@@ -25,6 +25,7 @@ public class FpsPanelController {
     private CheckBox fpsSwitch;
     private SeekBar fpsSizeSeekBar;
     private Button fpsColorButton;
+    private Button fpsLabelColorButton;
     private CheckBox fpsShadowSwitch;
     private LinearLayout fpsShadowConfigContainer;
     private Button fpsShadowColorButton;
@@ -81,6 +82,7 @@ public class FpsPanelController {
         fpsSwitch = activity.findViewById(R.id.fpsSwitch);
         fpsSizeSeekBar = activity.findViewById(R.id.fpsSizeSeekBar);
         fpsColorButton = activity.findViewById(R.id.fpsColorButton);
+        fpsLabelColorButton = activity.findViewById(R.id.fpsLabelColorButton);
         fpsShadowSwitch = activity.findViewById(R.id.fpsShadowSwitch);
         fpsShadowConfigContainer = activity.findViewById(R.id.shadowConfigFps);
         fpsShadowColorButton = activity.findViewById(R.id.fpsShadowColorButton);
@@ -132,14 +134,14 @@ public class FpsPanelController {
         fpsSwitch.setChecked(FpsConfig.enabled);
         activity.applyCheckboxTint(fpsSwitch, FpsConfig.enabled);
         fpsSizeSeekBar.setProgress((int) FpsConfig.size);
-        fpsBgSwitch.setChecked(FpsConfig.bgEnabled);
-        activity.applyCheckboxTint(fpsBgSwitch, FpsConfig.bgEnabled);
-        fpsBgConfigContainer.setVisibility(FpsConfig.bgEnabled ? View.VISIBLE : View.GONE);
-        fpsBgPaddingSeekBar.setProgress(FpsConfig.bgPadding);
-        fpsBgOffsetXSeekBar.setProgress(FpsConfig.bgOffsetX + 60);
-        fpsBgOffsetYSeekBar.setProgress(FpsConfig.bgOffsetY + 60);
-        fpsBgMarginSeekBar.setProgress(FpsConfig.bgMargin);
-        fpsBgRadiusSeekBar.setProgress(FpsConfig.bgRadius);
+        fpsBgSwitch.setChecked(FpsConfig.bg.enabled);
+        activity.applyCheckboxTint(fpsBgSwitch, FpsConfig.bg.enabled);
+        fpsBgConfigContainer.setVisibility(FpsConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        fpsBgPaddingSeekBar.setProgress(FpsConfig.bg.padding);
+        fpsBgOffsetXSeekBar.setProgress(FpsConfig.bg.offsetX + 60);
+        fpsBgOffsetYSeekBar.setProgress(FpsConfig.bg.offsetY + 60);
+        fpsBgMarginSeekBar.setProgress(FpsConfig.bg.margin);
+        fpsBgRadiusSeekBar.setProgress(FpsConfig.bg.radius);
         fpsShadowSwitch.setChecked(FpsConfig.shadow.enabled);
         activity.applyCheckboxTint(fpsShadowSwitch, FpsConfig.shadow.enabled);
         fpsShadowConfigContainer.setVisibility(FpsConfig.shadow.enabled ? View.VISIBLE : View.GONE);
@@ -151,11 +153,11 @@ public class FpsPanelController {
         fpsValueOnlyCheck.setChecked(FpsConfig.showOnlyValue);
         fpsSafeArea.setChecked(FpsConfig.safeArea);
         fpsSizeLabel.setText("Ukuran Teks: " + (int) FpsConfig.size);
-        fpsBgPaddingLabel.setText("Ukuran Background: " + FpsConfig.bgPadding);
-        fpsBgOffsetXLabel.setText("Offset X: " + FpsConfig.bgOffsetX);
-        fpsBgOffsetYLabel.setText("Offset Y: " + FpsConfig.bgOffsetY);
-        fpsBgMarginLabel.setText("Margin: " + FpsConfig.bgMargin);
-        fpsBgRadiusLabel.setText("Radius: " + FpsConfig.bgRadius);
+        fpsBgPaddingLabel.setText("Ukuran Background: " + FpsConfig.bg.padding);
+        fpsBgOffsetXLabel.setText("Offset X: " + FpsConfig.bg.offsetX);
+        fpsBgOffsetYLabel.setText("Offset Y: " + FpsConfig.bg.offsetY);
+        fpsBgMarginLabel.setText("Margin: " + FpsConfig.bg.margin);
+        fpsBgRadiusLabel.setText("Radius: " + FpsConfig.bg.radius);
         fpsShadowBlurLabel.setText("Blur Shadow: " + (int) FpsConfig.shadow.blur);
         fpsShadowOffsetXLabel.setText("Shadow X: " + (int) FpsConfig.shadow.offsetX);
         fpsShadowOffsetYLabel.setText("Shadow Y: " + (int) FpsConfig.shadow.offsetY);
@@ -218,8 +220,17 @@ public class FpsPanelController {
             });
         });
 
+        fpsLabelColorButton.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Pilih Warna Label", FpsConfig.labelColor, color -> {
+                FpsConfig.labelColor = color;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("fps_label_color", color).apply();
+                FloatingService.updateFpsLabelColorStatic();
+            });
+        });
+
         fpsBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            FpsConfig.bgEnabled = isChecked;
+            FpsConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(fpsBgSwitch, isChecked);
             fpsBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
@@ -228,8 +239,8 @@ public class FpsPanelController {
         });
 
         fpsBgColorButton.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background FPS", FpsConfig.bgColor, color -> {
-                FpsConfig.bgColor = color;
+            ColorPickerDialog.show(activity, "Warna Background FPS", FpsConfig.bg.color, color -> {
+                FpsConfig.bg.color = color;
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_color", color).apply();
                 FloatingService.updateFpsBackgroundStatic();
@@ -239,7 +250,7 @@ public class FpsPanelController {
         fpsBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                FpsConfig.bgPadding = progress;
+                FpsConfig.bg.padding = progress;
                 fpsBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_padding", progress).apply();
@@ -252,7 +263,7 @@ public class FpsPanelController {
         fpsBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                FpsConfig.bgOffsetX = offset;
+                FpsConfig.bg.offsetX = offset;
                 fpsBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_offset_x", offset).apply();
@@ -265,7 +276,7 @@ public class FpsPanelController {
         fpsBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                FpsConfig.bgOffsetY = offset;
+                FpsConfig.bg.offsetY = offset;
                 fpsBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_offset_y", offset).apply();
@@ -277,7 +288,7 @@ public class FpsPanelController {
 
         fpsBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                FpsConfig.bgMargin = progress;
+                FpsConfig.bg.margin = progress;
                 fpsBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_margin", progress).apply();
@@ -289,7 +300,7 @@ public class FpsPanelController {
 
         fpsBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                FpsConfig.bgRadius = progress;
+                FpsConfig.bg.radius = progress;
                 fpsBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_radius", progress).apply();

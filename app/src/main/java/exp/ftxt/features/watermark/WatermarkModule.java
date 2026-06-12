@@ -194,18 +194,18 @@ public class WatermarkModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (WatermarkConfig.bgEnabled) {
-            int pad = WatermarkConfig.bgPadding;
+        if (WatermarkConfig.bg.enabled) {
+            int pad = WatermarkConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(WatermarkConfig.bgEnabled);
-        view.setBgColor(WatermarkConfig.bgColor);
-        view.setBgOffsetX(WatermarkConfig.bgOffsetX);
-        view.setBgOffsetY(WatermarkConfig.bgOffsetY);
-        view.setBgMargin(WatermarkConfig.bgMargin);
-        view.setBgRadius(WatermarkConfig.bgRadius);
+        view.setBgEnabled(WatermarkConfig.bg.enabled);
+        view.setBgColor(WatermarkConfig.bg.color);
+        view.setBgOffsetX(WatermarkConfig.bg.offsetX);
+        view.setBgOffsetY(WatermarkConfig.bg.offsetY);
+        view.setBgMargin(WatermarkConfig.bg.margin);
+        view.setBgRadius(WatermarkConfig.bg.radius);
     }
 
     public void updateTouchFlags() {

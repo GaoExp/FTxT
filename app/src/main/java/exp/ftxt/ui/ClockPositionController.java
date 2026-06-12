@@ -60,13 +60,13 @@ public class ClockPositionController {
             p.size = ClockConfig.size;
             p.color = ClockConfig.color;
             p.shadow = PresetHandler.copyShadow(ClockConfig.shadow);
-            p.bgEnabled = ClockConfig.bgEnabled;
-            p.bgColor = ClockConfig.bgColor;
-            p.bgPadding = ClockConfig.bgPadding;
-            p.bgOffsetX = ClockConfig.bgOffsetX;
-            p.bgOffsetY = ClockConfig.bgOffsetY;
-            p.bgMargin = ClockConfig.bgMargin;
-            p.bgRadius = ClockConfig.bgRadius;
+            p.bgEnabled = ClockConfig.bg.enabled;
+            p.bgColor = ClockConfig.bg.color;
+            p.bgPadding = ClockConfig.bg.padding;
+            p.bgOffsetX = ClockConfig.bg.offsetX;
+            p.bgOffsetY = ClockConfig.bg.offsetY;
+            p.bgMargin = ClockConfig.bg.margin;
+            p.bgRadius = ClockConfig.bg.radius;
             p.touchPassthrough = ClockConfig.touchPassthrough;
             p.safeArea = ClockConfig.safeArea;
         }
@@ -84,13 +84,13 @@ public class ClockPositionController {
                 ClockConfig.shadow.offsetX = p.shadow.offsetX;
                 ClockConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            ClockConfig.bgEnabled = p.bgEnabled;
-            ClockConfig.bgColor = p.bgColor;
-            ClockConfig.bgPadding = p.bgPadding;
-            ClockConfig.bgOffsetX = p.bgOffsetX;
-            ClockConfig.bgOffsetY = p.bgOffsetY;
-            ClockConfig.bgMargin = p.bgMargin;
-            ClockConfig.bgRadius = p.bgRadius;
+            ClockConfig.bg.enabled = p.bgEnabled;
+            ClockConfig.bg.color = p.bgColor;
+            ClockConfig.bg.padding = p.bgPadding;
+            ClockConfig.bg.offsetX = p.bgOffsetX;
+            ClockConfig.bg.offsetY = p.bgOffsetY;
+            ClockConfig.bg.margin = p.bgMargin;
+            ClockConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
                 ClockConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("clock_lock", ClockConfig.touchPassthrough).apply();

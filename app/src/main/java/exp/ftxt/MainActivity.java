@@ -489,11 +489,11 @@ public class MainActivity extends AppCompatActivity {
         TextConfig.shadow.blur = prefs.getFloat("shadow_blur", 5f);
         TextConfig.shadow.offsetX = prefs.getFloat("shadow_offset_x", 3f);
         TextConfig.shadow.offsetY = prefs.getFloat("shadow_offset_y", 3f);
-        TextConfig.bgEnabled = prefs.getBoolean("text_bg_enabled", false);
-        TextConfig.bgColor = prefs.getInt("text_bg_color", 0xCC000000);
-        TextConfig.bgPadding = prefs.getInt("text_bg_padding", 25);
-        TextConfig.bgOffsetX = prefs.getInt("text_bg_offset_x", 0);
-        TextConfig.bgOffsetY = prefs.getInt("text_bg_offset_y", 0);
+        TextConfig.bg.enabled = prefs.getBoolean("text_bg_enabled", false);
+        TextConfig.bg.color = prefs.getInt("text_bg_color", 0xCC000000);
+        TextConfig.bg.padding = prefs.getInt("text_bg_padding", 25);
+        TextConfig.bg.offsetX = prefs.getInt("text_bg_offset_x", 0);
+        TextConfig.bg.offsetY = prefs.getInt("text_bg_offset_y", 0);
         FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
         FpsConfig.safeArea = prefs.getBoolean("fps_safe_area", true);
         FpsConfig.color = prefs.getInt("fps_color", Color.GREEN);
@@ -505,12 +505,13 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
         FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", true);
         FpsConfig.showOnlyValue = prefs.getBoolean("fps_show_only_value", false);
+        FpsConfig.labelColor = prefs.getInt("fps_label_color", Color.CYAN);
         FpsConfig.updateInterval = readFloatPref(prefs, "fps_update_interval", 1f);
-        FpsConfig.bgEnabled = prefs.getBoolean("fps_bg_enabled", false);
-        FpsConfig.bgColor = prefs.getInt("fps_bg_color", 0xCC000000);
-        FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
-        FpsConfig.bgOffsetX = prefs.getInt("fps_bg_offset_x", 0);
-        FpsConfig.bgOffsetY = prefs.getInt("fps_bg_offset_y", 0);
+        FpsConfig.bg.enabled = prefs.getBoolean("fps_bg_enabled", false);
+        FpsConfig.bg.color = prefs.getInt("fps_bg_color", 0xCC000000);
+        FpsConfig.bg.padding = prefs.getInt("fps_bg_padding", 10);
+        FpsConfig.bg.offsetX = prefs.getInt("fps_bg_offset_x", 0);
+        FpsConfig.bg.offsetY = prefs.getInt("fps_bg_offset_y", 0);
         FpsConfig.posX = prefs.getFloat("fps_pos_x_port", 0.05f);
         FpsConfig.posY = prefs.getFloat("fps_pos_y_port", 0.05f);
 
@@ -523,12 +524,13 @@ public class MainActivity extends AppCompatActivity {
         ClockConfig.shadow.offsetY = prefs.getFloat("clock_shadow_offset_y", 3f);
         ClockConfig.safeArea = prefs.getBoolean("clock_safe_area", true);
         ClockConfig.touchPassthrough = prefs.getBoolean("clock_lock", true);
-        ClockConfig.bgEnabled = prefs.getBoolean("clock_bg_enabled", false);
-        ClockConfig.bgColor = prefs.getInt("clock_bg_color", 0xCC000000);
-        ClockConfig.bgPadding = prefs.getInt("clock_bg_padding", 10);
+        ClockConfig.bg.enabled = prefs.getBoolean("clock_bg_enabled", false);
+        ClockConfig.bg.color = prefs.getInt("clock_bg_color", 0xCC000000);
+        ClockConfig.bg.padding = prefs.getInt("clock_bg_padding", 10);
 
         NetworkConfig.enabled = prefs.getBoolean("network_enabled", false);
         NetworkConfig.color = prefs.getInt("network_color", Color.GREEN);
+        NetworkConfig.labelColor = prefs.getInt("network_label_color", Color.CYAN);
         NetworkConfig.shadow.enabled = prefs.getBoolean("network_shadow_enabled", false);
         NetworkConfig.shadow.color = prefs.getInt("network_shadow_color", Color.BLACK);
         NetworkConfig.shadow.blur = prefs.getFloat("network_shadow_blur", 5f);
@@ -536,13 +538,14 @@ public class MainActivity extends AppCompatActivity {
         NetworkConfig.shadow.offsetY = prefs.getFloat("network_shadow_offset_y", 3f);
         NetworkConfig.safeArea = prefs.getBoolean("network_safe_area", true);
         NetworkConfig.touchPassthrough = prefs.getBoolean("network_lock", true);
-        NetworkConfig.bgEnabled = prefs.getBoolean("network_bg_enabled", false);
-        NetworkConfig.bgColor = prefs.getInt("network_bg_color", 0xCC000000);
-        NetworkConfig.bgPadding = prefs.getInt("network_bg_padding", 8);
+        NetworkConfig.bg.enabled = prefs.getBoolean("network_bg_enabled", false);
+        NetworkConfig.bg.color = prefs.getInt("network_bg_color", 0xCC000000);
+        NetworkConfig.bg.padding = prefs.getInt("network_bg_padding", 8);
         NetworkConfig.updateInterval = readFloatPref(prefs, "network_update_interval", 1f);
 
         BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
         BatteryCurrentConfig.color = prefs.getInt("batcur_color", Color.GREEN);
+        BatteryCurrentConfig.labelColor = prefs.getInt("batcur_label_color", Color.CYAN);
         BatteryCurrentConfig.shadow.enabled = prefs.getBoolean("batcur_shadow_enabled", false);
         BatteryCurrentConfig.shadow.color = prefs.getInt("batcur_shadow_color", Color.BLACK);
         BatteryCurrentConfig.shadow.blur = prefs.getFloat("batcur_shadow_blur", 5f);
@@ -550,9 +553,9 @@ public class MainActivity extends AppCompatActivity {
         BatteryCurrentConfig.shadow.offsetY = prefs.getFloat("batcur_shadow_offset_y", 3f);
         BatteryCurrentConfig.safeArea = prefs.getBoolean("batcur_safe_area", true);
         BatteryCurrentConfig.touchPassthrough = prefs.getBoolean("batcur_lock", true);
-        BatteryCurrentConfig.bgEnabled = prefs.getBoolean("batcur_bg_enabled", false);
-        BatteryCurrentConfig.bgColor = prefs.getInt("batcur_bg_color", 0xCC000000);
-        BatteryCurrentConfig.bgPadding = prefs.getInt("batcur_bg_padding", 8);
+        BatteryCurrentConfig.bg.enabled = prefs.getBoolean("batcur_bg_enabled", false);
+        BatteryCurrentConfig.bg.color = prefs.getInt("batcur_bg_color", 0xCC000000);
+        BatteryCurrentConfig.bg.padding = prefs.getInt("batcur_bg_padding", 8);
         BatteryCurrentConfig.showVoltage = prefs.getBoolean("batcur_show_voltage", true);
         BatteryCurrentConfig.showCurrent = prefs.getBoolean("batcur_show_current", true);
         BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
@@ -567,13 +570,13 @@ public class MainActivity extends AppCompatActivity {
         BatteryPercentageConfig.shadow.offsetX = prefs.getFloat("battpct_shadow_offset_x", 3f);
         BatteryPercentageConfig.shadow.offsetY = prefs.getFloat("battpct_shadow_offset_y", 3f);
         BatteryPercentageConfig.touchPassthrough = prefs.getBoolean("battpct_lock", true);
-        BatteryPercentageConfig.bgEnabled = prefs.getBoolean("battpct_bg_enabled", false);
-        BatteryPercentageConfig.bgColor = prefs.getInt("battpct_bg_color", 0xCC000000);
-        BatteryPercentageConfig.bgPadding = prefs.getInt("battpct_bg_padding", 8);
-        BatteryPercentageConfig.bgOffsetX = prefs.getInt("battpct_bg_offset_x", 0);
-        BatteryPercentageConfig.bgOffsetY = prefs.getInt("battpct_bg_offset_y", 0);
-        BatteryPercentageConfig.bgMargin = prefs.getInt("battpct_bg_margin", 0);
-        BatteryPercentageConfig.bgRadius = prefs.getInt("battpct_bg_radius", 0);
+        BatteryPercentageConfig.bg.enabled = prefs.getBoolean("battpct_bg_enabled", false);
+        BatteryPercentageConfig.bg.color = prefs.getInt("battpct_bg_color", 0xCC000000);
+        BatteryPercentageConfig.bg.padding = prefs.getInt("battpct_bg_padding", 8);
+        BatteryPercentageConfig.bg.offsetX = prefs.getInt("battpct_bg_offset_x", 0);
+        BatteryPercentageConfig.bg.offsetY = prefs.getInt("battpct_bg_offset_y", 0);
+        BatteryPercentageConfig.bg.margin = prefs.getInt("battpct_bg_margin", 0);
+        BatteryPercentageConfig.bg.radius = prefs.getInt("battpct_bg_radius", 0);
 
         BatteryConfig.enabled = prefs.getBoolean("battery_enabled", false);
         BatteryConfig.color = prefs.getInt("battery_color", Color.GREEN);
@@ -587,10 +590,11 @@ public class MainActivity extends AppCompatActivity {
         BatteryConfig.showOnlyValue = prefs.getBoolean("battery_show_only_value", false);
         BatteryConfig.showTemperature = prefs.getBoolean("battery_show_temperature", true);
         BatteryConfig.showPercentage = prefs.getBoolean("battery_show_percentage", false);
-        BatteryConfig.bgEnabled = prefs.getBoolean("battery_bg_enabled", false);
-        BatteryConfig.bgColor = prefs.getInt("battery_bg_color", 0xCC000000);
-        BatteryConfig.bgPadding = prefs.getInt("battery_bg_padding", 8);
+        BatteryConfig.bg.enabled = prefs.getBoolean("battery_bg_enabled", false);
+        BatteryConfig.bg.color = prefs.getInt("battery_bg_color", 0xCC000000);
+        BatteryConfig.bg.padding = prefs.getInt("battery_bg_padding", 8);
         BatteryConfig.updateInterval = readFloatPref(prefs, "battery_update_interval", 5f);
+        BatteryConfig.labelColor = prefs.getInt("battery_label_color", Color.CYAN);
 
         WatermarkConfig.enabled = prefs.getBoolean("watermark_enabled", false);
         WatermarkConfig.text = prefs.getString("watermark_text", "Watermark");
@@ -602,9 +606,9 @@ public class MainActivity extends AppCompatActivity {
         WatermarkConfig.shadow.offsetY = prefs.getFloat("watermark_shadow_offset_y", 3f);
         WatermarkConfig.safeArea = prefs.getBoolean("watermark_safe_area", true);
         WatermarkConfig.touchPassthrough = prefs.getBoolean("watermark_lock", true);
-        WatermarkConfig.bgEnabled = prefs.getBoolean("watermark_bg_enabled", false);
-        WatermarkConfig.bgColor = prefs.getInt("watermark_bg_color", 0xCC000000);
-        WatermarkConfig.bgPadding = prefs.getInt("watermark_bg_padding", 10);
+        WatermarkConfig.bg.enabled = prefs.getBoolean("watermark_bg_enabled", false);
+        WatermarkConfig.bg.color = prefs.getInt("watermark_bg_color", 0xCC000000);
+        WatermarkConfig.bg.padding = prefs.getInt("watermark_bg_padding", 10);
         WatermarkConfig.patternEnabled = prefs.getBoolean("watermark_pattern_enabled", false);
         WatermarkConfig.patternSpacingH = prefs.getFloat("watermark_pattern_spacing_h", 180f);
         WatermarkConfig.patternSpacingV = prefs.getFloat("watermark_pattern_spacing_v", 220f);

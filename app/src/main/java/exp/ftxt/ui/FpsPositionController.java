@@ -60,16 +60,17 @@ public class FpsPositionController {
             p.size = FpsConfig.size;
             p.color = FpsConfig.color;
             p.shadow = PresetHandler.copyShadow(FpsConfig.shadow);
-            p.bgEnabled = FpsConfig.bgEnabled;
-            p.bgColor = FpsConfig.bgColor;
-            p.bgPadding = FpsConfig.bgPadding;
-            p.bgOffsetX = FpsConfig.bgOffsetX;
-            p.bgOffsetY = FpsConfig.bgOffsetY;
-            p.bgMargin = FpsConfig.bgMargin;
-            p.bgRadius = FpsConfig.bgRadius;
+            p.bgEnabled = FpsConfig.bg.enabled;
+            p.bgColor = FpsConfig.bg.color;
+            p.bgPadding = FpsConfig.bg.padding;
+            p.bgOffsetX = FpsConfig.bg.offsetX;
+            p.bgOffsetY = FpsConfig.bg.offsetY;
+            p.bgMargin = FpsConfig.bg.margin;
+            p.bgRadius = FpsConfig.bg.radius;
             p.touchPassthrough = FpsConfig.touchPassthrough;
             p.safeArea = FpsConfig.safeArea;
             p.showOnlyValue = FpsConfig.showOnlyValue;
+            p.labelColor = FpsConfig.labelColor;
         }
 
         @Override
@@ -85,13 +86,13 @@ public class FpsPositionController {
                 FpsConfig.shadow.offsetX = p.shadow.offsetX;
                 FpsConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            FpsConfig.bgEnabled = p.bgEnabled;
-            FpsConfig.bgColor = p.bgColor;
-            FpsConfig.bgPadding = p.bgPadding;
-            FpsConfig.bgOffsetX = p.bgOffsetX;
-            FpsConfig.bgOffsetY = p.bgOffsetY;
-            FpsConfig.bgMargin = p.bgMargin;
-            FpsConfig.bgRadius = p.bgRadius;
+            FpsConfig.bg.enabled = p.bgEnabled;
+            FpsConfig.bg.color = p.bgColor;
+            FpsConfig.bg.padding = p.bgPadding;
+            FpsConfig.bg.offsetX = p.bgOffsetX;
+            FpsConfig.bg.offsetY = p.bgOffsetY;
+            FpsConfig.bg.margin = p.bgMargin;
+            FpsConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
                 FpsConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("fps_lock", FpsConfig.touchPassthrough).apply();
@@ -104,6 +105,10 @@ public class FpsPositionController {
                 FpsConfig.showOnlyValue = p.showOnlyValue;
                 prefs.edit().putBoolean("fps_show_only_value", FpsConfig.showOnlyValue).apply();
             }
+            if (p.labelColor != null) {
+                FpsConfig.labelColor = p.labelColor;
+                prefs.edit().putInt("fps_label_color", FpsConfig.labelColor).apply();
+            }
         }
 
         @Override
@@ -113,6 +118,7 @@ public class FpsPositionController {
             FloatingService.updateFpsColorStatic();
             FloatingService.updateFpsShadowStatic();
             FloatingService.updateFpsBackgroundStatic();
+            FloatingService.updateFpsLabelColorStatic();
         }
     };
 
