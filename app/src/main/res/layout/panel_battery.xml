@@ -108,26 +108,100 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
-                <Button
-                    android:id="@+id/batteryColorButton"
-                    android:text="Pilih Warna"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
 
-                <Button
-                    android:id="@+id/batteryLabelColorButton"
-                    android:text="Warna Label"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
 
-                <Button
-                    android:id="@+id/batteryIntervalButton"
-                    android:text="Update: 5s"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                        <View
+                            android:id="@+id/batteryColorPreview"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="#FF0000"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Warna"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <View
+                            android:id="@+id/batteryLabelColorPreview"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="#00FF00"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Label"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingStart="8dp">
+
+                        <TextView
+                            android:text="Update="
+                            android:textSize="14sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/batteryIntervalValue"
+                            android:text="1"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:gravity="center"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="3dp"
+                            android:background="#555555"
+                            android:textColor="#FFFFFF"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:minWidth="36dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:text="s"
+                            android:textSize="14sp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 </LinearLayout>
 

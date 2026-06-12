@@ -1,6 +1,8 @@
 [3.9.3.72.1] - 2026-06-12
 ♻️ Perubahan Fitur
 - Kontrol Interval semua modul jadi single button + dialog — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method findIntervalIndex() dihapus.
+- Tombol Pilih Warna jadi preview kotak — Semua modul (FPS, Battery, Battery Current, Network): tombol "Pilih Warna" dan "Warna Label" diganti preview kotak 40×40 yang menunjukkan warna aktif. Tap preview → color picker.
+- Kontrol interval inline PopupWindow — Kontrol interval diubah jadi Update= [1]s dengan popup scroll 5 item (PopupWindow). Item terpilih di-highlight biru.
 🔢 Version
 versionCode: 152
 versionName: 3.9.3.72.1

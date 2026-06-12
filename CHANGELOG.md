@@ -1,15 +1,17 @@
 ## [3.9.3.72.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Kontrol Interval semua modul jadi single button + dialog** — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method `findIntervalIndex()` dihapus.
+- **Tombol Pilih Warna jadi preview kotak** — Semua modul (FPS, Battery, Battery Current, Network): tombol "Pilih Warna" dan "Warna Label" diganti preview kotak 40×40 yang menunjukkan warna aktif. Tap preview → color picker.
+- **Kontrol interval inline PopupWindow** — FPS: uji coba kontrol interval `Update= [1]s` dengan popup scroll 5 item (PopupWindow). Setelah sukses, diterapkan ke semua modul. Item terpilih di-highlight biru.
 ### ✏️ File Changed
-- `app/src/main/res/layout/panel_fps.xml` — Ganti `fpsIntervalMinus`/`Plus`/`Label` dengan `fpsIntervalButton`
-- `app/src/main/res/layout/panel_battery.xml` — Ganti `batteryIntervalMinus`/`Plus`/`Label` dengan `batteryIntervalButton`
-- `app/src/main/res/layout/panel_battery_current.xml` — Ganti `batCurIntervalMinus`/`Plus`/`Label` dengan `batCurIntervalButton`
-- `app/src/main/res/layout/panel_network.xml` — Ganti `networkIntervalMinus`/`Plus`/`Label` dengan `networkIntervalButton`
-- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Refactor kontrol interval ke AlertDialog
-- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Refactor kontrol interval ke AlertDialog
-- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Refactor kontrol interval ke AlertDialog
-- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Refactor kontrol interval ke AlertDialog
+- `app/src/main/res/layout/panel_fps.xml` — Ganti `fpsIntervalMinus`/`Plus`/`Label` dengan `fpsIntervalButton`; lalu ganti jadi `fpsIntervalValue` inline + hapus `fpsColorButton`/`fpsLabelColorButton` → `fpsColorPreview`/`fpsLabelColorPreview`
+- `app/src/main/res/layout/panel_battery.xml` — Ganti `batteryColorButton`/`batteryLabelColorButton`/`batteryIntervalButton` → color previews + interval inline
+- `app/src/main/res/layout/panel_battery_current.xml` — Ganti `batCurColorButton`/`batCurLabelColorButton`/`batCurIntervalButton` → color previews + interval inline
+- `app/src/main/res/layout/panel_network.xml` — Ganti `networkColorButton`/`networkLabelColorButton`/`networkIntervalButton` → color previews + interval inline
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — AlertDialog → PopupWindow; Button → View preview; hapus `formatIntervalLabel`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — AlertDialog → PopupWindow; Button → View preview; hapus `formatIntervalLabel`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — AlertDialog → PopupWindow; Button → View preview; hapus `formatIntervalLabel`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — AlertDialog → PopupWindow; Button → View preview; hapus `formatIntervalLabel`
 ### 🔢 Version
 versionCode: 152
 versionName: 3.9.3.72.1

@@ -1,11 +1,15 @@
 package exp.ftxt.ui;
 
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -25,8 +29,8 @@ public class FpsPanelController {
 
     private CheckBox fpsSwitch;
     private SeekBar fpsSizeSeekBar;
-    private Button fpsColorButton;
-    private Button fpsLabelColorButton;
+    private View fpsColorPreview;
+    private View fpsLabelColorPreview;
     private CheckBox fpsShadowSwitch;
     private LinearLayout fpsShadowConfigContainer;
     private Button fpsShadowColorButton;
@@ -48,7 +52,8 @@ public class FpsPanelController {
     private TextView fpsBgMarginLabel, fpsBgRadiusLabel;
     private TextView fpsShadowBlurLabel, fpsShadowOffsetXLabel, fpsShadowOffsetYLabel;
     private FpsPositionController fpsPositionController;
-    private Button fpsIntervalButton;
+    private TextView fpsIntervalValue;
+    private PopupWindow intervalPopup;
 
     public FpsPanelController(MainActivity activity) {
         this.activity = activity;
@@ -80,8 +85,8 @@ public class FpsPanelController {
     private void bindViews() {
         fpsSwitch = activity.findViewById(R.id.fpsSwitch);
         fpsSizeSeekBar = activity.findViewById(R.id.fpsSizeSeekBar);
-        fpsColorButton = activity.findViewById(R.id.fpsColorButton);
-        fpsLabelColorButton = activity.findViewById(R.id.fpsLabelColorButton);
+        fpsColorPreview = activity.findViewById(R.id.fpsColorPreview);
+        fpsLabelColorPreview = activity.findViewById(R.id.fpsLabelColorPreview);
         fpsShadowSwitch = activity.findViewById(R.id.fpsShadowSwitch);
         fpsShadowConfigContainer = activity.findViewById(R.id.shadowConfigFps);
         fpsShadowColorButton = activity.findViewById(R.id.fpsShadowColorButton);
@@ -108,7 +113,7 @@ public class FpsPanelController {
         fpsShadowBlurLabel = activity.findViewById(R.id.fpsShadowBlurLabel);
         fpsShadowOffsetXLabel = activity.findViewById(R.id.fpsShadowOffsetXLabel);
         fpsShadowOffsetYLabel = activity.findViewById(R.id.fpsShadowOffsetYLabel);
-        fpsIntervalButton = activity.findViewById(R.id.fpsIntervalButton);
+        fpsIntervalValue = activity.findViewById(R.id.fpsIntervalValue);
 
         View sectionDisplay = activity.findViewById(R.id.fps_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.fps_sectionDisplayHeader);
@@ -131,6 +136,8 @@ public class FpsPanelController {
         fpsSwitch.setChecked(FpsConfig.enabled);
         activity.applyCheckboxTint(fpsSwitch, FpsConfig.enabled);
         fpsSizeSeekBar.setProgress((int) FpsConfig.size);
+        fpsColorPreview.setBackgroundColor(FpsConfig.color);
+        fpsLabelColorPreview.setBackgroundColor(FpsConfig.labelColor);
         fpsBgSwitch.setChecked(FpsConfig.bg.enabled);
         activity.applyCheckboxTint(fpsBgSwitch, FpsConfig.bg.enabled);
         fpsBgConfigContainer.setVisibility(FpsConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -158,13 +165,7 @@ public class FpsPanelController {
         fpsShadowBlurLabel.setText("Blur Shadow: " + (int) FpsConfig.shadow.blur);
         fpsShadowOffsetXLabel.setText("Shadow X: " + (int) FpsConfig.shadow.offsetX);
         fpsShadowOffsetYLabel.setText("Shadow Y: " + (int) FpsConfig.shadow.offsetY);
-        fpsIntervalButton.setText(formatIntervalLabel(FpsConfig.updateInterval));
-    }
-
-    private String formatIntervalLabel(float v) {
-        if (v == (long) v) return "Update: " + (long) v + "s";
-        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
-        return "Update: " + s + "s";
+        fpsIntervalValue.setText(formatIntervalValue(FpsConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -208,18 +209,20 @@ public class FpsPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        fpsColorButton.setOnClickListener(v -> {
+        fpsColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna FPS", FpsConfig.color, color -> {
                 FpsConfig.color = color;
+                fpsColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_color", color).apply();
                 FloatingService.updateFpsColorStatic();
             });
         });
 
-        fpsLabelColorButton.setOnClickListener(v -> {
+        fpsLabelColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Label", FpsConfig.labelColor, color -> {
                 FpsConfig.labelColor = color;
+                fpsLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_label_color", color).apply();
                 FloatingService.updateFpsLabelColorStatic();
@@ -420,25 +423,77 @@ public class FpsPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        fpsIntervalButton.setOnClickListener(v -> {
-            String[] items = new String[INTERVAL_STEPS.length];
-            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
+        fpsIntervalValue.setOnClickListener(v -> showIntervalPopup(v));
+    }
+
+    private void showIntervalPopup(View anchor) {
+        if (intervalPopup != null && intervalPopup.isShowing()) {
+            intervalPopup.dismiss();
+            return;
+        }
+
+        int currentIdx = -1;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (INTERVAL_STEPS[i] == FpsConfig.updateInterval) {
+                currentIdx = i;
+                break;
             }
-            new AlertDialog.Builder(activity)
-                    .setTitle("Interval Update")
-                    .setItems(items, (dialog, which) -> {
-                        FpsConfig.updateInterval = INTERVAL_STEPS[which];
-                        updateIntervalDisplay();
-                        FloatingService.updateFpsUpdateIntervalStatic();
-                    })
-                    .show();
-        });
+        }
+
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            TextView item = new TextView(activity);
+            item.setText(formatIntervalValue(INTERVAL_STEPS[i]) + "s");
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setTextColor(0xFF222222);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (i == currentIdx) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+
+            final int idx = i;
+            item.setOnClickListener(v -> {
+                FpsConfig.updateInterval = INTERVAL_STEPS[idx];
+                updateIntervalDisplay();
+                FloatingService.updateFpsUpdateIntervalStatic();
+                if (intervalPopup != null) intervalPopup.dismiss();
+            });
+            content.addView(item);
+        }
+
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(content);
+
+        intervalPopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dp(200), true);
+        intervalPopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        intervalPopup.setOutsideTouchable(true);
+        intervalPopup.setElevation(dp(4));
+        intervalPopup.showAsDropDown(anchor, 0, dp(2));
     }
 
     private void updateIntervalDisplay() {
-        fpsIntervalButton.setText(formatIntervalLabel(FpsConfig.updateInterval));
+        fpsIntervalValue.setText(formatIntervalValue(FpsConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("fps_update_interval", FpsConfig.updateInterval).apply();
+    }
+
+    private String formatIntervalValue(float v) {
+        if (v == (long) v) return String.valueOf((long) v);
+        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
+        return s;
+    }
+
+    private int dp(int dp) {
+        return (int) (dp * activity.getResources().getDisplayMetrics().density);
     }
 }

@@ -1,11 +1,15 @@
 package exp.ftxt.ui;
 
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -23,8 +27,8 @@ public class BatteryCurrentPanelController {
 
     private CheckBox batCurSwitch;
     private SeekBar batCurSizeSeekBar;
-    private Button batCurColorButton;
-    private Button batCurLabelColorButton;
+    private View batCurColorPreview;
+    private View batCurLabelColorPreview;
     private CheckBox batCurShadowSwitch;
     private LinearLayout batCurShadowConfigContainer;
     private Button batCurShadowColorButton;
@@ -48,7 +52,8 @@ public class BatteryCurrentPanelController {
     private TextView batCurBgMarginLabel, batCurBgRadiusLabel;
     private TextView batCurShadowBlurLabel, batCurShadowOffsetXLabel, batCurShadowOffsetYLabel;
     private BatteryCurrentPositionController batCurPositionController;
-    private Button batCurIntervalButton;
+    private TextView batCurIntervalValue;
+    private PopupWindow intervalPopup;
 
     public BatteryCurrentPanelController(MainActivity activity) {
         this.activity = activity;
@@ -80,8 +85,8 @@ public class BatteryCurrentPanelController {
     private void bindViews() {
         batCurSwitch = activity.findViewById(R.id.batCurSwitch);
         batCurSizeSeekBar = activity.findViewById(R.id.batCurSizeSeekBar);
-        batCurColorButton = activity.findViewById(R.id.batCurColorButton);
-        batCurLabelColorButton = activity.findViewById(R.id.batCurLabelColorButton);
+        batCurColorPreview = activity.findViewById(R.id.batCurColorPreview);
+        batCurLabelColorPreview = activity.findViewById(R.id.batCurLabelColorPreview);
         batCurShadowSwitch = activity.findViewById(R.id.batCurShadowSwitch);
         batCurShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryCurrent);
         batCurShadowColorButton = activity.findViewById(R.id.batCurShadowColorButton);
@@ -110,7 +115,7 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
         batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
         batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
-        batCurIntervalButton = activity.findViewById(R.id.batCurIntervalButton);
+        batCurIntervalValue = activity.findViewById(R.id.batCurIntervalValue);
 
         View sectionDisplay = activity.findViewById(R.id.batCur_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.batCur_sectionDisplayHeader);
@@ -133,6 +138,8 @@ public class BatteryCurrentPanelController {
         batCurSwitch.setChecked(BatteryCurrentConfig.enabled);
         activity.applyCheckboxTint(batCurSwitch, BatteryCurrentConfig.enabled);
         batCurSizeSeekBar.setProgress((int) BatteryCurrentConfig.size);
+        batCurColorPreview.setBackgroundColor(BatteryCurrentConfig.color);
+        batCurLabelColorPreview.setBackgroundColor(BatteryCurrentConfig.labelColor);
         batCurBgSwitch.setChecked(BatteryCurrentConfig.bg.enabled);
         activity.applyCheckboxTint(batCurBgSwitch, BatteryCurrentConfig.bg.enabled);
         batCurBgConfigContainer.setVisibility(BatteryCurrentConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -165,7 +172,7 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryCurrentConfig.shadow.blur);
         batCurShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryCurrentConfig.shadow.offsetX);
         batCurShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryCurrentConfig.shadow.offsetY);
-        batCurIntervalButton.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
+        batCurIntervalValue.setText(formatIntervalValue(BatteryCurrentConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -209,18 +216,20 @@ public class BatteryCurrentPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        batCurColorButton.setOnClickListener(v -> {
+        batCurColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Bat Current", BatteryCurrentConfig.color, color -> {
                 BatteryCurrentConfig.color = color;
+                batCurColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_color", color).apply();
                 FloatingService.updateBatteryCurrentColorStatic();
             });
         });
 
-        batCurLabelColorButton.setOnClickListener(v -> {
+        batCurLabelColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Label Bat Current", BatteryCurrentConfig.labelColor, color -> {
                 BatteryCurrentConfig.labelColor = color;
+                batCurLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_label_color", color).apply();
                 FloatingService.updateBatteryCurrentLabelColorStatic();
@@ -416,31 +425,77 @@ public class BatteryCurrentPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        batCurIntervalButton.setOnClickListener(v -> {
-            String[] items = new String[INTERVAL_STEPS.length];
-            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
+        batCurIntervalValue.setOnClickListener(v -> showIntervalPopup(v));
+    }
+
+    private void showIntervalPopup(View anchor) {
+        if (intervalPopup != null && intervalPopup.isShowing()) {
+            intervalPopup.dismiss();
+            return;
+        }
+
+        int currentIdx = -1;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (INTERVAL_STEPS[i] == BatteryCurrentConfig.updateInterval) {
+                currentIdx = i;
+                break;
             }
-            new AlertDialog.Builder(activity)
-                    .setTitle("Interval Update")
-                    .setItems(items, (dialog, which) -> {
-                        BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[which];
-                        updateIntervalDisplay();
-                        FloatingService.updateBatteryCurrentUpdateIntervalStatic();
-                    })
-                    .show();
-        });
+        }
+
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            TextView item = new TextView(activity);
+            item.setText(formatIntervalValue(INTERVAL_STEPS[i]) + "s");
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setTextColor(0xFF222222);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (i == currentIdx) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+
+            final int idx = i;
+            item.setOnClickListener(v -> {
+                BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx];
+                updateIntervalDisplay();
+                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+                if (intervalPopup != null) intervalPopup.dismiss();
+            });
+            content.addView(item);
+        }
+
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(content);
+
+        intervalPopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dp(200), true);
+        intervalPopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        intervalPopup.setOutsideTouchable(true);
+        intervalPopup.setElevation(dp(4));
+        intervalPopup.showAsDropDown(anchor, 0, dp(2));
     }
 
     private void updateIntervalDisplay() {
-        batCurIntervalButton.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
+        batCurIntervalValue.setText(formatIntervalValue(BatteryCurrentConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("batcur_update_interval", BatteryCurrentConfig.updateInterval).apply();
     }
 
-    private String formatIntervalLabel(float v) {
-        if (v == (long) v) return "Update: " + (long) v + "s";
+    private String formatIntervalValue(float v) {
+        if (v == (long) v) return String.valueOf((long) v);
         String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
-        return "Update: " + s + "s";
+        return s;
+    }
+
+    private int dp(int dp) {
+        return (int) (dp * activity.getResources().getDisplayMetrics().density);
     }
 }

@@ -1,11 +1,15 @@
 package exp.ftxt.ui;
 
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -23,8 +27,8 @@ public class BatteryPanelController {
 
     private CheckBox batterySwitch;
     private SeekBar batterySizeSeekBar;
-    private Button batteryColorButton;
-    private Button batteryLabelColorButton;
+    private View batteryColorPreview;
+    private View batteryLabelColorPreview;
     private CheckBox batteryShadowSwitch;
     private LinearLayout batteryShadowConfigContainer;
     private Button batteryShadowColorButton;
@@ -48,7 +52,8 @@ public class BatteryPanelController {
     private TextView batteryBgMarginLabel, batteryBgRadiusLabel;
     private TextView batteryShadowBlurLabel, batteryShadowOffsetXLabel, batteryShadowOffsetYLabel;
     private BatteryPositionController batteryPositionController;
-    private Button batteryIntervalButton;
+    private TextView batteryIntervalValue;
+    private PopupWindow intervalPopup;
 
     public BatteryPanelController(MainActivity activity) {
         this.activity = activity;
@@ -80,8 +85,8 @@ public class BatteryPanelController {
     private void bindViews() {
         batterySwitch = activity.findViewById(R.id.batterySwitch);
         batterySizeSeekBar = activity.findViewById(R.id.batterySizeSeekBar);
-        batteryColorButton = activity.findViewById(R.id.batteryColorButton);
-        batteryLabelColorButton = activity.findViewById(R.id.batteryLabelColorButton);
+        batteryColorPreview = activity.findViewById(R.id.batteryColorPreview);
+        batteryLabelColorPreview = activity.findViewById(R.id.batteryLabelColorPreview);
         batteryShadowSwitch = activity.findViewById(R.id.batteryShadowSwitch);
         batteryShadowConfigContainer = activity.findViewById(R.id.shadowConfigBattery);
         batteryShadowColorButton = activity.findViewById(R.id.batteryShadowColorButton);
@@ -110,7 +115,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel = activity.findViewById(R.id.batteryShadowBlurLabel);
         batteryShadowOffsetXLabel = activity.findViewById(R.id.batteryShadowOffsetXLabel);
         batteryShadowOffsetYLabel = activity.findViewById(R.id.batteryShadowOffsetYLabel);
-        batteryIntervalButton = activity.findViewById(R.id.batteryIntervalButton);
+        batteryIntervalValue = activity.findViewById(R.id.batteryIntervalValue);
 
         View sectionDisplay = activity.findViewById(R.id.battery_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.battery_sectionDisplayHeader);
@@ -133,6 +138,8 @@ public class BatteryPanelController {
         batterySwitch.setChecked(BatteryConfig.enabled);
         activity.applyCheckboxTint(batterySwitch, BatteryConfig.enabled);
         batterySizeSeekBar.setProgress((int) BatteryConfig.size);
+        batteryColorPreview.setBackgroundColor(BatteryConfig.color);
+        batteryLabelColorPreview.setBackgroundColor(BatteryConfig.labelColor);
         batteryBgSwitch.setChecked(BatteryConfig.bg.enabled);
         activity.applyCheckboxTint(batteryBgSwitch, BatteryConfig.bg.enabled);
         batteryBgConfigContainer.setVisibility(BatteryConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -162,7 +169,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
-        batteryIntervalButton.setText(formatIntervalLabel(BatteryConfig.updateInterval));
+        batteryIntervalValue.setText(formatIntervalValue(BatteryConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -206,18 +213,20 @@ public class BatteryPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        batteryColorButton.setOnClickListener(v -> {
+        batteryColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Baterai", BatteryConfig.color, color -> {
                 BatteryConfig.color = color;
+                batteryColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_color", color).apply();
                 FloatingService.updateBatteryColorStatic();
             });
         });
 
-        batteryLabelColorButton.setOnClickListener(v -> {
+        batteryLabelColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Label", BatteryConfig.labelColor, color -> {
                 BatteryConfig.labelColor = color;
+                batteryLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_label_color", color).apply();
                 FloatingService.updateBatteryLabelColorStatic();
@@ -410,31 +419,77 @@ public class BatteryPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        batteryIntervalButton.setOnClickListener(v -> {
-            String[] items = new String[INTERVAL_STEPS.length];
-            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
+        batteryIntervalValue.setOnClickListener(v -> showIntervalPopup(v));
+    }
+
+    private void showIntervalPopup(View anchor) {
+        if (intervalPopup != null && intervalPopup.isShowing()) {
+            intervalPopup.dismiss();
+            return;
+        }
+
+        int currentIdx = -1;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (INTERVAL_STEPS[i] == BatteryConfig.updateInterval) {
+                currentIdx = i;
+                break;
             }
-            new AlertDialog.Builder(activity)
-                    .setTitle("Interval Update")
-                    .setItems(items, (dialog, which) -> {
-                        BatteryConfig.updateInterval = INTERVAL_STEPS[which];
-                        updateIntervalDisplay();
-                        FloatingService.updateBatteryUpdateIntervalStatic();
-                    })
-                    .show();
-        });
+        }
+
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            TextView item = new TextView(activity);
+            item.setText(formatIntervalValue(INTERVAL_STEPS[i]) + "s");
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setTextColor(0xFF222222);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (i == currentIdx) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+
+            final int idx = i;
+            item.setOnClickListener(v -> {
+                BatteryConfig.updateInterval = INTERVAL_STEPS[idx];
+                updateIntervalDisplay();
+                FloatingService.updateBatteryUpdateIntervalStatic();
+                if (intervalPopup != null) intervalPopup.dismiss();
+            });
+            content.addView(item);
+        }
+
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(content);
+
+        intervalPopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dp(200), true);
+        intervalPopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        intervalPopup.setOutsideTouchable(true);
+        intervalPopup.setElevation(dp(4));
+        intervalPopup.showAsDropDown(anchor, 0, dp(2));
     }
 
     private void updateIntervalDisplay() {
-        batteryIntervalButton.setText(formatIntervalLabel(BatteryConfig.updateInterval));
+        batteryIntervalValue.setText(formatIntervalValue(BatteryConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("battery_update_interval", BatteryConfig.updateInterval).apply();
     }
 
-    private String formatIntervalLabel(float v) {
-        if (v == (long) v) return "Update: " + (long) v + "s";
+    private String formatIntervalValue(float v) {
+        if (v == (long) v) return String.valueOf((long) v);
         String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
-        return "Update: " + s + "s";
+        return s;
+    }
+
+    private int dp(int dp) {
+        return (int) (dp * activity.getResources().getDisplayMetrics().density);
     }
 }

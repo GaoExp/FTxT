@@ -1,10 +1,14 @@
 package exp.ftxt.ui;
 
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -23,8 +27,8 @@ public class NetworkPanelController {
 
     private CheckBox networkSwitch;
     private SeekBar networkSizeSeekBar;
-    private Button networkColorButton;
-    private Button networkLabelColorButton;
+    private View networkColorPreview;
+    private View networkLabelColorPreview;
     private CheckBox networkShadowSwitch;
     private LinearLayout networkShadowConfigContainer;
     private Button networkShadowColorButton;
@@ -45,7 +49,8 @@ public class NetworkPanelController {
     private TextView networkBgMarginLabel, networkBgRadiusLabel;
     private TextView networkShadowBlurLabel, networkShadowOffsetXLabel, networkShadowOffsetYLabel;
     private NetworkPositionController networkPositionController;
-    private Button networkIntervalButton;
+    private TextView networkIntervalValue;
+    private PopupWindow intervalPopup;
 
     public NetworkPanelController(MainActivity activity) {
         this.activity = activity;
@@ -77,8 +82,8 @@ public class NetworkPanelController {
     private void bindViews() {
         networkSwitch = activity.findViewById(R.id.networkSwitch);
         networkSizeSeekBar = activity.findViewById(R.id.networkSizeSeekBar);
-        networkColorButton = activity.findViewById(R.id.networkColorButton);
-        networkLabelColorButton = activity.findViewById(R.id.networkLabelColorButton);
+        networkColorPreview = activity.findViewById(R.id.networkColorPreview);
+        networkLabelColorPreview = activity.findViewById(R.id.networkLabelColorPreview);
         networkShadowSwitch = activity.findViewById(R.id.networkShadowSwitch);
         networkShadowConfigContainer = activity.findViewById(R.id.shadowConfigNetwork);
         networkShadowColorButton = activity.findViewById(R.id.networkShadowColorButton);
@@ -104,7 +109,7 @@ public class NetworkPanelController {
         networkShadowBlurLabel = activity.findViewById(R.id.networkShadowBlurLabel);
         networkShadowOffsetXLabel = activity.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = activity.findViewById(R.id.networkShadowOffsetYLabel);
-        networkIntervalButton = activity.findViewById(R.id.networkIntervalButton);
+        networkIntervalValue = activity.findViewById(R.id.networkIntervalValue);
 
         View sectionDisplay = activity.findViewById(R.id.network_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.network_sectionDisplayHeader);
@@ -127,6 +132,8 @@ public class NetworkPanelController {
         networkSwitch.setChecked(NetworkConfig.enabled);
         activity.applyCheckboxTint(networkSwitch, NetworkConfig.enabled);
         networkSizeSeekBar.setProgress((int) NetworkConfig.size);
+        networkColorPreview.setBackgroundColor(NetworkConfig.color);
+        networkLabelColorPreview.setBackgroundColor(NetworkConfig.labelColor);
         networkBgSwitch.setChecked(NetworkConfig.bg.enabled);
         activity.applyCheckboxTint(networkBgSwitch, NetworkConfig.bg.enabled);
         networkBgConfigContainer.setVisibility(NetworkConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -153,13 +160,13 @@ public class NetworkPanelController {
         networkShadowBlurLabel.setText("Blur Shadow: " + (int) NetworkConfig.shadow.blur);
         networkShadowOffsetXLabel.setText("Shadow X: " + (int) NetworkConfig.shadow.offsetX);
         networkShadowOffsetYLabel.setText("Shadow Y: " + (int) NetworkConfig.shadow.offsetY);
-        networkIntervalButton.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+        networkIntervalValue.setText(formatIntervalValue(NetworkConfig.updateInterval));
     }
 
-    private String formatIntervalLabel(float v) {
-        if (v == (long) v) return "Update: " + (long) v + "s";
+    private String formatIntervalValue(float v) {
+        if (v == (long) v) return String.valueOf((long) v);
         String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
-        return "Update: " + s + "s";
+        return s;
     }
 
     private void setupListeners() {
@@ -203,18 +210,20 @@ public class NetworkPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
-        networkColorButton.setOnClickListener(v -> {
+        networkColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna", NetworkConfig.color, color -> {
                 NetworkConfig.color = color;
+                networkColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_color", color).apply();
                 FloatingService.updateNetworkColorStatic();
             });
         });
 
-        networkLabelColorButton.setOnClickListener(v -> {
+        networkLabelColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Label", NetworkConfig.labelColor, color -> {
                 NetworkConfig.labelColor = color;
+                networkLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_label_color", color).apply();
                 FloatingService.updateNetworkLabelColorStatic();
@@ -389,25 +398,71 @@ public class NetworkPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        networkIntervalButton.setOnClickListener(v -> {
-            String[] items = new String[INTERVAL_STEPS.length];
-            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
+        networkIntervalValue.setOnClickListener(v -> showIntervalPopup(v));
+    }
+
+    private void showIntervalPopup(View anchor) {
+        if (intervalPopup != null && intervalPopup.isShowing()) {
+            intervalPopup.dismiss();
+            return;
+        }
+
+        int currentIdx = -1;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (INTERVAL_STEPS[i] == NetworkConfig.updateInterval) {
+                currentIdx = i;
+                break;
             }
-            new AlertDialog.Builder(activity)
-                    .setTitle("Interval Update")
-                    .setItems(items, (dialog, which) -> {
-                        NetworkConfig.updateInterval = INTERVAL_STEPS[which];
-                        updateIntervalDisplay();
-                        FloatingService.updateNetworkUpdateIntervalStatic();
-                    })
-                    .show();
-        });
+        }
+
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            TextView item = new TextView(activity);
+            item.setText(formatIntervalValue(INTERVAL_STEPS[i]) + "s");
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setTextColor(0xFF222222);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (i == currentIdx) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+
+            final int idx = i;
+            item.setOnClickListener(v -> {
+                NetworkConfig.updateInterval = INTERVAL_STEPS[idx];
+                updateIntervalDisplay();
+                FloatingService.updateNetworkUpdateIntervalStatic();
+                if (intervalPopup != null) intervalPopup.dismiss();
+            });
+            content.addView(item);
+        }
+
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(content);
+
+        intervalPopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dp(200), true);
+        intervalPopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        intervalPopup.setOutsideTouchable(true);
+        intervalPopup.setElevation(dp(4));
+        intervalPopup.showAsDropDown(anchor, 0, dp(2));
     }
 
     private void updateIntervalDisplay() {
-        networkIntervalButton.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+        networkIntervalValue.setText(formatIntervalValue(NetworkConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("network_update_interval", NetworkConfig.updateInterval).apply();
+    }
+
+    private int dp(int dp) {
+        return (int) (dp * activity.getResources().getDisplayMetrics().density);
     }
 }
