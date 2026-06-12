@@ -43,6 +43,9 @@ public class NetworkPanelController {
     private TextView networkBgMarginLabel, networkBgRadiusLabel;
     private TextView networkShadowBlurLabel, networkShadowOffsetXLabel, networkShadowOffsetYLabel;
     private NetworkPositionController networkPositionController;
+    private Button networkIntervalMinus;
+    private Button networkIntervalPlus;
+    private TextView networkIntervalLabel;
 
     public NetworkPanelController(MainActivity activity) {
         this.activity = activity;
@@ -100,6 +103,9 @@ public class NetworkPanelController {
         networkShadowBlurLabel = activity.findViewById(R.id.networkShadowBlurLabel);
         networkShadowOffsetXLabel = activity.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = activity.findViewById(R.id.networkShadowOffsetYLabel);
+        networkIntervalMinus = activity.findViewById(R.id.networkIntervalMinus);
+        networkIntervalPlus = activity.findViewById(R.id.networkIntervalPlus);
+        networkIntervalLabel = activity.findViewById(R.id.networkIntervalLabel);
 
         View sectionDisplay = activity.findViewById(R.id.network_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.network_sectionDisplayHeader);
@@ -148,6 +154,13 @@ public class NetworkPanelController {
         networkShadowBlurLabel.setText("Blur Shadow: " + (int) NetworkConfig.shadow.blur);
         networkShadowOffsetXLabel.setText("Shadow X: " + (int) NetworkConfig.shadow.offsetX);
         networkShadowOffsetYLabel.setText("Shadow Y: " + (int) NetworkConfig.shadow.offsetY);
+        networkIntervalLabel.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+    }
+
+    private String formatIntervalLabel(float v) {
+        if (v == (long) v) return "Update: " + (long) v + "s";
+        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
+        return "Update: " + s + "s";
     }
 
     private void setupListeners() {
@@ -352,6 +365,8 @@ public class NetworkPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_safe_area", isChecked).apply();
         });
+
+        setupIntervalListeners();
     }
 
     private void saveNetworkShadowPrefs() {
@@ -361,5 +376,43 @@ public class NetworkPanelController {
                 .putFloat("network_shadow_offset_x", NetworkConfig.shadow.offsetX)
                 .putFloat("network_shadow_offset_y", NetworkConfig.shadow.offsetY)
                 .apply();
+    }
+
+    private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
+
+    private void setupIntervalListeners() {
+        networkIntervalMinus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(NetworkConfig.updateInterval);
+            if (idx > 0) {
+                NetworkConfig.updateInterval = INTERVAL_STEPS[idx - 1];
+                updateIntervalDisplay();
+                FloatingService.updateNetworkUpdateIntervalStatic();
+            }
+        });
+
+        networkIntervalPlus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(NetworkConfig.updateInterval);
+            if (idx < INTERVAL_STEPS.length - 1) {
+                NetworkConfig.updateInterval = INTERVAL_STEPS[idx + 1];
+                updateIntervalDisplay();
+                FloatingService.updateNetworkUpdateIntervalStatic();
+            }
+        });
+    }
+
+    private int findIntervalIndex(float val) {
+        int closest = 0;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
+                closest = i;
+            }
+        }
+        return closest;
+    }
+
+    private void updateIntervalDisplay() {
+        networkIntervalLabel.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit().putFloat("network_update_interval", NetworkConfig.updateInterval).apply();
     }
 }

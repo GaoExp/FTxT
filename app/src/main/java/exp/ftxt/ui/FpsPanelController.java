@@ -46,6 +46,9 @@ public class FpsPanelController {
     private TextView fpsBgMarginLabel, fpsBgRadiusLabel;
     private TextView fpsShadowBlurLabel, fpsShadowOffsetXLabel, fpsShadowOffsetYLabel;
     private FpsPositionController fpsPositionController;
+    private Button fpsIntervalMinus;
+    private Button fpsIntervalPlus;
+    private TextView fpsIntervalLabel;
 
     public FpsPanelController(MainActivity activity) {
         this.activity = activity;
@@ -104,6 +107,9 @@ public class FpsPanelController {
         fpsShadowBlurLabel = activity.findViewById(R.id.fpsShadowBlurLabel);
         fpsShadowOffsetXLabel = activity.findViewById(R.id.fpsShadowOffsetXLabel);
         fpsShadowOffsetYLabel = activity.findViewById(R.id.fpsShadowOffsetYLabel);
+        fpsIntervalMinus = activity.findViewById(R.id.fpsIntervalMinus);
+        fpsIntervalPlus = activity.findViewById(R.id.fpsIntervalPlus);
+        fpsIntervalLabel = activity.findViewById(R.id.fpsIntervalLabel);
 
         View sectionDisplay = activity.findViewById(R.id.fps_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.fps_sectionDisplayHeader);
@@ -153,6 +159,13 @@ public class FpsPanelController {
         fpsShadowBlurLabel.setText("Blur Shadow: " + (int) FpsConfig.shadow.blur);
         fpsShadowOffsetXLabel.setText("Shadow X: " + (int) FpsConfig.shadow.offsetX);
         fpsShadowOffsetYLabel.setText("Shadow Y: " + (int) FpsConfig.shadow.offsetY);
+        fpsIntervalLabel.setText(formatIntervalLabel(FpsConfig.updateInterval));
+    }
+
+    private String formatIntervalLabel(float v) {
+        if (v == (long) v) return "Update: " + (long) v + "s";
+        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
+        return "Update: " + s + "s";
     }
 
     private void setupListeners() {
@@ -383,6 +396,8 @@ public class FpsPanelController {
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow X", fpsShadowOffsetXSeekBar, fpsShadowOffsetXLabel, "Shadow X: "));
         fpsShadowOffsetYLabel.setOnClickListener(v ->
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", fpsShadowOffsetYSeekBar, fpsShadowOffsetYLabel, "Shadow Y: "));
+
+        setupIntervalListeners();
     }
 
     private void saveFpsShadowPrefs() {
@@ -392,5 +407,43 @@ public class FpsPanelController {
                 .putFloat("fps_shadow_offset_x", FpsConfig.shadow.offsetX)
                 .putFloat("fps_shadow_offset_y", FpsConfig.shadow.offsetY)
                 .apply();
+    }
+
+    private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
+
+    private void setupIntervalListeners() {
+        fpsIntervalMinus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(FpsConfig.updateInterval);
+            if (idx > 0) {
+                FpsConfig.updateInterval = INTERVAL_STEPS[idx - 1];
+                updateIntervalDisplay();
+                FloatingService.updateFpsUpdateIntervalStatic();
+            }
+        });
+
+        fpsIntervalPlus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(FpsConfig.updateInterval);
+            if (idx < INTERVAL_STEPS.length - 1) {
+                FpsConfig.updateInterval = INTERVAL_STEPS[idx + 1];
+                updateIntervalDisplay();
+                FloatingService.updateFpsUpdateIntervalStatic();
+            }
+        });
+    }
+
+    private int findIntervalIndex(float val) {
+        int closest = 0;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
+                closest = i;
+            }
+        }
+        return closest;
+    }
+
+    private void updateIntervalDisplay() {
+        fpsIntervalLabel.setText(formatIntervalLabel(FpsConfig.updateInterval));
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit().putFloat("fps_update_interval", FpsConfig.updateInterval).apply();
     }
 }

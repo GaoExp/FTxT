@@ -212,7 +212,7 @@ public class NetworkModule {
             lastTxBytes = txBytes;
             lastTimestamp = now;
 
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, (long)(NetworkConfig.updateInterval * 1000));
         }
     };
 

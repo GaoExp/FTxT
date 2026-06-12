@@ -75,6 +75,7 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Menampilkan frame rate real-time
 - Opsi "Hanya Nilai" untuk menyembunyikan label FPS
 - Ukuran 5–140sp, dengan shadow, background, dan kontrol posisi
+- Interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Jam Digital
 - Format 24 jam `HH:mm:ss`, update tiap 1 detik
@@ -82,8 +83,9 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
 ### Suhu Baterai
-- Menampilkan suhu baterai dalam °C, update tiap 5 detik
-- Opsi tampilkan hanya nilai suhu
+- Menampilkan suhu baterai dalam °C
+- Opsi tampilkan hanya nilai suhu, persentase
+- Interval update bisa diatur 0.2–10 detik (default 5d)
 
 ### Battery Percentage
 - Menampilkan persentase baterai dalam %, update tiap 5 detik
@@ -91,12 +93,13 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 
 ### Battery Current
 - Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
-- Update tiap 5 detik
+- Opsi tampilkan mV, mA, W (toggle)
+- Interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Network Speed
 - Kecepatan internet real-time format `↓128KB/s ↑128KB/s`
 - Otomatis berubah ke MB/s saat >1024 KB/s
-- Polling tiap 1 detik via TrafficStats
+- Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Watermark
 - Teks watermark kustom dengan opacity semi-transparan

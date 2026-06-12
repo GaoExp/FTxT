@@ -46,6 +46,9 @@ public class BatteryCurrentPanelController {
     private TextView batCurBgMarginLabel, batCurBgRadiusLabel;
     private TextView batCurShadowBlurLabel, batCurShadowOffsetXLabel, batCurShadowOffsetYLabel;
     private BatteryCurrentPositionController batCurPositionController;
+    private Button batCurIntervalMinus;
+    private Button batCurIntervalPlus;
+    private TextView batCurIntervalLabel;
 
     public BatteryCurrentPanelController(MainActivity activity) {
         this.activity = activity;
@@ -106,6 +109,9 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
         batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
         batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
+        batCurIntervalMinus = activity.findViewById(R.id.batCurIntervalMinus);
+        batCurIntervalPlus = activity.findViewById(R.id.batCurIntervalPlus);
+        batCurIntervalLabel = activity.findViewById(R.id.batCurIntervalLabel);
 
         View sectionDisplay = activity.findViewById(R.id.batCur_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.batCur_sectionDisplayHeader);
@@ -160,6 +166,7 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryCurrentConfig.shadow.blur);
         batCurShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryCurrentConfig.shadow.offsetX);
         batCurShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryCurrentConfig.shadow.offsetY);
+        batCurIntervalLabel.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -385,6 +392,8 @@ public class BatteryCurrentPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_safe_area", isChecked).apply();
         });
+
+        setupIntervalListeners();
     }
 
     private void saveBatCurShadowPrefs() {
@@ -394,5 +403,49 @@ public class BatteryCurrentPanelController {
                 .putFloat("batcur_shadow_offset_x", BatteryCurrentConfig.shadow.offsetX)
                 .putFloat("batcur_shadow_offset_y", BatteryCurrentConfig.shadow.offsetY)
                 .apply();
+    }
+
+    private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
+
+    private void setupIntervalListeners() {
+        batCurIntervalMinus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(BatteryCurrentConfig.updateInterval);
+            if (idx > 0) {
+                BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx - 1];
+                updateIntervalDisplay();
+                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+            }
+        });
+
+        batCurIntervalPlus.setOnClickListener(v -> {
+            int idx = findIntervalIndex(BatteryCurrentConfig.updateInterval);
+            if (idx < INTERVAL_STEPS.length - 1) {
+                BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx + 1];
+                updateIntervalDisplay();
+                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+            }
+        });
+    }
+
+    private int findIntervalIndex(float val) {
+        int closest = 0;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
+                closest = i;
+            }
+        }
+        return closest;
+    }
+
+    private void updateIntervalDisplay() {
+        batCurIntervalLabel.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit().putFloat("batcur_update_interval", BatteryCurrentConfig.updateInterval).apply();
+    }
+
+    private String formatIntervalLabel(float v) {
+        if (v == (long) v) return "Update: " + (long) v + "s";
+        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
+        return "Update: " + s + "s";
     }
 }

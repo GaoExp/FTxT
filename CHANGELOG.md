@@ -1,3 +1,32 @@
+## [3.9.3.71.0] - 2026-06-12
+### ✨ Fitur Baru
+- **Kontrol Interval Update (float, 0.2-10s)** — Semua modul (FPS, Network, Battery Current, Battery Temperature) kini mendukung interval update float dengan step: 0.2s, 0.5s, 0.75s, 1-10s. Tombol -/+ di panel masing-masing.
+### 🔧 Optimasi & Penyesuaian
+- **updateInterval int→float** — Semua Config berubah dari `int` ke `float`, module pakai `(long)(updateInterval * 1000)`.
+- **readFloatPref migration** — `MainActivity.readFloatPref()` handle migrasi SP dari int ke float agar tidak crash.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java` — `updateInterval` int→float (default 5f)
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — `* 1000L` → `(long)(* 1000)`
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsConfig.java` — `updateInterval` int→float (default 1f)
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — `* 1000L` → `(long)(* 1000)`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkConfig.java` — `updateInterval` int→float (default 1f)
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — `* 1000L` → `(long)(* 1000)`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentConfig.java` — `updateInterval` int→float (default 1f)
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — `* 1000L` → `(long)(* 1000)`
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah 4 method update interval static
+- `app/src/main/java/exp/ftxt/MainActivity.java` — `readFloatPref()` migrasi SP int→float + load 4 key interval
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Interval float steps + `formatIntervalLabel()`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Interval float steps + `formatIntervalLabel()`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Interval float steps + `formatIntervalLabel()`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Interval float steps + `formatIntervalLabel()`
+- `app/src/main/res/layout/panel_battery.xml` — Tambah interval controls
+- `app/src/main/res/layout/panel_fps.xml` — Tambah interval controls
+- `app/src/main/res/layout/panel_network.xml` — Tambah interval controls
+- `app/src/main/res/layout/panel_battery_current.xml` — Tambah interval controls
+### 🔢 Version
+versionCode: 149
+versionName: 3.9.3.71.0
+---
 ## [3.9.3.70.0] - 2026-06-11
 ### ✨ Fitur Baru
 - **Kontrol Interval Update Battery Stats** — Tambah tombol - dan + di panel Battery Stats untuk mengatur interval update dari 1-10 detik. Label menampilkan interval aktif (contoh: "Update: 5s"). Interval disimpan di SharedPreferences dan diaplikasikan langsung.

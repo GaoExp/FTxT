@@ -23,4 +23,5 @@ public class BatteryCurrentConfig {
     public static boolean showPower = true;
     public static float posX = 0.75f;
     public static float posY = 0.85f;
+    public static float updateInterval = 1f; // detik: 0.2, 0.5, 0.75, 1-10
 }

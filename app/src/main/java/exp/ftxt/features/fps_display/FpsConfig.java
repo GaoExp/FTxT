@@ -21,4 +21,5 @@ public class FpsConfig {
     public static boolean showOnlyValue = false;
     public static float posX = 0.05f;
     public static float posY = 0.05f;
+    public static float updateInterval = 1f; // detik: 0.2, 0.5, 0.75, 1-10
 }

@@ -505,6 +505,7 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.shadow.offsetY = prefs.getFloat("fps_shadow_offset_y", 3f);
         FpsConfig.touchPassthrough = prefs.getBoolean("fps_lock", true);
         FpsConfig.showOnlyValue = prefs.getBoolean("fps_show_only_value", false);
+        FpsConfig.updateInterval = readFloatPref(prefs, "fps_update_interval", 1f);
         FpsConfig.bgEnabled = prefs.getBoolean("fps_bg_enabled", false);
         FpsConfig.bgColor = prefs.getInt("fps_bg_color", 0xCC000000);
         FpsConfig.bgPadding = prefs.getInt("fps_bg_padding", 10);
@@ -538,6 +539,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkConfig.bgEnabled = prefs.getBoolean("network_bg_enabled", false);
         NetworkConfig.bgColor = prefs.getInt("network_bg_color", 0xCC000000);
         NetworkConfig.bgPadding = prefs.getInt("network_bg_padding", 8);
+        NetworkConfig.updateInterval = readFloatPref(prefs, "network_update_interval", 1f);
 
         BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
         BatteryCurrentConfig.color = prefs.getInt("batcur_color", Color.GREEN);
@@ -554,6 +556,7 @@ public class MainActivity extends AppCompatActivity {
         BatteryCurrentConfig.showVoltage = prefs.getBoolean("batcur_show_voltage", true);
         BatteryCurrentConfig.showCurrent = prefs.getBoolean("batcur_show_current", true);
         BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
+        BatteryCurrentConfig.updateInterval = readFloatPref(prefs, "batcur_update_interval", 1f);
 
         BatteryPercentageConfig.enabled = prefs.getBoolean("battpct_enabled", false);
         BatteryPercentageConfig.size = prefs.getFloat("battpct_size", 12f);
@@ -587,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
         BatteryConfig.bgEnabled = prefs.getBoolean("battery_bg_enabled", false);
         BatteryConfig.bgColor = prefs.getInt("battery_bg_color", 0xCC000000);
         BatteryConfig.bgPadding = prefs.getInt("battery_bg_padding", 8);
-        BatteryConfig.updateInterval = prefs.getInt("battery_update_interval", 5);
+        BatteryConfig.updateInterval = readFloatPref(prefs, "battery_update_interval", 5f);
 
         WatermarkConfig.enabled = prefs.getBoolean("watermark_enabled", false);
         WatermarkConfig.text = prefs.getString("watermark_text", "Watermark");
@@ -606,6 +609,16 @@ public class MainActivity extends AppCompatActivity {
         WatermarkConfig.patternSpacingH = prefs.getFloat("watermark_pattern_spacing_h", 180f);
         WatermarkConfig.patternSpacingV = prefs.getFloat("watermark_pattern_spacing_v", 220f);
         WatermarkConfig.patternAngle = prefs.getFloat("watermark_pattern_angle", -30f);
+    }
+
+    private float readFloatPref(SharedPreferences prefs, String key, float defaultVal) {
+        try {
+            return prefs.getFloat(key, defaultVal);
+        } catch (ClassCastException e) {
+            int old = prefs.getInt(key, (int) defaultVal);
+            prefs.edit().remove(key).putFloat(key, old).apply();
+            return old;
+        }
     }
 
     private void updateNavSelection(int selectedId) {

@@ -281,7 +281,7 @@ public class FpsModule {
             }
             frameCount++;
             long elapsed = (frameTimeNanos - lastFrameTime) / 1000000;
-            if (elapsed >= 1000) {
+            if (elapsed >= (long)(FpsConfig.updateInterval * 1000)) {
                 fpsValue = (float) frameCount * 1000 / elapsed;
                 frameCount = 0;
                 lastFrameTime = frameTimeNanos;

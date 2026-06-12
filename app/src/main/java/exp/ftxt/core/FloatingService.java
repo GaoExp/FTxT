@@ -285,6 +285,13 @@ public class FloatingService extends Service {
         return null;
     }
 
+    public static void updateFpsUpdateIntervalStatic() {
+        if (instance != null && instance.fpsModule != null) {
+            instance.fpsModule.stop();
+            instance.fpsModule.start(instance.windowManager, instance);
+        }
+    }
+
     // --- Clock Module Delegates ---
 
     public static void startClockStatic() {
@@ -411,6 +418,13 @@ public class FloatingService extends Service {
         return null;
     }
 
+    public static void updateNetworkUpdateIntervalStatic() {
+        if (instance != null && instance.networkModule != null) {
+            instance.networkModule.stop();
+            instance.networkModule.start(instance.windowManager, instance);
+        }
+    }
+
     // --- Battery Percentage Module Delegates ---
 
     public static void startBatteryPercentageStatic() {
@@ -535,6 +549,13 @@ public class FloatingService extends Service {
             return instance.batteryCurrentModule.getCurrentPosition();
         }
         return null;
+    }
+
+    public static void updateBatteryCurrentUpdateIntervalStatic() {
+        if (instance != null && instance.batteryCurrentModule != null) {
+            instance.batteryCurrentModule.stop();
+            instance.batteryCurrentModule.start(instance.windowManager, instance);
+        }
     }
 
     // --- Watermark Module Delegates ---

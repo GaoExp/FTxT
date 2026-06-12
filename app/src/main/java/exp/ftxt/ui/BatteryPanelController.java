@@ -164,7 +164,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
-        batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
+        batteryIntervalLabel.setText(formatIntervalLabel(BatteryConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -400,25 +400,47 @@ public class BatteryPanelController {
                 .apply();
     }
 
+    private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
+
     private void setupIntervalListeners() {
         batteryIntervalMinus.setOnClickListener(v -> {
-            if (BatteryConfig.updateInterval > 1) {
-                BatteryConfig.updateInterval--;
-                batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
-                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putInt("battery_update_interval", BatteryConfig.updateInterval).apply();
+            int idx = findIntervalIndex(BatteryConfig.updateInterval);
+            if (idx > 0) {
+                BatteryConfig.updateInterval = INTERVAL_STEPS[idx - 1];
+                updateIntervalDisplay();
                 FloatingService.updateBatteryUpdateIntervalStatic();
             }
         });
 
         batteryIntervalPlus.setOnClickListener(v -> {
-            if (BatteryConfig.updateInterval < 10) {
-                BatteryConfig.updateInterval++;
-                batteryIntervalLabel.setText("Update: " + BatteryConfig.updateInterval + "s");
-                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                        .edit().putInt("battery_update_interval", BatteryConfig.updateInterval).apply();
+            int idx = findIntervalIndex(BatteryConfig.updateInterval);
+            if (idx < INTERVAL_STEPS.length - 1) {
+                BatteryConfig.updateInterval = INTERVAL_STEPS[idx + 1];
+                updateIntervalDisplay();
                 FloatingService.updateBatteryUpdateIntervalStatic();
             }
         });
+    }
+
+    private int findIntervalIndex(float val) {
+        int closest = 0;
+        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
+                closest = i;
+            }
+        }
+        return closest;
+    }
+
+    private void updateIntervalDisplay() {
+        batteryIntervalLabel.setText(formatIntervalLabel(BatteryConfig.updateInterval));
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit().putFloat("battery_update_interval", BatteryConfig.updateInterval).apply();
+    }
+
+    private String formatIntervalLabel(float v) {
+        if (v == (long) v) return "Update: " + (long) v + "s";
+        String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
+        return "Update: " + s + "s";
     }
 }

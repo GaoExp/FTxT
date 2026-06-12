@@ -196,7 +196,7 @@ public class BatteryCurrentModule {
             if (view != null) {
                 view.setText(getBatteryCurrentText());
             }
-            handler.postDelayed(this, 1000);
+            handler.postDelayed(this, (long)(BatteryCurrentConfig.updateInterval * 1000));
         }
     };
 

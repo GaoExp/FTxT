@@ -1,3 +1,15 @@
+[3.9.3.71.0] - 2026-06-12
+✨ Fitur Baru
+- Kontrol Interval Update (float, 0.2-10s) — Semua modul (FPS, Network, Battery Current, Battery Temperature) kini mendukung interval update float dengan step: 0.2s, 0.5s, 0.75s, 1-10s. Tombol -/+ di panel masing-masing.
+🔧 Optimasi & Penyesuaian
+- updateInterval int→float — Semua Config berubah dari int ke float, module pakai (long)(updateInterval * 1000).
+- readFloatPref migration — MainActivity.readFloatPref() handle migrasi SP dari int ke float agar tidak crash.
+🔢 Version
+versionCode: 149
+versionName: 3.9.3.71.0
+
+══════════════════════════════════════════════
+
 [3.9.3.69.9] - 2026-06-11
 ✨ Fitur Baru
 - Kontrol Interval Update Battery Stats — Tambah tombol - dan + di panel Battery Stats untuk mengatur interval update dari 1-10 detik. Label menampilkan interval aktif (contoh: "Update: 5s"). Interval disimpan di SharedPreferences dan diaplikasikan langsung.
