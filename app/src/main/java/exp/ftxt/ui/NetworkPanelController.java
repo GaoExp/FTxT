@@ -26,6 +26,7 @@ public class NetworkPanelController {
     private final MainActivity activity;
 
     private CheckBox networkSwitch;
+    private CheckBox networkValueOnlyCheck;
     private SeekBar networkSizeSeekBar;
     private View networkColorPreview;
     private View networkLabelColorPreview;
@@ -81,6 +82,7 @@ public class NetworkPanelController {
 
     private void bindViews() {
         networkSwitch = activity.findViewById(R.id.networkSwitch);
+        networkValueOnlyCheck = activity.findViewById(R.id.networkValueOnlyCheck);
         networkSizeSeekBar = activity.findViewById(R.id.networkSizeSeekBar);
         networkColorPreview = activity.findViewById(R.id.networkColorPreview);
         networkLabelColorPreview = activity.findViewById(R.id.networkLabelColorPreview);
@@ -150,6 +152,7 @@ public class NetworkPanelController {
         networkShadowOffsetYSeekBar.setProgress((int) NetworkConfig.shadow.offsetY + 60);
         networkLockSwitch.setChecked(NetworkConfig.touchPassthrough);
         activity.applyCheckboxTint(networkLockSwitch, NetworkConfig.touchPassthrough);
+        networkValueOnlyCheck.setChecked(NetworkConfig.showOnlyValue);
         networkSafeArea.setChecked(NetworkConfig.safeArea);
         networkSizeLabel.setText("Ukuran Teks: " + (int) NetworkConfig.size);
         networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bg.padding);
@@ -374,6 +377,15 @@ public class NetworkPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_lock", isChecked).apply();
             FloatingService.updateNetworkTouchFlagsStatic();
+        });
+
+        networkValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.showOnlyValue = isChecked;
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_show_only_value", isChecked).apply();
+            if (FloatingService.instance != null && FloatingService.instance.networkModule != null) {
+                FloatingService.instance.networkModule.updateColor(NetworkConfig.color);
+            }
         });
 
         networkSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {

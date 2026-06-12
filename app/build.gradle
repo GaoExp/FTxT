@@ -22,8 +22,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 152
-        versionName "3.9.3.72.1"
+        versionCode 153
+        versionName "3.9.3.73.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

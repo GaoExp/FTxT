@@ -203,15 +203,19 @@ public class NetworkModule {
         if (view == null) return;
         String text = getCurrentSpeedText();
         view.setTextColor(NetworkConfig.color);
-        SpannableString spannable = new SpannableString(text);
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
-                spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
-                        i, i + 1, 0);
+        if (NetworkConfig.showOnlyValue) {
+            view.setText(text.replace("↓", "").replace("↑", "").replace("MB/s", "").replace("KB/s", ""));
+        } else {
+            SpannableString spannable = new SpannableString(text);
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
+                    spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
+                            i, i + 1, 0);
+                }
             }
+            view.setText(spannable);
         }
-        view.setText(spannable);
     }
 
     private final Runnable tickRunnable = new Runnable() {

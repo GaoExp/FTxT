@@ -1,3 +1,20 @@
+## [3.9.3.73.0] - 2026-06-12
+### ✨ Fitur Baru
+- **Sembunyikan Label untuk Network Stats** — Opsi baru "Sembunyikan Label" di panel Network Stats untuk menyembunyikan label ↓↑MB/s dan hanya menampilkan angka kecepatan.
+### ♻️ Perubahan Fitur
+- **Rename "Hanya Tampilkan Nilai" jadi "Sembunyikan Label"** — FPS dan Battery: teks opsi diganti agar lebih jelas maksudnya.
+- **Interval inline pindah ke samping checkbox** — Kontrol `Update= [X]s` dipindah dari bawah baris warna ke samping kanan checkbox "Sembunyikan Label" di panel FPS, Battery, dan Network.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkConfig.java` — Tambah field `showOnlyValue`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Implementasi logika `showOnlyValue`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Tambah checkbox handler & UI untuk showOnlyValue
+- `app/src/main/res/layout/panel_network.xml` — Tambah checkbox "Sembunyikan Label"; interval inline pindah ke samping checkbox
+- `app/src/main/res/layout/panel_fps.xml` — Rename teks checkbox; interval inline pindah ke samping checkbox
+- `app/src/main/res/layout/panel_battery.xml` — Rename teks checkbox; interval inline pindah ke samping checkbox
+### 🔢 Version
+versionCode: 153
+versionName: 3.9.3.73.0
+
 ## [3.9.3.72.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Kontrol Interval semua modul jadi single button + dialog** — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method `findIntervalIndex()` dihapus.
