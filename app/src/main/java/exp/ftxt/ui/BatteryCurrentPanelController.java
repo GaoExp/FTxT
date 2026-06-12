@@ -1,5 +1,6 @@
 package exp.ftxt.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
@@ -47,9 +48,7 @@ public class BatteryCurrentPanelController {
     private TextView batCurBgMarginLabel, batCurBgRadiusLabel;
     private TextView batCurShadowBlurLabel, batCurShadowOffsetXLabel, batCurShadowOffsetYLabel;
     private BatteryCurrentPositionController batCurPositionController;
-    private Button batCurIntervalMinus;
-    private Button batCurIntervalPlus;
-    private TextView batCurIntervalLabel;
+    private Button batCurIntervalButton;
 
     public BatteryCurrentPanelController(MainActivity activity) {
         this.activity = activity;
@@ -111,9 +110,7 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
         batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
         batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
-        batCurIntervalMinus = activity.findViewById(R.id.batCurIntervalMinus);
-        batCurIntervalPlus = activity.findViewById(R.id.batCurIntervalPlus);
-        batCurIntervalLabel = activity.findViewById(R.id.batCurIntervalLabel);
+        batCurIntervalButton = activity.findViewById(R.id.batCurIntervalButton);
 
         View sectionDisplay = activity.findViewById(R.id.batCur_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.batCur_sectionDisplayHeader);
@@ -168,7 +165,7 @@ public class BatteryCurrentPanelController {
         batCurShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryCurrentConfig.shadow.blur);
         batCurShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryCurrentConfig.shadow.offsetX);
         batCurShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryCurrentConfig.shadow.offsetY);
-        batCurIntervalLabel.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
+        batCurIntervalButton.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -419,37 +416,24 @@ public class BatteryCurrentPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        batCurIntervalMinus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(BatteryCurrentConfig.updateInterval);
-            if (idx > 0) {
-                BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx - 1];
-                updateIntervalDisplay();
-                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+        batCurIntervalButton.setOnClickListener(v -> {
+            String[] items = new String[INTERVAL_STEPS.length];
+            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
             }
+            new AlertDialog.Builder(activity)
+                    .setTitle("Interval Update")
+                    .setItems(items, (dialog, which) -> {
+                        BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[which];
+                        updateIntervalDisplay();
+                        FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+                    })
+                    .show();
         });
-
-        batCurIntervalPlus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(BatteryCurrentConfig.updateInterval);
-            if (idx < INTERVAL_STEPS.length - 1) {
-                BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx + 1];
-                updateIntervalDisplay();
-                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
-            }
-        });
-    }
-
-    private int findIntervalIndex(float val) {
-        int closest = 0;
-        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
-                closest = i;
-            }
-        }
-        return closest;
     }
 
     private void updateIntervalDisplay() {
-        batCurIntervalLabel.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
+        batCurIntervalButton.setText(formatIntervalLabel(BatteryCurrentConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("batcur_update_interval", BatteryCurrentConfig.updateInterval).apply();
     }

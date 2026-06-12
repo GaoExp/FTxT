@@ -1,3 +1,19 @@
+## [3.9.3.72.1] - 2026-06-12
+### ♻️ Perubahan Fitur
+- **Kontrol Interval semua modul jadi single button + dialog** — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method `findIntervalIndex()` dihapus.
+### ✏️ File Changed
+- `app/src/main/res/layout/panel_fps.xml` — Ganti `fpsIntervalMinus`/`Plus`/`Label` dengan `fpsIntervalButton`
+- `app/src/main/res/layout/panel_battery.xml` — Ganti `batteryIntervalMinus`/`Plus`/`Label` dengan `batteryIntervalButton`
+- `app/src/main/res/layout/panel_battery_current.xml` — Ganti `batCurIntervalMinus`/`Plus`/`Label` dengan `batCurIntervalButton`
+- `app/src/main/res/layout/panel_network.xml` — Ganti `networkIntervalMinus`/`Plus`/`Label` dengan `networkIntervalButton`
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Refactor kontrol interval ke AlertDialog
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Refactor kontrol interval ke AlertDialog
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Refactor kontrol interval ke AlertDialog
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Refactor kontrol interval ke AlertDialog
+### 🔢 Version
+versionCode: 152
+versionName: 3.9.3.72.1
+
 ## [3.9.3.72.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Warna Label FPS Terpisah** — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `fps_label_color`).

@@ -1,3 +1,12 @@
+[3.9.3.72.1] - 2026-06-12
+♻️ Perubahan Fitur
+- Kontrol Interval semua modul jadi single button + dialog — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method findIntervalIndex() dihapus.
+🔢 Version
+versionCode: 152
+versionName: 3.9.3.72.1
+
+══════════════════════════════════════════════
+
 [3.9.3.72.0] - 2026-06-12
 ✨ Fitur Baru
 - Warna Label FPS Terpisah — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences.

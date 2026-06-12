@@ -1,5 +1,6 @@
 package exp.ftxt.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
@@ -44,9 +45,7 @@ public class NetworkPanelController {
     private TextView networkBgMarginLabel, networkBgRadiusLabel;
     private TextView networkShadowBlurLabel, networkShadowOffsetXLabel, networkShadowOffsetYLabel;
     private NetworkPositionController networkPositionController;
-    private Button networkIntervalMinus;
-    private Button networkIntervalPlus;
-    private TextView networkIntervalLabel;
+    private Button networkIntervalButton;
 
     public NetworkPanelController(MainActivity activity) {
         this.activity = activity;
@@ -105,9 +104,7 @@ public class NetworkPanelController {
         networkShadowBlurLabel = activity.findViewById(R.id.networkShadowBlurLabel);
         networkShadowOffsetXLabel = activity.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = activity.findViewById(R.id.networkShadowOffsetYLabel);
-        networkIntervalMinus = activity.findViewById(R.id.networkIntervalMinus);
-        networkIntervalPlus = activity.findViewById(R.id.networkIntervalPlus);
-        networkIntervalLabel = activity.findViewById(R.id.networkIntervalLabel);
+        networkIntervalButton = activity.findViewById(R.id.networkIntervalButton);
 
         View sectionDisplay = activity.findViewById(R.id.network_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.network_sectionDisplayHeader);
@@ -156,7 +153,7 @@ public class NetworkPanelController {
         networkShadowBlurLabel.setText("Blur Shadow: " + (int) NetworkConfig.shadow.blur);
         networkShadowOffsetXLabel.setText("Shadow X: " + (int) NetworkConfig.shadow.offsetX);
         networkShadowOffsetYLabel.setText("Shadow Y: " + (int) NetworkConfig.shadow.offsetY);
-        networkIntervalLabel.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+        networkIntervalButton.setText(formatIntervalLabel(NetworkConfig.updateInterval));
     }
 
     private String formatIntervalLabel(float v) {
@@ -392,37 +389,24 @@ public class NetworkPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        networkIntervalMinus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(NetworkConfig.updateInterval);
-            if (idx > 0) {
-                NetworkConfig.updateInterval = INTERVAL_STEPS[idx - 1];
-                updateIntervalDisplay();
-                FloatingService.updateNetworkUpdateIntervalStatic();
+        networkIntervalButton.setOnClickListener(v -> {
+            String[] items = new String[INTERVAL_STEPS.length];
+            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
             }
+            new AlertDialog.Builder(activity)
+                    .setTitle("Interval Update")
+                    .setItems(items, (dialog, which) -> {
+                        NetworkConfig.updateInterval = INTERVAL_STEPS[which];
+                        updateIntervalDisplay();
+                        FloatingService.updateNetworkUpdateIntervalStatic();
+                    })
+                    .show();
         });
-
-        networkIntervalPlus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(NetworkConfig.updateInterval);
-            if (idx < INTERVAL_STEPS.length - 1) {
-                NetworkConfig.updateInterval = INTERVAL_STEPS[idx + 1];
-                updateIntervalDisplay();
-                FloatingService.updateNetworkUpdateIntervalStatic();
-            }
-        });
-    }
-
-    private int findIntervalIndex(float val) {
-        int closest = 0;
-        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
-                closest = i;
-            }
-        }
-        return closest;
     }
 
     private void updateIntervalDisplay() {
-        networkIntervalLabel.setText(formatIntervalLabel(NetworkConfig.updateInterval));
+        networkIntervalButton.setText(formatIntervalLabel(NetworkConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("network_update_interval", NetworkConfig.updateInterval).apply();
     }

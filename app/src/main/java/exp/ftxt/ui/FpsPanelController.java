@@ -1,5 +1,6 @@
 package exp.ftxt.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
@@ -47,9 +48,7 @@ public class FpsPanelController {
     private TextView fpsBgMarginLabel, fpsBgRadiusLabel;
     private TextView fpsShadowBlurLabel, fpsShadowOffsetXLabel, fpsShadowOffsetYLabel;
     private FpsPositionController fpsPositionController;
-    private Button fpsIntervalMinus;
-    private Button fpsIntervalPlus;
-    private TextView fpsIntervalLabel;
+    private Button fpsIntervalButton;
 
     public FpsPanelController(MainActivity activity) {
         this.activity = activity;
@@ -109,9 +108,7 @@ public class FpsPanelController {
         fpsShadowBlurLabel = activity.findViewById(R.id.fpsShadowBlurLabel);
         fpsShadowOffsetXLabel = activity.findViewById(R.id.fpsShadowOffsetXLabel);
         fpsShadowOffsetYLabel = activity.findViewById(R.id.fpsShadowOffsetYLabel);
-        fpsIntervalMinus = activity.findViewById(R.id.fpsIntervalMinus);
-        fpsIntervalPlus = activity.findViewById(R.id.fpsIntervalPlus);
-        fpsIntervalLabel = activity.findViewById(R.id.fpsIntervalLabel);
+        fpsIntervalButton = activity.findViewById(R.id.fpsIntervalButton);
 
         View sectionDisplay = activity.findViewById(R.id.fps_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.fps_sectionDisplayHeader);
@@ -161,7 +158,7 @@ public class FpsPanelController {
         fpsShadowBlurLabel.setText("Blur Shadow: " + (int) FpsConfig.shadow.blur);
         fpsShadowOffsetXLabel.setText("Shadow X: " + (int) FpsConfig.shadow.offsetX);
         fpsShadowOffsetYLabel.setText("Shadow Y: " + (int) FpsConfig.shadow.offsetY);
-        fpsIntervalLabel.setText(formatIntervalLabel(FpsConfig.updateInterval));
+        fpsIntervalButton.setText(formatIntervalLabel(FpsConfig.updateInterval));
     }
 
     private String formatIntervalLabel(float v) {
@@ -423,37 +420,24 @@ public class FpsPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        fpsIntervalMinus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(FpsConfig.updateInterval);
-            if (idx > 0) {
-                FpsConfig.updateInterval = INTERVAL_STEPS[idx - 1];
-                updateIntervalDisplay();
-                FloatingService.updateFpsUpdateIntervalStatic();
+        fpsIntervalButton.setOnClickListener(v -> {
+            String[] items = new String[INTERVAL_STEPS.length];
+            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
             }
+            new AlertDialog.Builder(activity)
+                    .setTitle("Interval Update")
+                    .setItems(items, (dialog, which) -> {
+                        FpsConfig.updateInterval = INTERVAL_STEPS[which];
+                        updateIntervalDisplay();
+                        FloatingService.updateFpsUpdateIntervalStatic();
+                    })
+                    .show();
         });
-
-        fpsIntervalPlus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(FpsConfig.updateInterval);
-            if (idx < INTERVAL_STEPS.length - 1) {
-                FpsConfig.updateInterval = INTERVAL_STEPS[idx + 1];
-                updateIntervalDisplay();
-                FloatingService.updateFpsUpdateIntervalStatic();
-            }
-        });
-    }
-
-    private int findIntervalIndex(float val) {
-        int closest = 0;
-        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
-                closest = i;
-            }
-        }
-        return closest;
     }
 
     private void updateIntervalDisplay() {
-        fpsIntervalLabel.setText(formatIntervalLabel(FpsConfig.updateInterval));
+        fpsIntervalButton.setText(formatIntervalLabel(FpsConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("fps_update_interval", FpsConfig.updateInterval).apply();
     }

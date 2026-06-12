@@ -1,12 +1,12 @@
 package exp.ftxt.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -48,9 +48,7 @@ public class BatteryPanelController {
     private TextView batteryBgMarginLabel, batteryBgRadiusLabel;
     private TextView batteryShadowBlurLabel, batteryShadowOffsetXLabel, batteryShadowOffsetYLabel;
     private BatteryPositionController batteryPositionController;
-    private Button batteryIntervalMinus;
-    private Button batteryIntervalPlus;
-    private TextView batteryIntervalLabel;
+    private Button batteryIntervalButton;
 
     public BatteryPanelController(MainActivity activity) {
         this.activity = activity;
@@ -112,9 +110,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel = activity.findViewById(R.id.batteryShadowBlurLabel);
         batteryShadowOffsetXLabel = activity.findViewById(R.id.batteryShadowOffsetXLabel);
         batteryShadowOffsetYLabel = activity.findViewById(R.id.batteryShadowOffsetYLabel);
-        batteryIntervalMinus = activity.findViewById(R.id.batteryIntervalMinus);
-        batteryIntervalPlus = activity.findViewById(R.id.batteryIntervalPlus);
-        batteryIntervalLabel = activity.findViewById(R.id.batteryIntervalLabel);
+        batteryIntervalButton = activity.findViewById(R.id.batteryIntervalButton);
 
         View sectionDisplay = activity.findViewById(R.id.battery_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.battery_sectionDisplayHeader);
@@ -166,7 +162,7 @@ public class BatteryPanelController {
         batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
         batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
-        batteryIntervalLabel.setText(formatIntervalLabel(BatteryConfig.updateInterval));
+        batteryIntervalButton.setText(formatIntervalLabel(BatteryConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -414,37 +410,24 @@ public class BatteryPanelController {
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
 
     private void setupIntervalListeners() {
-        batteryIntervalMinus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(BatteryConfig.updateInterval);
-            if (idx > 0) {
-                BatteryConfig.updateInterval = INTERVAL_STEPS[idx - 1];
-                updateIntervalDisplay();
-                FloatingService.updateBatteryUpdateIntervalStatic();
+        batteryIntervalButton.setOnClickListener(v -> {
+            String[] items = new String[INTERVAL_STEPS.length];
+            for (int i = 0; i < INTERVAL_STEPS.length; i++) {
+                items[i] = formatIntervalLabel(INTERVAL_STEPS[i]);
             }
+            new AlertDialog.Builder(activity)
+                    .setTitle("Interval Update")
+                    .setItems(items, (dialog, which) -> {
+                        BatteryConfig.updateInterval = INTERVAL_STEPS[which];
+                        updateIntervalDisplay();
+                        FloatingService.updateBatteryUpdateIntervalStatic();
+                    })
+                    .show();
         });
-
-        batteryIntervalPlus.setOnClickListener(v -> {
-            int idx = findIntervalIndex(BatteryConfig.updateInterval);
-            if (idx < INTERVAL_STEPS.length - 1) {
-                BatteryConfig.updateInterval = INTERVAL_STEPS[idx + 1];
-                updateIntervalDisplay();
-                FloatingService.updateBatteryUpdateIntervalStatic();
-            }
-        });
-    }
-
-    private int findIntervalIndex(float val) {
-        int closest = 0;
-        for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-            if (Math.abs(INTERVAL_STEPS[i] - val) < Math.abs(INTERVAL_STEPS[closest] - val)) {
-                closest = i;
-            }
-        }
-        return closest;
     }
 
     private void updateIntervalDisplay() {
-        batteryIntervalLabel.setText(formatIntervalLabel(BatteryConfig.updateInterval));
+        batteryIntervalButton.setText(formatIntervalLabel(BatteryConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .edit().putFloat("battery_update_interval", BatteryConfig.updateInterval).apply();
     }
