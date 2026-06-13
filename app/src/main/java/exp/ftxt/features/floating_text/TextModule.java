@@ -3,9 +3,13 @@ package exp.ftxt.features.floating_text;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.View;
 import android.view.WindowManager;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
@@ -28,6 +32,7 @@ import exp.ftxt.shared.ui.ShadowTextView;
 public class TextModule {
 
     private ShadowTextView view;
+    private SealPatternView sealView;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
@@ -36,6 +41,7 @@ public class TextModule {
     private int screenHeight;
     private String orientationSuffix;
     private int posCalibrationY;
+    private boolean patternMode;
 
     public static Runnable onPositionUpdate;
 
@@ -59,6 +65,12 @@ public class TextModule {
 
     public void createOverlay() {
         if (view != null) return;
+        patternMode = TextConfig.patternEnabled;
+
+        if (patternMode) {
+            createPatternOverlay();
+            return;
+        }
 
         DisplayMetrics metrics = new DisplayMetrics();
         wm.getDefaultDisplay().getRealMetrics(metrics);
@@ -94,7 +106,41 @@ public class TextModule {
         view.post(this::updatePosition);
     }
 
+    private void createPatternOverlay() {
+        sealView = new SealPatternView(context);
+
+        params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+                        | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+                        | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                PixelFormat.TRANSLUCENT
+        );
+
+        params.gravity = Gravity.TOP | Gravity.START;
+        params.x = 0;
+        params.y = 0;
+
+        try {
+            wm.addView(sealView, params);
+        } catch (Exception e) {
+            e.printStackTrace();
+            sealView = null;
+        }
+    }
+
     public void destroyOverlay() {
+        if (sealView != null && wm != null) {
+            try {
+                wm.removeView(sealView);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            sealView = null;
+        }
         if (view != null && wm != null) {
             try {
                 wm.removeView(view);
@@ -105,16 +151,29 @@ public class TextModule {
         }
     }
 
+    public void updatePattern() {
+        boolean newMode = TextConfig.patternEnabled;
+        if (newMode != patternMode) {
+            destroyOverlay();
+            createOverlay();
+        } else if (sealView != null) {
+            sealView.invalidate();
+        }
+    }
+
     public void updateText(String text) {
         if (view != null) view.setText(text);
+        if (sealView != null) sealView.invalidate();
     }
 
     public void updateSize(float size) {
         if (view != null) view.setTextSize(size);
+        if (sealView != null) sealView.invalidate();
     }
 
     public void updateColor(int color) {
         if (view != null) view.setTextColor(color);
+        if (sealView != null) sealView.invalidate();
     }
 
     public void updateShadow() {
@@ -268,5 +327,56 @@ public class TextModule {
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;
+    }
+
+    private class SealPatternView extends View {
+        private final Paint paint;
+
+        SealPatternView(Context context) {
+            super(context);
+            paint = new Paint();
+            paint.setAntiAlias(true);
+            paint.setSubpixelText(true);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            String text = TextConfig.text;
+            if (text == null || text.isEmpty()) return;
+
+            float textSize = TextConfig.size;
+            int color = TextConfig.patternColor;
+            float spacingH = TextConfig.patternSpacingH;
+            float spacingV = TextConfig.patternSpacingV;
+            float angle = TextConfig.patternAngle;
+
+            paint.setTextSize(textSize);
+            paint.setColor(color);
+            paint.setAlpha(Color.alpha(color));
+
+            float textWidth = paint.measureText(text);
+            Paint.FontMetrics fm = paint.getFontMetrics();
+            float textHeight = fm.descent - fm.ascent;
+
+            int w = getWidth();
+            int h = getHeight();
+            float diagonal = (float) Math.sqrt(w * w + h * h);
+
+            canvas.save();
+            canvas.rotate(angle, w / 2f, h / 2f);
+
+            float startX = -diagonal;
+            float startY = -diagonal + textHeight;
+
+            for (float x = startX; x < diagonal; x += spacingH) {
+                for (float y = startY; y < diagonal; y += spacingV) {
+                    canvas.drawText(text, x, y, paint);
+                }
+            }
+
+            canvas.restore();
+        }
     }
 }

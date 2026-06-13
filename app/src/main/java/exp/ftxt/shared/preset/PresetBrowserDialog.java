@@ -105,6 +105,7 @@ public class PresetBrowserDialog extends DialogFragment {
         filteredMetadata = new ArrayList<>(fullMetadata);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
+        recyclerView.addItemDecoration(new androidx.recyclerview.widget.DividerItemDecoration(activity, LinearLayoutManager.VERTICAL));
         adapter = new PresetAdapter();
         recyclerView.setAdapter(adapter);
 

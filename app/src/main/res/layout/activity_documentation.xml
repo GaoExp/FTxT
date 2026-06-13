@@ -12,64 +12,94 @@
         android:background="#2196F3"
         android:title="Dokumentasi"/>
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="0dp"
-        android:overScrollMode="always"
-        android:scrollbars="vertical"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/docList"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/docReadmeButton"
-                android:text="README"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
+                android:layout_height="match_parent"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="?android:attr/listDivider"
+                    android:showDividers="middle"
+                    android:dividerPadding="0dp">
 
-            <TextView
-                android:id="@+id/docChangelogButton"
-                android:text="CHANGELOG"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/docReadmeButton"
+                        android:text="README"
+                        android:textSize="16sp"
+                        android:padding="16dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"/>
+                    <TextView
+                        android:id="@+id/docChangelogButton"
+                        android:text="CHANGELOG"
+                        android:textSize="16sp"
+                        android:padding="16dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
 
-            <TextView
-                android:id="@+id/docPanduanButton"
-                android:text="PANDUAN"
-                android:textSize="16sp"
-                android:padding="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"/>
+                    <TextView
+                        android:id="@+id/docPanduanButton"
+                        android:text="PANDUAN"
+                        android:textSize="16sp"
+                        android:padding="16dp"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+            </ScrollView>
 
         </LinearLayout>
 
-    </ScrollView>
+        <LinearLayout
+            android:id="@+id/docContent"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="16dp"
+                android:overScrollMode="always"
+                android:scrollbars="vertical">
+
+                <TextView
+                    android:id="@+id/docTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="16dp"/>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>

@@ -7,6 +7,5 @@
     <item name="navBatteryCurrent" type="id"/>
     <item name="navClock" type="id"/>
     <item name="navCrosshair" type="id"/>
-    <item name="navWatermark" type="id"/>
     <item name="navLogo" type="id"/>
 </resources>

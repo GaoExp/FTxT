@@ -39,8 +39,6 @@
 
             <include layout="@layout/panel_crosshair"/>
 
-            <include layout="@layout/panel_watermark"/>
-
             <include layout="@layout/panel_logo"/>
 
         </FrameLayout>

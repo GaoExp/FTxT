@@ -48,6 +48,16 @@ public class TextPanelController {
     private TextView shadowBlurLabel, shadowOffsetXLabel, shadowOffsetYLabel;
     private TextPositionController positionController;
 
+    private CheckBox textPatternSwitch;
+    private SeekBar textPatternSpacingH;
+    private SeekBar textPatternSpacingV;
+    private SeekBar textPatternAngle;
+    private TextView textPatternSpacingHLabel;
+    private TextView textPatternSpacingVLabel;
+    private TextView textPatternAngleLabel;
+    private LinearLayout textPatternContainer;
+    private LinearLayout textPositionContainer;
+
     public TextPanelController(MainActivity activity) {
         this.activity = activity;
         bindViews();
@@ -122,6 +132,16 @@ public class TextPanelController {
         shadowOffsetXLabel = activity.findViewById(R.id.shadowOffsetXLabel);
         shadowOffsetYLabel = activity.findViewById(R.id.shadowOffsetYLabel);
 
+        textPatternSwitch = activity.findViewById(R.id.textPatternSwitch);
+        textPatternSpacingH = activity.findViewById(R.id.textPatternSpacingH);
+        textPatternSpacingV = activity.findViewById(R.id.textPatternSpacingV);
+        textPatternAngle = activity.findViewById(R.id.textPatternAngle);
+        textPatternSpacingHLabel = activity.findViewById(R.id.textPatternSpacingHLabel);
+        textPatternSpacingVLabel = activity.findViewById(R.id.textPatternSpacingVLabel);
+        textPatternAngleLabel = activity.findViewById(R.id.textPatternAngleLabel);
+        textPatternContainer = activity.findViewById(R.id.textPatternContainer);
+        textPositionContainer = activity.findViewById(R.id.textPositionContainer);
+
         View sectionDisplay = activity.findViewById(R.id.text_sectionDisplay);
         TextView sectionDisplayHeader = activity.findViewById(R.id.text_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
@@ -165,6 +185,16 @@ public class TextPanelController {
         shadowOffsetXLabel.setText("Shadow X: " + (int) TextConfig.shadow.offsetX);
         shadowOffsetYLabel.setText("Shadow Y: " + (int) TextConfig.shadow.offsetY);
         shadowColorPreview.setBackgroundColor(TextConfig.shadow.color);
+
+        textPatternSwitch.setChecked(TextConfig.patternEnabled);
+        activity.applyCheckboxTint(textPatternSwitch, TextConfig.patternEnabled);
+        textPatternSpacingH.setProgress((int) TextConfig.patternSpacingH);
+        textPatternSpacingV.setProgress((int) TextConfig.patternSpacingV);
+        textPatternAngle.setProgress((int) TextConfig.patternAngle + 180);
+        textPatternSpacingHLabel.setText("Spasi Horizontal: " + (int) TextConfig.patternSpacingH);
+        textPatternSpacingVLabel.setText("Spasi Vertikal: " + (int) TextConfig.patternSpacingV);
+        textPatternAngleLabel.setText("Sudut: " + (int) TextConfig.patternAngle + "\u00B0");
+        updatePatternVisibility();
     }
 
     private void setupListeners() {
@@ -387,6 +417,54 @@ public class TextPanelController {
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
+        textPatternSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            TextConfig.patternEnabled = isChecked;
+            activity.applyCheckboxTint(textPatternSwitch, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("text_pattern_enabled", isChecked).apply();
+            updatePatternVisibility();
+            FloatingService.updateTextPatternStatic();
+        });
+
+        textPatternSpacingH.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 50) progress = 50;
+                TextConfig.patternSpacingH = progress;
+                textPatternSpacingHLabel.setText("Spasi Horizontal: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("text_pattern_spacing_h", (float) progress).apply();
+                FloatingService.updateTextPatternStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        textPatternSpacingV.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 50) progress = 50;
+                TextConfig.patternSpacingV = progress;
+                textPatternSpacingVLabel.setText("Spasi Vertikal: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("text_pattern_spacing_v", (float) progress).apply();
+                FloatingService.updateTextPatternStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        textPatternAngle.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int angle = progress - 180;
+                TextConfig.patternAngle = angle;
+                textPatternAngleLabel.setText("Sudut: " + angle + "\u00B0");
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("text_pattern_angle", (float) angle).apply();
+                FloatingService.updateTextPatternStatic();
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
         textSizeLabel.setOnClickListener(v ->
                 SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", seekBar, 150, textSizeLabel, "Ukuran Teks: "));
         bgPaddingLabel.setOnClickListener(v ->
@@ -405,6 +483,18 @@ public class TextPanelController {
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow X", shadowOffsetXSeekBar, shadowOffsetXLabel, "Shadow X: "));
         shadowOffsetYLabel.setOnClickListener(v ->
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", shadowOffsetYSeekBar, shadowOffsetYLabel, "Shadow Y: "));
+    }
+
+    private void updatePatternVisibility() {
+        boolean pattern = TextConfig.patternEnabled;
+        if (textPositionContainer != null)
+            textPositionContainer.setVisibility(pattern ? View.GONE : View.VISIBLE);
+        if (textPatternContainer != null)
+            textPatternContainer.setVisibility(pattern ? View.VISIBLE : View.GONE);
+        if (touchPassthroughSwitch != null) {
+            touchPassthroughSwitch.setEnabled(!pattern);
+            touchPassthroughSwitch.setAlpha(pattern ? 0.4f : 1f);
+        }
     }
 
     private void applyInitialTints() {

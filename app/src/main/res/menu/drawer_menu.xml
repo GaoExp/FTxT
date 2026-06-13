@@ -32,10 +32,6 @@
             android:title="@string/nav_crosshair"/>
 
         <item
-            android:id="@+id/nav_watermark"
-            android:title="@string/nav_watermark"/>
-
-        <item
             android:id="@+id/nav_battery_percentage"
             android:title="@string/nav_battery_percentage"/>
 

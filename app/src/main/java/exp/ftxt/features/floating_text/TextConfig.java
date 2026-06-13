@@ -15,4 +15,11 @@ public class TextConfig {
     public static BackgroundConfig bg = new BackgroundConfig(25);
     public static float posX = 0.5f;
     public static float posY = 0.8f;
+
+    // Seal pattern mode
+    public static boolean patternEnabled = false;
+    public static float patternSpacingH = 180f;
+    public static float patternSpacingV = 220f;
+    public static float patternAngle = -30f;
+    public static int patternColor = 0x22FFFFFF;
 }

@@ -21,7 +21,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <!-- Overlay + Kunci Posisi -->
+    <!-- Overlay + Mode Segel + Kunci Posisi -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -31,6 +31,13 @@
         <CheckBox
             android:id="@+id/overlaySwitch"
             android:text="Overlay"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <CheckBox
+            android:id="@+id/textPatternSwitch"
+            android:text="Mode Segel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"/>
@@ -182,6 +189,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+    <!-- Position Controls Container (hidden in pattern mode) -->
+    <LinearLayout
+        android:id="@+id/textPositionContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <!-- Kontrol Posisi -->
     <LinearLayout
         android:orientation="horizontal"
@@ -302,6 +316,65 @@
         android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/textPatternContainer"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textPatternSpacingHLabel"
+            android:text="Spasi Horizontal: 180"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <SeekBar
+            android:id="@+id/textPatternSpacingH"
+            android:max="500"
+            android:progress="180"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/textPatternSpacingVLabel"
+            android:text="Spasi Vertikal: 220"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <SeekBar
+            android:id="@+id/textPatternSpacingV"
+            android:max="500"
+            android:progress="220"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/textPatternAngleLabel"
+            android:text="Sudut: -30\u00B0"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <SeekBar
+            android:id="@+id/textPatternAngle"
+            android:max="360"
+            android:progress="150"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
     </LinearLayout>
 

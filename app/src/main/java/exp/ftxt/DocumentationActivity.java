@@ -1,13 +1,11 @@
 package exp.ftxt;
 
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.util.TypedValue;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -15,18 +13,64 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 
+import io.noties.markwon.Markwon;
+import io.noties.markwon.ext.tables.TablePlugin;
+import io.noties.markwon.ext.tasklist.TaskListPlugin;
+
 public class DocumentationActivity extends AppCompatActivity {
+
+    private Markwon markwon;
+    private LinearLayout docList;
+    private LinearLayout docContent;
+    private Toolbar toolbar;
+    private TextView docTextView;
+    private float currentDocTextSize = 14;
+    private View zoomView;
+    private TextView zoomValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_documentation);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        markwon = Markwon.builder(this)
+                .usePlugin(TablePlugin.create(this))
+                .usePlugin(TaskListPlugin.create(this))
+                .build();
+
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Dokumentasi");
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(v -> {
+            if (docContent.getVisibility() == View.VISIBLE) {
+                showList();
+            } else {
+                finish();
+            }
+        });
+
+        docList = findViewById(R.id.docList);
+        docContent = findViewById(R.id.docContent);
+        docTextView = findViewById(R.id.docTextView);
+
+        zoomView = getLayoutInflater().inflate(R.layout.toolbar_zoom, toolbar, false);
+        zoomValue = zoomView.findViewById(R.id.toolbarZoomValue);
+
+        zoomView.findViewById(R.id.toolbarZoomOut).setOnClickListener(v -> {
+            if (currentDocTextSize > 4) {
+                currentDocTextSize -= 2;
+                docTextView.setTextSize(currentDocTextSize);
+                zoomValue.setText(String.valueOf((int) currentDocTextSize));
+            }
+        });
+
+        zoomView.findViewById(R.id.toolbarZoomIn).setOnClickListener(v -> {
+            if (currentDocTextSize < 60) {
+                currentDocTextSize += 2;
+                docTextView.setTextSize(currentDocTextSize);
+                zoomValue.setText(String.valueOf((int) currentDocTextSize));
+            }
+        });
 
         findViewById(R.id.docReadmeButton).setOnClickListener(v -> showDoc("README"));
         findViewById(R.id.docChangelogButton).setOnClickListener(v -> showDoc("CHANGELOG"));
@@ -34,71 +78,24 @@ public class DocumentationActivity extends AppCompatActivity {
     }
 
     private void showDoc(String name) {
-        String content = readAssetFile(name + ".txt");
-        showContentDialog(name, content);
+        String content = readAssetFile(name + ".md");
+        markwon.setMarkdown(docTextView, content);
+        docTextView.setTextSize(currentDocTextSize);
+        zoomValue.setText(String.valueOf((int) currentDocTextSize));
+        docList.setVisibility(View.GONE);
+        docContent.setVisibility(View.VISIBLE);
+        toolbar.setTitle(name);
+        toolbar.addView(zoomView, new Toolbar.LayoutParams(
+                Toolbar.LayoutParams.WRAP_CONTENT,
+                Toolbar.LayoutParams.MATCH_PARENT,
+                android.view.Gravity.END));
     }
 
-    private float currentDocTextSize = 14;
-
-    private void showContentDialog(String title, String content) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(title);
-
-        LinearLayout root = new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout controls = new LinearLayout(this);
-        controls.setOrientation(LinearLayout.HORIZONTAL);
-        controls.setPadding(16, 8, 16, 4);
-
-        Button minusBtn = new Button(this);
-        minusBtn.setText("−");
-        minusBtn.setTextSize(18);
-        controls.addView(minusBtn);
-
-        TextView sizeLabel = new TextView(this);
-        sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
-        sizeLabel.setPadding(16, 0, 16, 0);
-        sizeLabel.setGravity(android.view.Gravity.CENTER);
-        sizeLabel.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-        controls.addView(sizeLabel);
-
-        Button plusBtn = new Button(this);
-        plusBtn.setText("+");
-        plusBtn.setTextSize(18);
-        controls.addView(plusBtn);
-
-        ScrollView scrollView = new ScrollView(this);
-        TextView textView = new TextView(this);
-        textView.setText(content);
-        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 25, getResources().getDisplayMetrics());
-        textView.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-        textView.setTextSize(currentDocTextSize);
-        scrollView.addView(textView);
-
-        root.addView(controls);
-        root.addView(scrollView, new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
-
-        minusBtn.setOnClickListener(v -> {
-            if (currentDocTextSize > 4) {
-                currentDocTextSize -= 2;
-                textView.setTextSize(currentDocTextSize);
-                sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
-            }
-        });
-
-        plusBtn.setOnClickListener(v -> {
-            if (currentDocTextSize < 60) {
-                currentDocTextSize += 2;
-                textView.setTextSize(currentDocTextSize);
-                sizeLabel.setText(String.format("%.0f sp", currentDocTextSize));
-            }
-        });
-
-        builder.setView(root);
-        builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-        builder.create().show();
+    private void showList() {
+        docContent.setVisibility(View.GONE);
+        docList.setVisibility(View.VISIBLE);
+        toolbar.setTitle("Dokumentasi");
+        toolbar.removeView(zoomView);
     }
 
     private String readAssetFile(String filename) {
