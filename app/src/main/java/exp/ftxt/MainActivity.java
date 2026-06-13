@@ -1,6 +1,5 @@
 package exp.ftxt;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -9,14 +8,12 @@ import android.content.res.ColorStateList;
 import android.util.TypedValue;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.DragEvent;
 import android.view.Gravity;
 import android.content.res.Configuration;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -25,12 +22,18 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
@@ -90,7 +93,9 @@ public class MainActivity extends AppCompatActivity {
     private View panelWatermark;
     private View panelLogo;
 
-    private LinearLayout navItemContainer;
+    private RecyclerView navItemContainer;
+    private SidebarAdapter sidebarAdapter;
+    private ItemTouchHelper sidebarTouchHelper;
     private static final String PREFS_SIDEBAR_STATE = "sidebar_state";
 
     private static final String DEFAULT_SIDEBAR_JSON =
@@ -632,16 +637,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ========================================================================
-    // Sidebar — flat list item (tanpa grup)
+    // Sidebar — RecyclerView + ItemTouchHelper
     // ========================================================================
-
-    private void setupDrawerAllItemsDrag() {
-        for (int i = 0; i < navItemContainer.getChildCount(); i++) {
-            View child = navItemContainer.getChildAt(i);
-            makeDraggable(child);
-        }
-        setupDragTarget(navItemContainer);
-    }
 
     private int selectableBgResId = -1;
 
@@ -654,98 +651,19 @@ public class MainActivity extends AppCompatActivity {
         return selectableBgResId;
     }
 
-    private void makeDraggable(View view) {
-        view.setOnLongClickListener(v -> {
-            ClipData data = ClipData.newPlainText("", "");
-            View.DragShadowBuilder shadow = new View.DragShadowBuilder(v);
-            v.startDragAndDrop(data, shadow, v, 0);
-            v.setVisibility(View.INVISIBLE);
-            return true;
-        });
-    }
-
-    private void setupDragTarget(ViewGroup container) {
-        container.setOnDragListener((v, event) -> {
-            switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    return true;
-
-                case DragEvent.ACTION_DRAG_ENTERED:
-                case DragEvent.ACTION_DRAG_EXITED:
-                    return true;
-
-                case DragEvent.ACTION_DROP: {
-                    View dragged = (View) event.getLocalState();
-                    if (dragged == null) return true;
-                    ViewGroup dropTarget = (ViewGroup) v;
-                    ViewGroup oldParent = (ViewGroup) dragged.getParent();
-                    if (oldParent == null) return true;
-
-                    float dropY = event.getY();
-                    int targetIdx = -1;
-                    for (int i = 0; i < dropTarget.getChildCount(); i++) {
-                        View child = dropTarget.getChildAt(i);
-                        float midY = child.getY() + child.getHeight() / 2f;
-                        if (dropY < midY) {
-                            targetIdx = i;
-                            break;
-                        }
-                    }
-                    if (targetIdx == -1) {
-                        targetIdx = dropTarget.getChildCount();
-                    }
-
-                    if (oldParent == dropTarget) {
-                        int draggedIdx = dropTarget.indexOfChild(dragged);
-                        if (draggedIdx >= 0 && draggedIdx != targetIdx) {
-                            if (draggedIdx < targetIdx) targetIdx--;
-                            dropTarget.removeView(dragged);
-                            dropTarget.addView(dragged, targetIdx);
-                        }
-                    } else {
-                        oldParent.removeView(dragged);
-                        dropTarget.addView(dragged, targetIdx);
-                    }
-                    saveSidebarState();
-                    dragged.setVisibility(View.VISIBLE);
-                    dragged.setAlpha(1f);
-                    return true;
-                }
-
-                case DragEvent.ACTION_DRAG_ENDED: {
-                    View dv = (View) event.getLocalState();
-                    if (dv != null) {
-                        dv.setVisibility(View.VISIBLE);
-                        dv.setAlpha(1f);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
     // ========================================================================
     // Persistensi sidebar — flat JSON array
     // ========================================================================
 
     private void saveSidebarState() {
         JSONArray arr = new JSONArray();
-        for (int i = 0; i < navItemContainer.getChildCount(); i++) {
-            View v = navItemContainer.getChildAt(i);
-            if (v instanceof TextView) {
-                try {
-                    JSONObject item = new JSONObject();
-                    String text = ((TextView) v).getText().toString();
-                    int id = v.getId();
-                    if (id != View.NO_ID) {
-                        String resName = getResources().getResourceEntryName(id);
-                        item.put("id", resName);
-                    }
-                    item.put("l", text);
-                    arr.put(item);
-                } catch (Exception e) { /* skip */ }
-            }
+        for (SidebarItem item : sidebarAdapter.getItems()) {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("id", item.id);
+                obj.put("l", item.label);
+                arr.put(obj);
+            } catch (Exception e) { /* skip */ }
         }
         getSharedPreferences(PREFS_SIDEBAR_STATE, MODE_PRIVATE)
                 .edit().putString("sidebar_json", arr.toString()).apply();
@@ -757,12 +675,10 @@ public class MainActivity extends AppCompatActivity {
         return json != null ? json : DEFAULT_SIDEBAR_JSON;
     }
 
-    private void rebuildSidebar() {
-        navItemContainer.removeAllViews();
-
+    private List<SidebarItem> parseSidebarJson() {
+        List<SidebarItem> list = new ArrayList<>();
         try {
             JSONArray arr = new JSONArray(loadSidebarState());
-
             if (arr.length() > 0) {
                 JSONObject first = arr.getJSONObject(0);
                 if (first.has("n")) {
@@ -776,88 +692,159 @@ public class MainActivity extends AppCompatActivity {
                     arr = flat;
                 }
             }
-
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject item = arr.getJSONObject(i);
-                String label = item.getString("l");
-                String id = item.optString("id", null);
-                navItemContainer.addView(buildSidebarItem(label, id));
+                list.add(new SidebarItem(item.getString("l"), item.optString("id", null)));
             }
         } catch (Exception e) {
             try {
                 JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
                 for (int i = 0; i < def.length(); i++) {
                     JSONObject item = def.getJSONObject(i);
-                    String label = item.getString("l");
-                    String id = item.optString("id", null);
-                    navItemContainer.addView(buildSidebarItem(label, id));
+                    list.add(new SidebarItem(item.getString("l"), item.optString("id", null)));
                 }
             } catch (Exception e2) { /* ignore */ }
         }
-
-        setupDrawerAllItemsDrag();
+        return list;
     }
 
-    private TextView buildSidebarItem(String label, String id) {
-        TextView tv = new TextView(this);
-        tv.setText(label);
-        tv.setTextSize(16);
-        tv.setPadding(dp(16), dp(12), dp(16), dp(12));
-        tv.setLayoutParams(new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        tv.setBackgroundResource(resolveSelectableItemBackground());
-        tv.setClickable(true);
-        tv.setFocusable(true);
+    private void rebuildSidebar() {
+        List<SidebarItem> items = parseSidebarJson();
 
-        if (id != null) {
-            int idRes = getResources().getIdentifier(id, "id", getPackageName());
-            if (idRes != 0) tv.setId(idRes);
-        }
+        navItemContainer.setLayoutManager(new LinearLayoutManager(this));
+        sidebarAdapter = new SidebarAdapter(items);
+        navItemContainer.setAdapter(sidebarAdapter);
 
-        tv.setOnClickListener(v -> {
-            int itemId = v.getId();
-            updateNavSelection(itemId);
-
-            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
-                    .edit().putInt("nav_selected_item", itemId).apply();
-
-            hideAllPanels();
-            if (itemId == R.id.navFps) {
-                panelFps.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_fps);
-            } else if (itemId == R.id.navBattery) {
-                panelBattery.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_battery);
-            } else if (itemId == R.id.navBatteryCurrent) {
-                panelBatteryCurrent.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_battery_current);
-            } else if (itemId == R.id.navClock) {
-                panelClock.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_clock);
-            } else if (itemId == R.id.navNetwork) {
-                panelNetwork.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_network);
-            } else if (itemId == R.id.navCrosshair) {
-                panelCrosshair.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle("Crosshair");
-            } else if (itemId == R.id.navWatermark) {
-                panelWatermark.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle("Watermark");
-                if (watermarkPanelController != null) watermarkPanelController.onPanelShown();
-            } else if (itemId == R.id.navLogo) {
-                panelLogo.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle("Logo Display");
-            } else {
-                panelText.setVisibility(View.VISIBLE);
-                getSupportActionBar().setTitle(R.string.nav_floating_text);
+        ItemTouchHelper.SimpleCallback cb = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            @Override
+            public boolean onMove(RecyclerView rv, RecyclerView.ViewHolder vh, RecyclerView.ViewHolder target) {
+                int from = vh.getAdapterPosition();
+                int to = target.getAdapterPosition();
+                if (from < 0 || to < 0 || from == to) return false;
+                sidebarAdapter.moveItem(from, to);
+                return true;
             }
 
-            DrawerLayout drawer = findViewById(R.id.drawerLayout);
-            drawer.closeDrawers();
-        });
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder vh, int dir) {}
 
-        makeDraggable(tv);
-        return tv;
+            @Override
+            public void clearView(RecyclerView rv, RecyclerView.ViewHolder vh) {
+                super.clearView(rv, vh);
+                saveSidebarState();
+            }
+        };
+        ItemTouchHelper ith = new ItemTouchHelper(cb);
+        ith.attachToRecyclerView(navItemContainer);
+        sidebarTouchHelper = ith;
+    }
+
+    // ========================================================================
+    // SidebarItem model & SidebarAdapter
+    // ========================================================================
+
+    private static class SidebarItem {
+        final String label;
+        final String id;
+
+        SidebarItem(String label, String id) {
+            this.label = label;
+            this.id = id;
+        }
+    }
+
+    private class SidebarAdapter extends RecyclerView.Adapter<SidebarAdapter.ViewHolder> {
+        private final List<SidebarItem> items;
+
+        SidebarAdapter(List<SidebarItem> items) {
+            this.items = items;
+        }
+
+        List<SidebarItem> getItems() { return items; }
+
+        void moveItem(int from, int to) {
+            SidebarItem item = items.remove(from);
+            items.add(to, item);
+            notifyItemMoved(from, to);
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder {
+            final TextView textView;
+
+            ViewHolder(TextView tv) {
+                super(tv);
+                textView = tv;
+                tv.setOnClickListener(v -> {
+                    int itemId = v.getId();
+                    updateNavSelection(itemId);
+                    getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                            .edit().putInt("nav_selected_item", itemId).apply();
+                    hideAllPanels();
+                    if (itemId == R.id.navFps) {
+                        panelFps.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_fps);
+                    } else if (itemId == R.id.navBattery) {
+                        panelBattery.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_battery);
+                    } else if (itemId == R.id.navBatteryCurrent) {
+                        panelBatteryCurrent.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_battery_current);
+                    } else if (itemId == R.id.navClock) {
+                        panelClock.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_clock);
+                    } else if (itemId == R.id.navNetwork) {
+                        panelNetwork.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_network);
+                    } else if (itemId == R.id.navCrosshair) {
+                        panelCrosshair.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle("Crosshair");
+                    } else if (itemId == R.id.navWatermark) {
+                        panelWatermark.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle("Watermark");
+                        if (watermarkPanelController != null) watermarkPanelController.onPanelShown();
+                    } else if (itemId == R.id.navLogo) {
+                        panelLogo.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle("Logo Display");
+                    } else {
+                        panelText.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_floating_text);
+                    }
+                    DrawerLayout drawer = findViewById(R.id.drawerLayout);
+                    drawer.closeDrawers();
+                });
+                tv.setOnLongClickListener(v -> {
+                    sidebarTouchHelper.startDrag(this);
+                    return true;
+                });
+            }
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            TextView tv = new TextView(MainActivity.this);
+            tv.setTextSize(16);
+            tv.setPadding(dp(16), dp(12), dp(16), dp(12));
+            tv.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            tv.setBackgroundResource(resolveSelectableItemBackground());
+            tv.setClickable(true);
+            tv.setFocusable(true);
+            return new ViewHolder(tv);
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder h, int pos) {
+            SidebarItem item = items.get(pos);
+            h.textView.setText(item.label);
+            if (item.id != null) {
+                int idRes = getResources().getIdentifier(item.id, "id", getPackageName());
+                if (idRes != 0) h.textView.setId(idRes);
+            }
+        }
+
+        @Override
+        public int getItemCount() { return items.size(); }
     }
 
     private void hideAllPanels() {

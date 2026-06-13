@@ -1,3 +1,17 @@
+[3.11.3.78.1] - 2026-06-13
+♻️ Perubahan Fitur
+- Drag & drop reorder preset — Migrasi ListView ke RecyclerView + ItemTouchHelper untuk animasi drag smooth.
+- Drag & drop drawer sidebar — Migrasi LinearLayout+DragEvent ke RecyclerView+ItemTouchHelper untuk animasi drag smooth di navigasi drawer.
+🗒️ File Added
+- app/src/main/res/values/ids.xml — ID R.id.nav* untuk drawer
+🔧 Optimasi & Penyesuaian
+- Lint MissingDefaultResource di drawable-night — Nonaktifkan lint error yang gagal di release build.
+🔢 Version
+versionCode: 161
+versionName: 3.11.3.78.1
+
+════════════════════════════════════════════════
+
 [3.11.3.78.0] - 2026-06-13
 🚮 Fitur Dihapus
 - Tombol Ekspor Semua di dialog preset — Tombol "Ekspor Semua" dihapus.

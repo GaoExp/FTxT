@@ -1,19 +1,15 @@
 package exp.ftxt.shared.preset;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.graphics.Color;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +18,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -48,13 +47,13 @@ public class PresetBrowserDialog extends DialogFragment {
     private List<Map<String, Object>> fullMetadata;
     private List<Map<String, Object>> filteredMetadata;
     private PresetAdapter adapter;
-    private ListView listView;
+    private RecyclerView recyclerView;
+    private ItemTouchHelper itemTouchHelper;
     private TextView emptyHint;
     private TextInputEditText searchBar;
     private int lastSelectedPos = -1;
     private boolean selectMode;
     private final Set<Integer> checkedSet = new HashSet<>();
-    private String draggedName;
     private Button btnTandai;
     private Button btnTandaiSemua;
     private View btnSimpan, btnImport, btnHapus, btnFavorit, btnBagikan, btnEkspor;
@@ -91,7 +90,7 @@ public class PresetBrowserDialog extends DialogFragment {
         View view = LayoutInflater.from(activity).inflate(R.layout.dialog_preset_browser, null, false);
 
         searchBar = view.findViewById(R.id.searchBar);
-        listView = view.findViewById(R.id.presetList);
+        recyclerView = view.findViewById(R.id.presetList);
         emptyHint = view.findViewById(R.id.emptyHint);
         btnTandai = view.findViewById(R.id.btnTandai);
         btnTandaiSemua = view.findViewById(R.id.btnTandaiSemua);
@@ -105,8 +104,59 @@ public class PresetBrowserDialog extends DialogFragment {
         fullMetadata = PresetManager.getIndexMetadata(activity);
         filteredMetadata = new ArrayList<>(fullMetadata);
 
+        recyclerView.setLayoutManager(new LinearLayoutManager(activity));
         adapter = new PresetAdapter();
-        listView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
+
+        ItemTouchHelper.SimpleCallback touchCb = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            private String dragName;
+
+            @Override
+            public boolean isLongPressDragEnabled() { return !selectMode; }
+
+            @Override
+            public boolean onMove(RecyclerView rv, RecyclerView.ViewHolder vh, RecyclerView.ViewHolder target) {
+                int from = vh.getAdapterPosition();
+                int to = target.getAdapterPosition();
+                if (from < 0 || to < 0 || from == to) return false;
+                Map<String, Object> item = filteredMetadata.remove(from);
+                filteredMetadata.add(to, item);
+                adapter.notifyItemMoved(from, to);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder vh, int dir) {}
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder vh, int actionState) {
+                super.onSelectedChanged(vh, actionState);
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && vh != null) {
+                    dragName = (String) filteredMetadata.get(vh.getAdapterPosition()).get("name");
+                    vh.itemView.setElevation(8f);
+                    vh.itemView.setTranslationZ(8f);
+                } else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                    dragName = null;
+                }
+            }
+
+            @Override
+            public void clearView(RecyclerView rv, RecyclerView.ViewHolder vh) {
+                super.clearView(rv, vh);
+                vh.itemView.setElevation(0f);
+                vh.itemView.setTranslationZ(0f);
+                if (dragName != null) {
+                    int newPos = indexInFiltered(dragName);
+                    if (newPos >= 0) PresetManager.reorder(activity, dragName, newPos);
+                    refreshData();
+                    dragName = null;
+                }
+            }
+        };
+        ItemTouchHelper ith = new ItemTouchHelper(touchCb);
+        ith.attachToRecyclerView(recyclerView);
+        itemTouchHelper = ith;
 
         searchBar.addTextChangedListener(new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -114,54 +164,6 @@ public class PresetBrowserDialog extends DialogFragment {
                 filter(s.toString());
             }
             @Override public void afterTextChanged(android.text.Editable s) {}
-        });
-
-        listView.setOnItemClickListener((parent, v, position, id) -> {
-            if (selectMode) {
-                CheckBox chk = v.findViewById(R.id.chkSelect);
-                if (chk != null) {
-                    chk.setChecked(!chk.isChecked());
-                    if (chk.isChecked()) checkedSet.add(position);
-                    else checkedSet.remove(position);
-                    btnTandai.setText(checkedSet.isEmpty() ? "Tandai" : "Tandai (" + checkedSet.size() + ")");
-                }
-                return;
-            }
-            lastSelectedPos = position;
-            Map<String, Object> item = filteredMetadata.get(position);
-            showItemMenu(v, item);
-        });
-
-        listView.setOnItemLongClickListener((parent, v, position, id) -> {
-            if (selectMode) return false;
-            draggedName = (String) filteredMetadata.get(position).get("name");
-            ClipData data = ClipData.newPlainText("preset_name", draggedName);
-            v.startDragAndDrop(data, new View.DragShadowBuilder(v), v, 0);
-            return true;
-        });
-
-        listView.setOnDragListener((v, event) -> {
-            switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    return true;
-                case DragEvent.ACTION_DRAG_LOCATION: {
-                    int overPos = listView.pointToPosition((int) event.getX(), (int) event.getY());
-                    if (overPos >= 0) {
-                        String overName = (String) filteredMetadata.get(overPos).get("name");
-                        if (!overName.equals(draggedName)) {
-                            PresetManager.reorder(activity, draggedName, overPos);
-                            refreshData();
-                        }
-                    }
-                    return true;
-                }
-                case DragEvent.ACTION_DROP:
-                    return true;
-                case DragEvent.ACTION_DRAG_ENDED:
-                    draggedName = null;
-                    return true;
-            }
-            return false;
         });
 
         if (onSaveClick != null) {
@@ -298,9 +300,21 @@ public class PresetBrowserDialog extends DialogFragment {
         updateEmptyState();
     }
 
+    private int indexInFull(String name) {
+        for (int i = 0; i < fullMetadata.size(); i++)
+            if (fullMetadata.get(i).get("name").equals(name)) return i;
+        return -1;
+    }
+
+    private int indexInFiltered(String name) {
+        for (int i = 0; i < filteredMetadata.size(); i++)
+            if (filteredMetadata.get(i).get("name").equals(name)) return i;
+        return -1;
+    }
+
     private void updateEmptyState() {
         boolean empty = filteredMetadata.isEmpty();
-        listView.setVisibility(empty ? View.GONE : View.VISIBLE);
+        recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
         emptyHint.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 
@@ -431,59 +445,79 @@ public class PresetBrowserDialog extends DialogFragment {
     // ADAPTER
     // ====================================================================
 
-    private class PresetAdapter extends BaseAdapter {
-        @Override
-        public int getCount() { return filteredMetadata.size(); }
+    private class PresetAdapter extends RecyclerView.Adapter<PresetAdapter.ViewHolder> {
 
-        @Override
-        public Object getItem(int pos) { return filteredMetadata.get(pos); }
+        class ViewHolder extends RecyclerView.ViewHolder {
+            View thumb;
+            TextView txtName, txtTags;
+            ImageView imgFav;
+            CheckBox chk;
 
-        @Override
-        public long getItemId(int pos) { return pos; }
+            ViewHolder(View v) {
+                super(v);
+                thumb = v.findViewById(R.id.thumbColor);
+                txtName = v.findViewById(R.id.txtName);
+                txtTags = v.findViewById(R.id.txtTags);
+                imgFav = v.findViewById(R.id.imgFavorite);
+                chk = v.findViewById(R.id.chkSelect);
 
-        @Override
-        public View getView(int pos, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(activity)
-                        .inflate(R.layout.preset_browser_item, parent, false);
+                v.setOnClickListener(click -> {
+                    int pos = getAdapterPosition();
+                    if (pos < 0) return;
+                    if (selectMode) {
+                        chk.setChecked(!chk.isChecked());
+                        if (chk.isChecked()) checkedSet.add(pos);
+                        else checkedSet.remove(pos);
+                        btnTandai.setText(checkedSet.isEmpty() ? "Tandai" : "Tandai (" + checkedSet.size() + ")");
+                    } else {
+                        lastSelectedPos = pos;
+                        showItemMenu(v, filteredMetadata.get(pos));
+                    }
+                });
+
+                v.setOnLongClickListener(click -> {
+                    if (selectMode) return false;
+                    itemTouchHelper.startDrag(this);
+                    return true;
+                });
             }
+        }
 
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(activity)
+                    .inflate(R.layout.preset_browser_item, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder h, int pos) {
             Map<String, Object> item = filteredMetadata.get(pos);
             String name = (String) item.get("name");
 
-            View thumb = convertView.findViewById(R.id.thumbColor);
-            TextView txtName = convertView.findViewById(R.id.txtName);
-            TextView txtTags = convertView.findViewById(R.id.txtTags);
-            ImageView imgFav = convertView.findViewById(R.id.imgFavorite);
-            CheckBox chk = convertView.findViewById(R.id.chkSelect);
-
-            txtName.setText(name);
+            h.txtName.setText(name);
 
             int color = 0;
-            if (item.containsKey("color")) {
-                color = (Integer) item.get("color");
-            }
-            thumb.setBackgroundColor(color != 0 ? color : Color.GRAY);
+            if (item.containsKey("color")) color = (Integer) item.get("color");
+            h.thumb.setBackgroundColor(color != 0 ? color : Color.GRAY);
 
             @SuppressWarnings("unchecked")
             List<String> tags = (List<String>) item.get("tags");
             if (tags != null && !tags.isEmpty()) {
-                txtTags.setText(String.join(", ", tags));
-                txtTags.setVisibility(View.VISIBLE);
+                h.txtTags.setText(String.join(", ", tags));
+                h.txtTags.setVisibility(View.VISIBLE);
             } else {
-                txtTags.setVisibility(View.GONE);
+                h.txtTags.setVisibility(View.GONE);
             }
 
-            boolean favorite = false;
-            if (item.containsKey("favorite")) {
-                favorite = (Boolean) item.get("favorite");
-            }
-            imgFav.setImageResource(favorite ? R.drawable.ic_star_filled : R.drawable.ic_star_outline);
+            boolean fav = false;
+            if (item.containsKey("favorite")) fav = (Boolean) item.get("favorite");
+            h.imgFav.setImageResource(fav ? R.drawable.ic_star_filled : R.drawable.ic_star_outline);
 
-            chk.setVisibility(selectMode ? View.VISIBLE : View.GONE);
-            chk.setChecked(checkedSet.contains(pos));
-
-            return convertView;
+            h.chk.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+            h.chk.setChecked(checkedSet.contains(pos));
         }
+
+        @Override
+        public int getItemCount() { return filteredMetadata.size(); }
     }
 }

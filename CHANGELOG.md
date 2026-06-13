@@ -1,3 +1,20 @@
+## [3.11.3.78.1] - 2026-06-13
+### 🔧 Optimasi & Penyesuaian
+- **Drag & drop reorder preset** — Migrasi ListView ke RecyclerView + ItemTouchHelper untuk animasi drag & drop yang smooth.
+- **Drag & drop drawer sidebar** — Migrasi `LinearLayout`+`DragEvent` ke `RecyclerView`+`ItemTouchHelper` untuk animasi drag & drop smooth di navigasi drawer.
+- **Lint `MissingDefaultResource` di drawable-night** — Nonaktifkan lint `MissingDefaultResource` yang menyebabkan `lintVitalRelease` gagal karena drawable malam tanpa deklarasi di folder dasar.
+### 🗒️ File Added
+- `app/src/main/res/values/ids.xml` — Deklarasi ID `R.id.nav*` untuk drawer (hilang setelah hapus `TextView` statik)
+### ✏️ File Changed
+- `app/build.gradle` — Tambah dependency `androidx.recyclerview:recyclerview:1.3.2`; tambah `lint { disable 'MissingDefaultResource' }`
+- `app/src/main/res/layout/dialog_preset_browser.xml` — `ListView` → `RecyclerView`
+- `app/src/main/res/layout/drawer_content.xml` — `ScrollView`+`LinearLayout`+static `TextView` → `RecyclerView`
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — `ListView`+`BaseAdapter` → `RecyclerView`+`ItemTouchHelper`; hapus `ClipData`/`DragEvent`, tambah `LinearLayoutManager`/`ViewHolder`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — `LinearLayout`+`DragEvent`+`makeDraggable`/`setupDragTarget`/`buildSidebarItem` → `RecyclerView`+`ItemTouchHelper`+`SidebarAdapter`; hapus `ClipData`/`DragEvent`, tambah `RecyclerView`/`ItemTouchHelper`/`LinearLayoutManager`
+### 🔢 Version
+versionCode: 161
+versionName: 3.11.3.78.1
+---
 ## [3.11.3.78.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Tombol Ekspor Semua di dialog preset** — Tombol "Ekspor Semua" dihapus dari bottom bar dialog browser preset.
@@ -31,7 +48,7 @@
 ### 🔢 Version
 versionCode: 160
 versionName: 3.11.3.78.0
-
+---
 ## [3.10.3.77.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Tombol Simpan/Muat Preset dari panel posisi** — Tombol `btnSavePreset`, `btnLoadPreset`, dan label `txtActivePreset` dihapus dari semua 8 panel posisi (Battery, Battery%, BatteryCurrent, Clock, FPS, Network, Text, Watermark). Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".
@@ -53,7 +70,7 @@ versionName: 3.11.3.78.0
 ### 🔢 Version
 versionCode: 159
 versionName: 3.10.3.77.0
-
+---
 ## [3.9.3.76.0] - 2026-06-13
 ### ✨ Fitur Baru
 - **Opsi Ganti Ikon Aplikasi** — Pengaturan ikon aplikasi di Konfigurasi: toggle Default/Alternatif. Dua varian ikon aplikasi bisa dipilih langsung dari dalam aplikasi.
@@ -99,7 +116,7 @@ versionName: 3.10.3.77.0
 ### 🔢 Version
 versionCode: 158
 versionName: 3.9.3.76.0
-
+---
 ## [3.9.3.75.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **148 CSS Color Names** — ColorNameResolver di-upgrade dengan 148 warna CSS standar. Pencocokan warna menggunakan Euclidean distance untuk hasil yang lebih akurat.
@@ -110,7 +127,7 @@ versionName: 3.9.3.76.0
 ### 🔢 Version
 versionCode: 157
 versionName: 3.9.3.75.0
-
+---
 ## [3.9.3.74.2] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Tutup Aplikasi pindah ke navigation drawer** — Tombol Kill Service dipindahkan dari popup settings (gear) ke bagian paling bawah navigation drawer, dengan ikon close di sebelah kiri.
@@ -130,7 +147,7 @@ versionName: 3.9.3.75.0
 ### 🔢 Version
 versionCode: 156
 versionName: 3.9.3.74.2
-
+---
 ## [3.9.3.74.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Semua preview warna dalam satu baris horizontal** — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata. Shadow/bg preview dipindahkan dari section Shadow/Background ke section Display.
@@ -149,7 +166,7 @@ versionName: 3.9.3.74.2
 ### 🔢 Version
 versionCode: 155
 versionName: 3.9.3.74.1
-
+---
 ## [3.9.3.74.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Battery Current** — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.
@@ -169,7 +186,7 @@ versionName: 3.9.3.74.1
 ### 🔢 Version
 versionCode: 154
 versionName: 3.9.3.74.0
-
+---
 ## [3.9.3.73.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Network Stats** — Opsi baru "Sembunyikan Label" di panel Network Stats untuk menyembunyikan label ↓↑MB/s dan hanya menampilkan angka kecepatan.
@@ -186,7 +203,7 @@ versionName: 3.9.3.74.0
 ### 🔢 Version
 versionCode: 153
 versionName: 3.9.3.73.0
-
+---
 ## [3.9.3.72.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Kontrol Interval semua modul jadi single button + dialog** — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method `findIntervalIndex()` dihapus.
@@ -204,7 +221,7 @@ versionName: 3.9.3.73.0
 ### 🔢 Version
 versionCode: 152
 versionName: 3.9.3.72.1
-
+---
 ## [3.9.3.72.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Warna Label FPS Terpisah** — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `fps_label_color`).

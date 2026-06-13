@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="navFloatingText" type="id"/>
+    <item name="navFps" type="id"/>
+    <item name="navNetwork" type="id"/>
+    <item name="navBattery" type="id"/>
+    <item name="navBatteryCurrent" type="id"/>
+    <item name="navClock" type="id"/>
+    <item name="navCrosshair" type="id"/>
+    <item name="navWatermark" type="id"/>
+    <item name="navLogo" type="id"/>
+</resources>

@@ -170,7 +170,7 @@ FTxT/
     │       │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
     │       │   ├── dialog_hsv_color_picker.xml  — Dialog color picker dengan wheel & ARGB sliders
     │       │   ├── dialog_preset_browser.xml    — Dialog browser preset dengan search & list
-    │       │   ├── drawer_content.xml           — Konten navigation drawer: scroll + item list
+    │       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
     │       │   ├── nav_header.xml               — Header navigation drawer: logo + versi
     │       │   ├── panel_text.xml               — Panel konfigurasi Floating Text
     │       │   ├── panel_fps.xml                — Panel konfigurasi FPS Display
@@ -194,7 +194,8 @@ FTxT/
     │       │   ├── colors.xml        — Warna: primary, accent, drawer, bg
     │       │   ├── strings.xml       — Semua string UI Bahasa Indonesia
     │       │   ├── styles.xml        — Style: AppTheme, popup animation, popup menu
-    │       │   └── themes.xml        — Theme: SplashScreen
+    │       │   ├── themes.xml        — Theme: SplashScreen
+    │       │   └── ids.xml           — ID tetap `R.id.nav*` untuk drawer
     │       ├── values-night/
     │       │   └── colors.xml        — Warna mode gelap: drawer bg, drawer header
     │       └── values-v31/
@@ -215,7 +216,7 @@ FTxT/
 | Layout XML | 20 |
 | Drawable XML | 20 |
 | Drawable PNG | 11 |
-| Values XML | 6 |
+| Values XML | 7 |
 | Mipmap XML | 2 |
 | Menu XML | 2 |
 | Anim XML | 2 |
@@ -225,5 +226,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~155** |
+| **Total file** | **~156** |
 | **Total direktori** | **~44** |
