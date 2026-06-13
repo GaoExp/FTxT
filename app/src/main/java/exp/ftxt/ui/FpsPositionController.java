@@ -159,27 +159,17 @@ public class FpsPositionController {
         btnLeft = activity.findViewById(R.id.fps_btnLeft);
         btnRight = activity.findViewById(R.id.fps_btnRight);
         coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
-        activePresetLabel = activity.findViewById(R.id.fps_txtActivePreset);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(FpsConfig.posX + dx), clamp(FpsConfig.posY + dy));
         });
-
-        View btnSavePreset = activity.findViewById(R.id.fps_btnSavePreset);
-        if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
-        }
-
-        View btnLoadPreset = activity.findViewById(R.id.fps_btnLoadPreset);
-        if (btnLoadPreset != null) {
-            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
-        }
     }
 
     public void showLoadPresetDialog() {
-        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
+                () -> PresetHandler.showSavePresetDialog(activity, delegate));
     }
 
     private static float clamp(float val) {

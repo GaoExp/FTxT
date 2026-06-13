@@ -373,41 +373,7 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/fps_txtActivePreset"
-                    android:text="Aktif: -"
-                    android:textSize="12sp"
-                    android:textColor="#999999"
-                    android:visibility="gone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"/>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <Button
-                        android:id="@+id/fps_btnSavePreset"
-                        android:text="Simpan"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="4dp"/>
-
-                    <Button
-                        android:id="@+id/fps_btnLoadPreset"
-                        android:text="Muat"
-                        android:singleLine="true"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="4dp"/>
-
-                </LinearLayout>
 
                 <CheckBox
                     android:id="@+id/fpsSafeArea"

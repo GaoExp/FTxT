@@ -414,8 +414,7 @@ public class MainActivity extends AppCompatActivity {
     // ========================================================================
 
     // ========================================================================
-    // Settings popup — gear icon → dropdown: Konfigurasi, Dokumentasi, Tutup
-    // ========================================================================
+    // Settings popup — gear icon → dropdown: Muat Preset, Konfigurasi, Dokumentasi
     private void showSettingsPopup() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);

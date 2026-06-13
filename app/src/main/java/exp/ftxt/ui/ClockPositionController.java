@@ -148,27 +148,17 @@ public class ClockPositionController {
         btnLeft = activity.findViewById(R.id.clock_btnLeft);
         btnRight = activity.findViewById(R.id.clock_btnRight);
         coordDisplay = activity.findViewById(R.id.clock_posCoordDisplay);
-        activePresetLabel = activity.findViewById(R.id.clock_txtActivePreset);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(ClockConfig.posX + dx), clamp(ClockConfig.posY + dy));
         });
-
-        View btnSavePreset = activity.findViewById(R.id.clock_btnSavePreset);
-        if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
-        }
-
-        View btnLoadPreset = activity.findViewById(R.id.clock_btnLoadPreset);
-        if (btnLoadPreset != null) {
-            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
-        }
     }
 
     public void showLoadPresetDialog() {
-        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
+                () -> PresetHandler.showSavePresetDialog(activity, delegate));
     }
 
     private static float clamp(float val) {

@@ -154,27 +154,17 @@ public class NetworkPositionController {
         btnLeft = activity.findViewById(R.id.network_btnLeft);
         btnRight = activity.findViewById(R.id.network_btnRight);
         coordDisplay = activity.findViewById(R.id.network_posCoordDisplay);
-        activePresetLabel = activity.findViewById(R.id.network_txtActivePreset);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(NetworkConfig.posX + dx), clamp(NetworkConfig.posY + dy));
         });
-
-        View btnSavePreset = activity.findViewById(R.id.network_btnSavePreset);
-        if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
-        }
-
-        View btnLoadPreset = activity.findViewById(R.id.network_btnLoadPreset);
-        if (btnLoadPreset != null) {
-            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
-        }
     }
 
     public void showLoadPresetDialog() {
-        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
+                () -> PresetHandler.showSavePresetDialog(activity, delegate));
     }
 
     private static float clamp(float val) {

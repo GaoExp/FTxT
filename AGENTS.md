@@ -282,10 +282,13 @@ JANGAN:
 - melakukan refactor tanpa diminta 
 - mengubah file di luar scope request 
 - mengaudit seluruh project tanpa diminta 
+- melakukan build tanpa perintah user
 - membuat checklist panjang maupun singkat untuk request sederhana (IMPORTANT) 
 - memberi penjelasan panjang bila tidak diminta (IMPORTANT)
 
 Utamakan: 
+- membaca selalu agents.md setiap kali melakukan pekerjaan 
+- memeriksa status commit atau log apakah sudah dipush atau belum
 - perubahan minimal 
 - perubahan terfokus 
 - jawaban singkat 

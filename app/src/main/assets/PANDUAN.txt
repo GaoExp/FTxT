@@ -130,9 +130,9 @@ Background dan Shadow
 - Klik label slider untuk edit nilai manual via dialog
 
 Preset System (v2)
-Setiap panel overlay memiliki tombol:
-- Simpan - Simpan seluruh konfigurasi panel (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, toggle display)
-- Muat - Buka browser preset dengan search, filter, favorite, rename, delete, reorder, selective apply
+Akses preset dari icon gear - "Muat Preset". Dialog preset terbuka dengan tombol:
+- Simpan - Simpan seluruh konfigurasi panel aktif (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, toggle display)
+- Pilih preset dari daftar untuk Muat (search, filter, favorite, rename, delete, reorder, selective apply)
 - E/I - Ekspor ke file (Downloads) / Impor dari file (file picker)
 - Bagikan - Bagikan preset via Android share intent
 

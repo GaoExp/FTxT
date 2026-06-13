@@ -1,3 +1,14 @@
+[3.10.3.77.0] - 2026-06-13
+🚮 Fitur Dihapus
+- Tombol Simpan/Muat Preset dari panel posisi — Tombol btnSavePreset, btnLoadPreset, dan label txtActivePreset dihapus dari semua 8 panel. Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".
+♻️ Perubahan Fitur
+- Dialog preset terpusat — Dialog preset sekarang punya tombol Simpan di dalamnya. Panel panggil overload showLoadPresetDialog dengan onSaveClick.
+🔢 Version
+versionCode: 159
+versionName: 3.10.3.77.0
+
+════════════════════════════════════════════════
+
 [3.9.3.76.0] - 2026-06-13
 ✨ Fitur Baru
 - Opsi Ganti Ikon Aplikasi — Pengaturan ikon aplikasi di Konfigurasi: toggle Default/Alternatif.

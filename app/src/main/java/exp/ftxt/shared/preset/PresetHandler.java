@@ -70,6 +70,11 @@ public class PresetHandler {
 
     public static void showLoadPresetDialog(Activity activity, Delegate delegate,
                                             StringHolder activePresetName, Runnable postApply) {
+        showLoadPresetDialog(activity, delegate, activePresetName, postApply, null);
+    }
+
+    public static void showLoadPresetDialog(Activity activity, Delegate delegate,
+                                            StringHolder activePresetName, Runnable postApply, Runnable onSaveClick) {
         if (!(activity instanceof FragmentActivity)) {
             PresetManager.showLoadPresetDialog(activity, activePresetName.value, name -> {
                 doLoadPreset(activity, name, delegate, activePresetName, postApply);
@@ -78,7 +83,7 @@ public class PresetHandler {
         }
         new PresetBrowserDialog(activity, name -> {
             doLoadPreset(activity, name, delegate, activePresetName, postApply);
-        }, null).show(((FragmentActivity) activity).getSupportFragmentManager(), "PresetBrowserDialog");
+        }, null, onSaveClick).show(((FragmentActivity) activity).getSupportFragmentManager(), "PresetBrowserDialog");
     }
 
     private static void doLoadPreset(Activity activity, String name, Delegate delegate,

@@ -35,6 +35,7 @@ public class PresetBrowserDialog extends DialogFragment {
     private final Activity activity;
     private final OnPresetSelectedListener listener;
     private final Runnable onDismissListener;
+    private final Runnable onSaveClick;
 
     private List<Map<String, Object>> fullMetadata;
     private List<Map<String, Object>> filteredMetadata;
@@ -46,9 +47,14 @@ public class PresetBrowserDialog extends DialogFragment {
     private ActivityResultLauncher<String[]> importLauncher;
 
     public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener) {
+        this(activity, listener, onDismissListener, null);
+    }
+
+    public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener, Runnable onSaveClick) {
         this.activity = activity;
         this.listener = listener;
         this.onDismissListener = onDismissListener;
+        this.onSaveClick = onSaveClick;
     }
 
     @Override
@@ -72,6 +78,7 @@ public class PresetBrowserDialog extends DialogFragment {
         searchBar = view.findViewById(R.id.searchBar);
         listView = view.findViewById(R.id.presetList);
         emptyHint = view.findViewById(R.id.emptyHint);
+        View btnSimpan = view.findViewById(R.id.btnSimpan);
         View btnExportAll = view.findViewById(R.id.btnExportAll);
         View btnImport = view.findViewById(R.id.btnImport);
 
@@ -103,6 +110,15 @@ public class PresetBrowserDialog extends DialogFragment {
             showItemMenu(v, item);
             return true;
         });
+
+        if (onSaveClick != null) {
+            btnSimpan.setOnClickListener(v -> {
+                onSaveClick.run();
+                dismiss();
+            });
+        } else {
+            btnSimpan.setVisibility(View.GONE);
+        }
 
         btnExportAll.setOnClickListener(v -> {
             String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";

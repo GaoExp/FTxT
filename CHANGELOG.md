@@ -1,3 +1,25 @@
+## [3.10.3.77.0] - 2026-06-13
+### 🚮 Fitur Dihapus
+- **Tombol Simpan/Muat Preset dari panel posisi** — Tombol `btnSavePreset`, `btnLoadPreset`, dan label `txtActivePreset` dihapus dari semua 8 panel posisi (Battery, Battery%, BatteryCurrent, Clock, FPS, Network, Text, Watermark). Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".
+### ♻️ Perubahan Fitur
+- **Dialog preset terpusat** — Dialog preset (PresetBrowserDialog) sekarang punya tombol Simpan di dalamnya. Setiap panel posisi panggil overload `showLoadPresetDialog` 5-param dengan `onSaveClick`.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — Tambah overload `showLoadPresetDialog` 5-param (`onSaveClick`)
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — Dukungan tombol Simpan di dialog
+- `app/src/main/res/layout/dialog_preset_browser.xml` — Tambah tombol Simpan
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Hapus binding btnSave/btnLoad/txtActivePreset; update showLoadPresetDialog
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/ui/WatermarkPositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Hapus binding btnSave/btnLoad
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Sama
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Update komentar popup settings; fix duplikasi kode
+### 🔢 Version
+versionCode: 159
+versionName: 3.10.3.77.0
+
 ## [3.9.3.76.0] - 2026-06-13
 ### ✨ Fitur Baru
 - **Opsi Ganti Ikon Aplikasi** — Pengaturan ikon aplikasi di Konfigurasi: toggle Default/Alternatif. Dua varian ikon aplikasi bisa dipilih langsung dari dalam aplikasi.
@@ -39,6 +61,7 @@
 - `app/src/main/res/drawable/drawer_header_bg.xml` — Ganti src ke `drawbar_light`
 - `app/src/main/res/drawable-night/drawer_header_bg.xml` — Ganti src ke `drawbar_dark`
 - `app/src/main/res/drawable/main_bg.xml` — Ganti src ke `bg_main_light2`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Hapus opsi "Muat Preset" dari popup settings (gear)
 ### 🔢 Version
 versionCode: 158
 versionName: 3.9.3.76.0

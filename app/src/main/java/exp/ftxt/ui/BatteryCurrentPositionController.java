@@ -169,27 +169,17 @@ public class BatteryCurrentPositionController {
         btnLeft = activity.findViewById(R.id.batCurBtnLeft);
         btnRight = activity.findViewById(R.id.batCurBtnRight);
         coordDisplay = activity.findViewById(R.id.batCurPosCoordDisplay);
-        activePresetLabel = activity.findViewById(R.id.batCurTxtActivePreset);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(BatteryCurrentConfig.posX + dx), clamp(BatteryCurrentConfig.posY + dy));
         });
-
-        View btnSavePreset = activity.findViewById(R.id.batCurBtnSavePreset);
-        if (btnSavePreset != null) {
-            btnSavePreset.setOnClickListener(v -> PresetHandler.showSavePresetDialog(activity, delegate));
-        }
-
-        View btnLoadPreset = activity.findViewById(R.id.batCurBtnLoadPreset);
-        if (btnLoadPreset != null) {
-            btnLoadPreset.setOnClickListener(v -> showLoadPresetDialog());
-        }
     }
 
     public void showLoadPresetDialog() {
-        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll);
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
+                () -> PresetHandler.showSavePresetDialog(activity, delegate));
     }
 
     private static float clamp(float val) {

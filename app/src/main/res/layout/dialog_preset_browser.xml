@@ -60,6 +60,15 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:id="@+id/btnSimpan"
+            android:text="Simpan"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
             android:id="@+id/btnExportAll"
             android:text="Ekspor Semua"
             style="@style/Widget.MaterialComponents.Button.TextButton"
