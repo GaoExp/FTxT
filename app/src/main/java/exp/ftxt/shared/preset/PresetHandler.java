@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 
 import java.util.List;
+import java.util.function.Consumer;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -29,7 +30,7 @@ public class PresetHandler {
         void syncToService();
     }
 
-    public static void showSavePresetDialog(Activity activity, Delegate delegate) {
+    public static void showSavePresetDialog(Activity activity, Delegate delegate, Runnable onSaved) {
         EditText input = new EditText(activity);
         input.setHint("Nama preset");
 
@@ -48,24 +49,25 @@ public class PresetHandler {
                         new AlertDialog.Builder(activity)
                                 .setTitle("Timpa Preset")
                                 .setMessage("Preset \"" + name + "\" sudah ada. Timpa?")
-                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(activity, name, delegate))
+                                .setPositiveButton("Ya", (d2, w2) -> doSavePreset(activity, name, delegate, onSaved))
                                 .setNegativeButton("Batal", null)
                                 .show();
                     } else {
-                        doSavePreset(activity, name, delegate);
+                        doSavePreset(activity, name, delegate, onSaved);
                     }
                 })
                 .setNegativeButton("Batal", null)
                 .show();
     }
 
-    private static void doSavePreset(Activity activity, String name, Delegate delegate) {
+    private static void doSavePreset(Activity activity, String name, Delegate delegate, Runnable onSaved) {
         OverlayPreset preset = new OverlayPreset();
         delegate.saveToPreset(preset);
         int orientation = activity.getResources().getConfiguration().orientation;
         preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
+        if (onSaved != null) onSaved.run();
     }
 
     public static void showLoadPresetDialog(Activity activity, Delegate delegate,
@@ -74,7 +76,7 @@ public class PresetHandler {
     }
 
     public static void showLoadPresetDialog(Activity activity, Delegate delegate,
-                                            StringHolder activePresetName, Runnable postApply, Runnable onSaveClick) {
+                                            StringHolder activePresetName, Runnable postApply, Consumer<Runnable> onSaveClick) {
         if (!(activity instanceof FragmentActivity)) {
             PresetManager.showLoadPresetDialog(activity, activePresetName.value, name -> {
                 doLoadPreset(activity, name, delegate, activePresetName, postApply);

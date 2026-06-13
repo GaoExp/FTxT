@@ -310,7 +310,7 @@ Default response style:
 - singkat 
 - fokus 
 - actionable 
-- tulis ulang chat di file talkhere.txt jika user melaporkan chat terpotong / terputus
+- tulis ulang percakapan terakhir di file talkhere.txt jika user melaporkan chat terpotong / terputus
 - dalam talkhere.txt letakkan entry chat baru di atas, biarkan chat lama berada di bawah
 
 JANGAN: 

@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="80dp"
     android:gravity="center_vertical"
     android:background="@drawable/drawer_header_bg"
     android:paddingStart="16dp"
@@ -13,7 +13,7 @@
     <TextView
         android:id="@+id/navHeaderTitle"
         android:text="FunText"
-        android:textSize="20sp"
+        android:textSize="23sp"
         android:textColor="@color/drawer_header_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

@@ -46,8 +46,8 @@
             android:id="@+id/hexEditButton"
             android:src="@drawable/ic_edit"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
             android:contentDescription="Edit HEX"
             android:padding="4dp"/>
 

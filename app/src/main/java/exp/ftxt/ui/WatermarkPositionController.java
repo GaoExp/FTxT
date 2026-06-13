@@ -158,7 +158,7 @@ public class WatermarkPositionController {
 
     public void showLoadPresetDialog() {
         PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
-                () -> PresetHandler.showSavePresetDialog(activity, delegate));
+                (onSaved) -> PresetHandler.showSavePresetDialog(activity, delegate, onSaved));
     }
 
     private static float clamp(float val) {

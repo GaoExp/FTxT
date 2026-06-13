@@ -1,11 +1,16 @@
 package exp.ftxt.shared.preset;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.graphics.Color;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -21,8 +26,11 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import exp.ftxt.R;
 
@@ -35,7 +43,7 @@ public class PresetBrowserDialog extends DialogFragment {
     private final Activity activity;
     private final OnPresetSelectedListener listener;
     private final Runnable onDismissListener;
-    private final Runnable onSaveClick;
+    private final Consumer<Runnable> onSaveClick;
 
     private List<Map<String, Object>> fullMetadata;
     private List<Map<String, Object>> filteredMetadata;
@@ -43,6 +51,13 @@ public class PresetBrowserDialog extends DialogFragment {
     private ListView listView;
     private TextView emptyHint;
     private TextInputEditText searchBar;
+    private int lastSelectedPos = -1;
+    private boolean selectMode;
+    private final Set<Integer> checkedSet = new HashSet<>();
+    private String draggedName;
+    private Button btnTandai;
+    private Button btnTandaiSemua;
+    private View btnSimpan, btnImport, btnHapus, btnFavorit, btnBagikan, btnEkspor;
 
     private ActivityResultLauncher<String[]> importLauncher;
 
@@ -50,7 +65,7 @@ public class PresetBrowserDialog extends DialogFragment {
         this(activity, listener, onDismissListener, null);
     }
 
-    public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener, Runnable onSaveClick) {
+    public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener, Consumer<Runnable> onSaveClick) {
         this.activity = activity;
         this.listener = listener;
         this.onDismissListener = onDismissListener;
@@ -78,9 +93,14 @@ public class PresetBrowserDialog extends DialogFragment {
         searchBar = view.findViewById(R.id.searchBar);
         listView = view.findViewById(R.id.presetList);
         emptyHint = view.findViewById(R.id.emptyHint);
-        View btnSimpan = view.findViewById(R.id.btnSimpan);
-        View btnExportAll = view.findViewById(R.id.btnExportAll);
-        View btnImport = view.findViewById(R.id.btnImport);
+        btnTandai = view.findViewById(R.id.btnTandai);
+        btnTandaiSemua = view.findViewById(R.id.btnTandaiSemua);
+        btnSimpan = view.findViewById(R.id.btnSimpan);
+        btnImport = view.findViewById(R.id.btnImport);
+        btnHapus = view.findViewById(R.id.btnHapus);
+        btnFavorit = view.findViewById(R.id.btnFavorit);
+        btnBagikan = view.findViewById(R.id.btnBagikan);
+        btnEkspor = view.findViewById(R.id.btnEkspor);
 
         fullMetadata = PresetManager.getIndexMetadata(activity);
         filteredMetadata = new ArrayList<>(fullMetadata);
@@ -97,36 +117,129 @@ public class PresetBrowserDialog extends DialogFragment {
         });
 
         listView.setOnItemClickListener((parent, v, position, id) -> {
-            Map<String, Object> item = filteredMetadata.get(position);
-            String name = (String) item.get("name");
-            if (listener != null) {
-                listener.onPresetSelected(name);
+            if (selectMode) {
+                CheckBox chk = v.findViewById(R.id.chkSelect);
+                if (chk != null) {
+                    chk.setChecked(!chk.isChecked());
+                    if (chk.isChecked()) checkedSet.add(position);
+                    else checkedSet.remove(position);
+                    btnTandai.setText(checkedSet.isEmpty() ? "Tandai" : "Tandai (" + checkedSet.size() + ")");
+                }
+                return;
             }
-            dismiss();
+            lastSelectedPos = position;
+            Map<String, Object> item = filteredMetadata.get(position);
+            showItemMenu(v, item);
         });
 
         listView.setOnItemLongClickListener((parent, v, position, id) -> {
-            Map<String, Object> item = filteredMetadata.get(position);
-            showItemMenu(v, item);
+            if (selectMode) return false;
+            draggedName = (String) filteredMetadata.get(position).get("name");
+            ClipData data = ClipData.newPlainText("preset_name", draggedName);
+            v.startDragAndDrop(data, new View.DragShadowBuilder(v), v, 0);
             return true;
         });
 
+        listView.setOnDragListener((v, event) -> {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return true;
+                case DragEvent.ACTION_DRAG_LOCATION: {
+                    int overPos = listView.pointToPosition((int) event.getX(), (int) event.getY());
+                    if (overPos >= 0) {
+                        String overName = (String) filteredMetadata.get(overPos).get("name");
+                        if (!overName.equals(draggedName)) {
+                            PresetManager.reorder(activity, draggedName, overPos);
+                            refreshData();
+                        }
+                    }
+                    return true;
+                }
+                case DragEvent.ACTION_DROP:
+                    return true;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    draggedName = null;
+                    return true;
+            }
+            return false;
+        });
+
         if (onSaveClick != null) {
-            btnSimpan.setOnClickListener(v -> {
-                onSaveClick.run();
-                dismiss();
-            });
+            btnSimpan.setOnClickListener(v -> onSaveClick.accept(this::refreshData));
         } else {
             btnSimpan.setVisibility(View.GONE);
         }
 
-        btnExportAll.setOnClickListener(v -> {
-            String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
-            if (PresetManager.exportToFile(activity, filename)) {
-                Toast.makeText(activity, "Semua preset diekspor ke Downloads/" + filename, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(activity, "Gagal mengekspor preset", Toast.LENGTH_SHORT).show();
+        btnTandaiSemua.setOnClickListener(v -> {
+            boolean allChecked = checkedSet.size() == filteredMetadata.size();
+            checkedSet.clear();
+            if (!allChecked) {
+                for (int i = 0; i < filteredMetadata.size(); i++) checkedSet.add(i);
             }
+            updateBottomBar();
+            adapter.notifyDataSetChanged();
+        });
+
+        btnTandai.setOnClickListener(v -> {
+            selectMode = !selectMode;
+            if (!selectMode) checkedSet.clear();
+            updateBottomBar();
+            adapter.notifyDataSetChanged();
+        });
+
+        btnHapus.setOnClickListener(v -> {
+            if (checkedSet.isEmpty()) return;
+            List<String> toDelete = new ArrayList<>();
+            for (int pos : checkedSet) {
+                if (pos < filteredMetadata.size())
+                    toDelete.add((String) filteredMetadata.get(pos).get("name"));
+            }
+            new AlertDialog.Builder(activity)
+                    .setTitle("Hapus Preset")
+                    .setMessage("Hapus " + toDelete.size() + " preset terpilih?")
+                    .setPositiveButton("Ya", (d, w) -> {
+                        PresetManager.deleteMultiple(activity, toDelete);
+                        Toast.makeText(activity, toDelete.size() + " preset dihapus", Toast.LENGTH_SHORT).show();
+                        exitSelectMode();
+                        refreshData();
+                    })
+                    .setNegativeButton("Batal", null)
+                    .show();
+        });
+
+        btnFavorit.setOnClickListener(v -> {
+            if (checkedSet.isEmpty()) return;
+            for (int pos : checkedSet) {
+                if (pos < filteredMetadata.size()) {
+                    Map<String, Object> item = filteredMetadata.get(pos);
+                    String name = (String) item.get("name");
+                    boolean fav = (Boolean) item.getOrDefault("favorite", false);
+                    PresetManager.setFavorite(activity, name, !fav);
+                }
+            }
+            Toast.makeText(activity, "Favorit " + checkedSet.size() + " preset diubah", Toast.LENGTH_SHORT).show();
+            exitSelectMode();
+            refreshData();
+        });
+
+        btnBagikan.setOnClickListener(v -> {
+            if (checkedSet.isEmpty()) return;
+            for (int pos : checkedSet) {
+                if (pos < filteredMetadata.size()) {
+                    String name = (String) filteredMetadata.get(pos).get("name");
+                    PresetManager.sharePreset(activity, name);
+                }
+            }
+            exitSelectMode();
+        });
+
+        btnEkspor.setOnClickListener(v -> {
+            if (checkedSet.isEmpty()) return;
+            String filename = "ftxt_presets_" + System.currentTimeMillis() + ".txt";
+            if (!PresetManager.exportToFile(activity, filename)) {
+                Toast.makeText(activity, "Gagal mengekspor", Toast.LENGTH_SHORT).show();
+            }
+            exitSelectMode();
         });
 
         btnImport.setOnClickListener(v -> importLauncher.launch(new String[]{"text/plain"}));
@@ -134,11 +247,20 @@ public class PresetBrowserDialog extends DialogFragment {
         updateEmptyState();
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
-                .setTitle("Pilih Preset")
-                .setView(view)
-                .setNegativeButton("Batal", (d, w) -> dismiss())
                 .create();
+        dialog.setView(view, 0, 0, 0, 0);
         dialog.setCanceledOnTouchOutside(true);
+        dialog.setOnShowListener(d -> {
+            int itemHeight = (int) (activity.getResources().getDisplayMetrics().density * 40 + 0.5f);
+            int maxHeight = itemHeight * 7 + 6;
+            ViewGroup wrapper = view.findViewById(R.id.listWrapper);
+            if (wrapper.getHeight() > maxHeight) {
+                LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) wrapper.getLayoutParams();
+                lp.weight = 0;
+                lp.height = maxHeight;
+                wrapper.setLayoutParams(lp);
+            }
+        });
         return dialog;
     }
 
@@ -182,6 +304,24 @@ public class PresetBrowserDialog extends DialogFragment {
         emptyHint.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 
+    private void updateBottomBar() {
+        btnTandai.setText(selectMode ? "Tandai (" + checkedSet.size() + ")" : "Tandai");
+        btnTandaiSemua.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        btnSimpan.setVisibility(selectMode ? View.GONE : (onSaveClick != null ? View.VISIBLE : View.GONE));
+        btnImport.setVisibility(selectMode ? View.GONE : View.VISIBLE);
+        btnHapus.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        btnFavorit.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        btnBagikan.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+        btnEkspor.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+    }
+
+    private void exitSelectMode() {
+        selectMode = false;
+        checkedSet.clear();
+        updateBottomBar();
+        adapter.notifyDataSetChanged();
+    }
+
     private void refreshData() {
         fullMetadata = PresetManager.getIndexMetadata(activity);
         filter(searchBar.getText().toString());
@@ -192,6 +332,7 @@ public class PresetBrowserDialog extends DialogFragment {
         boolean favorite = (Boolean) item.getOrDefault("favorite", false);
 
         PopupMenu popup = new PopupMenu(activity, anchor);
+        popup.getMenu().add(0, 7, 0, "Gunakan Preset");
         popup.getMenu().add(0, 1, 0, "Ganti Nama");
         popup.getMenu().add(0, 2, 0, "Hapus");
         popup.getMenu().add(0, 3, 0, favorite ? "Batal Favorite" : "Favorite");
@@ -201,6 +342,10 @@ public class PresetBrowserDialog extends DialogFragment {
 
         popup.setOnMenuItemClickListener(itemMenu -> {
             switch (itemMenu.getItemId()) {
+                case 7:
+                    if (listener != null) listener.onPresetSelected(name);
+                    dismiss();
+                    return true;
                 case 1:
                     showRenameDialog(name);
                     return true;
@@ -310,6 +455,7 @@ public class PresetBrowserDialog extends DialogFragment {
             TextView txtName = convertView.findViewById(R.id.txtName);
             TextView txtTags = convertView.findViewById(R.id.txtTags);
             ImageView imgFav = convertView.findViewById(R.id.imgFavorite);
+            CheckBox chk = convertView.findViewById(R.id.chkSelect);
 
             txtName.setText(name);
 
@@ -333,6 +479,9 @@ public class PresetBrowserDialog extends DialogFragment {
                 favorite = (Boolean) item.get("favorite");
             }
             imgFav.setImageResource(favorite ? R.drawable.ic_star_filled : R.drawable.ic_star_outline);
+
+            chk.setVisibility(selectMode ? View.VISIBLE : View.GONE);
+            chk.setChecked(checkedSet.contains(pos));
 
             return convertView;
         }

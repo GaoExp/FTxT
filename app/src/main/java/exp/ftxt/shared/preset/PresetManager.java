@@ -218,10 +218,12 @@ public class PresetManager {
             item.name = name;
             item.createdAt = now;
             item.updatedAt = now;
-            index.add(item);
+            index.add(0, item);
             isNew = true;
         } else {
-            // existing: push current data to history
+            // existing: move to top, push current data to history
+            index.remove(item);
+            index.add(0, item);
             item.updatedAt = now;
             // Save previous version to history
             try {
@@ -430,6 +432,7 @@ public class PresetManager {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Downloads.DISPLAY_NAME, filename);
                 values.put(MediaStore.Downloads.MIME_TYPE, "text/plain");
+                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS + "/FunText");
 
                 Uri uri = activity.getContentResolver().insert(
                         MediaStore.Downloads.EXTERNAL_CONTENT_URI, values
@@ -442,19 +445,22 @@ public class PresetManager {
                         writer.write(jsonContent);
                         writer.flush();
                         writer.close();
+                        Toast.makeText(activity, "Diekspor ke Downloads/FunText/" + filename, Toast.LENGTH_SHORT).show();
                         return true;
                     }
                 }
             } else {
-                File dir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS
+                File dir = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS), "FunText"
                 );
+                dir.mkdirs();
                 File file = new File(dir, filename);
                 FileOutputStream fos = new FileOutputStream(file);
                 OutputStreamWriter writer = new OutputStreamWriter(fos);
                 writer.write(jsonContent);
                 writer.flush();
                 writer.close();
+                Toast.makeText(activity, "Diekspor ke Downloads/FunText/" + filename, Toast.LENGTH_SHORT).show();
                 return true;
             }
         } catch (Exception e) {
@@ -736,6 +742,20 @@ public class PresetManager {
         item.favorite = fav;
         item.updatedAt = System.currentTimeMillis();
         saveIndex(prefs, index);
+        return true;
+    }
+
+    public static boolean reorder(Context context, String name, int toIndex) {
+        SharedPreferences prefs = getPrefs(context);
+        List<PresetIndexItem> list = getIndex(prefs);
+        int fromIndex = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).name.equals(name)) { fromIndex = i; break; }
+        }
+        if (fromIndex < 0 || toIndex < 0 || toIndex >= list.size() || fromIndex == toIndex) return false;
+        PresetIndexItem it = list.remove(fromIndex);
+        list.add(toIndex, it);
+        saveIndex(prefs, list);
         return true;
     }
 
