@@ -137,13 +137,32 @@ FTxT/
     │       │   ├── ic_exit.xml              — Ikon exit/keluar untuk tombol Keluar
     │       │   ├── ic_launcher_background.xml   — Background launcher adaptive icon
     │       │   ├── ic_launcher_foreground.png   — Foreground launcher adaptive icon
+    │       │   ├── ic_launcher_bg.png       — Background ikon aplikasi
+    │       │   ├── ic_launcher_foreground_alt.png — Foreground ikon alternatif
     │       │   ├── ic_screen_rotation.xml   — Ikon orientasi layar (toolbar)
     │       │   ├── ic_settings.xml          — Ikon gear untuk settings
     │       │   ├── ic_star_filled.xml       — Ikon bintang solid (favorit)
     │       │   ├── ic_star_outline.xml      — Ikon bintang outline (non-favorit)
     │       │   ├── ic_sun.xml               — Ikon matahari untuk tema terang
     │       │   ├── ic_theme.xml             — Ikon tema gelap/terang
-    │       │   └── splash_screen.xml        — Splash screen drawable
+    │       │   ├── splash_screen.xml        — Splash screen drawable
+    │       │   ├── bg_alt_light2.png        — Background drawer tema terang
+    │       │   ├── bg_main_light2.png       — Background layar utama tema terang
+    │       │   ├── appbar_light.png         — Background toolbar tema terang
+    │       │   ├── drawbar_light.png        — Background header drawer tema terang
+    │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg terang
+    │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer terang
+    │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg terang
+    │       │   └── main_bg.xml              — Drawable wrapper main bg terang
+    │       ├── drawable-night/
+    │       │   ├── bg_alt.png               — Background drawer tema gelap
+    │       │   ├── bg_main_dark.png         — Background layar utama tema gelap
+    │       │   ├── appbar_dark.png          — Background toolbar tema gelap
+    │       │   ├── drawbar_dark.png         — Background header drawer tema gelap
+    │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg gelap (flip 180°)
+    │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer gelap
+    │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg gelap
+    │       │   └── main_bg.xml              — Drawable wrapper main bg gelap
     │       ├── layout/
     │       │   ├── activity_main.xml            — Layout utama dengan DrawerLayout + CoordinatorLayout
     │       │   ├── activity_settings.xml        — Layout halaman pengaturan izin
@@ -168,7 +187,8 @@ FTxT/
     │       │   ├── drawer_menu.xml   — Menu navigation drawer: daftar panel
     │       │   └── main_menu.xml     — Menu toolbar: settings, theme, exit
     │       ├── mipmap-anydpi-v26/
-    │       │   └── ic_launcher.xml   — Adaptive icon launcher
+    │       │   ├── ic_launcher.xml   — Adaptive icon launcher (default)
+    │       │   └── ic_launcher_alt.xml   — Adaptive icon launcher (alternatif)
     │       ├── values/
     │       │   ├── colors.xml        — Warna: primary, accent, drawer, bg
     │       │   ├── strings.xml       — Semua string UI Bahasa Indonesia
@@ -192,9 +212,10 @@ FTxT/
 |----------|-------:|
 | Java source | 67 |
 | Layout XML | 20 |
-| Drawable XML | 13 |
+| Drawable XML | 20 |
+| Drawable PNG | 11 |
 | Values XML | 6 |
-| Mipmap XML | 1 |
+| Mipmap XML | 2 |
 | Menu XML | 2 |
 | Anim XML | 2 |
 | XML lainnya (Manifest, backup) | 2 |
@@ -203,5 +224,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~136** |
-| **Total direktori** | **~42** |
+| **Total file** | **~155** |
+| **Total direktori** | **~44** |

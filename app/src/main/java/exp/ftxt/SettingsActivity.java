@@ -1,5 +1,6 @@
 package exp.ftxt;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -25,6 +26,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch overlaySwitch;
     private Switch notificationSwitch;
     private Switch batterySwitch;
+    private Switch iconSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class SettingsActivity extends AppCompatActivity {
         overlaySwitch = findViewById(R.id.overlayPermissionSwitch);
         notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
         batterySwitch = findViewById(R.id.batteryPermissionSwitch);
+        iconSwitch = findViewById(R.id.iconSwitch);
 
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
 
@@ -75,6 +78,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        boolean useAltIcon = prefs.getBoolean("alt_icon", false);
+        iconSwitch.setChecked(useAltIcon);
+        applySwitchTint(iconSwitch, useAltIcon);
+
+        iconSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(iconSwitch, isChecked);
+            prefs.edit().putBoolean("alt_icon", isChecked).apply();
+            setIcon(isChecked);
+        });
+
     }
 
     @Override
@@ -91,6 +104,16 @@ public class SettingsActivity extends AppCompatActivity {
             sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
             sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
+    }
+
+    private void setIcon(boolean useAlt) {
+        PackageManager pm = getPackageManager();
+        ComponentName def = new ComponentName(this, "exp.ftxt.MainActivityDefault");
+        ComponentName alt = new ComponentName(this, "exp.ftxt.MainActivityAlt");
+        int defState = useAlt ? PackageManager.COMPONENT_ENABLED_STATE_DISABLED : PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        int altState = useAlt ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+        pm.setComponentEnabledSetting(def, defState, PackageManager.DONT_KILL_APP);
+        pm.setComponentEnabledSetting(alt, altState, PackageManager.DONT_KILL_APP);
     }
 
     private void updatePermissionSwitches() {

@@ -20,17 +20,35 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.FTxT.SplashScreen">
+        </activity>
+
+        <activity-alias
+            android:name=".MainActivityDefault"
+            android:targetActivity=".MainActivity"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher">
 
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN"/>
-
-                <category
-                    android:name="android.intent.category.LAUNCHER"/>
-
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
 
-        </activity>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".MainActivityAlt"
+            android:targetActivity=".MainActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_alt">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+        </activity-alias>
 
         <activity
             android:name=".SettingsActivity"

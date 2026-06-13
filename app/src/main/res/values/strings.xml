@@ -17,5 +17,10 @@
     <string name="nav_logo">Logo Display</string>
 
     <string name="back_press_toast">Tekan kembali lagi untuk keluar</string>
+
+    <!-- Icon -->
+    <string name="icon_section">Ikon Aplikasi</string>
+    <string name="icon_default">Default</string>
+    <string name="icon_alt">Alternatif</string>
 </resources>
 

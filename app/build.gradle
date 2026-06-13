@@ -21,8 +21,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 157
-        versionName "3.9.3.75.0"
+        versionCode 158
+        versionName "3.9.3.76.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,7 +41,6 @@ android {
     buildTypes {
 
         debug {
-            applicationIdSuffix ".debug"
         }
 
         release {
@@ -63,9 +62,8 @@ android {
         variant.outputs.all { output ->
             def appName = "FTxT"
             def version = variant.versionName
-            def buildType = variant.buildType.name
 
-            outputFileName = "${appName}-${buildType}-v${version}.apk"
+            outputFileName = "${appName}-v${version}-Beta.apk"
         }
     }
 

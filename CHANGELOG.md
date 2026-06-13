@@ -1,3 +1,48 @@
+## [3.9.3.76.0] - 2026-06-13
+### ✨ Fitur Baru
+- **Opsi Ganti Ikon Aplikasi** — Pengaturan ikon aplikasi di Konfigurasi: toggle Default/Alternatif. Dua varian ikon aplikasi bisa dipilih langsung dari dalam aplikasi.
+- **Background Antarmuka Tema Gelap & Terang** — Drawer navigation, header, toolbar, dan layar utama masing-masing punya background gambar sendiri untuk tema gelap dan terang.
+### 🗒️ File Added
+- `app/src/main/res/mipmap-anydpi-v26/ic_launcher_alt.xml`
+- `app/src/main/res/drawable/ic_launcher_foreground_alt.png`
+- `app/src/main/res/drawable/ic_launcher_bg.png`
+- `app/src/main/res/drawable-night/bg_alt.png`
+- `app/src/main/res/drawable/bg_alt_light.png`
+- `app/src/main/res/drawable/bg_alt_light2.png`
+- `app/src/main/res/drawable/bg_main_light.png`
+- `app/src/main/res/drawable/bg_main_light2.png`
+- `app/src/main/res/drawable-night/bg_main_dark.png`
+- `app/src/main/res/drawable/appbar_light.png`
+- `app/src/main/res/drawable-night/appbar_dark.png`
+- `app/src/main/res/drawable/drawbar_light.png`
+- `app/src/main/res/drawable-night/drawbar_dark.png`
+- `app/src/main/res/drawable/toolbar_bg.xml`
+- `app/src/main/res/drawable-night/toolbar_bg.xml`
+- `app/src/main/res/drawable/drawer_bg.xml`
+- `app/src/main/res/drawable-night/drawer_bg.xml`
+- `app/src/main/res/drawable/drawer_header_bg.xml`
+- `app/src/main/res/drawable-night/drawer_header_bg.xml`
+- `app/src/main/res/drawable/main_bg.xml`
+- `app/src/main/res/drawable-night/main_bg.xml`
+### ✏️ File Changed
+- `app/src/main/AndroidManifest.xml` — Tambah activity-alias `MainActivityDefault` dan `MainActivityAlt`
+- `app/src/main/java/exp/ftxt/SettingsActivity.java` — Tambah toggle ikon + `setIcon()`
+- `app/src/main/res/layout/activity_settings.xml` — Tambah section Ikon Aplikasi
+- `app/src/main/res/values/strings.xml` — Tambah string icon
+- `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` — Background pakai `ic_launcher_bg`
+- `app/src/main/res/mipmap-anydpi-v26/ic_launcher_alt.xml` — Background pakai `ic_launcher_bg`
+- `app/src/main/res/layout/drawer_content.xml` — Background ganti `@color/drawer_background` → `@drawable/drawer_bg`
+- `app/src/main/res/layout/nav_header.xml` — Background ganti `@color/drawer_header_background` → `@drawable/drawer_header_bg`; height `70dp` + gravity center_vertical; textColor hitam
+- `app/src/main/res/layout/activity_main.xml` — Toolbar `#2196F3` → `@drawable/toolbar_bg`; LinearLayout tambah `@drawable/main_bg`
+- `app/src/main/res/drawable/drawer_bg.xml` — Ganti src ke `bg_alt_light2`
+- `app/src/main/res/drawable-night/drawer_bg.xml` — Ganti src ke `bg_alt`; flip 180° via rotate drawable
+- `app/src/main/res/drawable/drawer_header_bg.xml` — Ganti src ke `drawbar_light`
+- `app/src/main/res/drawable-night/drawer_header_bg.xml` — Ganti src ke `drawbar_dark`
+- `app/src/main/res/drawable/main_bg.xml` — Ganti src ke `bg_main_light2`
+### 🔢 Version
+versionCode: 158
+versionName: 3.9.3.76.0
+
 ## [3.9.3.75.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **148 CSS Color Names** — ColorNameResolver di-upgrade dengan 148 warna CSS standar. Pencocokan warna menggunakan Euclidean distance untuk hasil yang lebih akurat.
