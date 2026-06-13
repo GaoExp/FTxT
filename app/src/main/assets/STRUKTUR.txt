@@ -151,8 +151,9 @@ FTxT/
     │       │   ├── drawbar_light.png        - Background header drawer terang
     │       │   ├── drawer_bg.xml            - Wrapper drawer bg terang
     │       │   ├── drawer_header_bg.xml     - Wrapper header drawer terang
-    │       │   ├── toolbar_bg.xml           - Wrapper toolbar bg terang
-    │       │   └── main_bg.xml              - Wrapper main bg terang
+│       │   ├── toolbar_bg.xml           - Wrapper toolbar bg terang
+│       │   ├── vertical_divider.xml     - Divider vertikal untuk bottom bar preset
+│       │   └── main_bg.xml              - Wrapper main bg terang
     │       ├── drawable-night/
     │       │   ├── bg_alt.png               - Background drawer tema gelap
     │       │   ├── bg_main_dark.png         - Background layar utama gelap

@@ -135,13 +135,16 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Klik label slider untuk edit nilai manual via dialog
 
 ### Preset System (v2)
-Akses preset dari **icon gear → "Muat Preset"**. Dialog preset terbuka dengan tombol:
-- **Simpan** — Simpan seluruh konfigurasi panel aktif (posisi, ukuran, warna, shadow, background, orientasi, touchPassthrough, safeArea, toggle display)
-- Pilih preset dari daftar untuk **Muat** (search, filter, favorite, rename, delete, reorder, selective apply)
-- **E/I** — Ekspor ke file (Downloads) / Impor dari file (file picker)
-- **Bagikan** — Bagikan preset via Android share intent
+Akses preset dari **icon gear → "Muat Preset"**. Dialog preset terbuka dengan:
+- **Search bar** — Cari preset berdasarkan nama atau tag
+- **Header**: tombol **Tandai** — Aktifkan mode pilih, checkbox muncul di tiap item
+- **Header**: tombol **Tandai Semua** — Centang/hapus centang semua item
+- **Bottom bar (normal)**: **Simpan** — Simpan seluruh konfigurasi panel aktif; **Impor** — Impor dari file
+- **Bottom bar (Tandai)**: **Hapus**, **Favorit**, **Bagikan**, **Ekspor** — Aksi batch untuk item terpilih
+- **Tap item**: menu dengan **Gunakan Preset** di urutan pertama
+- **Long-press item**: **Drag & drop** — Tukar posisi preset dalam daftar
 
-Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 versi.
+Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 versi. Preset baru diletakkan di urutan teratas.
 
 ### Kontrol Posisi
 - **Slider X/Y** — Posisi horizontal dan vertikal (persentase 0.0–1.0)
