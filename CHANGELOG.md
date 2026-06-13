@@ -1,3 +1,37 @@
+## [3.11.3.78.0] - 2026-06-13
+### 🚮 Fitur Dihapus
+- **Tombol Ekspor Semua di dialog preset** — Tombol "Ekspor Semua" dihapus dari bottom bar dialog browser preset.
+### ✨ Fitur Baru
+- **Tombol Tandai di header** — Mode pilih: tap Tandai → checkbox muncul di tiap item → tap item untuk centang.
+- **Tombol Tandai Semua di header** — Centang atau hapus centang semua item.
+- **Tombol aksi batch di bottom bar** — Saat mode Tandai aktif, tombol Simpan/Impor berubah menjadi Hapus, Favorit, Bagikan, Ekspor.
+- **Opsi Gunakan Preset di menu item** — Saat mengetuk preset, muncul menu dengan opsi "Gunakan Preset" di urutan pertama.
+- **Drag & drop reorder preset** — Ketuk lama preset untuk drag & drop menukar posisi preset dalam daftar.
+### ♻️ Perubahan Fitur
+- **Title "Pilih Preset" pindah ke header layout** — Sebelumnya via `AlertDialog.setTitle()`, sekarang langsung di XML header.
+- **CheckBox di setiap item preset** — Muncul hanya saat mode Tandai aktif.
+- **Preset yang disimpan diletakkan di paling atas** — Preset baru maupun hasil update langsung berada di urutan teratas daftar.
+### 🐞 Bug Fixes
+- **Preset baru tidak muncul di daftar setelah simpan** — `onSaveClick` async menyebabkan `refreshData()` kepanggil sebelum save selesai. Diperbaiki dengan mengubah `onSaveClick` dari `Runnable` ke `Consumer<Runnable>`, sehingga `refreshData()` dipanggil via callback setelah save benar-benar selesai.
+### ✏️ File Changed
+- `app/src/main/res/layout/dialog_preset_browser.xml` — Tambah header (title + btnTandaiSemua + btnTandai); tambah btnHapus/btnFavorit/btnBagikan/btnEkspor di bottom + divider vertikal; divider ListView; hapus btnExportAll; FrameLayout wrapper ListView + maxHeight 280dp; hapus Batal
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — Select mode, checkedSet, handler btnTandai/btnTandaiSemua + aksi batch (Hapus/Favorit/Bagikan/Ekspor); handler Gunakan Preset; drag & drop reorder; hapus setTitle; onSaveClick Runnable → Consumer\<Runnable\>
+- `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — showSavePresetDialog + doSavePreset tambah parameter onSaved; showLoadPresetDialog ubah onSaveClick Runnable → Consumer\<Runnable\>
+- `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Tambah method `reorder`; save() pindahkan item ke index 0
+- `app/src/main/res/layout/preset_browser_item.xml` — Tambah chkSelect CheckBox; padding & ukuran dikecilkan; height checkbox disamakan (32dp)
+- `app/src/main/res/drawable/vertical_divider.xml` — Divider vertikal untuk bottom bar
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/WatermarkPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — update lambda onSaveClick
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — update lambda onSaveClick
+### 🔢 Version
+versionCode: 160
+versionName: 3.11.3.78.0
+
 ## [3.10.3.77.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Tombol Simpan/Muat Preset dari panel posisi** — Tombol `btnSavePreset`, `btnLoadPreset`, dan label `txtActivePreset` dihapus dari semua 8 panel posisi (Battery, Battery%, BatteryCurrent, Clock, FPS, Network, Text, Watermark). Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".

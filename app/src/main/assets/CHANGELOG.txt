@@ -1,3 +1,24 @@
+[3.11.3.78.0] - 2026-06-13
+🚮 Fitur Dihapus
+- Tombol Ekspor Semua di dialog preset — Tombol "Ekspor Semua" dihapus.
+✨ Fitur Baru
+- Tombol Tandai di header — Mode pilih dengan checkbox.
+- Tombol Tandai Semua di header — Centang/hapus centang semua item.
+- Tombol aksi batch di bottom bar — Hapus, Favorit, Bagikan, Ekspor saat mode Tandai.
+- Opsi Gunakan Preset di menu item — Tap preset buka menu dengan opsi "Gunakan Preset".
+- Drag & drop reorder preset — Ketuk lama preset untuk drag & drop menukar posisi.
+♻️ Perubahan Fitur
+- Title "Pilih Preset" pindah ke header layout.
+- CheckBox di setiap item preset.
+- Preset yang disimpan diletakkan di paling atas daftar.
+🐞 Bug Fixes
+- Preset baru tidak muncul di daftar setelah simpan — onSaveClick async diperbaiki dengan callback Consumer\<Runnable\>.
+🔢 Version
+versionCode: 160
+versionName: 3.11.3.78.0
+
+════════════════════════════════════════════════
+
 [3.10.3.77.0] - 2026-06-13
 🚮 Fitur Dihapus
 - Tombol Simpan/Muat Preset dari panel posisi — Tombol btnSavePreset, btnLoadPreset, dan label txtActivePreset dihapus dari semua 8 panel. Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".
