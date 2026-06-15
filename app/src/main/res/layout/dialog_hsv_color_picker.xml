@@ -7,11 +7,63 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <exp.ftxt.shared.color.HSVColorPickerView
-        android:id="@+id/colorWheel"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/dialogTitle"
+            android:text="Pilih Warna"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/modeLabel"
+            android:text="Color Wheel"
+            android:textSize="13sp"
+            android:textColor="#999"
+            android:gravity="center_vertical"
+            android:layout_marginEnd="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/switchModeButton"
+            android:src="@drawable/ic_swap"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Tukar mode"
+            android:layout_width="32dp"
+            android:layout_height="32dp"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/wheelContainer"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp">
+
+        <exp.ftxt.shared.color.HSVColorPickerView
+            android:id="@+id/colorWheel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <SeekBar
+            android:id="@+id/hueSeekBar"
+            android:max="360"
+            android:progress="0"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginHorizontal="20dp"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/colorPreview"

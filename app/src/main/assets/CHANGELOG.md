@@ -1,4 +1,49 @@
-## [3.11.4.79.0] - 2026-06-13
+# [3.12.4.80.0] - 2026-06-13
+### 🚮 Fitur Dihapus
+- **Material Design Colors** — ~270 warna Material Design dihapus dari `ColorNameResolver.java`. Method `loadMaterialColors()` dan pemanggilannya dicabut. Tersisa CSS Colors (148) dan XKCD Colors (~950) sebagai sumber nama warna.
+### ✨ Fitur Baru
+- **Opsi Model Color Picker** — Di Konfigurasi, tersedia pilihan model Color Picker: **Color Wheel** atau **Hue Slider**.
+- **Mode Hue Slider** — UI color picker alternatif dengan slider Hue (0–360°), Saturation (0–100%), Brightness (0–100%), Opacity (0–100%). Dilengkapi swatch Current/Previous (dengan nama warna di dalamnya), info AHEX/HSV/ARGB, dan grid Saved Colors (maks 8) dengan tombol [+]. Masing-masing slider memiliki gradient background dinamis yang merepresentasikan rentang nilai.
+- **Saved Colors** — Warna dapat disimpan (max 16, via [+] hijau di header atau tap slot kosong hijau), di-load via tap (dialog Apply dengan Hapus merah). Grid 2×8 selalu tampil penuh. Data disimpan di SharedPreferences. Bagian ini bisa ditutup/dibuka via toggle.
+### ♻️ Perubahan Fitur
+- **Hue Slider layout redesain** — Info warna AHEX/HSV/ARGB pindah ke atas (kiri), preview Current/Previous digabung horizontal (kanan) dengan pembatas, label slider dipersingkat jadi H:/S:/V:/A:.
+- **Tombol switch mode color picker** — Tombol ⇄ (ic_swap) ditambahkan di title bar Color Wheel dan Hue Slider untuk menukar mode color picker tanpa perlu buka Konfigurasi.
+- **"Lihat Dokumentasi" → "Dokumentasi"** — Label menu popup pengaturan (gear) diubah dari "Lihat Dokumentasi" menjadi "Dokumentasi".
+- **STRUKTUR.md ditambahkan ke daftar dokumentasi in-app** — Tombol STRUKTUR ditambahkan di daftar dokumen, bisa dibaca seperti README/CHANGELOG/PANDUAN.
+- **Slider height diperkecil** — Tinggi slider Hue/Saturation/Brightness/Opacity dari 16dp jadi 8dp.
+- **Hapus label colorName** — Nama warna tidak lagi ditampilkan sebagai teks terpisah di bawah info ARGB karena sudah ada di dalam swatch Current/Previous.
+- **Saved Colors grid 2×8 + drag-reorder + anti-flicker** — Slot warna tersimpan diubah dari horizontal row jadi GridLayout 2 baris × 8 kolom. Semua 16 slot selalu tampil. Slot kosong: border hijau [ ] bukan hijau penuh. [+] di header jadi hijau, simpan di slot pertama (geser warna lain ke kanan). Long-press pada slot terisi → drop di slot lain → swap warna. Update in-place (no removeAllViews) agar tidak berkedip.
+- **Animasi geser saat simpan via [+] ** — Tombol [+] sekarang: simpan warna → set sel ke posisi kiri (translationX -cellStep) → update konten via loadSavedColors → animasi semua sel geser ke kanan ke posisi final (300ms AccelerateDecelerate). Warna baru muncul dari kiri, warna lama bergeser ke kanan.
+- **Animasi geser saat hapus warna** — Tombol Hapus sekarang: hapus warna dari preferences → set sel dari idx hapus hingga akhir ke kanan (translationX +cellStep) → update konten via loadSavedColors → animasi sel yang terdampak geser ke kiri ke posisi final (300ms AccelerateDecelerate). Warna setelah slot terhapus bergeser ke kiri mengisi celah.
+- **Thumb slider jadi lingkaran** — Thumb Hue/Saturation/Brightness/Opacity diubah dari rectangle 2×10dp jadi lingkaran 12×12dp (shape oval + layout_width/layout_height 12dp).
+- **Info warna pindah ke bawah swatch** — Teks AHEX/HSV/ARGB dipindah dari bawah slider Opacity ke bawah swatch Current/Previous.
+- **Checkerboard pattern untuk area transparan** — Swatch Current/Previous dan slider Opacity kini memiliki background pola kotak-kotak (abu terang/gelap) yang menampilkan area transparan/alpha channel. Menggunakan `BitmapDrawable` dengan `TileMode.REPEAT` + `LayerDrawable` (checkerboard di bawah, warna/gradien di atas).
+### 🔧 Optimasi & Penyesuaian
+- **Jarak antar elemen Hue Slider dirapatkan** — Padding root 16→12dp, marginBottom swatch 12→6dp, marginBottom info warna 8→4dp, marginBottom slider 8→4dp, marginBottom opacity slider 12→6dp, marginBottom grid saved 12→6dp.
+### 🐞 Bug Fixes
+- **Slider mode color picker crash (NPE)** — Layout `dialog_hue_slider_picker.xml` menggunakan custom slider (FrameLayout+gradientBg+thumb+touchArea) tapi Java code `ColorPickerDialog.java` mengharapkan `SeekBar`. Diperbaiki dengan implementasi custom slider: touch handling via `OnTouchListener` + `MotionEvent`, posisi thumb via `setTranslationX()`, dan mapping progress manual untuk keempat slider (Hue 0-360, Saturation/Brightness/Opacity 0-100).
+- **Build gagal: cannot find symbol Animator** — `ColorPickerDialog.java` menggunakan `List<Animator>` tanpa mengimpor `android.animation.Animator`. Ditambahkan import yang hilang.
+- **Edit HEX di Hue Slider mode force close (NPE)** — Saat user klik ikon edit HEX dan OK, method `setThumbPos()` memanggil `parent.post()` tanpa cek null pada thumb dan thumb.getParent() di dalam lambda. Diperbaiki dengan menambahkan null check pada thumb sebelum getParent(), dan cek ulang thumb.getParent() di dalam lambda sebelum mengakses parent.
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/shared/color/ColorNameResolver.java` — Hapus `loadMaterialColors()` dan seluruh data Material Design colors dari static block
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Ubah "Lihat Dokumentasi" jadi "Dokumentasi" di popup menu pengaturan
+- `app/src/main/java/exp/ftxt/DocumentationActivity.java` — Tambah onClickListener untuk `docStrukturButton`
+- `app/src/main/res/layout/activity_documentation.xml` — Tambah `docStrukturButton` TextView setelah PANDUAN
+- `app/src/main/res/layout/activity_settings.xml` — Tambah RadioGroup (Color Wheel / Hue Slider) di Model Color Picker
+- `app/src/main/res/layout/dialog_hue_slider_picker.xml` — Redesain layout: title row + mode label + switch button; info AHEX/HSV/ARGB di kiri, swatch Current/Previous horizontal di kanan; label slider pendek H:/S:/V:/A:; Header Saved Colors [+] hijau di kiri, label tengah, toggle collapse ʌ di kanan; GridLayout 8×2; thumb 12×12dp
+- `app/src/main/res/drawable/seekbar_thumb.xml` — Shape rectangle 2×10dp → oval 12×12dp (lingkaran)
+- `app/src/main/res/layout/dialog_hsv_color_picker.xml` — Wheel dibungkus FrameLayout + tambah `hueSeekBar`; tambah title row + mode label + switch button
+- `app/src/main/res/values/strings.xml` — Tambah string color_picker_section, color_picker_disk, color_picker_slider
+- `app/src/main/java/exp/ftxt/SettingsActivity.java` — Tambah RadioGroup listener + load/save `color_picker_mode` preference
+- `app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java` — Refactor: `show()` routing ke `showDiskMode()` atau `showSliderMode()`; slider mode dengan H/S/B/O slider, gradient background, Saved Colors (simpan/muat), swatch current/previous; ganti SeekBar dengan custom slider: `setThumbPos()` + `setupSliderTouch()` + progress arrays, hapus import SeekBar/ColorDrawable, tambah MotionEvent; Saved Colors: ganti LinearLayout→GridLayout, 16 slot selalu tampil (filled/empty hijau), empty slot tap→simpan, filled tap→dialog Apply+Hapus, drag-reorder+DragEvent; [+] simpan warna: set sel ke posisi kiri → loadSavedColors update konten → animasi ObjectAnimator geser sel ke kanan (300ms AccelerateDecelerate); tambah import `android.animation.Animator`; tambah `createCheckerboard()` + `setSwatchBg()` + checkerboard di swatch dan slider Opacity via LayerDrawable; tambah handler switch mode button di kedua mode; ubah label slider ke format pendek H:/S:/V:/A:; tambah null check di method `setThumbPos()`
+### 🗒️ File Added
+- `app/src/main/res/drawable/ic_swap.xml` — Icon swap untuk tombol tukar mode color picker
+### 🔢 Version
+`3.11.4.79.0` → `3.12.4.80.0` (minor+1, patch=0)
+
+---
+
+# [3.11.4.79.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Watermark Module** — Seluruh modul Watermark dihapus total: WatermarkConfig, WatermarkModule, WatermarkPanelController, WatermarkPositionController, panel_watermark.xml, seluruh referensi dari FloatingService, MainActivity, layout, menu, strings, dan ids. Mode Segel sudah dipindahkan ke Floating Text di versi yang sama.
 ### 📥 Fitur Dipulihkan
@@ -53,9 +98,10 @@
 ### 🔢 Version
 versionCode: 163
 versionName: 3.11.4.79.0
+
 ---
 
-## [3.11.3.78.1] - 2026-06-13
+# [3.11.3.78.1] - 2026-06-13
 ### 🔧 Optimasi & Penyesuaian
 - **Drag & drop reorder preset** — Migrasi ListView ke RecyclerView + ItemTouchHelper untuk animasi drag & drop yang smooth.
 - **Drag & drop drawer sidebar** — Migrasi `LinearLayout`+`DragEvent` ke `RecyclerView`+`ItemTouchHelper` untuk animasi drag & drop smooth di navigasi drawer.
@@ -71,8 +117,10 @@ versionName: 3.11.4.79.0
 ### 🔢 Version
 versionCode: 161
 versionName: 3.11.3.78.1
+
 ---
-## [3.11.3.78.0] - 2026-06-13
+
+# [3.11.3.78.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Tombol Ekspor Semua di dialog preset** — Tombol "Ekspor Semua" dihapus dari bottom bar dialog browser preset.
 ### ✨ Fitur Baru
@@ -105,8 +153,10 @@ versionName: 3.11.3.78.1
 ### 🔢 Version
 versionCode: 160
 versionName: 3.11.3.78.0
+
 ---
-## [3.10.3.77.0] - 2026-06-13
+
+# [3.10.3.77.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Tombol Simpan/Muat Preset dari panel posisi** — Tombol `btnSavePreset`, `btnLoadPreset`, dan label `txtActivePreset` dihapus dari semua 8 panel posisi (Battery, Battery%, BatteryCurrent, Clock, FPS, Network, Text, Watermark). Fungsi preset tetap bisa diakses via icon gear → "Muat Preset".
 ### ♻️ Perubahan Fitur
@@ -127,8 +177,10 @@ versionName: 3.11.3.78.0
 ### 🔢 Version
 versionCode: 159
 versionName: 3.10.3.77.0
+
 ---
-## [3.9.3.76.0] - 2026-06-13
+
+# [3.9.3.76.0] - 2026-06-13
 ### ✨ Fitur Baru
 - **Opsi Ganti Ikon Aplikasi** — Pengaturan ikon aplikasi di Konfigurasi: toggle Default/Alternatif. Dua varian ikon aplikasi bisa dipilih langsung dari dalam aplikasi.
 - **Background Antarmuka Tema Gelap & Terang** — Drawer navigation, header, toolbar, dan layar utama masing-masing punya background gambar sendiri untuk tema gelap dan terang.
@@ -173,8 +225,10 @@ versionName: 3.10.3.77.0
 ### 🔢 Version
 versionCode: 158
 versionName: 3.9.3.76.0
+
 ---
-## [3.9.3.75.0] - 2026-06-12
+
+# [3.9.3.75.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **148 CSS Color Names** — ColorNameResolver di-upgrade dengan 148 warna CSS standar. Pencocokan warna menggunakan Euclidean distance untuk hasil yang lebih akurat.
 - **254 Material Design Colors** — ColorNameResolver diperluas dengan 254 warna Material Design (Red, Pink, Purple, Deep Purple, Indigo, Blue, Light Blue, Cyan, Teal, Green, Light Green, Lime, Yellow, Amber, Orange, Deep Orange, Brown, Grey, Blue Grey) masing-masing dengan shade 50–900 + accent A100–A700.
@@ -184,8 +238,10 @@ versionName: 3.9.3.76.0
 ### 🔢 Version
 versionCode: 157
 versionName: 3.9.3.75.0
+
 ---
-## [3.9.3.74.2] - 2026-06-12
+
+# [3.9.3.74.2] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Tutup Aplikasi pindah ke navigation drawer** — Tombol Kill Service dipindahkan dari popup settings (gear) ke bagian paling bawah navigation drawer, dengan ikon close di sebelah kiri.
 - **Konfirmasi Keluar jadi default** — Checkbox Konfirmasi Keluar di Konfigurasi dihapus. Behavior ketuk dua kali untuk keluar sekarang aktif secara default tanpa perlu toggle.
@@ -204,8 +260,10 @@ versionName: 3.9.3.75.0
 ### 🔢 Version
 versionCode: 156
 versionName: 3.9.3.74.2
+
 ---
-## [3.9.3.74.1] - 2026-06-12
+
+# [3.9.3.74.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Semua preview warna dalam satu baris horizontal** — Setiap modul: semua preview warna (Warna/Nilai, Label, Shadow, Background) disusun dalam satu baris horizontal rata. Shadow/bg preview dipindahkan dari section Shadow/Background ke section Display.
 - **Semua tombol warna jadi preview kotak 30×30** — Tombol Pilih Warna, Warna Label, Shadow, dan Background di semua 8 panel diganti preview kotak 30×30. Tap preview → color picker.
@@ -223,8 +281,10 @@ versionName: 3.9.3.74.2
 ### 🔢 Version
 versionCode: 155
 versionName: 3.9.3.74.1
+
 ---
-## [3.9.3.74.0] - 2026-06-12
+
+# [3.9.3.74.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Battery Current** — Opsi baru "Sembunyikan Label" di panel Battery Current untuk menyembunyikan label mV/mA/W dan hanya menampilkan angka. Mode value-only menampilkan voltase dalam volt (V) bukan milivolt.
 ### ♻️ Perubahan Fitur
@@ -243,8 +303,10 @@ versionName: 3.9.3.74.1
 ### 🔢 Version
 versionCode: 154
 versionName: 3.9.3.74.0
+
 ---
-## [3.9.3.73.0] - 2026-06-12
+
+# [3.9.3.73.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Sembunyikan Label untuk Network Stats** — Opsi baru "Sembunyikan Label" di panel Network Stats untuk menyembunyikan label ↓↑MB/s dan hanya menampilkan angka kecepatan.
 ### ♻️ Perubahan Fitur
@@ -260,8 +322,10 @@ versionName: 3.9.3.74.0
 ### 🔢 Version
 versionCode: 153
 versionName: 3.9.3.73.0
+
 ---
-## [3.9.3.72.1] - 2026-06-12
+
+# [3.9.3.72.1] - 2026-06-12
 ### ♻️ Perubahan Fitur
 - **Kontrol Interval semua modul jadi single button + dialog** — Tombol interval FPS, Battery Temperature, Battery Current, dan Network Stats diubah dari 3 elemen ([-] label [+]) menjadi 1 tombol yang membuka dialog daftar pilihan interval. Method `findIntervalIndex()` dihapus.
 - **Tombol Pilih Warna jadi preview kotak** — Semua modul (FPS, Battery, Battery Current, Network): tombol "Pilih Warna" dan "Warna Label" diganti preview kotak 40×40 yang menunjukkan warna aktif. Tap preview → color picker.
@@ -278,8 +342,10 @@ versionName: 3.9.3.73.0
 ### 🔢 Version
 versionCode: 152
 versionName: 3.9.3.72.1
+
 ---
-## [3.9.3.72.0] - 2026-06-12
+
+# [3.9.3.72.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Warna Label FPS Terpisah** — Nilai FPS dan teks "FPS" kini bisa diwarnai berbeda. Button "Warna Label" di panel FPS untuk mengatur warna teks label, sementara "Pilih Warna" untuk nilai angka. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `fps_label_color`).
 - **Warna Label Battery Temperature Terpisah** — Nilai suhu dan satuan °C/% bisa diwarnai berbeda. Button "Warna Label" di panel Battery Temperature. Menggunakan SpannableString dengan ForegroundColorSpan. Disimpan di preset dan SharedPreferences (key: `battery_label_color`).
@@ -343,8 +409,10 @@ versionName: 3.9.3.72.1
 ### 🔢 Version
 versionCode: 151
 versionName: 3.9.3.72.0
+
 ---
-## [3.9.3.71.0] - 2026-06-12
+
+# [3.9.3.71.0] - 2026-06-12
 ### ✨ Fitur Baru
 - **Kontrol Interval Update (float, 0.2-10s)** — Semua modul (FPS, Network, Battery Current, Battery Temperature) kini mendukung interval update float dengan step: 0.2s, 0.5s, 0.75s, 1-10s. Tombol -/+ di panel masing-masing.
 ### 🔧 Optimasi & Penyesuaian
@@ -372,8 +440,10 @@ versionName: 3.9.3.72.0
 ### 🔢 Version
 versionCode: 149
 versionName: 3.9.3.71.0
+
 ---
-## [3.9.3.70.0] - 2026-06-11
+
+# [3.9.3.70.0] - 2026-06-11
 ### ✨ Fitur Baru
 - **Kontrol Interval Update Battery Stats** — Tambah tombol - dan + di panel Battery Stats untuk mengatur interval update dari 1-10 detik. Label menampilkan interval aktif (contoh: "Update: 5s"). Interval disimpan di SharedPreferences dan diaplikasikan langsung.
 ### 🔧 Optimasi & Penyesuaian
@@ -390,8 +460,10 @@ versionName: 3.9.3.71.0
 ### 🔢 Version
 versionCode: 147
 versionName: 3.9.3.69.9
+
 ---
-## [3.9.3.69.8] - 2026-06-11
+
+# [3.9.3.69.8] - 2026-06-11
 ### 🐞 Bug Fixes
 - **Semua modul ikut ter-nonaktifkan saat satu modul dimatikan** — Logic di semua panel controller hanya check 1-2 modul lainnya sebelum stop service, menyebabkan modul aktif lainnya ikut mati. Diperbaiki dengan helper function `isAnyModuleActive()` di MainActivity yang check SEMUA 7 modul (Text overlay, FPS, Clock, Battery, Battery%, Battery Current, Network, Watermark).
 ### 🔧 Optimasi & Penyesuaian
@@ -409,8 +481,10 @@ versionName: 3.9.3.69.9
 ### 🔢 Version
 versionCode: 146
 versionName: 3.9.3.69.8
+
 ---
-## [3.9.3.69.7] - 2026-06-11
+
+# [3.9.3.69.7] - 2026-06-11
 ### 🐞 Bug Fixes
 - **CI: signing path dobel `app/app/`** — `storeFile=app/release.jks` di keystore.properties, tapi build.gradle resolve path relatif ke direktori `app/`. Diubah jadi `storeFile=release.jks`.
 ### ✏️ File Changed
@@ -419,7 +493,7 @@ versionName: 3.9.3.69.8
 versionCode: 145
 versionName: 3.9.3.69.7
 ---
-## [3.9.3.69.6] - 2026-06-11
+# [3.9.3.69.6] - 2026-06-11
 ### 🐞 Bug Fixes
 - **APK release tidak signed** — Workflow decode keystore ke `app/release.jks` tapi tidak bikin `keystore.properties`, sehingga signing config di build.gradle tidak aktif. Ditambahkan step generate properties setelah decode.
 ### ✏️ File Changed
@@ -427,8 +501,10 @@ versionName: 3.9.3.69.7
 ### 🔢 Version
 versionCode: 144
 versionName: 3.9.3.69.6
+
 ---
-## [3.9.3.69.5] - 2026-06-11
+
+# [3.9.3.69.5] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **README.md** — Deskripsi lengkap untuk semua file di struktur project (131 file, 42 direktori)
 ### ✏️ File Changed
@@ -436,8 +512,10 @@ versionName: 3.9.3.69.6
 ### 🔢 Version
 versionCode: 143
 versionName: 3.9.3.69.5
+
 ---
-## [3.9.3.69.4] - 2026-06-11
+
+# [3.9.3.69.4] - 2026-06-11
 ### 🐞 Bug Fixes
 - **release.yml dikembalikan ke versi kerja sebelumnya** — Agent AI sebelumnya merusak workflow: mengganti Java 17→21, mengganti secret names, path keystore, dan struktur workflow yang menyebabkan build gagal. Dikembalikan ke versi `sementara/release.yml` yang terbukti berhasil.
 ### ✏️ File Changed
@@ -446,8 +524,10 @@ versionName: 3.9.3.69.5
 ### 🔢 Version
 versionCode: 142
 versionName: 3.9.3.69.4
+
 ---
-## [3.9.3.69.3] - 2026-06-11
+
+# [3.9.3.69.3] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **Refactor layout** — Ekstrak semua panel tersisa (Battery Current, Network, Crosshair, Watermark, Logo) dari `activity_main.xml` ke file terpisah menggunakan `<include>`; hapus leftover konten duplikat battery & battery_percentage
 - **release.yml** — Upgrade Java 17→21 untuk kompatibilitas keystore (Tag number over 30)
@@ -464,8 +544,10 @@ versionName: 3.9.3.69.4
 ### 🔢 Version
 versionCode: 141
 versionName: 3.9.3.69.3
+
 ---
-## [3.9.3.69.2] - 2026-06-11
+
+# [3.9.3.69.2] - 2026-06-11
 ### 🔧 Optimasi & Penyesuaian
 - **activity_main.xml** — Seragamkan format header collapsible section Shadow & Background di panel Battery Percentage dan Battery Current (bold, 16sp, paddingVertical)
 - **Refactor layout** — Ekstrak 3 panel pertama (Text, FPS, Clock) dari `activity_main.xml` ke file terpisah (`panel_text.xml`, `panel_fps.xml`, `panel_clock.xml`) menggunakan `<include>` untuk mempercepat build AAPT2
@@ -480,8 +562,10 @@ versionName: 3.9.3.69.3
 ### 🔢 Version
 versionCode: 140
 versionName: 3.9.3.69.2
+
 ---
-## [3.9.3.69.1] - 2026-06-11
+
+# [3.9.3.69.1] - 2026-06-11
 ### ♻️ Perubahan Fitur
 - **CHANGELOG.md** — Tambah entry header [1.3.1.9.0 - 1.0.0.0.0] untuk Catatan Major 1; hapus duplikasi
 - **release.yml** — Tambah step decode keystore dari org secrets; tambah `mkdir -p key` untuk buat folder di CI runner
@@ -519,8 +603,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 139
 - versionName: 3.9.3.69.1
+
 ---
-## [3.9.3.69.0] - 2026-06-02
+
+# [3.9.3.69.0] - 2026-06-02
 ### ✨ Fitur Baru
 - **Watermark Seal Pattern** — Mode segel pada watermark: teks diulang diagonal melayar penuh dengan kontrol spasi horizontal, spasi vertikal, dan sudut (angle). Canvas custom view dengan Paint anti-aliased. Aktif via toggle "Mode Segel" di panel watermark.
 ### ✏️ File Changed
@@ -532,8 +618,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 138
 - versionName: 3.9.3.69.0
+
 ---
-## [3.9.3.68.0] - 2026-06-02
+
+# [3.9.3.68.0] - 2026-06-02
 ### ✨ Fitur Baru
 - **Watermark Overlay** — Modul watermark teks baru dengan teks kustom, warna semi-transparan default (0x55FFFFFF), ukuran (5–200sp), shadow, background, kontrol posisi (slider X/Y, D-Pad, preset full-config), touch passthrough, dan safe area. Panel dapat diakses dari sidebar navigasi.
 ### 🗒️ File Added
@@ -549,8 +637,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 137
 - versionName: 3.9.3.68.0
+
 ---
-## [3.9.3.67.2] - 2026-06-01
+
+# [3.9.3.67.2] - 2026-06-01
 ### ♻️ Perubahan Fitur
 - **Tampilan FPS Display diseragamkan** — Hapus gaya neumorphism (neu_bg, DpadButton, FpsActionButton, PresetButton, ClickableLabel dll) pada panel FPS Display agar konsisten dengan panel fitur lainnya. Semua button dan kontrol kini menggunakan gaya default/inline seperti panel Text, Clock, Battery, dll.
 ### 🔧 Optimasi & Penyesuaian
@@ -562,8 +652,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 136
 - versionName: 3.9.3.67.2
+
 ---
-## [3.9.3.67.1] - 2026-06-01
+
+# [3.9.3.67.1] - 2026-06-01
 ### 🐞 Bug Fixes
 - **CI build gagal — SDK license & platform 35** — Workflow release.yml tidak accept SDK licenses dan tidak install platform 35 (compileSdk). Ditambahkan step `sdkmanager --licenses` dan install `platforms;android-35` + `build-tools;35.0.0`. Juga fallback `ANDROID_SDK_ROOT` jika `ANDROID_HOME` tidak diset.
 ### ✏️ File Changed
@@ -571,8 +663,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 135
 - versionName: 3.9.3.67.1
+
 ---
-## [3.9.3.67.0] - 2026-06-01
+
+# [3.9.3.67.0] - 2026-06-01
 ### ✨ Fitur Baru
 - **PresetBrowserDialog** — Dialog browser preset modern dengan search, filter, color thumbnail, favorite, rename, delete, reorder, dan export/import. Menggantikan AlertDialog radio-list lama.
 - **Active Preset Label** — Setiap panel (7 module) menampilkan label preset aktif di atas tombol preset.
@@ -605,8 +699,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 134
 - versionName: 3.9.3.67.0
+
 ---
-## [3.9.3.66.0] - 2026-06-01
+
+# [3.9.3.66.0] - 2026-06-01
 ### ✨ Fitur Baru
 - **Tombol Muat di Semua Panel** — Tombol "Muat Preset" (Load) kini muncul sebagai button fisik di layout setiap panel, posisinya di antara Simpan dan E/I. Sebelumnya hanya tersedia di menu popup toolbar (gear icon).
 ### ✏️ File Changed
@@ -615,8 +711,10 @@ versionName: 3.9.3.69.2
 ### 🔢 Version
 - versionCode: 127
 - versionName: 3.9.3.66.0
+
 ---
-## [3.9.3.65.0 – 3.9.3.63.0] - 2026-05-31–06-01
+
+# [3.9.3.65.0 – 3.9.3.63.0] - 2026-05-31–06-01
 Menggabungkan 3 release.
 ### ✨ Fitur Baru
 - **Preset System v2 — UUID-based Index & Metadata** — Sistem penyimpanan preset diupgrade dari name-based keys ke UUID-based storage dengan index metadata yang terurut. Backward compatible: migrasi otomatis dari format lama.
@@ -650,8 +748,10 @@ Menggabungkan 3 release.
 ### 🔢 Version
 - versionCode: 126
 - versionName: 3.9.3.63.0
+
 ---
-## [3.9.2.62.0 – 2.8.2.56.0] - 2026-05-16–06-01
+
+# [3.9.2.62.0 – 2.8.2.56.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Safe Area "Gunakan Area Aman"** — Menambahkan checkbox "Gunakan Area Aman" pada semua 6 panel overlay (Text, FPS, Clock, Battery, Battery Current, Network) untuk mengaktifkan/nonaktifkan pembatasan posisi agar tetap dalam area aman layar.
@@ -683,8 +783,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 122
 - versionName: 2.8.2.56.0
+
 ---
-## [2.7.2.54.0 – 2.7.2.49.0] - 2026-05-16–06-01
+
+# [2.7.2.54.0 – 2.7.2.49.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Sistem Manajemen Preset Overlay (GSON)** — Sistem preset baru berbasis GSON yang menyimpan seluruh konfigurasi overlay (posisi, ukuran, warna, shadow, background, orientasi) dalam format JSON. Mendukung Save, Load, Rename, Select, Delete, Export (clipboard/file), dan Import (clipboard/file).
@@ -708,8 +810,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 113
 - versionName: 2.7.2.49.0
+
 ---
-## [2.6.2.48.0 – 2.6.1.43.0] - 2026-05-16–06-01
+
+# [2.6.2.48.0 – 2.6.1.43.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Preset Preview**: Tampilan mini-map posisi pada daftar preset saat memuat.
@@ -735,8 +839,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 106
 - versionName: 2.6.2.48.0
+
 ---
-## [2.6.1.42.0 – 2.4.1.38.0] - 2026-05-16–06-01
+
+# [2.6.1.42.0 – 2.4.1.38.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Orientasi Mode Posisi**: Tambah tombol [Potret] [Lanskap] di kontrol posisi untuk mengatur posisi overlay secara terpisah per orientasi. Setiap perubahan posisi otomatis tersimpan ke orientasi yang sedang aktif.
@@ -788,8 +894,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 96
 - versionName: 2.6.1.42.0
+
 ---
-## [2.3.1.37.0 – 2.3.1.32.0] - 2026-05-16–06-01
+
+# [2.3.1.37.0 – 2.3.1.32.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Tambah Grup**: Tombol "+ Tambah Grup" di sidebar untuk membuat grup kustom baru. Setiap grup memiliki header collapsible dan bisa ditambahi item sendiri.
@@ -837,8 +945,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 81
 - versionName: 2.3.1.37.0
+
 ---
-## [2.3.1.31.0 – 2.3.1.26.0] - 2026-05-16–06-01
+
+# [2.3.1.31.0 – 2.3.1.26.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Hanya Tampilkan Nilai FPS**: Tambah toggle di panel FPS untuk menyembunyikan teks "FPS" dan hanya menampilkan angka.
@@ -862,8 +972,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 65
 - versionName: 2.3.1.31.0
+
 ---
-## [2.3.1.25.0 – 2.3.1.21.0] - 2026-05-16–06-01
+
+# [2.3.1.25.0 – 2.3.1.21.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Force Close**: Tombol "Tutup Aplikasi" dipindah ke SettingsActivity (di bawah CHANGELOG/README, pojok kiri bawah).
@@ -909,8 +1021,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 56
 - versionName: 2.3.1.25.0
+
 ---
-## [2.3.1.20.0 – 2.3.1.16.0] - 2026-05-16–06-01
+
+# [2.3.1.20.0 – 2.3.1.16.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Shadow Config**: Konfigurasi shadow modular dengan Enable, Warna, Blur, X/Y Offset, Opacity.
@@ -935,8 +1049,10 @@ Menggabungkan 5 release.
 ### 🔢 Version
 - versionCode: 51
 - versionName: 2.3.1.20.0
+
 ---
-## [2.3.1.15.0 – 2.3.1.10.0] - 2026-05-16–06-01
+
+# [2.3.1.15.0 – 2.3.1.10.0] - 2026-05-16–06-01
 Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - Toggle tema (gelap/terang) via ikon bulan di toolbar kanan.
@@ -953,7 +1069,12 @@ Menggabungkan 5 release.
 - **TextConfig.size**: Fix posisi overlay tidak termuat dari SharedPreferences.
 ### 🔢 Version
 - versionName: 2.3.1.15.0 (merged entry)
+
 ---
-## [1.3.1.9.0 - 1.0.0.0.0] - Pra-2026
-### 💡 Catatan
-- Major 1 kebawah telah dipisahkan dari Project
+
+# ***[1.3.1.9.0 - 1.0.0.0.0] - Pra-2026***
+
+### 💡 ***Catatan!***
+> Major 1 kebawah telah dipisahkan dari Project
+
+---

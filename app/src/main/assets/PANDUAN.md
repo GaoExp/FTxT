@@ -1,5 +1,7 @@
 # Panduan Penggunaan FTxT (FunText)
 
+---
+
 ## Daftar Isi
 
 - [Persyaratan](#persyaratan)
@@ -10,10 +12,14 @@
 - [Pengaturan](#pengaturan)
 - [Izin](#izin)
 
+---
+
 ## Persyaratan
 
 - Android 8.0 (API 26) atau lebih baru
 - Izin overlay aplikasi lain (SYSTEM_ALERT_WINDOW)
+
+---
 
 ## Memulai
 
@@ -22,6 +28,8 @@
 3. Berikan izin yang diminta
 4. Aplikasi akan otomatis menjalankan overlay teks default
 5. Pilih modul overlay dari navigation drawer
+
+---
 
 ## Navigasi
 
@@ -44,6 +52,8 @@ Drawer terdiri dari menu berikut:
 | Kill Service | X | Hentikan semua layanan overlay + tutup app |
 | Keluar | → | Tutup UI aplikasi, overlay tetap berjalan |
 
+---
+
 ## Toolbar
 
 Ikon di pojok kanan toolbar:
@@ -55,6 +65,8 @@ Ikon di pojok kanan toolbar:
 | Bulan/Matahari 🌙☀️ | Toggle tema gelap/terang |
 
 Header toolbar menampilkan navigasi drawer dan judul modul yang aktif.
+
+---
 
 ## Fitur Overlay
 
@@ -141,10 +153,14 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 - **Touch Passthrough** — Kunci posisi agar sentuhan tembus ke aplikasi belakang
 - Posisi tersimpan otomatis per orientasi layar
 
+---
+
 ## Pengaturan
 
 - **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon
+
+---
 
 ## Izin
 

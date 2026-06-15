@@ -124,6 +124,35 @@
 
         </LinearLayout>
 
+        <TextView
+            android:text="Model Color Picker"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/colorPickerMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <RadioButton
+                android:id="@+id/colorPickerDisk"
+                android:text="Color Wheel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <RadioButton
+                android:id="@+id/colorPickerSlider"
+                android:text="Hue Slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </RadioGroup>
+
     </LinearLayout>
 
     </ScrollView>

@@ -1,9 +1,9 @@
 # FTxT (FunText) — Floating Text Overlay
 
-**Current Release:** `3.11.4.79.0` **Beta**
+>**Current Release:** `3.11.4.80.0` **Beta** 
 **Last Updated:** `2026-06-13`
 
-FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
+>>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
 ---
 
@@ -51,15 +51,15 @@ Dokumentasi juga tersedia di dalam aplikasi melalui **Pengaturan > tombol Dokume
 
 Belum ada lisensi resmi yang ditetapkan untuk project ini.
 
-Sebagian besar pengembangan dibantu AI, sementara pengembang menangani pengujian, penyesuaian implementasi, revisi, dan debugging sambil ngopi.
+>Sebagian besar pengembangan dibantu AI, sementara pengembang menangani pengujian, penyesuaian implementasi, revisi, dan debugging sambil ngopi.
 
-Silakan gunakan, modifikasi, fork, atau kustomisasi sesuai kebutuhan.
+>>Silakan gunakan, modifikasi, fork, atau kustomisasi sesuai kebutuhan.
 
 ---
 
 ## 👨‍💻 Author
 
-Developed by **GaoZhan**.
+<mark> Developed by <u>***GaoZhan.***</u> </mark>
 
 Aplikasi overlay teks Android FTxT (FunText) dengan fokus pada customization, real-time updates, dan lightweight overlay behavior.
 
@@ -70,7 +70,7 @@ Aplikasi overlay teks Android FTxT (FunText) dengan fokus pada customization, re
 Laporan bug, issue, atau permintaan fitur:
 Silakan buat issue atau hubungi pengembang.
 
-Respons tidak dijamin cepat, karena project ini berkembang mengikuti eksperimen, suasana hati, waktu luang, dan secangkir kopi.
+>Respons tidak dijamin cepat, karena project ini berkembang mengikuti eksperimen, suasana hati, waktu luang, dan secangkir kopi.
 
 ---
 
@@ -88,7 +88,7 @@ Respons tidak dijamin cepat, karena project ini berkembang mengikuti eksperimen,
 | Namespace | exp.ftxt |
 | Application ID | exp.ftxt |
 
-### Versioning
+### 🔢 Versioning
 
 Project ini **TIDAK** menggunakan Semantic Versioning standar. Format khusus: `major.removed.restored.minor.patch`
 

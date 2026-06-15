@@ -414,7 +414,7 @@ public class MainActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);
         popup.getMenu().add("Muat Preset");
         popup.getMenu().add("Konfigurasi");
-        popup.getMenu().add("Lihat Dokumentasi");
+        popup.getMenu().add("Dokumentasi");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if (title.equals("Muat Preset")) {
@@ -433,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else if (title.equals("Konfigurasi")) {
                 startActivity(new Intent(this, SettingsActivity.class));
-            } else if (title.equals("Lihat Dokumentasi")) {
+            } else if (title.equals("Dokumentasi")) {
                 startActivity(new Intent(this, DocumentationActivity.class));
             }
             return true;

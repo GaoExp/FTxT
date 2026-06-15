@@ -21,5 +21,10 @@
     <string name="icon_section">Ikon Aplikasi</string>
     <string name="icon_default">Default</string>
     <string name="icon_alt">Alternatif</string>
+
+    <!-- Color Picker -->
+    <string name="color_picker_section">Model Color Picker</string>
+    <string name="color_picker_disk">Color Wheel</string>
+    <string name="color_picker_slider">Hue Slider</string>
 </resources>
 

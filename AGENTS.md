@@ -290,6 +290,6 @@ Utamakan:
 
 Default response style:
 - singkat, fokus, actionable
-- tulis ulang percakapan terakhir di `talkhere.txt` jika chat terpotong/terputus (entry baru di atas)
+- tulis ulang percakapan terakhir di `/sementara/Chat.md` jika chat terpotong/terputus (entry baru di atas)
 
 Jika request sederhana = jawab sederhana.
