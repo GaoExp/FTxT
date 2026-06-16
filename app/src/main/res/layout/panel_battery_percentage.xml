@@ -280,11 +280,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <Button
+                        <ImageButton
                             android:id="@+id/batPctBtnUp"
-                            android:text="↑"
                             android:layout_width="35dp"
-                            android:layout_height="35dp"/>
+                            android:layout_height="35dp"
+                            android:src="@drawable/ic_arrow_up"
+                            android:contentDescription="@null"
+                            android:scaleType="centerInside"/>
 
                         <LinearLayout
                             android:orientation="horizontal"
@@ -292,29 +294,35 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
 
-                            <Button
+                            <ImageButton
                                 android:id="@+id/batPctBtnLeft"
-                                android:text="←"
                                 android:layout_width="35dp"
-                                android:layout_height="35dp"/>
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_arrow_left"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
 
                             <Space
                                 android:layout_width="60dp"
                                 android:layout_height="0dp"/>
 
-                            <Button
+                            <ImageButton
                                 android:id="@+id/batPctBtnRight"
-                                android:text="→"
                                 android:layout_width="35dp"
-                                android:layout_height="35dp"/>
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
 
                         </LinearLayout>
 
-                        <Button
+                        <ImageButton
                             android:id="@+id/batPctBtnDown"
-                            android:text="↓"
                             android:layout_width="35dp"
-                            android:layout_height="35dp"/>
+                            android:layout_height="35dp"
+                            android:src="@drawable/ic_arrow_down"
+                            android:contentDescription="@null"
+                            android:scaleType="centerInside"/>
 
                     </LinearLayout>
 

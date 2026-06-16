@@ -121,12 +121,23 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Color Picker
+Dua mode tersedia, bisa ditukar via tombol ⇄ di title bar:
+
+**Mode Color Wheel**
 - Color wheel full disk dengan crosshair
 - Slider ARGB (Alpha, Red, Green, Blue) — 0–255
 - Two-way sync: wheel ↔ slider
+
+**Mode Hue Slider**
+- Slider Hue (0–360°), Saturation (0–100%), Brightness (0–100%), Opacity (0–100%)
+- Masing-masing slider memiliki gradient background dinamis
+
+**Keduanya berbagi:**
 - Nama warna otomatis, HEX 8 digit (#AARRGGBB)
-- Edit HEX manual, klik label ARGB untuk edit numerik
+- Edit HEX manual, klik label untuk edit numerik
 - Long-press nilai warna untuk salin ke clipboard
+- Preview warna saat ini & sebelumnya
+- Grid Saved Colors (simpan/load/hapus, maks 16 warna)
 
 ### Background & Shadow
 - Background: warna (dengan alpha), ukuran/padding (0–80px), offset X/Y (-60–60px), margin (0–30px), radius rounded corner (0–50px)

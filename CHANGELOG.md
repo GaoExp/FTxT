@@ -1,3 +1,32 @@
+# [3.12.4.80.1] - 2026-06-16
+### 🔧 Optimasi & Penyesuaian
+- **Tombol D-Pad jadi ikon panah** — Tombol arah D-Pad (↑↓←→) di semua 7 panel overlay diubah dari teks Unicode menjadi ImageButton dengan vector drawable arrow icons.
+### 🐞 Bug Fixes
+- **Mode Segel tidak mengikuti warna teks** — `SealPatternView.onDraw()` membaca `TextConfig.patternColor` (default putih transparan) yang tidak pernah diperbarui, bukan `TextConfig.color`. Diperbaiki dengan menggunakan `TextConfig.color` langsung. Field `TextConfig.patternColor` dihapus.
+- **Color picker tidak update overlay real-time** — Warna pada teks overlay hanya berubah setelah tombol Apply ditekan. Diperbaiki dengan memanggil `callback.onColorSelected()` dari dalam listener slider/wheel di kedua mode color picker (disk & slider) agar overlay langsung berubah saat slider digeser atau wheel dipindah. Cancel button sekarang mengembalikan warna awal via `callback.onColorSelected(initialColor)`.
+- **Disk mode OK/Cancel tidak berfungsi** — Listener tombol OK dan Cancel di mode Color Wheel tidak dipasang sehingga tidak merespon ketukan. Ditambahkan listener OK→apply color + dismiss, Cancel→restore initial color + dismiss.
+### 🗒️ File Added
+- `app/src/main/res/drawable/ic_arrow_up.xml` — Icon panah atas untuk D-Pad
+- `app/src/main/res/drawable/ic_arrow_down.xml` — Icon panah bawah untuk D-Pad
+- `app/src/main/res/drawable/ic_arrow_left.xml` — Icon panah kiri untuk D-Pad
+- `app/src/main/res/drawable/ic_arrow_right.xml` — Icon panah kanan untuk D-Pad
+### ✏️ File Changed
+- `app/src/main/res/layout/panel_text.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_fps.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_clock.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_battery.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_battery_percentage.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_battery_current.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/res/layout/panel_network.xml` — D-Pad Button teks Unicode diganti ImageButton dengan ikon panah
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — `SealPatternView.onDraw()` pakai `TextConfig.color` ganti `TextConfig.patternColor`
+- `app/src/main/java/exp/ftxt/features/floating_text/TextConfig.java` — Hapus field `patternColor` yang tidak terpakai
+- `app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java` — Tambah `callback.onColorSelected()` di listener slider/wheel untuk real-time update overlay; Cancel restore `initialColor`; tambah listener OK/Cancel di disk mode
+### 🔢 Version
+`164` → `165`
+`3.12.4.80.0` → `3.12.4.80.1` (patch+1)
+
+---
+
 # [3.12.4.80.0] - 2026-06-13
 ### 🚮 Fitur Dihapus
 - **Material Design Colors** — ~270 warna Material Design dihapus dari `ColorNameResolver.java`. Method `loadMaterialColors()` dan pemanggilannya dicabut. Tersisa CSS Colors (148) dan XKCD Colors (~950) sebagai sumber nama warna.

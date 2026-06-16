@@ -124,6 +124,7 @@ public class ColorPickerDialog {
                 updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                         redLabel, greenLabel, blueLabel, alphaLabel,
                         redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                callback.onColorSelected(color);
                 isUpdating[0] = false;
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -147,6 +148,7 @@ public class ColorPickerDialog {
             updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                     redLabel, greenLabel, blueLabel, alphaLabel,
                     redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+            callback.onColorSelected(color);
             isUpdating[0] = false;
         });
 
@@ -168,6 +170,7 @@ public class ColorPickerDialog {
                 updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
                         redLabel, greenLabel, blueLabel, alphaLabel,
                         redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                callback.onColorSelected(color);
                 isUpdating[0] = false;
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
@@ -269,6 +272,19 @@ public class ColorPickerDialog {
             prefs.edit().putString("color_picker_mode", "slider").apply();
             dialog.dismiss();
             showSliderMode(activity, title, color, callback);
+        });
+
+        okButton.setOnClickListener(v -> {
+            int color = Color.argb(alphaSeekBar.getProgress(),
+                    redSeekBar.getProgress(),
+                    greenSeekBar.getProgress(), blueSeekBar.getProgress());
+            callback.onColorSelected(color);
+            dialog.dismiss();
+        });
+
+        cancelButton.setOnClickListener(v -> {
+            callback.onColorSelected(initialColor);
+            dialog.dismiss();
         });
 
         dialog.show();
@@ -390,6 +406,7 @@ public class ColorPickerDialog {
                     h, Math.round(s * 100), Math.round(v * 100)));
             rgbValue.setText(String.format("ARGB: %d, %d, %d, %d",
                     a, Color.red(color), Color.green(color), Color.blue(color)));
+            callback.onColorSelected(color);
         };
 
         setupSliderTouch(hueTouchArea, hueThumb, 360, hueProg, () -> {
@@ -529,7 +546,10 @@ public class ColorPickerDialog {
             dialog.dismiss();
         });
 
-        cancelButton.setOnClickListener(v -> dialog.dismiss());
+        cancelButton.setOnClickListener(v -> {
+            callback.onColorSelected(initialColor);
+            dialog.dismiss();
+        });
         dialog.show();
     }
 

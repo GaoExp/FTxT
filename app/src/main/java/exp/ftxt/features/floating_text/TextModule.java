@@ -347,7 +347,7 @@ public class TextModule {
             if (text == null || text.isEmpty()) return;
 
             float textSize = TextConfig.size;
-            int color = TextConfig.patternColor;
+            int color = TextConfig.color;
             float spacingH = TextConfig.patternSpacingH;
             float spacingV = TextConfig.patternSpacingV;
             float angle = TextConfig.patternAngle;

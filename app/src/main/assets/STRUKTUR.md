@@ -126,6 +126,10 @@ FTxT/
     │       │   ├── settings_popup_enter.xml — Animasi masuk popup settings
     │       │   └── settings_popup_exit.xml  — Animasi keluar popup settings
     │       ├── drawable/
+    │       │   ├── ic_arrow_down.xml        — Ikon panah bawah untuk D-Pad
+    │       │   ├── ic_arrow_left.xml        — Ikon panah kiri untuk D-Pad
+    │       │   ├── ic_arrow_right.xml       — Ikon panah kanan untuk D-Pad
+    │       │   ├── ic_arrow_up.xml          — Ikon panah atas untuk D-Pad
     │       │   ├── ic_close.xml             — Ikon close/X untuk Kill Service
     │       │   ├── ic_dots_vertical.xml     — Ikon tiga titik vertikal (overflow menu)
     │       │   ├── ic_edit.xml              — Ikon pensil untuk edit HEX/nilai
@@ -164,7 +168,8 @@ FTxT/
     │       │   ├── activity_main.xml            — Layout utama dengan DrawerLayout + CoordinatorLayout
     │       │   ├── activity_settings.xml        — Layout halaman pengaturan izin
     │       │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
-    │       │   ├── dialog_hsv_color_picker.xml  — Dialog color picker dengan wheel & ARGB sliders
+    │       │   ├── dialog_hsv_color_picker.xml  — Dialog color picker mode Color Wheel
+    │       │   ├── dialog_hue_slider_picker.xml — Dialog color picker mode Hue Slider
     │       │   ├── dialog_preset_browser.xml    — Dialog browser preset dengan search & list
     │       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
     │   │   ├── nav_header.xml               — Header navigation drawer: logo + versi

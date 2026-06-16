@@ -21,5 +21,4 @@ public class TextConfig {
     public static float patternSpacingH = 180f;
     public static float patternSpacingV = 220f;
     public static float patternAngle = -30f;
-    public static int patternColor = 0x22FFFFFF;
 }
