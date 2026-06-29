@@ -14,6 +14,7 @@
     <string name="nav_battery_percentage">Battery %</string>
     <string name="nav_battery_current">Battery Current</string>
     <string name="nav_logo">Logo Display</string>
+    <string name="nav_color_picker">Color Picker</string>
 
     <string name="back_press_toast">Tekan kembali lagi untuk keluar</string>
 

@@ -21,8 +21,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 165
-        versionName "3.12.4.80.1"
+        versionCode 167
+        versionName "4.82.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,7 +52,7 @@ android {
             )
 
             if (keystorePropertiesFile.exists()) {
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
         }
     }

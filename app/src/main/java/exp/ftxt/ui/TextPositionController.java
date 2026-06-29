@@ -186,6 +186,7 @@ public class TextPositionController {
 
     public void cleanup() {
         TextModule.onPositionUpdate = null;
+        FloatingService.setTextOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 

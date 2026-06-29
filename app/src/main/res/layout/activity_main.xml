@@ -41,6 +41,8 @@
 
             <include layout="@layout/panel_logo"/>
 
+            <include layout="@layout/panel_color_picker"/>
+
         </FrameLayout>
 
     </LinearLayout>

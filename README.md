@@ -1,6 +1,6 @@
 # FTxT (FunText) — Floating Text Overlay
 
->**Current Release:** `3.12.4.80.1` **Beta** 
+>**Current Release:** `4.82.0` **Beta** 
 **Last Updated:** `2026-06-16`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -90,19 +90,13 @@ Silakan buat issue atau hubungi pengembang.
 
 ### 🔢 Versioning
 
-Project ini **TIDAK** menggunakan Semantic Versioning standar. Format khusus: `major.removed.restored.minor.patch`
+Project ini menggunakan Semantic Versioning: `major.minor.patch`
 
-| Komponen | Arti |
-|----------|------|
-| major | Milestone besar / arsitektur |
-| removed | Counter fitur yang dihapus (tidak turun) |
-| restored | Counter fitur yang dipulihkan (tdk turun) |
-| minor | Feature release counter |
-| patch | Bugfix / optimization / maintenance |
-
-Aturan:
-- `patch` reset ke 0 saat `minor` naik
-- `minor` +1 saat `major`, `removed`, atau `restored` naik
+| Komponen | Naik saat | Reset |
+|----------|-----------|-------|
+| **major** | milestone besar, arsitektur, breaking change | `minor=0, patch=0` |
+| **minor** | fitur baru / fitur dihapus | `patch=0` |
+| **patch** | bugfix, optimasi, maintenance | — |
 
 ### Section Changelog
 
@@ -110,7 +104,6 @@ Aturan:
 |---------|-----------|
 | ✨ Fitur Baru | Fitur baru ditambahkan |
 | 🚮 Fitur Dihapus | Fitur dihapus/dinonaktifkan |
-| 📥 Fitur Dipulihkan | Fitur lama dikembalikan |
 | ♻️ Perubahan Fitur | Perubahan fitur existing |
 | 🔧 Optimasi & Penyesuaian | Optimasi, refactor, maintenance |
 | 🐞 Bug Fixes | Perbaikan bug |

@@ -202,6 +202,7 @@ public class BatteryCurrentPositionController {
 
     public void cleanup() {
         BatteryCurrentModule.onPositionUpdate = null;
+        FloatingService.setBatteryCurrentOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 

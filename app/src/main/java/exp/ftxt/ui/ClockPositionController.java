@@ -181,6 +181,7 @@ public class ClockPositionController {
 
     public void cleanup() {
         ClockModule.onPositionUpdate = null;
+        FloatingService.setClockOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 

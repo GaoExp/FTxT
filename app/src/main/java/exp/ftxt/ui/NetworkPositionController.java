@@ -187,6 +187,7 @@ public class NetworkPositionController {
 
     public void cleanup() {
         NetworkModule.onPositionUpdate = null;
+        FloatingService.setNetworkOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 

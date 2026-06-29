@@ -192,6 +192,7 @@ public class FpsPositionController {
 
     public void cleanup() {
         FpsModule.onPositionUpdate = null;
+        FloatingService.setFpsOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 

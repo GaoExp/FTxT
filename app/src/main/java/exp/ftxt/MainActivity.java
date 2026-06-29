@@ -50,6 +50,7 @@ import exp.ftxt.ui.ClockPanelController;
 import exp.ftxt.ui.FpsPanelController;
 import exp.ftxt.ui.NetworkPanelController;
 import exp.ftxt.ui.TextPanelController;
+import exp.ftxt.ui.ColorPickerPanelController;
 import exp.ftxt.utils.PermissionHelper;
 
 /**
@@ -88,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
     private NetworkPanelController networkPanel;
     private View panelCrosshair;
     private View panelLogo;
+    private View panelColorPicker;
+    private ColorPickerPanelController colorPickerPanel;
 
     private RecyclerView navItemContainer;
     private SidebarAdapter sidebarAdapter;
@@ -103,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
         "{\"id\":\"navBatteryCurrent\",\"l\":\"Battery Current\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
         "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
-        "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}]";
+        "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}," +
+        "{\"id\":\"navColorPicker\",\"l\":\"Color Picker\"}]";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         panelNetwork = findViewById(R.id.panel_network);
         panelCrosshair = findViewById(R.id.panel_crosshair);
         panelLogo = findViewById(R.id.panel_logo);
+        panelColorPicker = findViewById(R.id.panel_color_picker);
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
         int savedNavItem = prefs.getInt("nav_selected_item", R.id.navFloatingText);
         if (savedNavItem == R.id.navFps) {
@@ -159,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
             panelText.setVisibility(View.GONE);
             panelNetwork.setVisibility(View.VISIBLE);
             getSupportActionBar().setTitle(R.string.nav_network);
+        } else if (savedNavItem == R.id.navColorPicker) {
+            panelText.setVisibility(View.GONE);
+            panelColorPicker.setVisibility(View.VISIBLE);
+            getSupportActionBar().setTitle(R.string.nav_color_picker);
         }
 
         TextView navTitle = findViewById(R.id.navHeaderTitle);
@@ -184,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
         batteryPanel = new BatteryPanelController(this);
         batteryCurrentPanel = new BatteryCurrentPanelController(this);
         networkPanel = new NetworkPanelController(this);
+        colorPickerPanel = new ColorPickerPanelController(this);
 
         requestAllPermissionsOnFirstLaunch();
     }
@@ -230,6 +240,9 @@ public class MainActivity extends AppCompatActivity {
         }
         if (networkPanel != null && panelNetwork.getVisibility() == View.VISIBLE) {
             networkPanel.onPanelShown();
+        }
+        if (colorPickerPanel != null && panelColorPicker.getVisibility() == View.VISIBLE) {
+            colorPickerPanel.onPanelShown();
         }
         autoRequestAndStart();
         requestRemainingPermissions();
@@ -601,7 +614,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavSelection(int selectedId) {
         int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navBatteryCurrent, R.id.navClock, R.id.navCrosshair, R.id.navLogo};
+                R.id.navBatteryCurrent, R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker};
         for (int id : allIds) {
             View v = findViewById(id);
             if (v != null) {
@@ -777,6 +790,9 @@ public class MainActivity extends AppCompatActivity {
                     } else if (itemId == R.id.navLogo) {
                         panelLogo.setVisibility(View.VISIBLE);
                         getSupportActionBar().setTitle("Logo Display");
+                    } else if (itemId == R.id.navColorPicker) {
+                        panelColorPicker.setVisibility(View.VISIBLE);
+                        getSupportActionBar().setTitle(R.string.nav_color_picker);
                     } else {
                         panelText.setVisibility(View.VISIBLE);
                         getSupportActionBar().setTitle(R.string.nav_floating_text);
@@ -827,6 +843,7 @@ public class MainActivity extends AppCompatActivity {
         panelNetwork.setVisibility(View.GONE);
         panelCrosshair.setVisibility(View.GONE);
         panelLogo.setVisibility(View.GONE);
+        panelColorPicker.setVisibility(View.GONE);
     }
 
     @Override
@@ -838,6 +855,7 @@ public class MainActivity extends AppCompatActivity {
         if (batteryPanel != null) batteryPanel.cleanup();
         if (batteryCurrentPanel != null) batteryCurrentPanel.cleanup();
         if (networkPanel != null) networkPanel.cleanup();
+        if (colorPickerPanel != null) colorPickerPanel.cleanup();
     }
 
     private int dp(float dp) {

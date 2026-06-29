@@ -15,11 +15,6 @@ FTxT/
 ├── keystore.properties           — Konfigurasi signing release
 ├── local.properties              — Local SDK/NDK path
 │
-├── _karantina/                   — File deprecated/arsip
-│   └── exp/ftxt/shared/ui/
-│       ├── XyPadView.java        — XY Pad 2D drag (diganti Slider + D-Pad)
-│       └── PositionPresetManager.java  — Preset posisi lama (diganti PresetManager GSON)
-│
 ├── .github/workflows/
 │   └── release.yml               — GitHub Actions CI: build APK & GitHub Release
 │
@@ -70,6 +65,8 @@ FTxT/
     │   │   │   ├── network_stats/
     │   │   │   │   ├── NetworkConfig.java  — Konfigurasi statis Network overlay
     │   │   │   │   └── NetworkModule.java  — Kecepatan internet ↓↑ via TrafficStats, 1 detik
+    │   │   │   ├── color_picker/
+    │   │   │   │   └── TriangleColorPickerView.java — Custom View segitiga HSV untuk Color Picker
     │   │   │   ├── crosshair/      (placeholder — coming soon)
     │   │   │   ├── cpu_monitor/    (placeholder — coming soon)
     │   │   │   └── logo_display/   (placeholder — coming soon)
@@ -113,6 +110,7 @@ FTxT/
     │   │   │   ├── BatteryCurrentPositionController.java   — Kontrol posisi Battery Current
     │   │   │   ├── NetworkPanelController.java             — UI panel Network: switch, size, color, shadow
     │   │   │   ├── NetworkPositionController.java          — Kontrol posisi Network
+    │   │   │   ├── ColorPickerPanelController.java         — UI panel Color Picker: wheel, sliders, saved colors
     │   │   │
     │   │   ├── utils/
     │   │   │   └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
@@ -143,7 +141,9 @@ FTxT/
     │       │   ├── ic_star_filled.xml       — Ikon bintang solid (favorit)
     │       │   ├── ic_star_outline.xml      — Ikon bintang outline (non-favorit)
     │       │   ├── ic_sun.xml               — Ikon matahari untuk tema terang
+    │       │   ├── ic_swap.xml              — Ikon swap untuk tukar mode color picker
     │       │   ├── ic_theme.xml             — Ikon tema gelap/terang
+    │       │   ├── seekbar_thumb.xml        — Thumb slider lingkaran 12×12dp
     │       │   ├── splash_screen.xml        — Splash screen drawable
     │       │   ├── bg_alt_light2.png        — Background drawer tema terang
     │       │   ├── bg_main_light2.png       — Background layar utama tema terang
@@ -152,9 +152,9 @@ FTxT/
     │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg terang
     │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer terang
     │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg terang
-    │   │   ├── vertical_divider.xml     — Divider vertikal untuk bottom bar preset
-    │   │   ├── divider_horizontal.xml   — Divider horizontal untuk daftar dokumen
-    │   │   └── main_bg.xml              — Drawable wrapper main bg terang
+    │       │   ├── vertical_divider.xml     — Divider vertikal untuk bottom bar preset
+    │       │   ├── divider_horizontal.xml   — Divider horizontal untuk daftar dokumen
+    │       │   └── main_bg.xml              — Drawable wrapper main bg terang
     │       ├── drawable-night/
     │       │   ├── bg_alt.png               — Background drawer tema gelap
     │       │   ├── bg_main_dark.png         — Background layar utama tema gelap
@@ -182,6 +182,7 @@ FTxT/
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
     │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
     │   │   ├── panel_logo.xml               — Placeholder Logo Display (coming soon)
+    │   │   ├── panel_color_picker.xml       — Panel konfigurasi Color Picker
     │   │   ├── preset_browser_item.xml      — Item layout untuk daftar preset
     │   │   ├── preset_list_item.xml         — Item layout alternate untuk preset
     │   │   └── toolbar_zoom.xml             — Kontrol zoom − [+] di toolbar dokumentasi
@@ -213,9 +214,9 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 56 |
-| Layout XML | 19 |
-| Drawable XML | 22 |
+| Java source | 58 |
+| Layout XML | 20 |
+| Drawable XML | 24 |
 | Drawable PNG | 13 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -227,5 +228,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~146** |
+| **Total file** | **~151** |
 | **Total direktori** | **~44** |

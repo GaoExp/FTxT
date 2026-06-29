@@ -8,4 +8,5 @@
     <item name="navClock" type="id"/>
     <item name="navCrosshair" type="id"/>
     <item name="navLogo" type="id"/>
+    <item name="navColorPicker" type="id"/>
 </resources>

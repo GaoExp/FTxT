@@ -182,6 +182,7 @@ public class BatteryPercentagePositionController {
 
     public void cleanup() {
         BatteryPercentageModule.onPositionUpdate = null;
+        FloatingService.setBatteryPercentageOrientationSuffixStatic(null);
         if (dpad != null) dpad.cleanup();
     }
 
