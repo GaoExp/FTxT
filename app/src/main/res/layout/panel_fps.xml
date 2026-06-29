@@ -280,8 +280,9 @@
                         android:text="540X1200"
                         android:layout_marginStart="8dp"
                         android:textSize="12sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
 
                 </LinearLayout>
 
@@ -292,6 +293,7 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
+                        android:id="@+id/fps_sliderGroup"
                         android:orientation="vertical"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -327,13 +329,8 @@
 
                     </LinearLayout>
 
-                    <exp.ftxt.shared.ui.XyPadView
-                        android:id="@+id/fps_xyPad"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:layout_marginHorizontal="8dp"/>
-
                     <LinearLayout
+                        android:id="@+id/fps_dpadGroup"
                         android:orientation="vertical"
                         android:gravity="center"
                         android:layout_width="wrap_content"
@@ -386,8 +383,6 @@
                     </LinearLayout>
 
                 </LinearLayout>
-
-
 
                 <CheckBox
                     android:id="@+id/fpsSafeArea"

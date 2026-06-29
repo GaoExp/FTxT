@@ -316,8 +316,6 @@
 
     </LinearLayout>
 
-
-
     <CheckBox
         android:id="@+id/textSafeArea"
         android:text="Gunakan Area Aman"

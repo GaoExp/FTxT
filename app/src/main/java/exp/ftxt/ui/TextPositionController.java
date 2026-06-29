@@ -8,11 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
@@ -20,7 +15,6 @@ import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetHandler;
-import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.SliderPositionController;
 

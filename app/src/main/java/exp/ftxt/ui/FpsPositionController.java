@@ -8,11 +8,6 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
@@ -20,10 +15,8 @@ import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.fps_display.FpsModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetHandler;
-import exp.ftxt.shared.preset.PresetManager;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.SliderPositionController;
-import exp.ftxt.shared.ui.XyPadView;
 
 public class FpsPositionController {
 
@@ -35,7 +28,6 @@ public class FpsPositionController {
 
     private DpadController dpad;
     private SliderPositionController sliderController;
-    private XyPadView xyPad;
     private TextView coordDisplay;
     private TextView activePresetLabel;
     private int displayWidth, displayHeight;
@@ -137,10 +129,10 @@ public class FpsPositionController {
         bindViews();
 
         WindowManager wm = activity.getWindowManager();
-        DisplayMetrics realMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getRealMetrics(realMetrics);
-        displayWidth = realMetrics.widthPixels;
-        displayHeight = realMetrics.heightPixels;
+        DisplayMetrics dm = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(dm);
+        displayWidth = dm.widthPixels;
+        displayHeight = dm.heightPixels;
 
         FpsModule.onPositionUpdate = this::syncAll;
 
@@ -160,7 +152,6 @@ public class FpsPositionController {
         btnDown = activity.findViewById(R.id.fps_btnDown);
         btnLeft = activity.findViewById(R.id.fps_btnLeft);
         btnRight = activity.findViewById(R.id.fps_btnRight);
-        xyPad = activity.findViewById(R.id.fps_xyPad);
         coordDisplay = activity.findViewById(R.id.fps_posCoordDisplay);
     }
 
@@ -168,9 +159,6 @@ public class FpsPositionController {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(FpsConfig.posX + dx), clamp(FpsConfig.posY + dy));
         });
-        if (xyPad != null) {
-            xyPad.setOnPositionChangeListener((x, y) -> onPositionChanged(x, y));
-        }
     }
 
     public void showLoadPresetDialog() {
@@ -208,7 +196,6 @@ public class FpsPositionController {
 
     public void syncAll() {
         sliderController.sync(FpsConfig.posX, FpsConfig.posY);
-        if (xyPad != null) xyPad.setPosition(FpsConfig.posX, FpsConfig.posY);
         updateCoordDisplay();
         updateActivePresetLabel();
     }

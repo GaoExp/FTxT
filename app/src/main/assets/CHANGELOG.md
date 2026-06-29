@@ -1,27 +1,55 @@
+# [4.82.1] - 2026-06-29
+### 🚮 Fitur Dihapus
+- **XY Pad dihapus total** — Fitur XY Pad (2D drag area) dihapus dari FPS dan Floating Text. Kontrol posisi kembali ke slider X/Y (SeekBar) + D-Pad seperti sedia kala.
+### 🔥 File Removed
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Dihapus
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Hapus semua kode XY Pad (import, field, binding, toggle, listener, sync)
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Hapus semua kode XY Pad (import, field, binding, listener, sync)
+- `app/src/main/res/layout/panel_fps.xml` — Hapus `fps_xyPadRow`, `fps_btnSwap`, `fps_xyXSeek`, `fps_xyYSeek`, `fps_xyPad`
+- `app/src/main/res/layout/panel_text.xml` — Hapus `text_xyPadRow`, `text_xyPad`
+- `app/build.gradle` — versionCode 168, versionName 4.82.1
+- `STRUKTUR.md` — Update statistik (Java source 58→56, Layout XML 20→21, Drawable PNG 13→14)
+- `README.md` — Update versi ke 4.82.1, tanggal 2026-06-29
+### 🔢 Version
+4.82.1
+
 # [4.82.0] - 2026-06-18
 ### ♻️ Perubahan Fitur
 - **Color Piker dari Activity jadi Panel Modul** — Color Picker tidak lagi Activity terpisah, melainkan panel di MainActivity seperti modul lainnya (Floating Text, FPS, dll). Navigasi sidebar langsung menampilkan panel tanpa buka activity baru. Tombol silang dihilangkan, ikon navigasi drawer (garis 3) yang muncul.
-- **XY Pad dipulihkan di kontrol posisi FPS** — XyPadView (drag area 2D) dikembalikan dan ditempatkan di antara slider X/Y dan D-Pad pada panel FPS Display.
+- **XY Pad toggle di kontrol posisi FPS** — Tombol swap (ic_swap) untuk menukar mode D-Pad dengan XY Pad (2D drag area). Mode tersimpan di SharedPreferences.
+- **XY Pad FPS dengan slider X/Y tepi terintegrasi** — Saat mode XY Pad aktif, XyPadView menampilkan slider X horizontal di tepi atas dan slider Y vertikal di tepi kiri. Slider X hanya menggeser sumbu X, slider Y hanya sumbu Y, drag dot di area tengah tetap gerak 2D bebas. Kedua slider dan dot saling sinkron. Slider X/Y existing (SeekBar) disembunyikan saat mode XY Pad.
+### 🔧 Optimasi & Penyesuaian
+- **XY Pad persegi (1:1) dari API sistem** — `onMeasure` XyPadView ambil lebar layar via `WindowManager.getDefaultDisplay().getMetrics()` dan set lebar = tinggi = 20% lebar layar. Persegi agar ringkas dan konsisten di semua device.
+- **XY Pad ukuran proporsional (rasio layar)** — `onMeasure` XyPadView pakai `getRealMetrics()` untuk ukuran layar fisik (bukan area pakai). Tinggi dihitung proporsional sesuai rasio layar. Tambah `setFixedSize()` untuk opsi ukuran tetap (216×492).
+- **XY Pad diperbesar 20%→40% lebar layar** — Skala XyPadView dinaikkan jadi 40% lebar layar agar area gerak lebih luas dan presisi. Floating Text tidak lagi pakai fixed 216×492, ikut proporsional 40%.
+- **PADDING proporsional 8% per dimensi** — Padding absolut 40px (sama di lebar & tinggi) diganti PAD_RATIO=0.08 agar rasio area aktif persis sama dengan rasio layar. DOT_RADIUS juga proporsional (60% dari padding terkecil).
 ### ✨ Fitur Baru
 - **Menu Color Picker di Navigasi Drawer** — Menu baru "Color Picker" di sidebar. Adaptasi dari project ColorPicker (Mini ColPic): Color Disk (hue ring + SV triangle) dan Hue Slider mode (H/S/V/A custom slider), RGB slider collapsible, saved colors (16 slot dengan simpan/hapus), HEX/HSV/ARGB display dengan copy ke clipboard, HEX editor, color name resolver, toggle nama warna, checkerboard transparansi.
+- **XY Pad di Floating Text** — XY Pad ukuran tetap 216×492 sebagai pembanding di panel Floating Text.
 ### 🗒️ File Added
 - `app/src/main/res/layout/panel_color_picker.xml` — Panel color picker untuk MainActivity
 - `app/src/main/java/exp/ftxt/ui/ColorPickerPanelController.java` — Controller panel color picker
-- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Custom View XY Pad 2D drag (dipulihkan dari karantina)
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Custom View XY Pad 2D drag
 ### ✏️ File Changed
 - `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah panelColorPicker field, binding, init controller, handler sidebar show panel (ganti startActivity), hideAllPanels, onResume, onDestroy cleanup
 - `app/src/main/res/layout/activity_main.xml` — Tambah `<include layout="@layout/panel_color_picker"/>`
 - `app/src/main/AndroidManifest.xml` — Hapus deklarasi `ColorPickerActivity`
 - `app/src/main/res/values/ids.xml` — Tambah `navColorPicker`
 - `app/src/main/res/values/strings.xml` — Tambah string `nav_color_picker`
-- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
-- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`; integrasi XyPadView (bind, listener, sync)
-- `app/src/main/res/layout/panel_fps.xml` — Tambah XyPadView di antara slider dan D-Pad
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`; tambah XY Pad binding, setFixedSize(216,492), listener, sync
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`; integrasi XY Pad toggle (binding, listener, mode swap)
+- `app/src/main/res/layout/panel_fps.xml` — Tambah FrameLayout untuk D-Pad/XY Pad + tombol swap ic_swap
+- `app/src/main/res/layout/panel_text.xml` — Tambah XY Pad (text_xyPadRow, text_xyPad) di section posisi untuk perbandingan
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Ganti `getMetrics()` ke `getRealMetrics()`; tambah `setFixedSize()`; ukuran proporsional rasio layar (bukan persegi 1:1)
 - `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Tambah mode slider tepi: slider X horizontal (atas) + slider Y vertikal (kiri), flag `showSliders`, touch handling per area (X slider / Y slider / XY Pad)
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Aktifkan `xyPad.setShowSliders(true)` saat mode XY Pad via `updatePadVisibility()`; sembunyikan `fps_sliderGroup` saat mode XY Pad
+- `app/src/main/res/layout/panel_fps.xml` — Tambah `android:id="@+id/fps_sliderGroup"` pada container slider X/Y
 ### 🔥 File Removed
 - `app/src/main/java/exp/ftxt/features/color_picker/ColorPickerActivity.java` — Digantikan panel ColorPickerPanelController
 - `app/src/main/res/layout/activity_color_picker.xml` — Digantikan panel_color_picker.xml

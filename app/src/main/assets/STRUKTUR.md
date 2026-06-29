@@ -214,10 +214,10 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 58 |
-| Layout XML | 20 |
+| Java source | 56 |
+| Layout XML | 21 |
 | Drawable XML | 24 |
-| Drawable PNG | 13 |
+| Drawable PNG | 14 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
 | Menu XML | 2 |
