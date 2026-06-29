@@ -327,6 +327,12 @@
 
                     </LinearLayout>
 
+                    <exp.ftxt.shared.ui.XyPadView
+                        android:id="@+id/fps_xyPad"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_marginHorizontal="8dp"/>
+
                     <LinearLayout
                         android:orientation="vertical"
                         android:gravity="center"

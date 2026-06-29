@@ -1,11 +1,13 @@
 # [4.82.0] - 2026-06-18
 ### ♻️ Perubahan Fitur
 - **Color Piker dari Activity jadi Panel Modul** — Color Picker tidak lagi Activity terpisah, melainkan panel di MainActivity seperti modul lainnya (Floating Text, FPS, dll). Navigasi sidebar langsung menampilkan panel tanpa buka activity baru. Tombol silang dihilangkan, ikon navigasi drawer (garis 3) yang muncul.
+- **XY Pad dipulihkan di kontrol posisi FPS** — XyPadView (drag area 2D) dikembalikan dan ditempatkan di antara slider X/Y dan D-Pad pada panel FPS Display.
 ### ✨ Fitur Baru
 - **Menu Color Picker di Navigasi Drawer** — Menu baru "Color Picker" di sidebar. Adaptasi dari project ColorPicker (Mini ColPic): Color Disk (hue ring + SV triangle) dan Hue Slider mode (H/S/V/A custom slider), RGB slider collapsible, saved colors (16 slot dengan simpan/hapus), HEX/HSV/ARGB display dengan copy ke clipboard, HEX editor, color name resolver, toggle nama warna, checkerboard transparansi.
 ### 🗒️ File Added
 - `app/src/main/res/layout/panel_color_picker.xml` — Panel color picker untuk MainActivity
 - `app/src/main/java/exp/ftxt/ui/ColorPickerPanelController.java` — Controller panel color picker
+- `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Custom View XY Pad 2D drag (dipulihkan dari karantina)
 ### ✏️ File Changed
 - `app/src/main/java/exp/ftxt/MainActivity.java` — Tambah panelColorPicker field, binding, init controller, handler sidebar show panel (ganti startActivity), hideAllPanels, onResume, onDestroy cleanup
 - `app/src/main/res/layout/activity_main.xml` — Tambah `<include layout="@layout/panel_color_picker"/>`
@@ -13,7 +15,8 @@
 - `app/src/main/res/values/ids.xml` — Tambah `navColorPicker`
 - `app/src/main/res/values/strings.xml` — Tambah string `nav_color_picker`
 - `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
-- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`; integrasi XyPadView (bind, listener, sync)
+- `app/src/main/res/layout/panel_fps.xml` — Tambah XyPadView di antara slider dan D-Pad
 - `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Tambah reset `orientationSuffix` di `cleanup()`
