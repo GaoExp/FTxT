@@ -1,3 +1,24 @@
+# [4.82.3] - 2026-07-12
+### ♻️ Perubahan Fitur
+- **Pemeriksaan dan penyesuaian dokumen** — Verifikasi seluruh dokumen (README, CHANGELOG, STRUKTUR, PANDUAN) terhadap kondisi aktual project. Sinkronisasi isi dokumen dengan kode.
+### 🐞 Bug Fixes
+- **Section Version CHANGELOG tidak konsisten** — Entry v4.82.2 tidak menampilkan versi sebelumnya. Diperbaiki formatnya menjadi `4.82.1 → 4.82.2`.
+- **Pembatas antar entry CHANGELOG hilang** — Entry v4.82.2 dan v4.82.1 tidak memiliki pembatas `---`. Ditambahkan.
+- **Statistik STRUKTUR.md tidak akurat** — Jumlah Layout XML salah (21 → 20), tree masih menampilkan file yang sudah dihapus (`dialog_hsv_color_picker.xml`, `dialog_hue_slider_picker.xml`) dan belum mencantumkan file baru (`dialog_color_picker.xml`).
+- **Versi README.md belum update** — Masih menampilkan v4.82.1 dan tanggal 2026-06-29.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 170, versionName 4.82.3
+- `CHANGELOG.md` — Entry 4.82.3 baru, perbaiki section Version & pembatas v4.82.2
+- `README.md` — Update versi ke 4.82.3, tanggal 2026-07-12
+- `STRUKTUR.md` — Update statistik Layout XML 21→20, tree: hapus file dihapus, tambah dialog_color_picker.xml
+- `app/src/main/assets/CHANGELOG.md` — Sync dari root
+- `app/src/main/assets/README.md` — Sync dari root
+- `app/src/main/assets/STRUKTUR.md` — Sync dari root
+### 🔢 Version
+`4.82.2` → `4.82.3`
+
+---
+
 # [4.82.2] - 2026-06-30
 ### ♻️ Perubahan Fitur
 - **Color Picker Dialog digabung** — `ColorPickerDialog` sekarang menggunakan model yang sama dengan panel (`ColorPickerPanelController`): `TriangleColorPickerView` (segitiga) + slider H/S/V/A custom tanpa mode switching. Saved colors key diganti `cp_saved_colors` (share dengan panel). RGB slider tersedia sebagai collapsible section.
