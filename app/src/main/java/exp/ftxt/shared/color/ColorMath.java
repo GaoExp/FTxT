@@ -11,15 +11,19 @@ import android.graphics.Color;
  */
 public class ColorMath {
 
+    private static int[] hueColors;
+
     /**
      * Generate 361 warna hue (0–360) untuk SweepGradient color wheel.
      */
     public static int[] generateHueColors() {
-        int[] colors = new int[361];
-        for (int i = 0; i < 361; i++) {
-            colors[i] = Color.HSVToColor(new float[]{i, 1f, 1f});
+        if (hueColors == null) {
+            hueColors = new int[361];
+            for (int i = 0; i < 361; i++) {
+                hueColors[i] = Color.HSVToColor(new float[]{i, 1f, 1f});
+            }
         }
-        return colors;
+        return hueColors;
     }
 
     /**

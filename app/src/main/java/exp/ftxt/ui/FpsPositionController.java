@@ -145,6 +145,7 @@ public class FpsPositionController {
         );
         setupListeners();
         syncAll();
+        FloatingService.updateFpsPositionStatic();
     }
 
     private void bindViews() {

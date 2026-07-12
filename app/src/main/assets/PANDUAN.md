@@ -121,22 +121,18 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
 
 ### Color Picker
-Dua mode tersedia, bisa ditukar via tombol ⇄ di title bar:
+Color Wheel dan Hue/Saturation/Value/Alpha slider tampil bersamaan dalam satu panel:
 
-**Mode Color Wheel**
-- Color wheel full disk dengan crosshair
-- Slider ARGB (Alpha, Red, Green, Blue) — 0–255
-- Two-way sync: wheel ↔ slider
+- **Color Wheel** — Full disk dengan crosshair, sentuh untuk pilih warna
+- **Slider H/S/V** — Hue (0–360°), Saturation (0–100%), Brightness (0–100%), masing-masing dengan gradient background dinamis
+- **Slider Alpha** — Opacity (0–255) dengan checkerboard transparansi
+- **Slider RGB** — Klik "Tampilkan slider RGB" untuk edit Red/Green/Blue (0–255)
+- **Two-way sync** — Wheel, slider H/S/V, slider RGB saling sinkron
 
-**Mode Hue Slider**
-- Slider Hue (0–360°), Saturation (0–100%), Brightness (0–100%), Opacity (0–100%)
-- Masing-masing slider memiliki gradient background dinamis
-
-**Keduanya berbagi:**
+**Informasi & kontrol:**
 - Nama warna otomatis, HEX 8 digit (#AARRGGBB)
-- Edit HEX manual, klik label untuk edit numerik
+- Edit HEX manual via ikon pensil
 - Long-press nilai warna untuk salin ke clipboard
-- Preview warna saat ini & sebelumnya
 - Grid Saved Colors (simpan/load/hapus, maks 16 warna)
 
 ### Background & Shadow

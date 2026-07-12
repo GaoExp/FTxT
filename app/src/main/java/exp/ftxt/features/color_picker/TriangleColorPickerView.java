@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -113,18 +114,20 @@ public class TriangleColorPickerView extends View {
     }
 
     private void drawTriangle(Canvas canvas) {
-        int bmpSize = (int) (triRadius * 2 + 4);
+        float scale = 0.5f;
+        int bmpSize = (int) ((triRadius * 2 + 4) * scale);
         if (bmpSize <= 0) return;
 
         if (triangleBmp == null || triangleBmp.getWidth() != bmpSize || triangleDirty) {
             triangleBmp = Bitmap.createBitmap(bmpSize, bmpSize, Bitmap.Config.ARGB_8888);
 
+            float triR = triRadius * scale;
             float bmpCx = bmpSize / 2f;
             float bmpCy = bmpSize / 2f;
 
-            float ax = bmpCx, ay = bmpCy - triRadius;
-            float bx = bmpCx - triRadius * 0.866f, by = bmpCy + triRadius * 0.5f;
-            float cxv = bmpCx + triRadius * 0.866f, cyv = bmpCy + triRadius * 0.5f;
+            float ax = bmpCx, ay = bmpCy - triR;
+            float bx = bmpCx - triR * 0.866f, by = bmpCy + triR * 0.5f;
+            float cxv = bmpCx + triR * 0.866f, cyv = bmpCy + triR * 0.5f;
 
             float v0x = bx - ax, v0y = by - ay;
             float v1x = cxv - ax, v1y = cyv - ay;
@@ -179,7 +182,10 @@ public class TriangleColorPickerView extends View {
             triangleDirty = false;
         }
 
-        canvas.drawBitmap(triangleBmp, cx - bmpSize / 2f, cy - bmpSize / 2f, null);
+        float drawSize = bmpSize / scale;
+        canvas.drawBitmap(triangleBmp, null,
+                new RectF(cx - drawSize / 2f, cy - drawSize / 2f,
+                        cx + drawSize / 2f, cy + drawSize / 2f), null);
     }
 
     private void drawCrosshair(Canvas canvas) {
@@ -220,11 +226,18 @@ public class TriangleColorPickerView extends View {
         float dy = y - cy;
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
+        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE) {
+            if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
+        }
+
         if (action == MotionEvent.ACTION_DOWN) {
             touchOnRing = dist > innerRadius;
         }
 
         if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_MOVE) {
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);
+            }
             return true;
         }
 

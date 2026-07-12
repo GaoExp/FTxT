@@ -139,6 +139,7 @@ public class TextPositionController {
         );
         setupListeners();
         syncAll();
+        FloatingService.updateTextPositionStatic();
     }
 
     private void bindViews() {
