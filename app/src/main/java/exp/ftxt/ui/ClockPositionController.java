@@ -140,6 +140,7 @@ public class ClockPositionController {
         );
         setupListeners();
         syncAll();
+        FloatingService.updateClockPositionStatic();
     }
 
     private void bindViews() {

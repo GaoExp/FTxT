@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.widget.CheckBox;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +27,6 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch notificationSwitch;
     private Switch batterySwitch;
     private Switch iconSwitch;
-    private RadioGroup colorPickerMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,20 +43,8 @@ public class SettingsActivity extends AppCompatActivity {
         notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
         batterySwitch = findViewById(R.id.batteryPermissionSwitch);
         iconSwitch = findViewById(R.id.iconSwitch);
-        colorPickerMode = findViewById(R.id.colorPickerMode);
 
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-
-        String mode = prefs.getString("color_picker_mode", "slider");
-        if (mode.equals("slider")) {
-            colorPickerMode.check(R.id.colorPickerSlider);
-        } else {
-            colorPickerMode.check(R.id.colorPickerDisk);
-        }
-        colorPickerMode.setOnCheckedChangeListener((group, checkedId) -> {
-            String val = checkedId == R.id.colorPickerSlider ? "slider" : "disk";
-            prefs.edit().putString("color_picker_mode", val).apply();
-        });
 
         updatePermissionSwitches();
 

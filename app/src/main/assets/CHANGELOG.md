@@ -1,6 +1,40 @@
+# [4.82.2] - 2026-06-30
+### ♻️ Perubahan Fitur
+- **Color Picker Dialog digabung** — `ColorPickerDialog` sekarang menggunakan model yang sama dengan panel (`ColorPickerPanelController`): `TriangleColorPickerView` (segitiga) + slider H/S/V/A custom tanpa mode switching. Saved colors key diganti `cp_saved_colors` (share dengan panel). RGB slider tersedia sebagai collapsible section.
+### 🐞 Bug Fixes
+- **Slider Color Picker tersendat & terintercept scroll** — Slider Hue/Saturation/Value/Alpha dan RGB di panel Color Picker diperbaiki: touch event tidak lagi di-intercept oleh NestedScrollView (`requestDisallowInterceptTouchEvent(true)`), dan koordinat geser menggunakan `getRawX()` agar akurat meskipun jari keluar dari area slider.
+- **Triangle & Ring color wheel terintercept scroll** — `TriangleColorPickerView` dan `HSVColorPickerView` sekarang juga mencegah NestedScrollView meng-intercept touch event saat menggeser ring hue atau triangle SV. `HSVColorPickerView` juga tidak lagi mengabaikan sentuhan di luar wheel radius — tetap memproses perubahan hue dari sudut jari.
+- **Overlay hilang/off-screen saat orientasi berubah** — Semua 7 PositionController (`Text`, `Fps`, `Clock`, `Battery`, `BatteryPercentage`, `BatteryCurrent`, `Network`) sekarang memanggil `updatePositionStatic()` di akhir konstruktor, sehingga posisi overlay langsung di-recalculate ke dimensi layar baru saat Activity direcreate akibat perubahan orientasi.
+### 🔧 Optimasi & Penyesuaian
+- **Segitiga HSV Color Wheel rendering dioptimasi** — `TriangleColorPickerView.drawTriangle()` render bitmap segitiga di resolusi 0.5× lalu scale-up ke ukuran asli via `drawBitmap(bitmap, null, dstRect, null)`. Jumlah pixel yang diproses turun 75% (dari ~200k ke ~50k per frame). `ColorMath.generateHueColors()` di-cache static agar tidak alokasi array 361 elemen tiap `onDraw()`.
+- **Color Wheel Disk Dialog dioptimasi** — `HSVColorPickerView.drawColorWheel()` cache `SweepGradient` dan `RadialGradient` shader, dibuat ulang hanya saat ukuran view berubah (`onSizeChanged`), bukan tiap `onDraw()`.
+### 🔥 File Removed
+- `app/src/main/res/layout/dialog_hsv_color_picker.xml` — Tidak dipakai lagi (diganti `dialog_color_picker.xml`)
+- `app/src/main/res/layout/dialog_hue_slider_picker.xml` — Tidak dipakai lagi (diganti `dialog_color_picker.xml`)
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/ui/ColorPickerPanelController.java` — Perbaiki `setupSliderTouch()`: tambah `requestDisallowInterceptTouchEvent`, pakai `getRawX()` + `getLocationOnScreen()`; reusable `GradientDrawable` untuk sat/val/alpha (`setColors()` tanpa alokasi baru); cache `checkerDrawable`; optimasi `applySatGradient()` array 101→51; ekstrak `initGradientDrawables()`; aktifkan `colorWheel.setColor()` (sebelumnya di-comment)
+- `app/src/main/java/exp/ftxt/features/color_picker/TriangleColorPickerView.java` — Tambah `requestDisallowInterceptTouchEvent` di `onTouchEvent`; optimasi `drawTriangle()` render bitmap di resolusi 0.5× lalu scale-up
+- `app/src/main/java/exp/ftxt/shared/color/ColorMath.java` — Cache `generateHueColors()` static
+- `app/src/main/java/exp/ftxt/shared/color/HSVColorPickerView.java` — Tambah `requestDisallowInterceptTouchEvent`; hapus batasan `distance > wheelRadius` yang mengabaikan sentuhan di luar wheel; cache `SweepGradient` & `RadialGradient` shader via `onSizeChanged`
+- `app/src/main/java/exp/ftxt/shared/ui/ColorPickerDialog.java` — Rewrite total: gunakan `TriangleColorPickerView` + custom slider H/S/V/A/RGB, hapus mode switching, share saved colors key `cp_saved_colors` dengan panel
+- `app/src/main/res/layout/dialog_color_picker.xml` — Layout baru gabungan wheel + sliders + saved colors + collapsible RGB
+- `app/build.gradle` — versionCode 169, versionName 4.82.2
+- `gradle.properties` — JVM args 1024m → 2048m
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Tambah `updatePositionStatic()` di akhir konstruktor
+### 🔢 Version
+4.82.2
+
 # [4.82.1] - 2026-06-29
 ### 🚮 Fitur Dihapus
 - **XY Pad dihapus total** — Fitur XY Pad (2D drag area) dihapus dari FPS dan Floating Text. Kontrol posisi kembali ke slider X/Y (SeekBar) + D-Pad seperti sedia kala.
+### ♻️ Perubahan Fitur
+- **Color Picker panel digabung** — Color Wheel dan Hue/Saturation/Value/Alpha slider tidak lagi dipisah mode, melainkan tampil bersamaan dalam satu panel. Tombol swap mode dan pengaturan "Model Color Picker" di Konfigurasi dihapus.
 ### 🔥 File Removed
 - `app/src/main/java/exp/ftxt/shared/ui/XyPadView.java` — Dihapus
 ### ✏️ File Changed
@@ -9,6 +43,11 @@
 - `app/src/main/res/layout/panel_fps.xml` — Hapus `fps_xyPadRow`, `fps_btnSwap`, `fps_xyXSeek`, `fps_xyYSeek`, `fps_xyPad`
 - `app/src/main/res/layout/panel_text.xml` — Hapus `text_xyPadRow`, `text_xyPad`
 - `app/build.gradle` — versionCode 168, versionName 4.82.1
+- `app/src/main/java/exp/ftxt/ui/ColorPickerPanelController.java` — Hapus mode switching (isSliderMode, toggleMode, setupMode, switchModeBtn, hueSeekBar); gabung wheel + sliders selalu visible
+- `app/src/main/res/layout/panel_color_picker.xml` — Hapus mode header (label + tombol swap); sliderPanel selalu visible; hapus hueSeekBar tak terpakai
+- `app/src/main/java/exp/ftxt/SettingsActivity.java` — Hapus RadioGroup color picker mode
+- `app/src/main/res/layout/activity_settings.xml` — Hapus Model Color Picker section
+- `PANDUAN.md` — Update deskripsi Color Picker panel gabungan
 - `STRUKTUR.md` — Update statistik (Java source 58→56, Layout XML 20→21, Drawable PNG 13→14)
 - `README.md` — Update versi ke 4.82.1, tanggal 2026-06-29
 ### 🔢 Version

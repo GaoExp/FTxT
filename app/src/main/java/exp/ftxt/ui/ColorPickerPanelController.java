@@ -37,17 +37,10 @@ public class ColorPickerPanelController {
     private final MainActivity activity;
     private static final String PREFS_NAME = "ftxt_prefs";
     private static final String SAVED_COLORS_KEY = "cp_saved_colors";
-    private static final String MODE_KEY = "color_picker_mode";
     private static final String SHOW_NAME_KEY = "cp_show_color_name";
     private static final int MAX_SAVED_COLORS = 16;
 
-    private boolean isSliderMode = false;
-
-    private View wheelContainer;
     private TriangleColorPickerView colorWheel;
-    private View sliderPanel;
-    private ImageButton switchModeBtn;
-    private TextView modeLabel;
 
     private View previewContainer;
     private TextView colorPreview;
@@ -55,8 +48,6 @@ public class ColorPickerPanelController {
     private ImageButton hexEditButton;
 
     private SeekBar alphaSeek;
-
-    private SeekBar hueSeekBar;
 
     private CheckBox nameToggle;
     private boolean showColorName = true;
@@ -85,6 +76,17 @@ public class ColorPickerPanelController {
     private final int[] blueProg = {255};
 
     private boolean isUpdating = false;
+    private int lastNamedColor = 0;
+    private String lastColorName = "";
+    private int lastSatHue = -1;
+    private int lastValHue = -1;
+    private int lastAlphaColor = 0;
+    private int lastWheelArgb = 0;
+
+    private Drawable checkerDrawable;
+    private GradientDrawable satGd, valGd, alphaGd;
+    private final int[] satColors = new int[51];
+    private final int[] alphaColors = new int[2];
 
     public ColorPickerPanelController(MainActivity activity) {
         this.activity = activity;
@@ -94,11 +96,7 @@ public class ColorPickerPanelController {
     }
 
     private void bindViews() {
-        wheelContainer = activity.findViewById(R.id.cp_wheelContainer);
         colorWheel = activity.findViewById(R.id.cp_colorWheel);
-        sliderPanel = activity.findViewById(R.id.sliderPanel);
-        switchModeBtn = activity.findViewById(R.id.cp_switchModeButton);
-        modeLabel = activity.findViewById(R.id.cp_modeLabel);
 
         previewContainer = activity.findViewById(R.id.previewContainer);
         colorPreview = activity.findViewById(R.id.cp_colorPreview);
@@ -110,8 +108,6 @@ public class ColorPickerPanelController {
         nameToggle = activity.findViewById(R.id.nameToggle);
 
         alphaSeek = activity.findViewById(R.id.alphaSeek);
-
-        hueSeekBar = activity.findViewById(R.id.cp_hueSeekBar);
 
         hueThumb = activity.findViewById(R.id.cp_hueThumb);
         saturationThumb = activity.findViewById(R.id.cp_saturationThumb);
@@ -160,12 +156,12 @@ public class ColorPickerPanelController {
         showColorName = prefs.getBoolean(SHOW_NAME_KEY, true);
         nameToggle.setChecked(showColorName);
 
-        isSliderMode = prefs.getString(MODE_KEY, "disk").equals("slider");
-        setupMode(isSliderMode);
+        initGradientDrawables();
 
         int initialColor = Color.rgb(255, 0, 255);
         setColorValues(initialColor);
 
+        setupSliders();
         loadSavedColors();
         setupTransparencyChecker();
     }
@@ -184,7 +180,7 @@ public class ColorPickerPanelController {
         setupSliderTouch(blueTouchArea, blueThumb, 255, blueProg, this::onRgbChanged);
 
         colorWheel.setOnColorChangeListener(color -> {
-            if (isUpdating || isSliderMode) return;
+            if (isUpdating) return;
             isUpdating = true;
             int a = alphaSeek.getProgress();
             color = Color.argb(a, Color.red(color), Color.green(color), Color.blue(color));
@@ -192,26 +188,11 @@ public class ColorPickerPanelController {
             isUpdating = false;
         });
 
-        hueSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int p, boolean f) {
-                if (isUpdating || !isSliderMode) return;
-                isUpdating = true;
-                hueProg[0] = p;
-                int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
-                updateFromColor(color);
-                isUpdating = false;
-            }
-            @Override public void onStartTrackingTouch(SeekBar sb) {}
-            @Override public void onStopTrackingTouch(SeekBar sb) {}
-        });
-
         setupSliderTouch(hueTouchArea, hueThumb, 360, hueProg, this::updateSliderOutput);
 
         setupSliderTouch(saturationTouchArea, saturationThumb, 100, satProg, this::updateSliderOutput);
         setupSliderTouch(valueTouchArea, valueThumb, 100, valProg, this::updateSliderOutput);
         setupSliderTouch(alphaTouchArea, alphaThumb, 255, opaProg, this::updateSliderOutput);
-
-        switchModeBtn.setOnClickListener(v -> toggleMode());
 
         hexEditButton.setOnClickListener(v -> showHexEditor());
 
@@ -274,30 +255,25 @@ public class ColorPickerPanelController {
         colorWheel = null;
     }
 
-    private void toggleMode() {
-        isSliderMode = !isSliderMode;
-        activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                .edit().putString(MODE_KEY, isSliderMode ? "slider" : "disk").apply();
-        int color = getCurrentColor();
-        setupMode(isSliderMode);
-        setColorValues(color);
+    private void initGradientDrawables() {
+        satGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, satColors);
+        saturationGradientBg.setBackground(satGd);
+        valGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{Color.BLACK, Color.BLACK});
+        valueGradientBg.setBackground(valGd);
+        alphaGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, alphaColors);
+        alphaGradientBg.setBackground(new LayerDrawable(new Drawable[]{createCheckerboard(), alphaGd}));
     }
 
-    private void setupMode(boolean slider) {
-        wheelContainer.setVisibility(slider ? View.GONE : View.VISIBLE);
-        sliderPanel.setVisibility(slider ? View.VISIBLE : View.GONE);
-        modeLabel.setText(slider ? "Hue Slider" : "Color Wheel");
+    private void setupSliders() {
         int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
+        applyHueGradient(hueGradientBg);
+        applySatGradient(saturationGradientBg, hueProg[0]);
+        applyValueGradient(valueGradientBg, hueProg[0], satProg[0] / 100f);
         applyAlphaGradient(alphaGradientBg, color);
+        setThumbPos(hueThumb, hueProg[0], 360);
+        setThumbPos(saturationThumb, satProg[0], 100);
+        setThumbPos(valueThumb, valProg[0], 100);
         setThumbPos(alphaThumb, opaProg[0], 255);
-        if (slider) {
-            applyHueGradient(hueGradientBg);
-            applySatGradient(saturationGradientBg, hueProg[0]);
-            applyValueGradient(valueGradientBg, hueProg[0], satProg[0] / 100f);
-            setThumbPos(hueThumb, hueProg[0], 360);
-            setThumbPos(saturationThumb, satProg[0], 100);
-            setThumbPos(valueThumb, valProg[0], 100);
-        }
     }
 
     private void onRgbChanged() {
@@ -333,11 +309,11 @@ public class ColorPickerPanelController {
             greenProg[0] = g;
             blueProg[0] = b;
         }
-        alphaSeek.setProgress(a);
-
-        int val = computeValue(color);
-        int hue = computeHue(color);
-        int sat = computeSaturation(color);
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        int hue = Math.round(hsv[0]);
+        int sat = Math.round(hsv[1] * 100);
+        int val = Math.round(hsv[2] * 100);
 
         if (val == 0) {
             hue = hueProg[0];
@@ -362,34 +338,45 @@ public class ColorPickerPanelController {
         }
 
         colorPreview.setBackgroundColor(color);
-        String name = ColorNameResolver.getName(color);
-        colorPreview.setText(showColorName ? name : "");
+        if (color != lastNamedColor) {
+            lastNamedColor = color;
+            lastColorName = ColorNameResolver.getName(color);
+        }
+        colorPreview.setText(showColorName ? lastColorName : "");
         int textColor = (r * 0.299 + g * 0.587 + b * 0.114) > 128 ? Color.BLACK : Color.WHITE;
         colorPreview.setTextColor(textColor);
 
-        hexValue.setText(String.format("HEX: #%02X%02X%02X%02X", a, r, g, b));
-        hsvValue.setText(String.format("HSV: %d\u00B0, %d%%, %d%%", hue, sat, val));
-        rgbValue.setText(String.format("ARGB: %d, %d, %d, %d", a, r, g, b));
+        hexValue.setText("HEX: #" + hexColor(a, r, g, b));
+        hsvValue.setText("HSV: " + hue + "\u00B0, " + sat + "%, " + val + "%");
+        rgbValue.setText("ARGB: " + a + ", " + r + ", " + g + ", " + b);
 
-        colorWheel.setColor(color);
+        if (color != lastWheelArgb) {
+            colorWheel.setColor(color);
+            lastWheelArgb = color;
+        }
 
-        hueSeekBar.setProgress(hue);
-
-        alphaLabel.setText(String.format("%d", a));
+        alphaLabel.setText(String.valueOf(a));
         setThumbPos(alphaThumb, a, 255);
-        applyAlphaGradient(alphaGradientBg, color);
+        if (color != lastAlphaColor) {
+            applyAlphaGradient(alphaGradientBg, color);
+            lastAlphaColor = color;
+        }
 
-        if (isSliderMode) {
-            hueLabel.setText(String.format("%d\u00B0", hue));
-            saturationLabel.setText(String.format("%d%%", sat));
-            valueLabel.setText(String.format("%d%%", val));
+        hueLabel.setText(hue + "\u00B0");
+        saturationLabel.setText(sat + "%");
+        valueLabel.setText(val + "%");
 
-            setThumbPos(hueThumb, hue, 360);
-            setThumbPos(saturationThumb, sat, 100);
-            setThumbPos(valueThumb, val, 100);
+        setThumbPos(hueThumb, hue, 360);
+        setThumbPos(saturationThumb, sat, 100);
+        setThumbPos(valueThumb, val, 100);
 
+        if (hue != lastSatHue) {
             applySatGradient(saturationGradientBg, hue);
+            lastSatHue = hue;
+        }
+        if (hue != lastValHue) {
             applyValueGradient(valueGradientBg, hue, sat / 100f);
+            lastValHue = hue;
         }
         if (rgbVisible) {
             applyRedGradient(redGradientBg);
@@ -448,6 +435,7 @@ public class ColorPickerPanelController {
         BitmapDrawable checker = new BitmapDrawable(activity.getResources(), bitmap);
         checker.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
         previewContainer.setBackground(checker);
+        checkerDrawable = checker;
     }
 
     private void loadSavedColors() {
@@ -605,23 +593,33 @@ public class ColorPickerPanelController {
         touchArea.setOnTouchListener((v, event) -> {
             int a = event.getActionMasked();
             if (a == MotionEvent.ACTION_DOWN || a == MotionEvent.ACTION_MOVE) {
-                float x = event.getX();
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                float rawX = event.getRawX();
+                int[] loc = new int[2];
+                v.getLocationOnScreen(loc);
+                float x = rawX - loc[0];
                 float w = v.getWidth();
                 if (w <= 0) return true;
-                float ratio = Math.max(0, Math.min(1, x / w));
+                float clampedX = Math.max(0, Math.min(w, x));
+                float ratio = clampedX / w;
                 int prog = Math.round(ratio * max);
                 progHolder[0] = prog;
                 float tw = thumb.getWidth();
-                thumb.setTranslationX(Math.max(0, Math.min(w - tw, x - tw / 2)));
+                thumb.setTranslationX(clampedX - tw / 2f);
                 if (onUpdate != null) onUpdate.run();
+                return true;
+            }
+            if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
+                v.getParent().requestDisallowInterceptTouchEvent(false);
                 return true;
             }
             return false;
         });
     }
 
-    private static Drawable createCheckerboard(Context context) {
-        int size = dpToPx(context, 8);
+    private Drawable createCheckerboard() {
+        if (checkerDrawable != null) return checkerDrawable;
+        int size = dpToPx(activity, 8);
         Bitmap bmp = Bitmap.createBitmap(size * 2, size * 2, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bmp);
         Paint paint = new Paint();
@@ -633,9 +631,10 @@ public class ColorPickerPanelController {
         paint.setColor(dark);
         canvas.drawRect(size, 0, size * 2, size, paint);
         canvas.drawRect(0, size, size, size * 2, paint);
-        BitmapDrawable d = new BitmapDrawable(context.getResources(), bmp);
+        BitmapDrawable d = new BitmapDrawable(activity.getResources(), bmp);
         d.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
         d.setFilterBitmap(false);
+        checkerDrawable = d;
         return d;
     }
 
@@ -671,30 +670,21 @@ public class ColorPickerPanelController {
     }
 
     private void applySatGradient(View bar, int hue) {
-        int[] colors = new int[101];
-        for (int i = 0; i <= 100; i++) {
-            colors[i] = hsvToColor(hue, i, 100, 255);
+        for (int i = 0; i <= 50; i++) {
+            satColors[i] = hsvToColor(hue, i * 2, 100, 255);
         }
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        bar.setBackground(gd);
+        satGd.setColors(satColors);
     }
 
     private void applyValueGradient(View bar, int hue, float sat) {
         int fullColor = hsvToColor(hue, Math.round(sat * 100), 100, 255);
-        int[] colors = new int[]{Color.BLACK, fullColor};
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        bar.setBackground(gd);
+        valGd.setColors(new int[]{Color.BLACK, fullColor});
     }
 
     private void applyAlphaGradient(View bar, int color) {
-        int opaque = color | 0xFF000000;
-        int[] colors = new int[]{color & 0x00FFFFFF, opaque};
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        LayerDrawable layers = new LayerDrawable(new Drawable[]{
-                createCheckerboard(activity),
-                gd
-        });
-        bar.setBackground(layers);
+        alphaColors[0] = color & 0x00FFFFFF;
+        alphaColors[1] = color | 0xFF000000;
+        alphaGd.setColors(alphaColors);
     }
 
     private void applyRedGradient(View bar) {
@@ -713,6 +703,10 @@ public class ColorPickerPanelController {
         GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
                 new int[]{Color.BLACK, Color.BLUE});
         bar.setBackground(gd);
+    }
+
+    private static String hexColor(int a, int r, int g, int b) {
+        return String.format("%02X%02X%02X%02X", a, r, g, b);
     }
 
     private static int parseHex(String hex) {

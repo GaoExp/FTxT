@@ -146,6 +146,7 @@ public class NetworkPositionController {
         );
         setupListeners();
         syncAll();
+        FloatingService.updateNetworkPositionStatic();
     }
 
     private void bindViews() {

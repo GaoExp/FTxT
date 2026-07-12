@@ -21,6 +21,9 @@ public class HSVColorPickerView extends View {
     private float wheelCenterX;
     private float wheelCenterY;
 
+    private Shader wheelShader;
+    private Shader saturationShader;
+
     private float hue = 0f;
     private float saturation = 1f;
 
@@ -64,12 +67,18 @@ public class HSVColorPickerView extends View {
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        wheelCenterX = w / 2f;
+        wheelCenterY = h / 2f;
+        wheelRadius = Math.min(wheelCenterX, wheelCenterY) - 20f;
+        wheelShader = null;
+        saturationShader = null;
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        wheelCenterX = getWidth() / 2f;
-        wheelCenterY = getHeight() / 2f;
-        wheelRadius = Math.min(wheelCenterX, wheelCenterY) - 20f;
 
         drawColorWheel(canvas);
         drawSaturationOverlay(canvas);
@@ -77,25 +86,26 @@ public class HSVColorPickerView extends View {
     }
 
     private void drawColorWheel(Canvas canvas) {
-        int[] colors = ColorMath.generateHueColors();
-
-        Shader shader = new SweepGradient(wheelCenterX, wheelCenterY, colors, null);
-        colorWheelPaint.setShader(shader);
+        if (wheelShader == null) {
+            int[] colors = ColorMath.generateHueColors();
+            wheelShader = new SweepGradient(wheelCenterX, wheelCenterY, colors, null);
+        }
+        colorWheelPaint.setShader(wheelShader);
         canvas.drawCircle(wheelCenterX, wheelCenterY, wheelRadius, colorWheelPaint);
     }
 
     private void drawSaturationOverlay(Canvas canvas) {
-        int[] colors = new int[]{
-                0xFFFFFFFF,
-                0x00FFFFFF
-        };
-
-        Shader shader = new android.graphics.RadialGradient(
-                wheelCenterX, wheelCenterY, wheelRadius,
-                colors, new float[]{0f, 1f},
-                android.graphics.Shader.TileMode.CLAMP);
-
-        colorWheelPaint.setShader(shader);
+        if (saturationShader == null) {
+            int[] colors = new int[]{
+                    0xFFFFFFFF,
+                    0x00FFFFFF
+            };
+            saturationShader = new android.graphics.RadialGradient(
+                    wheelCenterX, wheelCenterY, wheelRadius,
+                    colors, new float[]{0f, 1f},
+                    android.graphics.Shader.TileMode.CLAMP);
+        }
+        colorWheelPaint.setShader(saturationShader);
         canvas.drawCircle(wheelCenterX, wheelCenterY, wheelRadius, colorWheelPaint);
     }
 
@@ -122,15 +132,15 @@ public class HSVColorPickerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
         float x = event.getX();
         float y = event.getY();
 
-        float distance = ColorMath.calculateDistance(wheelCenterX, wheelCenterY, x, y);
-
-        if (distance > wheelRadius) {
-            return true;
+        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE) {
+            if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
         }
 
+        float distance = ColorMath.calculateDistance(wheelCenterX, wheelCenterY, x, y);
         hue = ColorMath.calculateAngle(wheelCenterX, wheelCenterY, x, y);
         saturation = Math.min(distance / wheelRadius, 1f);
 
@@ -139,6 +149,10 @@ public class HSVColorPickerView extends View {
         if (listener != null) {
             int color = Color.HSVToColor(new float[]{hue, saturation, 1f});
             listener.onColorChange(color);
+        }
+
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+            if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);
         }
 
         return true;

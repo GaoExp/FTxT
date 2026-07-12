@@ -27,7 +27,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exp.ftxt.R;
+import exp.ftxt.features.color_picker.TriangleColorPickerView;
 import exp.ftxt.shared.color.ColorNameResolver;
-import exp.ftxt.shared.color.HSVColorPickerView;
 
 public class ColorPickerDialog {
 
@@ -46,141 +45,181 @@ public class ColorPickerDialog {
         void onColorSelected(int color);
     }
 
-    private static final String SAVED_COLORS_KEY = "saved_colors";
+    private static final String PREFS_NAME = "ftxt_prefs";
+    private static final String SAVED_COLORS_KEY = "cp_saved_colors";
     private static final int MAX_SAVED_COLORS = 16;
 
+    private static Drawable sCheckerDrawable;
+    private static GradientDrawable sSatGd, sValGd, sAlphaGd;
+    private static final int[] SAT_COLORS = new int[51];
+    private static final int[] ALPHA_COLORS = new int[2];
+
     public static void show(Activity activity, String title, int initialColor, ColorCallback callback) {
-        SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
-        boolean isSliderMode = prefs.getString("color_picker_mode", "slider").equals("slider");
-
-        if (isSliderMode) {
-            showSliderMode(activity, title, initialColor, callback);
-        } else {
-            showDiskMode(activity, title, initialColor, callback);
-        }
-    }
-
-    // ========================================================================
-    // Disk mode (color wheel)
-    // ========================================================================
-    private static void showDiskMode(Activity activity, String title, int initialColor, ColorCallback callback) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         View dialogView = activity.getLayoutInflater()
-                .inflate(R.layout.dialog_hsv_color_picker, null);
+                .inflate(R.layout.dialog_color_picker, null);
 
-        HSVColorPickerView colorWheel = dialogView.findViewById(R.id.colorWheel);
-        TextView colorPreview = dialogView.findViewById(R.id.colorPreview);
-        TextView hexValue = dialogView.findViewById(R.id.hexValue);
-        TextView hsvValue = dialogView.findViewById(R.id.hsvValue);
-        TextView rgbValue = dialogView.findViewById(R.id.rgbValue);
-        ImageButton hexEditButton = dialogView.findViewById(R.id.hexEditButton);
-        SeekBar redSeekBar = dialogView.findViewById(R.id.redSeekBar);
-        SeekBar greenSeekBar = dialogView.findViewById(R.id.greenSeekBar);
-        SeekBar blueSeekBar = dialogView.findViewById(R.id.blueSeekBar);
-        SeekBar alphaSeekBar = dialogView.findViewById(R.id.alphaSeekBar);
-        SeekBar hueSeekBar = dialogView.findViewById(R.id.hueSeekBar);
-        TextView redLabel = dialogView.findViewById(R.id.redLabel);
-        TextView greenLabel = dialogView.findViewById(R.id.greenLabel);
-        TextView blueLabel = dialogView.findViewById(R.id.blueLabel);
-        TextView alphaLabel = dialogView.findViewById(R.id.alphaLabel);
+        TriangleColorPickerView colorWheel = dialogView.findViewById(R.id.cp_colorWheel);
+        TextView dialogTitle = dialogView.findViewById(R.id.dialogTitle);
+        TextView colorPreview = dialogView.findViewById(R.id.cp_colorPreview);
+        TextView hexValue = dialogView.findViewById(R.id.cp_hexValue);
+        TextView hsvValue = dialogView.findViewById(R.id.cp_hsvValue);
+        TextView rgbValue = dialogView.findViewById(R.id.cp_rgbValue);
+        ImageButton hexEditButton = dialogView.findViewById(R.id.cp_hexEditButton);
+
+        View hueThumb = dialogView.findViewById(R.id.cp_hueThumb);
+        View saturationThumb = dialogView.findViewById(R.id.cp_saturationThumb);
+        View valueThumb = dialogView.findViewById(R.id.valueThumb);
+        View alphaThumb = dialogView.findViewById(R.id.cp_alphaThumb);
+        View hueTouchArea = dialogView.findViewById(R.id.cp_hueTouchArea);
+        View saturationTouchArea = dialogView.findViewById(R.id.cp_saturationTouchArea);
+        View valueTouchArea = dialogView.findViewById(R.id.valueTouchArea);
+        View alphaTouchArea = dialogView.findViewById(R.id.cp_alphaTouchArea);
+        View hueGradientBg = dialogView.findViewById(R.id.cp_hueGradientBg);
+        View saturationGradientBg = dialogView.findViewById(R.id.cp_saturationGradientBg);
+        View valueGradientBg = dialogView.findViewById(R.id.valueGradientBg);
+        View alphaGradientBg = dialogView.findViewById(R.id.cp_alphaGradientBg);
+        TextView hueLabel = dialogView.findViewById(R.id.cp_hueLabel);
+        TextView saturationLabel = dialogView.findViewById(R.id.cp_saturationLabel);
+        TextView valueLabel = dialogView.findViewById(R.id.valueLabel);
+        TextView alphaLabel = dialogView.findViewById(R.id.cp_alphaLabel);
+
+        View redThumb = dialogView.findViewById(R.id.redThumb);
+        View greenThumb = dialogView.findViewById(R.id.greenThumb);
+        View blueThumb = dialogView.findViewById(R.id.blueThumb);
+        View redTouchArea = dialogView.findViewById(R.id.redTouchArea);
+        View greenTouchArea = dialogView.findViewById(R.id.greenTouchArea);
+        View blueTouchArea = dialogView.findViewById(R.id.blueTouchArea);
+        View redGradientBg = dialogView.findViewById(R.id.redGradientBg);
+        View greenGradientBg = dialogView.findViewById(R.id.greenGradientBg);
+        View blueGradientBg = dialogView.findViewById(R.id.blueGradientBg);
+        TextView redValLabel = dialogView.findViewById(R.id.redValLabel);
+        TextView greenValLabel = dialogView.findViewById(R.id.greenValLabel);
+        TextView blueValLabel = dialogView.findViewById(R.id.blueValLabel);
+
+        GridLayout savedColorsGrid = dialogView.findViewById(R.id.cp_savedColorsGrid);
+        TextView savedColorsCount = dialogView.findViewById(R.id.cp_savedColorsCount);
+        TextView addSavedColor = dialogView.findViewById(R.id.cp_addSavedColor);
+        TextView collapseToggle = dialogView.findViewById(R.id.cp_collapseToggle);
+        View savedColorsHeader = dialogView.findViewById(R.id.savedColorsHeader);
+        View rgbSliderBody = dialogView.findViewById(R.id.rgbSliderBody);
+        View rgbHeader = dialogView.findViewById(R.id.rgbHeader);
+
         Button okButton = dialogView.findViewById(R.id.okButton);
         Button cancelButton = dialogView.findViewById(R.id.cancelButton);
 
-        redSeekBar.setProgress(Color.red(initialColor));
-        greenSeekBar.setProgress(Color.green(initialColor));
-        blueSeekBar.setProgress(Color.blue(initialColor));
-        alphaSeekBar.setProgress(Color.alpha(initialColor));
+        if (dialogTitle != null) dialogTitle.setText(title);
 
-        float[] initHsv = new float[3];
-        Color.colorToHSV(initialColor, initHsv);
-        hueSeekBar.setProgress(Math.round(initHsv[0]));
+        View previewContainer = dialogView.findViewById(R.id.previewContainer);
+        setupTransparencyChecker(previewContainer);
 
-        colorWheel.setColor(initialColor);
-
-        boolean isSliderMode = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
-                .getString("color_picker_mode", "slider").equals("slider");
-        if (isSliderMode) {
-            colorWheel.setVisibility(View.GONE);
-            hueSeekBar.setVisibility(View.VISIBLE);
-        }
-
-        updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
-
+        final int[] hueProg = {0};
+        final int[] satProg = {100};
+        final int[] valProg = {100};
+        final int[] opaProg = {255};
+        final int[] redProg = {255};
+        final int[] greenProg = {125};
+        final int[] blueProg = {255};
         final boolean[] isUpdating = {false};
+        final int[] lastSatHue = {-1};
+        final int[] lastValHue = {-1};
+        final int[] lastAlphaColor = {0};
+        final int[] lastWheelArgb = {0};
 
-        SeekBar.OnSeekBarChangeListener sliderListener = new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int p, boolean f) {
-                if (isUpdating[0]) return;
-                isUpdating[0] = true;
-                int color = Color.argb(alphaSeekBar.getProgress(),
-                        redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(), blueSeekBar.getProgress());
-                colorWheel.setColor(color);
-                float[] hsv = new float[3];
-                Color.colorToHSV(color, hsv);
-                hueSeekBar.setProgress(Math.round(hsv[0]));
-                updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                        redLabel, greenLabel, blueLabel, alphaLabel,
-                        redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
-                callback.onColorSelected(color);
-                isUpdating[0] = false;
-            }
-            @Override public void onStartTrackingTouch(SeekBar sb) {}
-            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        initGradientDrawables(saturationGradientBg, valueGradientBg, alphaGradientBg);
+
+        applyHueGradient(hueGradientBg);
+        applySatGradient(saturationGradientBg, hueProg[0]);
+        applyValueGradient(valueGradientBg, hueProg[0], satProg[0] / 100f);
+        setThumbPos(hueThumb, hueProg[0], 360);
+        setThumbPos(saturationThumb, satProg[0], 100);
+        setThumbPos(valueThumb, valProg[0], 100);
+        setThumbPos(alphaThumb, opaProg[0], 255);
+
+        Runnable updateSliderOutput = () -> {
+            if (isUpdating[0]) return;
+            isUpdating[0] = true;
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
+            updateDisplays(color, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                    hueThumb, saturationThumb, valueThumb, alphaThumb,
+                    hueProg, satProg, valProg, opaProg,
+                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+            isUpdating[0] = false;
         };
 
-        redSeekBar.setOnSeekBarChangeListener(sliderListener);
-        greenSeekBar.setOnSeekBarChangeListener(sliderListener);
-        blueSeekBar.setOnSeekBarChangeListener(sliderListener);
-        alphaSeekBar.setOnSeekBarChangeListener(sliderListener);
+        Runnable updateFromRgb = () -> {
+            if (isUpdating[0]) return;
+            isUpdating[0] = true;
+            int color = Color.argb(opaProg[0], redProg[0], greenProg[0], blueProg[0]);
+            updateDisplays(color, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                    hueThumb, saturationThumb, valueThumb, alphaThumb,
+                    hueProg, satProg, valProg, opaProg,
+                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+            isUpdating[0] = false;
+        };
 
         colorWheel.setOnColorChangeListener(color -> {
             if (isUpdating[0]) return;
             isUpdating[0] = true;
-            redSeekBar.setProgress(Color.red(color));
-            greenSeekBar.setProgress(Color.green(color));
-            blueSeekBar.setProgress(Color.blue(color));
-            float[] hsv = new float[3];
-            Color.colorToHSV(color, hsv);
-            hueSeekBar.setProgress(Math.round(hsv[0]));
-            updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                    redLabel, greenLabel, blueLabel, alphaLabel,
-                    redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
-            callback.onColorSelected(color);
+            int a = opaProg[0];
+            color = Color.argb(a, Color.red(color), Color.green(color), Color.blue(color));
+            updateDisplays(color, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                    hueThumb, saturationThumb, valueThumb, alphaThumb,
+                    hueProg, satProg, valProg, opaProg,
+                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
             isUpdating[0] = false;
         });
 
-        hueSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar sb, int p, boolean f) {
-                if (isUpdating[0]) return;
+        setupSliderTouch(hueTouchArea, hueThumb, 360, hueProg, () -> {
+            applySatGradient(saturationGradientBg, hueProg[0]);
+            updateSliderOutput.run();
+        });
+        setupSliderTouch(saturationTouchArea, saturationThumb, 100, satProg, updateSliderOutput);
+        setupSliderTouch(valueTouchArea, valueThumb, 100, valProg, updateSliderOutput);
+        setupSliderTouch(alphaTouchArea, alphaThumb, 255, opaProg, updateSliderOutput);
+
+        setupSliderTouch(redTouchArea, redThumb, 255, redProg, updateFromRgb);
+        setupSliderTouch(greenTouchArea, greenThumb, 255, greenProg, updateFromRgb);
+        setupSliderTouch(blueTouchArea, blueThumb, 255, blueProg, updateFromRgb);
+
+        rgbHeader.setOnClickListener(v -> {
+            boolean expanded = rgbSliderBody.getVisibility() == View.VISIBLE;
+            rgbSliderBody.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            if (!expanded) {
                 isUpdating[0] = true;
-                int current = Color.argb(alphaSeekBar.getProgress(),
-                        redSeekBar.getProgress(),
-                        greenSeekBar.getProgress(), blueSeekBar.getProgress());
-                float[] hsv = new float[3];
-                Color.colorToHSV(current, hsv);
-                int color = Color.HSVToColor(alphaSeekBar.getProgress(),
-                        new float[]{p, hsv[1], hsv[2]});
-                colorWheel.setColor(color);
-                redSeekBar.setProgress(Color.red(color));
-                greenSeekBar.setProgress(Color.green(color));
-                blueSeekBar.setProgress(Color.blue(color));
-                updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                        redLabel, greenLabel, blueLabel, alphaLabel,
-                        redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
-                callback.onColorSelected(color);
+                int c = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
+                updateDisplays(c, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                        hueLabel, saturationLabel, valueLabel, alphaLabel,
+                        hueThumb, saturationThumb, valueThumb, alphaThumb,
+                        hueProg, satProg, valProg, opaProg,
+                        saturationGradientBg, valueGradientBg, alphaGradientBg,
+                        lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                        rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                        redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                        redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
                 isUpdating[0] = false;
             }
-            @Override public void onStartTrackingTouch(SeekBar sb) {}
-            @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         hexEditButton.setOnClickListener(v -> {
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
             String currentHex = String.format("#%02X%02X%02X%02X",
-                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress());
+                    Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color));
 
             EditText input = new EditText(activity);
             input.setText(currentHex);
@@ -191,19 +230,17 @@ public class ColorPickerDialog {
                     .setView(input)
                     .setPositiveButton("OK", (d, w) -> {
                         try {
-                            int color = parseHex(input.getText().toString().trim());
+                            int parsed = parseHex(input.getText().toString().trim());
                             isUpdating[0] = true;
-                            alphaSeekBar.setProgress(Color.alpha(color));
-                            redSeekBar.setProgress(Color.red(color));
-                            greenSeekBar.setProgress(Color.green(color));
-                            blueSeekBar.setProgress(Color.blue(color));
-                            colorWheel.setColor(color);
-                            float[] hsv = new float[3];
-                            Color.colorToHSV(color, hsv);
-                            hueSeekBar.setProgress(Math.round(hsv[0]));
-                            updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                                    redLabel, greenLabel, blueLabel, alphaLabel,
-                                    redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
+                            updateDisplays(parsed, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                                    hueThumb, saturationThumb, valueThumb, alphaThumb,
+                                    hueProg, satProg, valProg, opaProg,
+                                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
                             isUpdating[0] = false;
                         } catch (IllegalArgumentException e) {
                             Toast.makeText(activity, "HEX tidak valid", Toast.LENGTH_SHORT).show();
@@ -214,70 +251,66 @@ public class ColorPickerDialog {
         });
 
         hexValue.setOnLongClickListener(v -> {
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
             copyToClipboard(activity, String.format("#%02X%02X%02X%02X",
-                    alphaSeekBar.getProgress(), redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress()));
+                    Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color)));
             Toast.makeText(activity, "HEX disalin", Toast.LENGTH_SHORT).show();
             return true;
         });
-
         hsvValue.setOnLongClickListener(v -> {
             copyToClipboard(activity, hsvValue.getText().toString());
             Toast.makeText(activity, "HSV disalin", Toast.LENGTH_SHORT).show();
             return true;
         });
-
         rgbValue.setOnLongClickListener(v -> {
             copyToClipboard(activity, rgbValue.getText().toString());
             Toast.makeText(activity, "ARGB disalin", Toast.LENGTH_SHORT).show();
             return true;
         });
 
-        redLabel.setOnClickListener(v -> showDiskValueEditor(activity, "R", redSeekBar, 255,
-                colorPreview, hexValue, hsvValue, rgbValue,
-                redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
-                colorWheel, hueSeekBar, isUpdating));
+        savedColorsGrid.setVisibility(View.GONE);
+        collapseToggle.setText("\u25BC");
 
-        greenLabel.setOnClickListener(v -> showDiskValueEditor(activity, "G", greenSeekBar, 255,
-                colorPreview, hexValue, hsvValue, rgbValue,
-                redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
-                colorWheel, hueSeekBar, isUpdating));
-
-        blueLabel.setOnClickListener(v -> showDiskValueEditor(activity, "B", blueSeekBar, 255,
-                colorPreview, hexValue, hsvValue, rgbValue,
-                redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
-                colorWheel, hueSeekBar, isUpdating));
-
-        alphaLabel.setOnClickListener(v -> showDiskValueEditor(activity, "A", alphaSeekBar, 255,
-                colorPreview, hexValue, hsvValue, rgbValue,
-                redLabel, greenLabel, blueLabel, alphaLabel,
-                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar,
-                colorWheel, hueSeekBar, isUpdating));
-
-        builder.setView(dialogView);
-
-        TextView dialogTitle = dialogView.findViewById(R.id.dialogTitle);
-        if (dialogTitle != null) dialogTitle.setText(title);
-
-        ImageButton switchModeBtn = dialogView.findViewById(R.id.switchModeButton);
-        AlertDialog dialog = builder.create();
-        switchModeBtn.setOnClickListener(v -> {
-            int color = Color.argb(alphaSeekBar.getProgress(),
-                    redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress());
-            SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
-            prefs.edit().putString("color_picker_mode", "slider").apply();
-            dialog.dismiss();
-            showSliderMode(activity, title, color, callback);
+        savedColorsHeader.setOnClickListener(v -> {
+            boolean expanded = savedColorsGrid.getVisibility() == View.VISIBLE;
+            savedColorsGrid.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            collapseToggle.setText(expanded ? "\u25BC" : "\u25B2");
+            if (!expanded) {
+                savedColorsGrid.post(() -> recalcGridCellSizes(savedColorsGrid, activity));
+            }
         });
 
+        addSavedColor.setOnClickListener(v -> {
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
+            saveColor(activity, color, true);
+            loadSavedColors(activity, savedColorsGrid, savedColorsCount,
+                    hueProg, satProg, valProg, opaProg,
+                    hueThumb, saturationThumb, valueThumb, alphaThumb,
+                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                    colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+        });
+
+        loadSavedColors(activity, savedColorsGrid, savedColorsCount,
+                hueProg, satProg, valProg, opaProg,
+                hueThumb, saturationThumb, valueThumb, alphaThumb,
+                saturationGradientBg, valueGradientBg, alphaGradientBg,
+                lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                hueLabel, saturationLabel, valueLabel, alphaLabel,
+                rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+
         okButton.setOnClickListener(v -> {
-            int color = Color.argb(alphaSeekBar.getProgress(),
-                    redSeekBar.getProgress(),
-                    greenSeekBar.getProgress(), blueSeekBar.getProgress());
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
             callback.onColorSelected(color);
             dialog.dismiss();
         });
@@ -288,11 +321,146 @@ public class ColorPickerDialog {
         });
 
         dialog.show();
+
+        isUpdating[0] = true;
+        colorWheel.setColor(initialColor);
+        updateDisplays(initialColor, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                hueLabel, saturationLabel, valueLabel, alphaLabel,
+                hueThumb, saturationThumb, valueThumb, alphaThumb,
+                hueProg, satProg, valProg, opaProg,
+                saturationGradientBg, valueGradientBg, alphaGradientBg,
+                lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+        isUpdating[0] = false;
     }
 
-    // ========================================================================
-    // Slider mode (Hue/Saturation/Brightness/Alpha sliders)
-    // ========================================================================
+    private static void updateDisplays(int color,
+                                        TriangleColorPickerView colorWheel,
+                                        TextView colorPreview, TextView hexValue,
+                                        TextView hsvValue, TextView rgbValue,
+                                        TextView hueLabel, TextView saturationLabel,
+                                        TextView valueLabel, TextView alphaLabel,
+                                        View hueThumb, View saturationThumb,
+                                        View valueThumb, View alphaThumb,
+                                        int[] hueProg, int[] satProg,
+                                        int[] valProg, int[] opaProg,
+                                        View saturationGradientBg, View valueGradientBg,
+                                        View alphaGradientBg,
+                                        int[] lastSatHue, int[] lastValHue,
+                                        int[] lastAlphaColor, int[] lastWheelArgb,
+                                        View rgbSliderBody,
+                                        TextView redValLabel, TextView greenValLabel,
+                                        TextView blueValLabel,
+                                        View redThumb, View greenThumb, View blueThumb,
+                                        int[] redProg, int[] greenProg, int[] blueProg,
+                                        View redGradientBg, View greenGradientBg,
+                                        View blueGradientBg,
+                                        boolean[] isUpdating) {
+        int a = Color.alpha(color);
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        boolean rgbVisible = rgbSliderBody.getVisibility() == View.VISIBLE;
+        if (rgbVisible) {
+            redProg[0] = r;
+            greenProg[0] = g;
+            blueProg[0] = b;
+        }
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        int hue = Math.round(hsv[0]);
+        int sat = Math.round(hsv[1] * 100);
+        int val = Math.round(hsv[2] * 100);
+
+        if (val == 0) { hue = hueProg[0]; sat = satProg[0]; }
+        if (sat == 0) { hue = hueProg[0]; }
+
+        hueProg[0] = hue;
+        satProg[0] = sat;
+        valProg[0] = val;
+        opaProg[0] = a;
+
+        if (rgbVisible) {
+            redValLabel.setText(String.valueOf(r));
+            greenValLabel.setText(String.valueOf(g));
+            blueValLabel.setText(String.valueOf(b));
+            setThumbPos(redThumb, r, 255);
+            setThumbPos(greenThumb, g, 255);
+            setThumbPos(blueThumb, b, 255);
+            applyRedGradient(redGradientBg);
+            applyGreenGradient(greenGradientBg);
+            applyBlueGradient(blueGradientBg);
+        }
+
+        colorPreview.setBackgroundColor(color);
+        colorPreview.setText(ColorNameResolver.getName(color));
+        int textColor = (r * 0.299 + g * 0.587 + b * 0.114) > 128 ? Color.BLACK : Color.WHITE;
+        colorPreview.setTextColor(textColor);
+
+        hexValue.setText("HEX: #" + hexColor(a, r, g, b));
+        hsvValue.setText("HSV: " + hue + "\u00B0, " + sat + "%, " + val + "%");
+        rgbValue.setText("ARGB: " + a + ", " + r + ", " + g + ", " + b);
+
+        if (color != lastWheelArgb[0]) {
+            colorWheel.setColor(color);
+            lastWheelArgb[0] = color;
+        }
+
+        alphaLabel.setText(String.valueOf(a));
+        setThumbPos(alphaThumb, a, 255);
+        if (color != lastAlphaColor[0]) {
+            applyAlphaGradient(alphaGradientBg, color);
+            lastAlphaColor[0] = color;
+        }
+
+        hueLabel.setText(hue + "\u00B0");
+        saturationLabel.setText(sat + "%");
+        valueLabel.setText(val + "%");
+
+        setThumbPos(hueThumb, hue, 360);
+        setThumbPos(saturationThumb, sat, 100);
+        setThumbPos(valueThumb, val, 100);
+
+        if (hue != lastSatHue[0]) {
+            applySatGradient(saturationGradientBg, hue);
+            lastSatHue[0] = hue;
+        }
+        if (hue != lastValHue[0]) {
+            applyValueGradient(valueGradientBg, hue, sat / 100f);
+            lastValHue[0] = hue;
+        }
+    }
+
+    private static void setupTransparencyChecker(View container) {
+        int tileSize = dpToPx(container.getContext(), 8);
+        Bitmap bitmap = Bitmap.createBitmap(tileSize * 2, tileSize * 2, Bitmap.Config.ARGB_8888);
+        int light = Color.rgb(204, 204, 204);
+        int dark = Color.rgb(153, 153, 153);
+        for (int y = 0; y < tileSize * 2; y++) {
+            for (int x = 0; x < tileSize * 2; x++) {
+                bitmap.setPixel(x, y, ((x / tileSize) + (y / tileSize)) % 2 == 0 ? light : dark);
+            }
+        }
+        BitmapDrawable checker = new BitmapDrawable(container.getContext().getResources(), bitmap);
+        checker.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        container.setBackground(checker);
+    }
+
+    private static void initGradientDrawables(View satBar, View valBar, View alphaBar) {
+        sSatGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, SAT_COLORS);
+        satBar.setBackground(sSatGd);
+        sValGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.BLACK, Color.BLACK});
+        valBar.setBackground(sValGd);
+        sAlphaGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, ALPHA_COLORS);
+        alphaBar.setBackground(new LayerDrawable(new Drawable[]{
+                createCheckerboard(alphaBar.getContext()), sAlphaGd}));
+    }
+
     private static void setThumbPos(View thumb, int progress, int max) {
         if (thumb == null) return;
         ViewGroup parent = (ViewGroup) thumb.getParent();
@@ -302,6 +470,7 @@ public class ColorPickerDialog {
             float pw = parent.getWidth();
             if (pw <= 0) return;
             float tw = thumb.getWidth();
+            if (tw <= 0) return;
             float ratio = Math.max(0, Math.min(1, progress / (float) max));
             thumb.setTranslationX(ratio * (pw - tw));
         });
@@ -312,319 +481,53 @@ public class ColorPickerDialog {
         touchArea.setOnTouchListener((v, event) -> {
             int a = event.getActionMasked();
             if (a == MotionEvent.ACTION_DOWN || a == MotionEvent.ACTION_MOVE) {
-                float x = event.getX();
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                float rawX = event.getRawX();
+                int[] loc = new int[2];
+                v.getLocationOnScreen(loc);
+                float x = rawX - loc[0];
                 float w = v.getWidth();
                 if (w <= 0) return true;
-                float ratio = Math.max(0, Math.min(1, x / w));
+                float clampedX = Math.max(0, Math.min(w, x));
+                float ratio = clampedX / w;
                 int prog = Math.round(ratio * max);
                 progHolder[0] = prog;
                 float tw = thumb.getWidth();
-                thumb.setTranslationX(Math.max(0, Math.min(w - tw, x - tw / 2)));
+                thumb.setTranslationX(clampedX - tw / 2f);
                 if (onUpdate != null) onUpdate.run();
+                return true;
+            }
+            if (a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL) {
+                v.getParent().requestDisallowInterceptTouchEvent(false);
                 return true;
             }
             return false;
         });
     }
 
-    private static void showSliderMode(Activity activity, String title, int initialColor, ColorCallback callback) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        View dialogView = activity.getLayoutInflater()
-                .inflate(R.layout.dialog_hue_slider_picker, null);
-
-        TextView currentSwatch = dialogView.findViewById(R.id.currentColorSwatch);
-        TextView previousSwatch = dialogView.findViewById(R.id.previousColorSwatch);
-        View hueThumb = dialogView.findViewById(R.id.hueThumb);
-        View saturationThumb = dialogView.findViewById(R.id.saturationThumb);
-        View brightnessThumb = dialogView.findViewById(R.id.brightnessThumb);
-        View alphaThumb = dialogView.findViewById(R.id.alphaThumb);
-        View hueTouchArea = dialogView.findViewById(R.id.hueTouchArea);
-        View saturationTouchArea = dialogView.findViewById(R.id.saturationTouchArea);
-        View brightnessTouchArea = dialogView.findViewById(R.id.brightnessTouchArea);
-        View alphaTouchArea = dialogView.findViewById(R.id.alphaTouchArea);
-        View hueGradientBg = dialogView.findViewById(R.id.hueGradientBg);
-        View saturationGradientBg = dialogView.findViewById(R.id.saturationGradientBg);
-        View brightnessGradientBg = dialogView.findViewById(R.id.brightnessGradientBg);
-        View alphaGradientBg = dialogView.findViewById(R.id.alphaGradientBg);
-        TextView hueLabel = dialogView.findViewById(R.id.hueLabel);
-        TextView saturationLabel = dialogView.findViewById(R.id.saturationLabel);
-        TextView brightnessLabel = dialogView.findViewById(R.id.brightnessLabel);
-        TextView alphaLabel = dialogView.findViewById(R.id.alphaLabel);
-        TextView hexValue = dialogView.findViewById(R.id.hexValue);
-        TextView hsvValue = dialogView.findViewById(R.id.hsvValue);
-        TextView rgbValue = dialogView.findViewById(R.id.rgbValue);
-        ImageButton hexEditButton = dialogView.findViewById(R.id.hexEditButton);
-        GridLayout savedColorsGrid = dialogView.findViewById(R.id.savedColorsGrid);
-        TextView addSavedColor = dialogView.findViewById(R.id.addSavedColor);
-        TextView collapseToggle = dialogView.findViewById(R.id.collapseToggle);
-        Button applyButton = dialogView.findViewById(R.id.applyButton);
-        Button cancelButton = dialogView.findViewById(R.id.cancelButton);
-
-        float[] initHsv = new float[3];
-        Color.colorToHSV(initialColor, initHsv);
-
-        setSwatchBg(previousSwatch, initialColor);
-        previousSwatch.setText(ColorNameResolver.getName(initialColor));
-        previousSwatch.setTextColor(textColorForBg(initialColor));
-
-        final int[] hueProg = {Math.round(initHsv[0])};
-        final int[] satProg = {Math.round(initHsv[1] * 100)};
-        final int[] briProg = {Math.round(initHsv[2] * 100)};
-        final int[] opaProg = {Color.alpha(initialColor)};
-
-        applyHueGradient(hueGradientBg);
-        applySatGradient(saturationGradientBg, hueProg[0]);
-        applyBrightnessGradient(brightnessGradientBg, hueProg[0], initHsv[1]);
-        applyAlphaGradient(alphaGradientBg, initialColor);
-
-        setThumbPos(hueThumb, hueProg[0], 360);
-        setThumbPos(saturationThumb, satProg[0], 100);
-        setThumbPos(brightnessThumb, briProg[0], 100);
-        setThumbPos(alphaThumb, opaProg[0], 255);
-
-        Runnable updateSlider = () -> {
-            int h = hueProg[0];
-            float s = satProg[0] / 100f;
-            float v = briProg[0] / 100f;
-            int a = opaProg[0];
-            int color = Color.HSVToColor(a, new float[]{h, s, v});
-
-            setSwatchBg(currentSwatch, color);
-            currentSwatch.setText(ColorNameResolver.getName(color));
-            currentSwatch.setTextColor(textColorForBg(color));
-            applyBrightnessGradient(brightnessGradientBg, h, s);
-            applyAlphaGradient(alphaGradientBg, color);
-
-            hueLabel.setText(String.format("H: %d\u00B0", h));
-            saturationLabel.setText(String.format("S: %d%%", satProg[0]));
-            brightnessLabel.setText(String.format("V: %d%%", briProg[0]));
-            alphaLabel.setText(String.format("A: %d", opaProg[0]));
-
-            hexValue.setText(String.format("AHEX: #%02X%02X%02X%02X",
-                    a, Color.red(color), Color.green(color), Color.blue(color)));
-            hsvValue.setText(String.format("HSV: %d\u00B0, %d%%, %d%%",
-                    h, Math.round(s * 100), Math.round(v * 100)));
-            rgbValue.setText(String.format("ARGB: %d, %d, %d, %d",
-                    a, Color.red(color), Color.green(color), Color.blue(color)));
-            callback.onColorSelected(color);
-        };
-
-        setupSliderTouch(hueTouchArea, hueThumb, 360, hueProg, () -> {
-            applySatGradient(saturationGradientBg, hueProg[0]);
-            updateSlider.run();
-        });
-
-        setupSliderTouch(saturationTouchArea, saturationThumb, 100, satProg, updateSlider);
-        setupSliderTouch(brightnessTouchArea, brightnessThumb, 100, briProg, updateSlider);
-        setupSliderTouch(alphaTouchArea, alphaThumb, 255, opaProg, updateSlider);
-
-        updateSlider.run();
-
-        // --- Fixed: compute color first, then format using ARGB components ---
-        hexValue.setOnLongClickListener(v -> {
-            int color = Color.HSVToColor(opaProg[0],
-                    new float[]{hueProg[0], satProg[0] / 100f, briProg[0] / 100f});
-            copyToClipboard(activity, String.format("#%02X%02X%02X%02X",
-                    opaProg[0], Color.red(color), Color.green(color), Color.blue(color)));
-            Toast.makeText(activity, "HEX disalin", Toast.LENGTH_SHORT).show();
-            return true;
-        });
-
-        hsvValue.setOnLongClickListener(v -> {
-            copyToClipboard(activity, hsvValue.getText().toString());
-            Toast.makeText(activity, "HSV disalin", Toast.LENGTH_SHORT).show();
-            return true;
-        });
-
-        rgbValue.setOnLongClickListener(v -> {
-            copyToClipboard(activity, rgbValue.getText().toString());
-            Toast.makeText(activity, "ARGB disalin", Toast.LENGTH_SHORT).show();
-            return true;
-        });
-
-        hexEditButton.setOnClickListener(v -> {
-            int color = Color.HSVToColor(opaProg[0],
-                    new float[]{hueProg[0], satProg[0] / 100f, briProg[0] / 100f});
-            String currentHex = String.format("#%02X%02X%02X%02X",
-                    opaProg[0], Color.red(color), Color.green(color), Color.blue(color));
-
-            EditText input = new EditText(activity);
-            input.setText(currentHex);
-            input.setSelection(input.length());
-
-            new AlertDialog.Builder(activity)
-                    .setTitle("Edit HEX")
-                    .setView(input)
-                    .setPositiveButton("OK", (d, w) -> {
-                        try {
-                            int color2 = parseHex(input.getText().toString().trim());
-                            float[] hsv = new float[3];
-                            Color.colorToHSV(color2, hsv);
-                            hueProg[0] = Math.round(hsv[0]);
-                            satProg[0] = Math.round(hsv[1] * 100);
-                            briProg[0] = Math.round(hsv[2] * 100);
-                            opaProg[0] = Color.alpha(color2);
-                            setThumbPos(hueThumb, hueProg[0], 360);
-                            setThumbPos(saturationThumb, satProg[0], 100);
-                            setThumbPos(brightnessThumb, briProg[0], 100);
-                            setThumbPos(alphaThumb, opaProg[0], 255);
-                            applySatGradient(saturationGradientBg, hueProg[0]);
-                            updateSlider.run();
-                        } catch (IllegalArgumentException e) {
-                            Toast.makeText(activity, "HEX tidak valid", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .setNegativeButton("Batal", null)
-                    .show();
-        });
-
-        loadSavedColors(activity, savedColorsGrid,
-                hueProg, satProg, briProg, opaProg,
-                hueThumb, saturationThumb, brightnessThumb, alphaThumb,
-                saturationGradientBg, updateSlider);
-
-        addSavedColor.setOnClickListener(btn -> {
-            int h = hueProg[0];
-            float s = satProg[0] / 100f;
-            float val = briProg[0] / 100f;
-            int a = opaProg[0];
-            int color = Color.HSVToColor(a, new float[]{h, s, val});
-            saveColor(activity, color, true);
-
-            int cellStep = savedColorsGrid.getWidth() / 8;
-            savedColorsGrid.setClipChildren(false);
-            for (int i = 0; i < savedColorsGrid.getChildCount(); i++) {
-                ((ViewGroup) savedColorsGrid.getChildAt(i)).setClipChildren(false);
-                savedColorsGrid.getChildAt(i).setTranslationX(-cellStep);
-            }
-
-            loadSavedColors(activity, savedColorsGrid,
-                    hueProg, satProg, briProg, opaProg,
-                    hueThumb, saturationThumb, brightnessThumb, alphaThumb,
-                    saturationGradientBg, updateSlider);
-
-            List<Animator> anims = new ArrayList<>();
-            for (int i = 0; i < savedColorsGrid.getChildCount(); i++) {
-                anims.add(ObjectAnimator.ofFloat(
-                        savedColorsGrid.getChildAt(i), "translationX", -cellStep, 0));
-            }
-            AnimatorSet set = new AnimatorSet();
-            set.playTogether(anims);
-            set.setDuration(300);
-            set.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
-            set.start();
-        });
-
-        collapseToggle.setOnClickListener(v -> {
-            boolean expanded = savedColorsGrid.getVisibility() == View.VISIBLE;
-            savedColorsGrid.setVisibility(expanded ? View.GONE : View.VISIBLE);
-            collapseToggle.setText(expanded ? "▼" : "▲");
-
-        });
-
-        builder.setView(dialogView);
-
-        TextView dialogTitle = dialogView.findViewById(R.id.dialogTitle);
-        if (dialogTitle != null) dialogTitle.setText(title);
-
-        AlertDialog dialog = builder.create();
-
-        ImageButton switchModeBtn = dialogView.findViewById(R.id.switchModeButton);
-        switchModeBtn.setOnClickListener(v -> {
-            int color = Color.HSVToColor(opaProg[0],
-                    new float[]{hueProg[0], satProg[0] / 100f, briProg[0] / 100f});
-            SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
-            prefs.edit().putString("color_picker_mode", "disk").apply();
-            dialog.dismiss();
-            showDiskMode(activity, title, color, callback);
-        });
-
-        applyButton.setOnClickListener(btn -> {
-            int color = Color.HSVToColor(opaProg[0],
-                    new float[]{hueProg[0], satProg[0] / 100f, briProg[0] / 100f});
-            callback.onColorSelected(color);
-            dialog.dismiss();
-        });
-
-        cancelButton.setOnClickListener(v -> {
-            callback.onColorSelected(initialColor);
-            dialog.dismiss();
-        });
-        dialog.show();
-    }
-
-    private static Drawable createCheckerboard(Context context) {
-        int size = dpToPx(context, 8);
-        Bitmap bmp = Bitmap.createBitmap(size * 2, size * 2, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bmp);
-        Paint paint = new Paint();
-        int light = Color.rgb(200, 200, 200);
-        int dark = Color.rgb(155, 155, 155);
-        paint.setColor(light);
-        canvas.drawRect(0, 0, size, size, paint);
-        canvas.drawRect(size, size, size * 2, size * 2, paint);
-        paint.setColor(dark);
-        canvas.drawRect(size, 0, size * 2, size, paint);
-        canvas.drawRect(0, size, size, size * 2, paint);
-        BitmapDrawable d = new BitmapDrawable(context.getResources(), bmp);
-        d.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
-        d.setFilterBitmap(false);
-        return d;
-    }
-
-    private static void setSwatchBg(TextView swatch, int color) {
-        LayerDrawable layers = new LayerDrawable(new Drawable[]{
-                createCheckerboard(swatch.getContext()),
-                new ColorDrawable(color)
-        });
-        swatch.setBackground(layers);
-    }
-
-    private static void applyHueGradient(View bar) {
-        int[] colors = new int[361];
-        for (int i = 0; i <= 360; i++) {
-            colors[i] = Color.HSVToColor(new float[]{i, 1f, 1f});
-        }
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        bar.setBackground(gd);
-    }
-
-    private static void applySatGradient(View bar, int hue) {
-        int[] colors = new int[101];
-        for (int i = 0; i <= 100; i++) {
-            colors[i] = Color.HSVToColor(new float[]{hue, i / 100f, 1f});
-        }
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        bar.setBackground(gd);
-    }
-
-    private static void applyBrightnessGradient(View bar, int hue, float sat) {
-        int fullColor = Color.HSVToColor(new float[]{hue, sat, 1f});
-        int[] colors = new int[]{Color.BLACK, fullColor};
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        bar.setBackground(gd);
-    }
-
-    private static void applyAlphaGradient(View bar, int color) {
-        int opaque = color | 0xFF000000;
-        int[] colors = new int[]{color & 0x00FFFFFF, opaque};
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-        LayerDrawable layers = new LayerDrawable(new Drawable[]{
-                createCheckerboard(bar.getContext()),
-                gd
-        });
-        bar.setBackground(layers);
-    }
-
-    private static void loadSavedColors(Activity activity, GridLayout grid,
-                                         int[] hueProg, int[] satProg, int[] briProg, int[] opaProg,
-                                         View hueThumb, View satThumb, View briThumb, View opaThumb,
-                                         View saturationGradientBg,
-                                         Runnable updateSlider) {
-        SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+    private static void loadSavedColors(Activity activity, GridLayout grid, TextView countView,
+                                         int[] hueProg, int[] satProg, int[] valProg, int[] opaProg,
+                                         View hueThumb, View satThumb, View valThumb, View opaThumb,
+                                         View saturationGradientBg, View valueGradientBg,
+                                         View alphaGradientBg,
+                                         int[] lastSatHue, int[] lastValHue,
+                                         int[] lastAlphaColor, int[] lastWheelArgb,
+                                         TriangleColorPickerView colorWheel,
+                                         TextView colorPreview, TextView hexValue,
+                                         TextView hsvValue, TextView rgbValue,
+                                         TextView hueLabel, TextView saturationLabel,
+                                         TextView valueLabel, TextView alphaLabel,
+                                         View rgbSliderBody,
+                                         TextView redValLabel, TextView greenValLabel,
+                                         TextView blueValLabel,
+                                         View redThumb, View greenThumb, View blueThumb,
+                                         int[] redProg, int[] greenProg, int[] blueProg,
+                                         View redGradientBg, View greenGradientBg,
+                                         View blueGradientBg,
+                                         boolean[] isUpdating) {
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String saved = prefs.getString(SAVED_COLORS_KEY, "");
         String[] hexes = saved.isEmpty() ? new String[0] : saved.split(",");
-        TextView countView = grid.getRootView().findViewById(R.id.savedColorsCount);
         if (countView != null) countView.setText(hexes.length + "/16");
         int margin = dpToPx(activity, 1);
         boolean init = grid.getChildCount() == 0;
@@ -658,21 +561,20 @@ public class ColorPickerDialog {
                     final int fc = color;
                     inner.setOnClickListener(v -> {
                         AlertDialog dlg = new AlertDialog.Builder(activity)
-                                .setTitle("Apply Color")
-                                .setMessage("Gunakan warna ini?")
+                                .setTitle("Gunakan Warna")
+                                .setMessage(ColorNameResolver.getName(fc) + "?")
                                 .setPositiveButton("Apply", (d, w) -> {
-                                    float[] hsv = new float[3];
-                                    Color.colorToHSV(fc, hsv);
-                                    hueProg[0] = Math.round(hsv[0]);
-                                    satProg[0] = Math.round(hsv[1] * 100);
-                                    briProg[0] = Math.round(hsv[2] * 100);
-                                    opaProg[0] = Color.alpha(fc);
-                                    setThumbPos(hueThumb, hueProg[0], 360);
-                                    setThumbPos(satThumb, satProg[0], 100);
-                                    setThumbPos(briThumb, briProg[0], 100);
-                                    setThumbPos(opaThumb, opaProg[0], 255);
-                                    applySatGradient(saturationGradientBg, hueProg[0]);
-                                    updateSlider.run();
+                                    isUpdating[0] = true;
+                                    updateDisplays(fc, colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                                            hueLabel, saturationLabel, valueLabel, alphaLabel,
+                                            hueThumb, satThumb, valThumb, opaThumb,
+                                            hueProg, satProg, valProg, opaProg,
+                                            saturationGradientBg, valueGradientBg, alphaGradientBg,
+                                            lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                                            rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                                            redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                                            redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
+                                    isUpdating[0] = false;
                                 })
                                 .setNegativeButton("Batal", null)
                                 .setNeutralButton("Hapus", (d, w) -> {
@@ -697,10 +599,16 @@ public class ColorPickerDialog {
                                             child.setTranslationX(cellStep);
                                         }
                                     }
-                                    loadSavedColors(activity, grid,
-                                            hueProg, satProg, briProg, opaProg,
-                                            hueThumb, satThumb, briThumb, opaThumb,
-                                            saturationGradientBg, updateSlider);
+                                    loadSavedColors(activity, grid, countView,
+                                            hueProg, satProg, valProg, opaProg,
+                                            hueThumb, satThumb, valThumb, opaThumb,
+                                            saturationGradientBg, valueGradientBg, alphaGradientBg,
+                                            lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                                            colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                                            hueLabel, saturationLabel, valueLabel, alphaLabel,
+                                            rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                                            redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                                            redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
                                     List<Animator> anims = new ArrayList<>();
                                     for (int k = idx; k < lastAffected; k++) {
                                         View child = grid.getChildAt(k);
@@ -725,39 +633,38 @@ public class ColorPickerDialog {
                         dlg.show();
                     });
                     inner.setOnLongClickListener(v -> {
-                        ClipData data = ClipData.newPlainText("grid_color_idx",
-                                String.valueOf(idx));
-                        v.startDragAndDrop(data,
-                                new View.DragShadowBuilder(v), v, 0);
+                        ClipData data = ClipData.newPlainText("grid_color_idx", String.valueOf(idx));
+                        v.startDragAndDrop(data, new View.DragShadowBuilder(v), v, 0);
                         return true;
                     });
                 } catch (IllegalArgumentException e) {
                     setEmptyInner(activity, inner, grid, prefs, idx,
-                            hueProg, satProg, briProg, opaProg,
-                            hueThumb, satThumb, briThumb, opaThumb,
-                            saturationGradientBg, updateSlider);
+                            hueProg, satProg, valProg, opaProg,
+                            hueThumb, satThumb, valThumb, opaThumb,
+                            saturationGradientBg, valueGradientBg, alphaGradientBg,
+                            lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                            colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                            hueLabel, saturationLabel, valueLabel, alphaLabel,
+                            rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                            redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                            redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
                 }
             } else {
                 setEmptyInner(activity, inner, grid, prefs, idx,
-                        hueProg, satProg, briProg, opaProg,
-                        hueThumb, satThumb, briThumb, opaThumb,
-                        saturationGradientBg, updateSlider);
+                        hueProg, satProg, valProg, opaProg,
+                        hueThumb, satThumb, valThumb, opaThumb,
+                        saturationGradientBg, valueGradientBg, alphaGradientBg,
+                        lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                        colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                        hueLabel, saturationLabel, valueLabel, alphaLabel,
+                        rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                        redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                        redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
             }
         }
 
         if (init) {
-            grid.post(() -> {
-                int w = grid.getWidth();
-                if (w <= 0) return;
-                int cellH = (w - margin * 2 * 8) / 8;
-                if (cellH < 10) return;
-                for (int ci = 0; ci < grid.getChildCount(); ci++) {
-                    View child = grid.getChildAt(ci);
-                    GridLayout.LayoutParams p = (GridLayout.LayoutParams) child.getLayoutParams();
-                    p.height = cellH;
-                    child.setLayoutParams(p);
-                }
-            });
+            grid.post(() -> recalcGridCellSizes(grid, activity));
         }
 
         grid.setOnDragListener((v, event) -> {
@@ -799,12 +706,17 @@ public class ColorPickerDialog {
                                         sb.append(s);
                                     }
                                 }
-                                prefs.edit().putString(SAVED_COLORS_KEY,
-                                        sb.toString()).apply();
-                                loadSavedColors(activity, grid,
-                                        hueProg, satProg, briProg, opaProg,
-                                        hueThumb, satThumb, briThumb, opaThumb,
-                                        saturationGradientBg, updateSlider);
+                                prefs.edit().putString(SAVED_COLORS_KEY, sb.toString()).apply();
+                                loadSavedColors(activity, grid, countView,
+                                        hueProg, satProg, valProg, opaProg,
+                                        hueThumb, satThumb, valThumb, opaThumb,
+                                        saturationGradientBg, valueGradientBg, alphaGradientBg,
+                                        lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                                        colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                                        hueLabel, saturationLabel, valueLabel, alphaLabel,
+                                        rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                                        redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                                        redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
                             }
                         }
                     } catch (Exception ignored) {}
@@ -824,31 +736,62 @@ public class ColorPickerDialog {
 
     private static void setEmptyInner(Activity activity, View inner, GridLayout grid,
                                        SharedPreferences prefs, int idx,
-                                       int[] hueProg, int[] satProg, int[] briProg, int[] opaProg,
-                                       View hueThumb, View satThumb, View briThumb, View opaThumb,
-                                       View saturationGradientBg,
-                                       Runnable updateSlider) {
+                                       int[] hueProg, int[] satProg, int[] valProg, int[] opaProg,
+                                       View hueThumb, View satThumb, View valThumb, View opaThumb,
+                                       View saturationGradientBg, View valueGradientBg,
+                                       View alphaGradientBg,
+                                       int[] lastSatHue, int[] lastValHue,
+                                       int[] lastAlphaColor, int[] lastWheelArgb,
+                                       TriangleColorPickerView colorWheel,
+                                       TextView colorPreview, TextView hexValue,
+                                       TextView hsvValue, TextView rgbValue,
+                                       TextView hueLabel, TextView saturationLabel,
+                                       TextView valueLabel, TextView alphaLabel,
+                                       View rgbSliderBody,
+                                       TextView redValLabel, TextView greenValLabel,
+                                       TextView blueValLabel,
+                                       View redThumb, View greenThumb, View blueThumb,
+                                       int[] redProg, int[] greenProg, int[] blueProg,
+                                       View redGradientBg, View greenGradientBg,
+                                       View blueGradientBg,
+                                       boolean[] isUpdating) {
         GradientDrawable border = new GradientDrawable();
         border.setShape(GradientDrawable.RECTANGLE);
         border.setStroke(dpToPx(activity, 2), Color.rgb(76, 175, 80));
         border.setColor(Color.TRANSPARENT);
         inner.setBackground(border);
         inner.setOnClickListener(v -> {
-            int h = hueProg[0];
-            float s = satProg[0] / 100f;
-            float val = briProg[0] / 100f;
-            int a = opaProg[0];
-            int c = Color.HSVToColor(a, new float[]{h, s, val});
-            saveColor(activity, c, false);
-            loadSavedColors(activity, grid,
-                    hueProg, satProg, briProg, opaProg,
-                    hueThumb, satThumb, briThumb, opaThumb,
-                    saturationGradientBg, updateSlider);
+            int color = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
+            saveColor(activity, color, false);
+            loadSavedColors(activity, grid, null,
+                    hueProg, satProg, valProg, opaProg,
+                    hueThumb, satThumb, valThumb, opaThumb,
+                    saturationGradientBg, valueGradientBg, alphaGradientBg,
+                    lastSatHue, lastValHue, lastAlphaColor, lastWheelArgb,
+                    colorWheel, colorPreview, hexValue, hsvValue, rgbValue,
+                    hueLabel, saturationLabel, valueLabel, alphaLabel,
+                    rgbSliderBody, redValLabel, greenValLabel, blueValLabel,
+                    redThumb, greenThumb, blueThumb, redProg, greenProg, blueProg,
+                    redGradientBg, greenGradientBg, blueGradientBg, isUpdating);
         });
     }
 
+    private static void recalcGridCellSizes(GridLayout grid, Context context) {
+        int w = grid.getWidth();
+        if (w <= 0) return;
+        int margin = dpToPx(context, 1);
+        int cellH = (w - margin * 2 * 8) / 8;
+        if (cellH < 10) return;
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            View child = grid.getChildAt(i);
+            GridLayout.LayoutParams p = (GridLayout.LayoutParams) child.getLayoutParams();
+            p.height = cellH;
+            child.setLayoutParams(p);
+        }
+    }
+
     private static void saveColor(Activity activity, int color, boolean prepend) {
-        SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String hex = String.format("#%02X%02X%02X%02X",
                 Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color));
         String saved = prefs.getString(SAVED_COLORS_KEY, "");
@@ -876,11 +819,95 @@ public class ColorPickerDialog {
         Toast.makeText(activity, "Warna tersimpan", Toast.LENGTH_SHORT).show();
     }
 
-    // ========================================================================
-    // Shared utilities
-    // ========================================================================
-    private static int dpToPx(Context context, int dp) {
-        return (int) (dp * context.getResources().getDisplayMetrics().density + 0.5f);
+    private static void applyHueGradient(View bar) {
+        int[] colors = new int[361];
+        for (int i = 0; i <= 360; i++) {
+            colors[i] = Color.HSVToColor(new float[]{i, 1f, 1f});
+        }
+        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
+        bar.setBackground(gd);
+    }
+
+    private static void applySatGradient(View bar, int hue) {
+        for (int i = 0; i <= 50; i++) {
+            SAT_COLORS[i] = Color.HSVToColor(new float[]{hue, (i * 2) / 100f, 1f});
+        }
+        if (sSatGd == null) {
+            sSatGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, SAT_COLORS);
+            bar.setBackground(sSatGd);
+        } else {
+            sSatGd.setColors(SAT_COLORS);
+        }
+    }
+
+    private static void applyValueGradient(View bar, int hue, float sat) {
+        int fullColor = Color.HSVToColor(new float[]{hue, sat, 1f});
+        if (sValGd == null) {
+            sValGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                    new int[]{Color.BLACK, fullColor});
+            bar.setBackground(sValGd);
+        } else {
+            sValGd.setColors(new int[]{Color.BLACK, fullColor});
+        }
+    }
+
+    private static void applyAlphaGradient(View bar, int color) {
+        ALPHA_COLORS[0] = color & 0x00FFFFFF;
+        ALPHA_COLORS[1] = color | 0xFF000000;
+        if (sAlphaGd == null) {
+            sAlphaGd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, ALPHA_COLORS);
+            bar.setBackground(new LayerDrawable(new Drawable[]{
+                    createCheckerboard(bar.getContext()), sAlphaGd}));
+        } else {
+            sAlphaGd.setColors(ALPHA_COLORS);
+        }
+    }
+
+    private static void applyRedGradient(View bar) {
+        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.BLACK, Color.RED});
+        bar.setBackground(gd);
+    }
+
+    private static void applyGreenGradient(View bar) {
+        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.BLACK, Color.GREEN});
+        bar.setBackground(gd);
+    }
+
+    private static void applyBlueGradient(View bar) {
+        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,
+                new int[]{Color.BLACK, Color.BLUE});
+        bar.setBackground(gd);
+    }
+
+    private static Drawable createCheckerboard(Context context) {
+        if (sCheckerDrawable != null) return sCheckerDrawable;
+        int size = dpToPx(context, 8);
+        Bitmap bmp = Bitmap.createBitmap(size * 2, size * 2, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bmp);
+        Paint paint = new Paint();
+        int light = Color.rgb(200, 200, 200);
+        int dark = Color.rgb(155, 155, 155);
+        paint.setColor(light);
+        canvas.drawRect(0, 0, size, size, paint);
+        canvas.drawRect(size, size, size * 2, size * 2, paint);
+        paint.setColor(dark);
+        canvas.drawRect(size, 0, size * 2, size, paint);
+        canvas.drawRect(0, size, size, size * 2, paint);
+        BitmapDrawable d = new BitmapDrawable(context.getResources(), bmp);
+        d.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        d.setFilterBitmap(false);
+        sCheckerDrawable = d;
+        return d;
+    }
+
+    private static int hsvToColor(int hue, int sat, int val, int alpha) {
+        return Color.HSVToColor(alpha, new float[]{hue, sat / 100f, val / 100f});
+    }
+
+    private static String hexColor(int a, int r, int g, int b) {
+        return String.format("%02X%02X%02X%02X", a, r, g, b);
     }
 
     private static int parseHex(String hex) {
@@ -890,86 +917,12 @@ public class ColorPickerDialog {
         return (int) Long.parseLong(hex, 16);
     }
 
-    private static int textColorForBg(int color) {
-        int r = Color.red(color);
-        int g = Color.green(color);
-        int b = Color.blue(color);
-        return (r * 0.299 + g * 0.587 + b * 0.114) > 128 ? Color.BLACK : Color.WHITE;
-    }
-
     private static void copyToClipboard(Context context, String text) {
         ClipboardManager cm = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
         cm.setPrimaryClip(ClipData.newPlainText("color", text));
     }
 
-    private static void updateDiskDisplay(TextView preview, TextView hex, TextView hsv, TextView rgb,
-                                           TextView rLabel, TextView gLabel, TextView bLabel, TextView aLabel,
-                                           SeekBar rBar, SeekBar gBar, SeekBar bBar, SeekBar aBar) {
-        int a = aBar.getProgress();
-        int r = rBar.getProgress();
-        int g = gBar.getProgress();
-        int b = bBar.getProgress();
-        int color = Color.argb(a, r, g, b);
-
-        preview.setBackgroundColor(color);
-        preview.setText(ColorNameResolver.getName(color));
-
-        int textColor = (r * 0.299 + g * 0.587 + b * 0.114) > 128 ? Color.BLACK : Color.WHITE;
-        preview.setTextColor(textColor);
-
-        hex.setText(String.format("HEX: #%02X%02X%02X%02X", a, r, g, b));
-
-        float[] hsvArr = new float[3];
-        Color.colorToHSV(color, hsvArr);
-        hsv.setText(String.format("HSV (%.0f\u00B0, %.0f%%, %.0f%%)",
-                hsvArr[0], hsvArr[1] * 100, hsvArr[2] * 100));
-
-        rgb.setText(String.format("ARGB (%d, %d, %d, %d)", a, r, g, b));
-
-        rLabel.setText(String.format("R:%d", r));
-        gLabel.setText(String.format("G:%d", g));
-        bLabel.setText(String.format("B:%d", b));
-        aLabel.setText(String.format("A:%d", a));
-    }
-
-    private static void showDiskValueEditor(Activity activity, String label, SeekBar bar, int max,
-                                              TextView colorPreview, TextView hexValue, TextView hsvValue, TextView rgbValue,
-                                              TextView redLabel, TextView greenLabel, TextView blueLabel, TextView alphaLabel,
-                                              SeekBar redSeekBar, SeekBar greenSeekBar, SeekBar blueSeekBar, SeekBar alphaSeekBar,
-                                              HSVColorPickerView colorWheel, SeekBar hueSeekBar, boolean[] isUpdating) {
-        EditText input = new EditText(activity);
-        input.setText(String.valueOf(bar.getProgress()));
-        input.setSelection(input.length());
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-
-        new AlertDialog.Builder(activity)
-                .setTitle("Edit " + label)
-                .setView(input)
-                .setPositiveButton("OK", (d, w) -> {
-                    try {
-                        int val = Integer.parseInt(input.getText().toString().trim());
-                        if (val < 0 || val > max) {
-                            Toast.makeText(activity, "Nilai harus 0-" + max, Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-                        isUpdating[0] = true;
-                        bar.setProgress(val);
-                        int color = Color.argb(alphaSeekBar.getProgress(),
-                                redSeekBar.getProgress(),
-                                greenSeekBar.getProgress(), blueSeekBar.getProgress());
-                        colorWheel.setColor(color);
-                        float[] hsv = new float[3];
-                        Color.colorToHSV(color, hsv);
-                        hueSeekBar.setProgress(Math.round(hsv[0]));
-                        updateDiskDisplay(colorPreview, hexValue, hsvValue, rgbValue,
-                                redLabel, greenLabel, blueLabel, alphaLabel,
-                                redSeekBar, greenSeekBar, blueSeekBar, alphaSeekBar);
-                        isUpdating[0] = false;
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(activity, "Nilai tidak valid", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Batal", null)
-                .show();
+    private static int dpToPx(Context context, int dp) {
+        return (int) (dp * context.getResources().getDisplayMetrics().density + 0.5f);
     }
 }

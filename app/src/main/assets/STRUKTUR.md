@@ -168,8 +168,7 @@ FTxT/
     │       │   ├── activity_main.xml            — Layout utama dengan DrawerLayout + CoordinatorLayout
     │       │   ├── activity_settings.xml        — Layout halaman pengaturan izin
     │       │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
-    │       │   ├── dialog_hsv_color_picker.xml  — Dialog color picker mode Color Wheel
-    │       │   ├── dialog_hue_slider_picker.xml — Dialog color picker mode Hue Slider
+    │       │   ├── dialog_color_picker.xml      — Dialog color picker gabungan wheel + sliders
     │       │   ├── dialog_preset_browser.xml    — Dialog browser preset dengan search & list
     │       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
     │   │   ├── nav_header.xml               — Header navigation drawer: logo + versi
@@ -215,7 +214,7 @@ FTxT/
 | Kategori | Jumlah |
 |----------|-------:|
 | Java source | 56 |
-| Layout XML | 21 |
+| Layout XML | 20 |
 | Drawable XML | 24 |
 | Drawable PNG | 14 |
 | Values XML | 7 |

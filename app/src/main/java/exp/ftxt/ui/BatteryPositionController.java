@@ -161,6 +161,7 @@ public class BatteryPositionController {
         );
         setupListeners();
         syncAll();
+        FloatingService.updateBatteryPositionStatic();
     }
 
     private void bindViews() {
