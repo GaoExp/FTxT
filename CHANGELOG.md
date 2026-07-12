@@ -1,3 +1,17 @@
+# [4.82.4] - 2026-07-12
+### 🐞 Bug Fixes
+- **Merge conflict branch lokal & remote** — Branch `main` lokal dan remote berbeda (diverged). Konflik di 5 file (CHANGELOG, README, build.gradle, dan pasangan assets-nya) diselesaikan dengan mempertahankan versi lokal v4.82.3.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 171, versionName 4.82.4
+- `CHANGELOG.md` — Entry 4.82.4 baru (merge conflict resolution)
+- `README.md` — Update versi ke 4.82.4
+- `app/src/main/assets/CHANGELOG.md` — Sync dari root
+- `app/src/main/assets/README.md` — Sync dari root
+### 🔢 Version
+`4.82.3` → `4.82.4`
+
+---
+
 # [4.82.3] - 2026-07-12
 ### ♻️ Perubahan Fitur
 - **Pemeriksaan dan penyesuaian dokumen** — Verifikasi seluruh dokumen (README, CHANGELOG, STRUKTUR, PANDUAN) terhadap kondisi aktual project. Sinkronisasi isi dokumen dengan kode.
@@ -18,7 +32,6 @@
 `4.82.2` → `4.82.3`
 
 ---
-
 # [4.82.2] - 2026-06-30
 ### ♻️ Perubahan Fitur
 - **Color Picker Dialog digabung** — `ColorPickerDialog` sekarang menggunakan model yang sama dengan panel (`ColorPickerPanelController`): `TriangleColorPickerView` (segitiga) + slider H/S/V/A custom tanpa mode switching. Saved colors key diganti `cp_saved_colors` (share dengan panel). RGB slider tersedia sebagai collapsible section.
