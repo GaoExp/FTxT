@@ -1,0 +1,47 @@
+package exp.ftxt.core;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+
+import exp.ftxt.features.battery_current.BatteryCurrentConfig;
+import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
+import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.fps_display.FpsConfig;
+import exp.ftxt.features.network_stats.NetworkConfig;
+
+/**
+ * Receiver yang otomatis memulai FloatingService saat HP reboot,
+ * jika sebelumnya ada modul overlay yang aktif.
+ *
+ * Dipakai oleh:
+ * - AndroidManifest.xml → receiver BootReceiver (action: BOOT_COMPLETED)
+ */
+public class BootReceiver extends BroadcastReceiver {
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (intent == null || !Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) return;
+
+        SharedPreferences prefs = context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+
+        // Load config enabled flags dari SharedPreferences
+        boolean textOn = prefs.getBoolean("text_overlay_on", false);
+        FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
+        ClockConfig.enabled = prefs.getBoolean("clock_enabled", false);
+        BatteryConfig.enabled = prefs.getBoolean("battery_enabled", false);
+        BatteryPercentageConfig.enabled = prefs.getBoolean("battpct_enabled", false);
+        BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
+        NetworkConfig.enabled = prefs.getBoolean("network_enabled", false);
+
+        boolean anyActive = textOn || FpsConfig.enabled || ClockConfig.enabled
+                || BatteryConfig.enabled || BatteryPercentageConfig.enabled
+                || BatteryCurrentConfig.enabled || NetworkConfig.enabled;
+
+        if (anyActive) {
+            context.startForegroundService(new Intent(context, FloatingService.class));
+        }
+    }
+}

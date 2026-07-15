@@ -17,6 +17,8 @@ import exp.ftxt.shared.ui.ShadowTextView;
 
 public class FpsModule {
 
+    private static final int FRAME_WINDOW_SIZE = 60;
+
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
@@ -24,13 +26,16 @@ public class FpsModule {
     private SharedPreferences prefs;
     private boolean running = false;
     private Choreographer choreographer;
-    private long lastFrameTime = 0;
-    private int frameCount = 0;
+    private long lastDisplayTime = 0;
     private float fpsValue = 0;
     private int screenWidth;
     private int screenHeight;
     private String orientationSuffix;
     private int posCalibrationY;
+
+    private final long[] frameTimes = new long[FRAME_WINDOW_SIZE];
+    private int frameIndex = 0;
+    private int frameFilled = 0;
 
     public static Runnable onPositionUpdate;
 
@@ -95,14 +100,18 @@ public class FpsModule {
 
         view.post(this::updatePosition);
         running = true;
-        lastFrameTime = 0;
-        frameCount = 0;
+        lastDisplayTime = 0;
+        frameIndex = 0;
+        frameFilled = 0;
         choreographer = Choreographer.getInstance();
         choreographer.postFrameCallback(frameCallback);
     }
 
     public void stop() {
         running = false;
+        if (choreographer != null) {
+            choreographer.removeFrameCallback(frameCallback);
+        }
         savePosition();
         if (view != null && wm != null) {
             try {
@@ -227,6 +236,12 @@ public class FpsModule {
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
     }
 
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition(prefs);
+        updatePosition();
+    }
+
     public boolean isRunning() {
         return running;
     }
@@ -293,15 +308,22 @@ public class FpsModule {
     private Choreographer.FrameCallback frameCallback = new Choreographer.FrameCallback() {
         @Override
         public void doFrame(long frameTimeNanos) {
-            if (lastFrameTime == 0) {
-                lastFrameTime = frameTimeNanos;
-            }
-            frameCount++;
-            long elapsed = (frameTimeNanos - lastFrameTime) / 1000000;
-            if (elapsed >= (long)(FpsConfig.updateInterval * 1000)) {
-                fpsValue = (float) frameCount * 1000 / elapsed;
-                frameCount = 0;
-                lastFrameTime = frameTimeNanos;
+            frameTimes[frameIndex] = frameTimeNanos;
+            frameIndex = (frameIndex + 1) % FRAME_WINDOW_SIZE;
+            if (frameFilled < FRAME_WINDOW_SIZE) frameFilled++;
+
+            long now = System.nanoTime();
+            long elapsedDisplay = (now - lastDisplayTime) / 1000000;
+            if (lastDisplayTime == 0 || elapsedDisplay >= (long)(FpsConfig.updateInterval * 1000)) {
+                if (frameFilled >= 2) {
+                    int newest = (frameIndex - 1 + FRAME_WINDOW_SIZE) % FRAME_WINDOW_SIZE;
+                    int oldest = (frameIndex) % FRAME_WINDOW_SIZE;
+                    long spanNanos = frameTimes[newest] - frameTimes[oldest];
+                    if (spanNanos > 0) {
+                        fpsValue = (float)(frameFilled - 1) * 1_000_000_000f / spanNanos;
+                    }
+                }
+                lastDisplayTime = now;
                 updateDisplay();
             }
             if (running && FpsConfig.enabled) {

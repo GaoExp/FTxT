@@ -13,6 +13,7 @@
 keystore.properties
 talkhere.txt
 /_planning/
+/_schedule/
 # key/ — folder untuk keystore CI, file sensitif diabaikan
 /key/*.jks
 /key/alias-key

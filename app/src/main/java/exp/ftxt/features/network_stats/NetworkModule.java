@@ -1,6 +1,8 @@
 package exp.ftxt.features.network_stats;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.net.TrafficStats;
 import android.os.Handler;
@@ -20,6 +22,7 @@ public class NetworkModule {
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
+    private SharedPreferences prefs;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -38,6 +41,7 @@ public class NetworkModule {
         if (running) return;
         wm = windowManager;
         context = ctx;
+        prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(NetworkConfig.shadow);
@@ -115,6 +119,24 @@ public class NetworkModule {
 
     public void updateBackground() {
         applyBackground();
+    }
+
+    private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
+    public void loadPosition() {
+        String sfx = posSuffix();
+        NetworkConfig.posX = prefs.getFloat("network_pos_x" + sfx, 0.75f);
+        NetworkConfig.posY = prefs.getFloat("network_pos_y" + sfx, 0.05f);
+        updatePosition();
+    }
+
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition();
     }
 
     public void updatePosition() {

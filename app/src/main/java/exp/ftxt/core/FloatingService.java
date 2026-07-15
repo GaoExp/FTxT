@@ -1,8 +1,12 @@
 package exp.ftxt.core;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.IBinder;
 
 import android.view.WindowManager;
@@ -52,6 +56,7 @@ public class FloatingService extends Service {
     private BatteryPercentageModule batteryPercentageModule;
     private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
+    private BroadcastReceiver configChangeReceiver;
 
     @Override
     public void onCreate() {
@@ -119,6 +124,18 @@ public class FloatingService extends Service {
             // Lihat: WakeLockManager → core/WakeLockManager.java
             wakeLockManager = new WakeLockManager();
             wakeLockManager.acquire(this);
+
+            // Register receiver untuk deteksi perubahan orientasi sistem
+            configChangeReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent != null && Intent.ACTION_CONFIGURATION_CHANGED.equals(intent.getAction())) {
+                        reloadAllPositions();
+                    }
+                }
+            };
+            IntentFilter filter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
+            registerReceiver(configChangeReceiver, filter);
 
             // Start FPS jika diaktifkan
             if (FpsConfig.enabled) {
@@ -655,9 +672,29 @@ public class FloatingService extends Service {
         return null;
     }
 
+    private void reloadAllPositions() {
+        if (textModule != null && textModule.isActive()) textModule.reloadPosition();
+        if (fpsModule != null && fpsModule.isRunning()) fpsModule.reloadPosition();
+        if (clockModule != null && clockModule.isRunning()) clockModule.reloadPosition();
+        if (batteryModule != null && batteryModule.isRunning()) batteryModule.reloadPosition();
+        if (batteryPercentageModule != null && batteryPercentageModule.isRunning()) batteryPercentageModule.reloadPosition();
+        if (batteryCurrentModule != null && batteryCurrentModule.isRunning()) batteryCurrentModule.reloadPosition();
+        if (networkModule != null && networkModule.isRunning()) networkModule.reloadPosition();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if (configChangeReceiver != null) {
+            unregisterReceiver(configChangeReceiver);
+            configChangeReceiver = null;
+        }
 
         clockModule.stop();
         batteryModule.stop();

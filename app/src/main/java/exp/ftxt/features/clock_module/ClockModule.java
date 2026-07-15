@@ -1,6 +1,8 @@
 package exp.ftxt.features.clock_module;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,6 +23,7 @@ public class ClockModule {
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
+    private SharedPreferences prefs;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -35,6 +38,7 @@ public class ClockModule {
         if (running) return;
         wm = windowManager;
         context = ctx;
+        prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(ClockConfig.shadow);
@@ -103,6 +107,24 @@ public class ClockModule {
 
     public void updateBackground() {
         applyBackground();
+    }
+
+    private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
+    public void loadPosition() {
+        String sfx = posSuffix();
+        ClockConfig.posX = prefs.getFloat("clock_pos_x" + sfx, 0.5f);
+        ClockConfig.posY = prefs.getFloat("clock_pos_y" + sfx, 0.05f);
+        updatePosition();
+    }
+
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition();
     }
 
     public void updatePosition() {

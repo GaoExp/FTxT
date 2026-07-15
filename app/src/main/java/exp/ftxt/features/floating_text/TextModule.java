@@ -320,6 +320,12 @@ public class TextModule {
         }
     }
 
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition(prefs);
+        updatePosition();
+    }
+
     public boolean isActive() {
         return view != null;
     }

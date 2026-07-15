@@ -3,6 +3,8 @@ package exp.ftxt.features.battery_temperature;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.BatteryManager;
 import android.os.Handler;
@@ -22,6 +24,7 @@ public class BatteryModule {
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
+    private SharedPreferences prefs;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -36,6 +39,7 @@ public class BatteryModule {
         if (running) return;
         wm = windowManager;
         context = ctx;
+        prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(BatteryConfig.shadow);
@@ -108,6 +112,24 @@ public class BatteryModule {
 
     public void updateBackground() {
         applyBackground();
+    }
+
+    private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
+    public void loadPosition() {
+        String sfx = posSuffix();
+        BatteryConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
+        BatteryConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
+        updatePosition();
+    }
+
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition();
     }
 
     public void updatePosition() {

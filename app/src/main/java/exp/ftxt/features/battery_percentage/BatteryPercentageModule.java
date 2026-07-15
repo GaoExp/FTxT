@@ -3,6 +3,8 @@ package exp.ftxt.features.battery_percentage;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.BatteryManager;
 import android.os.Handler;
@@ -22,6 +24,7 @@ public class BatteryPercentageModule {
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
+    private SharedPreferences prefs;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -36,6 +39,7 @@ public class BatteryPercentageModule {
         if (running) return;
         wm = windowManager;
         context = ctx;
+        prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
         view = new ShadowTextView(ctx);
         view.setShadowConfig(BatteryPercentageConfig.shadow);
@@ -107,6 +111,24 @@ public class BatteryPercentageModule {
 
     public void updateBackground() {
         applyBackground();
+    }
+
+    private String posSuffix() {
+        if (orientationSuffix != null) return "_" + orientationSuffix;
+        return (context.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) ? "_land" : "_port";
+    }
+
+    public void loadPosition() {
+        String sfx = posSuffix();
+        BatteryPercentageConfig.posX = prefs.getFloat("battpct_pos_x" + sfx, 0.5f);
+        BatteryPercentageConfig.posY = prefs.getFloat("battpct_pos_y" + sfx, 0.5f);
+        updatePosition();
+    }
+
+    public void reloadPosition() {
+        orientationSuffix = null;
+        loadPosition();
     }
 
     public void updatePosition() {

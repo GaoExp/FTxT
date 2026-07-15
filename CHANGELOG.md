@@ -1,12 +1,33 @@
 # [4.82.4] - 2026-07-12
+### ✨ Fitur Baru
+- **BootReceiver — auto-start overlay setelah reboot** — `BroadcastReceiver` baru yang otomatis memulai `FloatingService` saat HP reboot, jika sebelumnya ada modul overlay yang aktif. Config enabled flags di-load dari SharedPreferences sebelum memulai service.
+### ♻️ Perubahan Fitur
+- **FPS rolling average** — FPS sekarang dihitung dari 60 frame terakhir (circular buffer), bukan dari satu periode interval. Hasil lebih akurat dan stabil. Interval tetap mengontrol seberapa sering display di-update, tapi perhitungan FPS selalu menggunakan data dari 60 frame terakhir.
+- **WakeLock auto-renew** — `WakeLockManager` sekarang menggunakan `acquire(5 menit)` dengan auto-renew setiap 4 menit. Sebelumnya `acquire()` tanpa timeout, yang bisa bermasalah di Android 12+ karena pembatasan baru sistem.
+- **FloatingService START_STICKY** — `onStartCommand()` di-override untuk return `START_STICKY`, memastikan Android me-restart service jika ter-kills oleh sistem.
 ### 🐞 Bug Fixes
+- **FPS 2x lipat saat ubah interval** — Saat interval diubah (stop+start), Choreographer callback lama tidak di-cancel. Callback baru ditambah → 2 callback berjalan bersamaan → `frameCount` di-increment 2x → FPS nilainya 2x lipat. Ditambahkan `choreographer.removeFrameCallback(frameCallback)` di `stop()`.
+- **Foreground service crash di Android 14+ (targetSdk 35)** — `foregroundServiceType="dataSync"` memerlukan izin `FOREGROUND_SERVICE_DATA_SYNC` yang tidak ada di manifest. Service crash saat `startForeground()` tapi error di-catch, menyebabkan service jalan tanpa status foreground. Android mematikan service dalam ~10 detik. Diperbaiki dengan mengganti ke `specialUse` + menambahkan izin `FOREGROUND_SERVICE_SPECIAL_USE`.
+- **Overlay tidak mengikuti perubahan orientasi sistem** — Posisi overlay hanya berubah saat orientasi diubah dari dalam aplikasi. Saat orientasi sistem berubah (putar layar/app lain), overlay tetap di posisi lama karena `orientationSuffix` terkunci. Ditambahkan `BroadcastReceiver ACTION_CONFIGURATION_CHANGED` di `FloatingService` yang me-reset suffix dan me-load posisi ulang untuk semua modul aktif.
 - **Merge conflict branch lokal & remote** — Branch `main` lokal dan remote berbeda (diverged). Konflik di 5 file (CHANGELOG, README, build.gradle, dan pasangan assets-nya) diselesaikan dengan mempertahankan versi lokal v4.82.3.
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/core/BootReceiver.java` — Auto-start overlay setelah reboot
 ### ✏️ File Changed
 - `app/build.gradle` — versionCode 171, versionName 4.82.4
-- `CHANGELOG.md` — Entry 4.82.4 baru (merge conflict resolution)
+- `CHANGELOG.md` — Entry 4.82.4 baru (merge conflict resolution + keep-alive overlay)
 - `README.md` — Update versi ke 4.82.4
 - `app/src/main/assets/CHANGELOG.md` — Sync dari root
 - `app/src/main/assets/README.md` — Sync dari root
+- `app/src/main/AndroidManifest.xml` — Tambah permission RECEIVE_BOOT_COMPLETED + register BootReceiver
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah onStartCommand() START_STICKY + BroadcastReceiver ACTION_CONFIGURATION_CHANGED + reloadAllPositions()
+- `app/src/main/java/exp/ftxt/core/WakeLockManager.java` — Auto-renew wake lock setiap 4 menit dengan timeout 5 menit
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — Tambah reloadPosition()
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — Tambah reloadPosition()
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Tambah posSuffix(), loadPosition(), reloadPosition()
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Tambah posSuffix(), loadPosition(), reloadPosition()
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Tambah posSuffix(), loadPosition(), reloadPosition()
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah posSuffix(), loadPosition(), reloadPosition()
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Tambah posSuffix(), loadPosition(), reloadPosition()
 ### 🔢 Version
 `4.82.3` → `4.82.4`
 
@@ -88,6 +109,8 @@
 - `README.md` — Update versi ke 4.82.1, tanggal 2026-06-29
 ### 🔢 Version
 4.82.1
+
+---
 
 # [4.82.0] - 2026-06-18
 ### ♻️ Perubahan Fitur
