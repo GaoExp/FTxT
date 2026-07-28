@@ -114,14 +114,14 @@
 ## Ringkasan Eksekusi
 
 **Tahap 1: Stabilitas**
-- [ ] Optimasi memori & baterai (MASALAH_MEMORI_DAN_PROSES)
-- [ ] Refactor FloatingService (interface OverlayModule)
+- [=] Optimasi memori & baterai (MASALAH_MEMORI_DAN_PROSES)
+- [✓] Refactor FloatingService (interface OverlayModule)
 
 **Tahap 2: Maintainability**
 - [ ] Refactor ColorPickerDialog (ColorPickerConfig builder)
 
 **Tahap 3: Fitur Baru**
-- [] Notification Actions (tombol aksi di notifikasi)
+- [✓] Notification Actions (tombol aksi di notifikasi)
 
 **Tahap 4: Refactor Lanjutan**
 - [ ] Panel Navigation Fragment (jika diperlukan)

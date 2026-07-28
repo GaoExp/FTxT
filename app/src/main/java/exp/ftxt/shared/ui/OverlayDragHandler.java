@@ -5,18 +5,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-/**
- * Shared drag-to-move touch listener untuk overlay features.
- *
- * Menggantikan touchListener duplikat di TextModule dan FpsModule.
- *
- * Dipakai oleh:
- * - TextModule  → features/floating_text/TextModule.java (touchListener field)
- * - FpsModule   → features/fps_display/FpsModule.java (touchListener field)
- *
- * Cara pakai:
- *   view.setOnTouchListener(new OverlayDragHandler(params, wm, () -> savePosition()));
- */
 public class OverlayDragHandler implements View.OnTouchListener {
 
     private final WindowManager.LayoutParams params;

@@ -442,10 +442,6 @@ public class PresetBrowserDialog extends DialogFragment {
         }
     }
 
-    // ====================================================================
-    // ADAPTER
-    // ====================================================================
-
     private class PresetAdapter extends RecyclerView.Adapter<PresetAdapter.ViewHolder> {
 
         class ViewHolder extends RecyclerView.ViewHolder {

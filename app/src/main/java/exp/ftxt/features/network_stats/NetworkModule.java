@@ -107,6 +107,7 @@ public class NetworkModule implements OverlayModule {
             }
             view = null;
         }
+        params = null;
     }
 
     @Override
@@ -182,25 +183,16 @@ public class NetworkModule implements OverlayModule {
         return running;
     }
 
-    /**
-     * Sembunyikan overlay tanpa stop module.
-     */
     @Override
     public void hide() {
         if (view != null) view.setVisibility(android.view.View.GONE);
     }
 
-    /**
-     * Tampilkan overlay kembali.
-     */
     @Override
     public void show() {
         if (view != null) view.setVisibility(android.view.View.VISIBLE);
     }
 
-    /**
-     * Cek apakah overlay sedang tersembunyi.
-     */
     @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == android.view.View.GONE;

@@ -12,13 +12,6 @@ import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 
-/**
- * Receiver yang otomatis memulai FloatingService saat HP reboot,
- * jika sebelumnya ada modul overlay yang aktif.
- *
- * Dipakai oleh:
- * - AndroidManifest.xml → receiver BootReceiver (action: BOOT_COMPLETED)
- */
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
@@ -27,7 +20,6 @@ public class BootReceiver extends BroadcastReceiver {
 
         SharedPreferences prefs = context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
-        // Load config enabled flags dari SharedPreferences
         boolean textOn = prefs.getBoolean("text_overlay_on", false);
         FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
         ClockConfig.enabled = prefs.getBoolean("clock_enabled", false);

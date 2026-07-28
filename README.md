@@ -1,6 +1,6 @@
 # FTxT (FunText) — Floating Text Overlay
 
->**Current Release:** `4.83.1` **Beta** 
+>**Current Release:** `4.83.2` **Beta** 
 **Last Updated:** `2026-07-28`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -31,6 +31,7 @@
 - **Dark/Light Theme** — Toggle tema (default malam), tersimpan otomatis
 - **Collapsible Panel Sections** — Setiap panel overlay dikelompokkan dalam section collapsible: Tampilan, Posisi, Shadow, Background. Klik header ▾/▸ untuk toggle
 - **Overlay Toggle** — Auto-start, permission handling, WakeLock, foreground service
+- **Ikon Notifikasi Dinamis** — Ikon notifikasi status bar menampilkan nilai suhu baterai aktual yang di-generate sebagai Bitmap, update setiap 10 detik
 - **Android SplashScreen** — SplashScreen API resmi tanpa fake loading
 
 ---

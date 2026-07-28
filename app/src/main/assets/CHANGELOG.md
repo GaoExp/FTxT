@@ -1,3 +1,25 @@
+# [4.83.2] - 2026-07-28
+### ✨ Fitur Baru
+- **Ikon Notifikasi Dinamis — nilai suhu baterai di status bar** — Ikon notifikasi foreground service sekarang menampilkan nilai suhu baterai aktual (misal `37°`) yang di-generate secara dinamis sebagai Bitmap. Update setiap 10 detik. Title notifikasi juga menampilkan suhu (misal `FTxT 37°C`).
+### 🔧 Optimasi & Penyesuaian
+- **Optimasi Memori & Proses — Lazy Init, Conditional Resources** — Hemat memori dan baterai dengan 5 perubahan: (1) **Lazy Init Module** — 7 module overlay tidak lagi diinstansiasi semua di `onCreate()`. Module baru dibuat saat pertama diaktifkan. (2) **Cleanup Module saat Stop** — Null-kan `params` dan `choreographer` saat module di-stop agar bisa di-GC. (3) **Conditional WakeLock** — WakeLock hanya diambil jika ada module yang aktif. Saat semua overlay mati, CPU bisa tidur. (4) **Conditional BroadcastReceiver** — Receiver `CONFIG_CHANGED` hanya aktif saat ada overlay berjalan. (5) **Conditional Service Stop** — Service otomatis `stopSelf()` saat module terakhir di-stop.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 174, versionName 4.83.2
+- `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Tambah `generateIcon()` (Bitmap dinamis dari teks), `getBatteryTemp()` (baca suhu baterai), `buildNotificationDynamic()` (notifikasi dengan `Icon.createWithBitmap` + `DecoratedCustomViewStyle`), `startIconCycling()`/`stopIconCycling()` (update setiap 10 detik)
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Lazy init module (`ensure*Module()`), conditional WakeLock (`acquireWakeLockIfNeeded`/`releaseWakeLockIfEmpty`), conditional BroadcastReceiver (`registerConfigReceiver`/`unregisterConfigReceiver`), conditional service stop (`stopSelfIfEmpty`), panggil `NotificationHelper.startIconCycling()` di `onCreate()` dan `stopIconCycling()` di `onDestroy()`
+- `app/src/main/java/exp/ftxt/core/WakeLockManager.java` — Tambah method `isHeld()`
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — Tambah `params = null` di `destroyOverlay()`
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — Tambah `choreographer = null` + `params = null` di `stop()`
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Tambah `params = null` di `stop()`
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Tambah `params = null` di `stop()`
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Tambah `params = null` di `stop()`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah `params = null` di `stop()`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Tambah `params = null` di `stop()`
+### 🔢 Version
+`4.83.1` → `4.83.2`
+
+---
+
 # [4.83.1] - 2026-07-28
 ### 🔧 Optimasi & Penyesuaian
 - **Refactor FloatingService — Hapus Duplikasi Kode (Langkah 1-4)** — Buat interface `OverlayModule` untuk menyeragamkan semua modul overlay. Implement di 7 modul. Hapus ~430 baris static delegates di FloatingService, ganti dengan method generik berbasis loop (`startModule`, `stopModule`, `updateColorForModule`, `updateSizeForModule`, dll). FloatingService turun dari 785 → 351 baris (-55%). Update semua 14 UI controllers (7 PanelController + 7 PositionController) untuk pakai method generik baru.

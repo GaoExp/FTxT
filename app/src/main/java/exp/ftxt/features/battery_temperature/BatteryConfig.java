@@ -19,5 +19,5 @@ public class BatteryConfig {
     public static boolean showPercentage = false;
     public static float posX = 0.05f;
     public static float posY = 0.8f;
-    public static float updateInterval = 5f; // detik: 0.2, 0.5, 0.75, 1-10
+    public static float updateInterval = 5f;
 }

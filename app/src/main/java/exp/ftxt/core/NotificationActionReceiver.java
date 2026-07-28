@@ -4,14 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Handle aksi dari notifikasi foreground service.
- * 
- * Aksi yang didukung:
- * - TOGGLE_OVERLAY: Toggle semua overlay (show/hide)
- * - KILL_SERVICE: Hentikan semua overlay + tutup service
- * - OPEN_APP: Buka MainActivity
- */
 public class NotificationActionReceiver extends BroadcastReceiver {
 
     public static final String ACTION_TOGGLE_OVERLAY = "exp.ftxt.ACTION_TOGGLE_OVERLAY";
@@ -41,10 +33,8 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
 
         if (allHidden) {
-            // Tampilkan semua overlay
             FloatingService.showAllOverlays();
         } else {
-            // Sembunyikan semua overlay
             FloatingService.hideAllOverlays();
         }
 

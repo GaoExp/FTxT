@@ -17,19 +17,6 @@ import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-/**
- * Module untuk mengelola overlay teks floating.
- *
- * Membuat, menghapus, dan memperbarui TextView overlay melalui WindowManager.
- *
- * Menggunakan:
- * - OverlayDragHandler → shared/ui/OverlayDragHandler.java (drag-to-move)
- * - OverlayShadow      → shared/ui/OverlayShadow.java (shadow bg + elevation)
- *
- * Dipanggil oleh:
- * - FloatingService → core/FloatingService.java (static delegates)
- * - TextConfig      → features/floating_text/TextConfig.java (konfigurasi statis)
- */
 public class TextModule implements OverlayModule {
 
     private ShadowTextView view;
@@ -158,6 +145,7 @@ public class TextModule implements OverlayModule {
             }
             view = null;
         }
+        params = null;
     }
 
     public void updatePattern() {
@@ -359,27 +347,18 @@ public class TextModule implements OverlayModule {
         return view != null;
     }
 
-    /**
-     * Sembunyikan overlay tanpa stop module.
-     */
     @Override
     public void hide() {
         if (view != null) view.setVisibility(View.GONE);
         if (sealView != null) sealView.setVisibility(View.GONE);
     }
 
-    /**
-     * Tampilkan overlay kembali.
-     */
     @Override
     public void show() {
         if (view != null) view.setVisibility(View.VISIBLE);
         if (sealView != null) sealView.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Cek apakah overlay sedang tersembunyi.
-     */
     @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == View.GONE;

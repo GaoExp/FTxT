@@ -30,20 +30,6 @@ import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.ui.OverlayModule;
 
-/**
- * Foreground service untuk mengelola overlay Floating Text dan FPS Display.
- *
- * Menggunakan:
- * - NotificationHelper → core/NotificationHelper.java (channel + notification)
- * - WakeLockManager   → core/WakeLockManager.java (partial wake lock)
- * - TextModule         → features/floating_text/TextModule.java
- * - FpsModule          → features/fps_display/FpsModule.java
- *
- * Dipanggil oleh:
- * - MainActivity       → MainActivity.java (start/stop service via TextPanelController & FpsPanelController)
- * - TextPanelController → ui/TextPanelController.java
- * - FpsPanelController  → ui/FpsPanelController.java
- */
 public class FloatingService extends Service {
 
     private WindowManager windowManager;
@@ -70,13 +56,138 @@ public class FloatingService extends Service {
     public BatteryCurrentModule getBatteryCurrentModule() { return batteryCurrentModule; }
     public NetworkModule getNetworkModule() { return networkModule; }
 
-    public static TextModule textModule() { return instance != null ? instance.textModule : null; }
-    public static FpsModule fpsModule() { return instance != null ? instance.fpsModule : null; }
-    public static ClockModule clockModule() { return instance != null ? instance.clockModule : null; }
-    public static BatteryModule batteryModule() { return instance != null ? instance.batteryModule : null; }
-    public static BatteryPercentageModule batteryPercentageModule() { return instance != null ? instance.batteryPercentageModule : null; }
-    public static BatteryCurrentModule batteryCurrentModule() { return instance != null ? instance.batteryCurrentModule : null; }
-    public static NetworkModule networkModule() { return instance != null ? instance.networkModule : null; }
+    public static TextModule textModule() {
+        if (instance != null) instance.ensureTextModule();
+        return instance != null ? instance.textModule : null;
+    }
+    public static FpsModule fpsModule() {
+        if (instance != null) instance.ensureFpsModule();
+        return instance != null ? instance.fpsModule : null;
+    }
+    public static ClockModule clockModule() {
+        if (instance != null) instance.ensureClockModule();
+        return instance != null ? instance.clockModule : null;
+    }
+    public static BatteryModule batteryModule() {
+        if (instance != null) instance.ensureBatteryModule();
+        return instance != null ? instance.batteryModule : null;
+    }
+    public static BatteryPercentageModule batteryPercentageModule() {
+        if (instance != null) instance.ensureBatteryPercentageModule();
+        return instance != null ? instance.batteryPercentageModule : null;
+    }
+    public static BatteryCurrentModule batteryCurrentModule() {
+        if (instance != null) instance.ensureBatteryCurrentModule();
+        return instance != null ? instance.batteryCurrentModule : null;
+    }
+    public static NetworkModule networkModule() {
+        if (instance != null) instance.ensureNetworkModule();
+        return instance != null ? instance.networkModule : null;
+    }
+
+    private void ensureTextModule() {
+        if (textModule == null) {
+            textModule = new TextModule();
+            allModules.add(textModule);
+            textModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureFpsModule() {
+        if (fpsModule == null) {
+            fpsModule = new FpsModule();
+            allModules.add(fpsModule);
+            fpsModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureClockModule() {
+        if (clockModule == null) {
+            clockModule = new ClockModule();
+            allModules.add(clockModule);
+            clockModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureBatteryModule() {
+        if (batteryModule == null) {
+            batteryModule = new BatteryModule();
+            allModules.add(batteryModule);
+            batteryModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureBatteryPercentageModule() {
+        if (batteryPercentageModule == null) {
+            batteryPercentageModule = new BatteryPercentageModule();
+            allModules.add(batteryPercentageModule);
+            batteryPercentageModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureBatteryCurrentModule() {
+        if (batteryCurrentModule == null) {
+            batteryCurrentModule = new BatteryCurrentModule();
+            allModules.add(batteryCurrentModule);
+            batteryCurrentModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureNetworkModule() {
+        if (networkModule == null) {
+            networkModule = new NetworkModule();
+            allModules.add(networkModule);
+            networkModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private boolean isAnyModuleActive() {
+        for (OverlayModule module : allModules) {
+            if (module.isRunning()) return true;
+        }
+        return false;
+    }
+
+    private void registerConfigReceiver() {
+        if (configChangeReceiver != null) return;
+        configChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent != null && Intent.ACTION_CONFIGURATION_CHANGED.equals(intent.getAction())) {
+                    reloadAllPositions();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
+        registerReceiver(configChangeReceiver, filter);
+    }
+
+    private void unregisterConfigReceiver() {
+        if (configChangeReceiver == null) return;
+        unregisterReceiver(configChangeReceiver);
+        configChangeReceiver = null;
+    }
+
+    private void acquireWakeLockIfNeeded() {
+        if (isAnyModuleActive() && (wakeLockManager == null || !wakeLockManager.isHeld())) {
+            if (wakeLockManager == null) {
+                wakeLockManager = new WakeLockManager();
+            }
+            wakeLockManager.acquire(this);
+        }
+    }
+
+    private void releaseWakeLockIfEmpty() {
+        if (!isAnyModuleActive() && wakeLockManager != null && wakeLockManager.isHeld()) {
+            wakeLockManager.release();
+        }
+    }
+
+    private void stopSelfIfEmpty() {
+        if (!isAnyModuleActive()) {
+            stopSelf();
+        }
+    }
 
     @Override
     public void onCreate() {
@@ -85,28 +196,11 @@ public class FloatingService extends Service {
         instance = this;
         prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
 
-        textModule = new TextModule();
-        fpsModule = new FpsModule();
-        clockModule = new ClockModule();
-        batteryModule = new BatteryModule();
-        batteryPercentageModule = new BatteryPercentageModule();
-        batteryCurrentModule = new BatteryCurrentModule();
-        networkModule = new NetworkModule();
-
-        allModules.add(textModule);
-        allModules.add(fpsModule);
-        allModules.add(clockModule);
-        allModules.add(batteryModule);
-        allModules.add(batteryPercentageModule);
-        allModules.add(batteryCurrentModule);
-        allModules.add(networkModule);
-
-        // Notification channel + foreground service
-        // Lihat: NotificationHelper → core/NotificationHelper.java
         NotificationHelper.createChannel(this);
         try {
             startForeground(NotificationHelper.NOTIFICATION_ID,
                     NotificationHelper.buildNotification(this));
+            NotificationHelper.startIconCycling(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -114,53 +208,25 @@ public class FloatingService extends Service {
         try {
             windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-            for (OverlayModule module : allModules) {
-                module.init(windowManager, this, prefs);
-            }
-
-            // Start module yang enabled
-            if (ClockConfig.enabled) clockModule.start(windowManager, this);
-            if (BatteryConfig.enabled) batteryModule.start(windowManager, this);
-            if (BatteryPercentageConfig.enabled) batteryPercentageModule.start(windowManager, this);
-            if (BatteryCurrentConfig.enabled) batteryCurrentModule.start(windowManager, this);
-            if (NetworkConfig.enabled) networkModule.start(windowManager, this);
-            if (FpsConfig.enabled) fpsModule.start(windowManager, this);
-
-            // Buat text overlay jika sebelumnya aktif
             if (prefs.getBoolean("text_overlay_on", false)) {
+                ensureTextModule();
                 textModule.createOverlay();
             }
+            if (ClockConfig.enabled) { ensureClockModule(); clockModule.start(windowManager, this); }
+            if (BatteryConfig.enabled) { ensureBatteryModule(); batteryModule.start(windowManager, this); }
+            if (BatteryPercentageConfig.enabled) { ensureBatteryPercentageModule(); batteryPercentageModule.start(windowManager, this); }
+            if (BatteryCurrentConfig.enabled) { ensureBatteryCurrentModule(); batteryCurrentModule.start(windowManager, this); }
+            if (NetworkConfig.enabled) { ensureNetworkModule(); networkModule.start(windowManager, this); }
+            if (FpsConfig.enabled) { ensureFpsModule(); fpsModule.start(windowManager, this); }
 
-            // Wake lock agar CPU tidak tidur
-            // Lihat: WakeLockManager → core/WakeLockManager.java
-            wakeLockManager = new WakeLockManager();
-            wakeLockManager.acquire(this);
-
-            // Register receiver untuk deteksi perubahan orientasi sistem
-            configChangeReceiver = new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    if (intent != null && Intent.ACTION_CONFIGURATION_CHANGED.equals(intent.getAction())) {
-                        reloadAllPositions();
-                    }
-                }
-            };
-            IntentFilter filter = new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED);
-            registerReceiver(configChangeReceiver, filter);
+            acquireWakeLockIfNeeded();
+            if (isAnyModuleActive()) registerConfigReceiver();
 
         } catch (Exception e) {
             e.printStackTrace();
             stopSelf();
         }
     }
-
-    // ========================================================================
-    // Static delegates — dipanggil oleh MainActivity/panel controllers
-    // TextModule methods → modules/text/TextModule.java
-    // FpsModule methods  → modules/fps/FpsModule.java
-    // ========================================================================
-
-    // --- Text Module Specific ---
 
     public static void createTextOverlayStatic() {
         if (instance != null && instance.textModule != null) {
@@ -186,17 +252,20 @@ public class FloatingService extends Service {
         }
     }
 
-    // --- Generic Module Delegates ---
-
     public static void startModule(OverlayModule module) {
         if (instance != null && module != null) {
             module.start(instance.windowManager, instance);
+            instance.acquireWakeLockIfNeeded();
+            instance.registerConfigReceiver();
         }
     }
 
     public static void stopModule(OverlayModule module) {
         if (instance != null && module != null) {
             module.stop();
+            instance.releaseWakeLockIfEmpty();
+            instance.unregisterConfigReceiver();
+            instance.stopSelfIfEmpty();
         }
     }
 
@@ -271,25 +340,20 @@ public class FloatingService extends Service {
         }
     }
 
-    /**
-     * Update notifikasi foreground service.
-     * Dipanggil oleh NotificationActionReceiver saat user toggle overlay.
-     */
     public static void updateNotification() {
         if (instance != null) {
             NotificationHelper.updateNotification(instance);
         }
     }
 
-    /**
-     * Stop semua modul overlay.
-     * Dipanggil oleh NotificationActionReceiver.
-     */
     public static void stopAllModules() {
         if (instance == null) return;
         for (OverlayModule module : instance.allModules) {
             module.stop();
         }
+        instance.releaseWakeLockIfEmpty();
+        instance.unregisterConfigReceiver();
+        instance.stopSelfIfEmpty();
     }
 
     public static void hideAllOverlays() {
@@ -323,19 +387,23 @@ public class FloatingService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        if (configChangeReceiver != null) {
-            unregisterReceiver(configChangeReceiver);
-            configChangeReceiver = null;
-        }
+        NotificationHelper.stopIconCycling();
+        unregisterConfigReceiver();
 
         for (OverlayModule module : allModules) {
             module.stop();
         }
+        allModules.clear();
 
-        textModule.savePosition(prefs);
+        if (textModule != null) {
+            textModule.savePosition(prefs);
+            textModule.destroyOverlay();
+        }
 
-        wakeLockManager.release();
-        textModule.destroyOverlay();
+        if (wakeLockManager != null) {
+            wakeLockManager.release();
+            wakeLockManager = null;
+        }
 
         instance = null;
     }

@@ -103,6 +103,7 @@ public class BatteryCurrentModule implements OverlayModule {
             }
             view = null;
         }
+        params = null;
     }
 
     @Override
@@ -178,25 +179,16 @@ public class BatteryCurrentModule implements OverlayModule {
         return running;
     }
 
-    /**
-     * Sembunyikan overlay tanpa stop module.
-     */
     @Override
     public void hide() {
         if (view != null) view.setVisibility(android.view.View.GONE);
     }
 
-    /**
-     * Tampilkan overlay kembali.
-     */
     @Override
     public void show() {
         if (view != null) view.setVisibility(android.view.View.VISIBLE);
     }
 
-    /**
-     * Cek apakah overlay sedang tersembunyi.
-     */
     @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == android.view.View.GONE;
@@ -358,7 +350,6 @@ public class BatteryCurrentModule implements OverlayModule {
         int voltage = 0;
         int current = 0;
 
-        // Source 1: sticky broadcast
         try {
             Intent batteryIntent = context.registerReceiver(null,
                     new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -372,7 +363,6 @@ public class BatteryCurrentModule implements OverlayModule {
             }
         } catch (Exception ignored) {}
 
-        // Source 2: BatteryManager.getLongProperty (API 28+)
         if (current == 0 && Build.VERSION.SDK_INT >= 28) {
             try {
                 BatteryManager bm = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
@@ -381,7 +371,6 @@ public class BatteryCurrentModule implements OverlayModule {
             } catch (Exception ignored) {}
         }
 
-        // Source 3: sysfs
         if (voltage == 0) {
             voltage = readSysfs("voltage_now", 1000);
         }

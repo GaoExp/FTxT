@@ -40,7 +40,7 @@ FTxT/
     │   ├── java/exp/ftxt/
     │   │   ├── core/
     │   │   │   ├── FloatingService.java     — Foreground service: kelola semua overlay via WindowManager
-    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews)
+    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews + ikon dinamis Bitmap suhu)
     │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
     │   │   │   └── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
     │   │   │

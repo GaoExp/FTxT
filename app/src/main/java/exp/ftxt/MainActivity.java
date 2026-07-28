@@ -53,26 +53,6 @@ import exp.ftxt.ui.TextPanelController;
 import exp.ftxt.ui.ColorPickerPanelController;
 import exp.ftxt.utils.PermissionHelper;
 
-/**
- * Activity utama FTxT.
- *
- * Mengelola:
- * - Toolbar & Navigation Drawer (sidebar modular)
- * - Theme toggle (gelap/terang)
- * - Delegasi panel UI → TextPanelController dan FpsPanelController
- * - Delegasi permission → PermissionHelper
- * - Switch tint utility
- *
- * Panel UI didelegasikan ke:
- * - TextPanelController → ui/TextPanelController.java
- * - FpsPanelController  → ui/FpsPanelController.java
- *
- * Permission didelegasikan ke:
- * - PermissionHelper → utils/PermissionHelper.java
- *
- * Service overlay:
- * - FloatingService → core/FloatingService.java
- */
 public class MainActivity extends AppCompatActivity {
 
     View panelText;
@@ -339,9 +319,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ========================================================================
-    // CheckBox tint utility — dipanggil oleh PanelControllers
-    // ========================================================================
     public void applyCheckboxTint(CheckBox cb, boolean isChecked) {
         if (isChecked) {
             cb.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#2196F3")));
@@ -350,14 +327,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ========================================================================
-    // Permission helpers — dipanggil oleh TextPanelController saat toggle overlay
-    // Delegasi ke: PermissionHelper → utils/PermissionHelper.java
-    // ========================================================================
-
-    /**
-     * Periksa dan minta izin overlay. Return true jika perlu handling (izin belum diberikan).
-     */
     public boolean checkOverlayPermission() {
         if (!PermissionHelper.hasOverlayPermission(this)) {
             PermissionHelper.requestOverlayPermission(this);
@@ -366,9 +335,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    /**
-     * Periksa dan minta izin notifikasi (Android 13+). Return true jika perlu handling.
-     */
     public boolean checkNotificationPermission() {
         if (!PermissionHelper.hasNotificationPermission(this)) {
             PermissionHelper.requestNotificationPermission(this);
@@ -377,51 +343,32 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    /**
-     * Periksa dan minta nonaktifkan optimasi baterai jika perlu.
-     */
     public void checkBatteryOptimization() {
         if (!PermissionHelper.isIgnoringBatteryOptimizations(this)) {
             PermissionHelper.requestDisableBatteryOptimization(this);
         }
     }
 
-    /**
-     * Cek apakah switch text overlay sedang ON.
-     * Dipanggil oleh FpsPanelController saat FPS dimatikan.
-     */
     public boolean isTextOverlayOn() {
         return getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                 .getBoolean("text_overlay_on", false);
     }
 
-    /**
-     * Cek apakah ADA modul overlay yang sedang aktif.
-     * Jika tidak ada, service bisa di-stop.
-     */
     public boolean isAnyModuleActive() {
-        // Cek Text overlay
         if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE).getBoolean("text_overlay_on", false)) {
             return true;
         }
-        
-        // Cek FPS, Clock, Battery, Battery%, Battery Current, Network
+
         if (FpsConfig.enabled) return true;
         if (ClockConfig.enabled) return true;
         if (BatteryConfig.enabled) return true;
         if (BatteryPercentageConfig.enabled) return true;
         if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
-        
+
         return false;
     }
 
-    // ========================================================================
-    // Shadow config loading — dipanggil saat onCreate
-    // ========================================================================
-
-    // ========================================================================
-    // Settings popup — gear icon → dropdown: Muat Preset, Konfigurasi, Dokumentasi
     private void showSettingsPopup() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);
@@ -623,10 +570,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // ========================================================================
-    // Sidebar — RecyclerView + ItemTouchHelper
-    // ========================================================================
-
     private int selectableBgResId = -1;
 
     private int resolveSelectableItemBackground() {
@@ -638,10 +581,6 @@ public class MainActivity extends AppCompatActivity {
         return selectableBgResId;
     }
 
-    // ========================================================================
-    // Persistensi sidebar — flat JSON array
-    // ========================================================================
-
     private void saveSidebarState() {
         JSONArray arr = new JSONArray();
         for (SidebarItem item : sidebarAdapter.getItems()) {
@@ -650,7 +589,7 @@ public class MainActivity extends AppCompatActivity {
                 obj.put("id", item.id);
                 obj.put("l", item.label);
                 arr.put(obj);
-            } catch (Exception e) { /* skip */ }
+            } catch (Exception e) { }
         }
         getSharedPreferences(PREFS_SIDEBAR_STATE, MODE_PRIVATE)
                 .edit().putString("sidebar_json", arr.toString()).apply();
@@ -690,7 +629,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject item = def.getJSONObject(i);
                     list.add(new SidebarItem(item.getString("l"), item.optString("id", null)));
                 }
-            } catch (Exception e2) { /* ignore */ }
+            } catch (Exception e2) { }
         }
         return list;
     }
@@ -727,10 +666,6 @@ public class MainActivity extends AppCompatActivity {
         ith.attachToRecyclerView(navItemContainer);
         sidebarTouchHelper = ith;
     }
-
-    // ========================================================================
-    // SidebarItem model & SidebarAdapter
-    // ========================================================================
 
     private static class SidebarItem {
         final String label;

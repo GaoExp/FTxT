@@ -121,7 +121,7 @@ Static reference ke service membuat object tidak bisa di-GC (garbage collected) 
 
 ## Solusi yang Direkomendasikan
 
-### Prioritas 1: Lazy Initialization
+### ✅ Prioritas 1: Lazy Initialization — SELESAI
 Jangan buat semua module di `onCreate()`. Buat module hanya saat pertama kali diaktifkan:
 
 ```java
@@ -134,7 +134,7 @@ if (clockModule != null) {
 }
 ```
 
-### Prioritas 2: Conditional WakeLock
+### ✅ Prioritas 2: Conditional WakeLock — SELESAI
 WakeLock hanya diambil jika ada module yang aktif:
 
 ```java
@@ -158,7 +158,7 @@ if (!isAnyModuleActive() && wakeLockManager != null) {
 }
 ```
 
-### Prioritas 3: Conditional Service Start
+### ✅ Prioritas 3: Conditional Service Start — SELESAI
 Jangan langsung start foreground service. Mulai service hanya saat ada module yang diaktifkan:
 
 ```java
@@ -168,7 +168,7 @@ if (!isServiceRunning()) {
 }
 ```
 
-### Prioritas 4: Cleanup Module Saat Stop
+### ✅ Prioritas 4: Cleanup Module Saat Stop — SELESAI
 Saat module di-stop, null-kan referensi agar bisa di-GC:
 
 ```java
@@ -184,7 +184,7 @@ public void stop() {
 }
 ```
 
-### Prioritas 5: Conditional BroadcastReceiver
+### ✅ Prioritas 5: Conditional BroadcastReceiver — SELESAI
 Hanya register receiver saat ada overlay yang perlu di-reload:
 
 ```java
@@ -193,7 +193,7 @@ if (isAnyModuleActive()) {
 }
 ```
 
-### Prioritas 6: Hapus Static Instance
+### ❌ Prioritas 6: Hapus Static Instance — BELUM
 Ganti static instance dengan Application-level singleton yang lebih aman:
 
 ```java
@@ -233,9 +233,9 @@ public class FxtxApp extends Application {
 ## Kesimpulan
 
 Masalah utama bukan di satu bagian, tapi akumulasi dari beberapa keputusan desain:
-1. Semua module di-init sekaligus (wasteful)
-2. WakeLock selalu aktif (baterai)
-3. Service tetap jalan meskipun kosong (memory)
-4. Static references mencegah garbage collection (leak)
+1. ~~Semua module di-init sekaligus (wasteful)~~ ✅ **Selesai** — Lazy init
+2. ~~WakeLock selalu aktif (baterai)~~ ✅ **Selesai** — Conditional WakeLock
+3. ~~Service tetap jalan meskipun kosong (memory)~~ ✅ **Selesai** — Conditional service stop
+4. Static references mencegah garbage collection (leak) ❌ **Belum** — Hapus static instance
 
-Solusi paling berdampak dan相对 mudah diimplementasi adalah **conditional WakeLock** dan **lazy initialization**.
+**Status:** 5/6 solusi sudah diimplementasi (Prioritas 1-5). Prioritas 6 (hapus static instance) memerlukan refactor besar-besaran dan berisiko tinggi, ditunda untuk saat ini.

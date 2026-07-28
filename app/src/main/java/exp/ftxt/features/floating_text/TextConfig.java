@@ -17,7 +17,6 @@ public class TextConfig {
     public static float posX = 0.5f;
     public static float posY = 0.8f;
 
-    // Seal pattern mode
     public static boolean patternEnabled = false;
     public static float patternSpacingH = 180f;
     public static float patternSpacingV = 220f;

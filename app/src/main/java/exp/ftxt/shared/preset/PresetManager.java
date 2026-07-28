@@ -48,43 +48,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Manager untuk seluruh operasi CRUD preset overlay.
- *
- * Semua method static agar mudah dipanggil dari mana saja tanpa perlu instance.
- * Menggunakan GSON untuk serialize/deserialize JSON + SharedPreferences untuk storage.
- *
- * Struktur penyimpanan SharedPreferences (v2):
- * - KEY_INDEX          = JSON array of PresetIndexItem (ordered)
- * - KEY_PREFIX + uuid  = String JSON dari objek OverlayPreset
- * - KEY_HISTORY_<uuid> = JSON array of PresetVersion (history)
- */
 public class PresetManager {
 
-    // ====================================================================
-    // KONSTANTA
-    // ====================================================================
-
-    /** Nama file SharedPreferences */
     private static final String PREFS_NAME = "ftxt_presets";
 
-    /** Key index (v2) — array of PresetIndexItem */
     private static final String KEY_INDEX = "preset_index_v2";
 
-    /** Key lama — StringSet (tanpa urutan). Untuk migrasi otomatis. */
     private static final String KEY_INDEX_OLD = "preset_name_list";
 
-    /** Prefix key untuk data tiap preset (disimpan per-uuid) */
     private static final String KEY_PREFIX = "preset_data_";
 
-    /** Prefix key untuk history per preset (per-uuid) */
     private static final String KEY_HISTORY_PREFIX = "preset_history_";
 
-    // ====================================================================
-    // MODELS (inner static)
-    // ====================================================================
-
-    /** Index item metadata untuk satu preset */
     private static class PresetIndexItem {
         String uuid;
         String name;
@@ -93,14 +68,13 @@ public class PresetManager {
         List<String> tags;
         boolean favorite;
         int color;
-        String thumbnailPath; // relative to filesDir, e.g. "presets/thumb_<uuid>.png"
+        String thumbnailPath;
 
         PresetIndexItem() {
             tags = new ArrayList<>();
         }
     }
 
-    /** Preset version entry for history */
     private static class PresetVersion {
         long ts;
         OverlayPreset preset;
@@ -113,23 +87,13 @@ public class PresetManager {
         }
     }
 
-    // ====================================================================
-    // UTILITY — Ambil SharedPreferences
-    // ====================================================================
-
-    /** Mengembalikan objek SharedPreferences milik PresetManager */
     private static SharedPreferences getPrefs(Context context) {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    /** Mengembalikan instance GSON dengan pretty printing untuk human-readable JSON */
     private static Gson getGson() {
         return new GsonBuilder().setPrettyPrinting().create();
     }
-
-    // ====================================================================
-    // UTILITY — Index handling
-    // ====================================================================
 
     private static List<PresetIndexItem> getIndex(SharedPreferences prefs) {
         String json = prefs.getString(KEY_INDEX, null);
@@ -143,7 +107,6 @@ public class PresetManager {
                 e.printStackTrace();
             }
         }
-        // Fallback — migrate from old format
         return migrateFromOldFormat(prefs);
     }
 
@@ -152,7 +115,6 @@ public class PresetManager {
         prefs.edit().putString(KEY_INDEX, gson.toJson(list)).apply();
     }
 
-    /** Migrasi dari format lama (StringSet of names) ke index sederhana */
     private static List<PresetIndexItem> migrateFromOldFormat(SharedPreferences prefs) {
         Set<String> oldSet = prefs.getStringSet(KEY_INDEX_OLD, null);
         List<PresetIndexItem> list = new ArrayList<>();
@@ -166,7 +128,6 @@ public class PresetManager {
                 it.updatedAt = now;
                 list.add(it);
 
-                // Migrate old data if exists under KEY_PREFIX+name
                 String oldJson = prefs.getString(KEY_PREFIX + name, null);
                 if (oldJson != null) {
                     prefs.edit().putString(KEY_PREFIX + it.uuid, oldJson).remove(KEY_PREFIX + name).apply();
@@ -176,10 +137,6 @@ public class PresetManager {
         }
         return list;
     }
-
-    // ====================================================================
-    // HELPERS — find by name/uuid
-    // ====================================================================
 
     private static PresetIndexItem findByName(List<PresetIndexItem> index, String name) {
         if (index == null) return null;
@@ -193,15 +150,6 @@ public class PresetManager {
         return null;
     }
 
-    // ====================================================================
-    // 1. SIMPAN PRESET (v2)
-    // ====================================================================
-
-    /**
-     * Menyimpan satu preset ke SharedPreferences (v2 index + uuid storage).
-     * Jika nama sudah ada, update entry dan simpan history (versi sebelumnya).
-     * Juga generate thumbnail warna sederhana berdasarkan warna utama.
-     */
     public static void save(Context context, String name, OverlayPreset preset) {
         SharedPreferences prefs = getPrefs(context);
         Gson gson = getGson();
@@ -212,7 +160,6 @@ public class PresetManager {
         PresetIndexItem item = findByName(index, name);
         boolean isNew = false;
         if (item == null) {
-            // New preset: create uuid and index item
             item = new PresetIndexItem();
             item.uuid = UUID.randomUUID().toString();
             item.name = name;
@@ -221,21 +168,17 @@ public class PresetManager {
             index.add(0, item);
             isNew = true;
         } else {
-            // existing: move to top, push current data to history
             index.remove(item);
             index.add(0, item);
             item.updatedAt = now;
-            // Save previous version to history
             try {
                 String existingJson = prefs.getString(KEY_PREFIX + item.uuid, null);
                 if (existingJson != null) {
                     Type listType = new TypeToken<List<PresetVersion>>() {}.getType();
                     List<PresetVersion> history = gson.fromJson(prefs.getString(KEY_HISTORY_PREFIX + item.uuid, null), listType);
                     if (history == null) history = new ArrayList<>();
-                    // push current as previous
                     OverlayPreset prev = gson.fromJson(existingJson, OverlayPreset.class);
                     history.add(new PresetVersion(System.currentTimeMillis(), prev));
-                    // cap history size
                     if (history.size() > 10) history.remove(0);
                     prefs.edit().putString(KEY_HISTORY_PREFIX + item.uuid, gson.toJson(history)).apply();
                 }
@@ -244,14 +187,11 @@ public class PresetManager {
             }
         }
 
-        // Serialize OverlayPreset → JSON string (store under uuid)
         String json = gson.toJson(preset);
         prefs.edit().putString(KEY_PREFIX + item.uuid, json).apply();
 
-        // Store color in index for quick access
         item.color = preset.color;
 
-        // Generate simple color thumbnail (fill with preset.color) and save to filesDir
         try {
             String thumbPath = "presets/thumb_" + item.uuid + ".png";
             File out = new File(context.getFilesDir(), thumbPath);
@@ -272,18 +212,12 @@ public class PresetManager {
             e.printStackTrace();
         }
 
-        // Save updated index
         saveIndex(prefs, index);
 
-        // Remove legacy storage by name if exists
         if (!isNew) {
             prefs.edit().remove(KEY_PREFIX + name).apply();
         }
     }
-
-    // ====================================================================
-    // 2. MUAT PRESET (support name lookup → uuid)
-    // ====================================================================
 
     public static OverlayPreset load(Context context, String name) {
         SharedPreferences prefs = getPrefs(context);
@@ -297,10 +231,8 @@ public class PresetManager {
             return gson.fromJson(json, OverlayPreset.class);
         }
 
-        // Fallback: old key by name
         String oldJson = prefs.getString(KEY_PREFIX + name, null);
         if (oldJson != null) {
-            // migrate: create new uuid index entry
             OverlayPreset p = gson.fromJson(oldJson, OverlayPreset.class);
             save(context, name, p);
             return p;
@@ -308,10 +240,6 @@ public class PresetManager {
 
         return null;
     }
-
-    // ====================================================================
-    // 3. RENAME PRESET
-    // ====================================================================
 
     public static boolean rename(Context context, String oldName, String newName) {
         SharedPreferences prefs = getPrefs(context);
@@ -324,10 +252,6 @@ public class PresetManager {
         return true;
     }
 
-    // ====================================================================
-    // 4. SELECT — Mendapatkan daftar semua nama preset
-    // ====================================================================
-
     public static List<String> getAllNames(Context context) {
         List<String> out = new ArrayList<>();
         List<PresetIndexItem> index = getIndex(getPrefs(context));
@@ -335,17 +259,12 @@ public class PresetManager {
         return out;
     }
 
-    // ====================================================================
-    // 5. HAPUS PRESET
-    // ====================================================================
-
     public static void delete(Context context, String name) {
         SharedPreferences prefs = getPrefs(context);
         List<PresetIndexItem> index = getIndex(prefs);
         PresetIndexItem item = findByName(index, name);
         if (item == null) return;
 
-        // remove data & history & thumbnail
         prefs.edit().remove(KEY_PREFIX + item.uuid).remove(KEY_HISTORY_PREFIX + item.uuid).apply();
         if (item.thumbnailPath != null) {
             File f = new File(context.getFilesDir(), item.thumbnailPath);
@@ -373,10 +292,6 @@ public class PresetManager {
         prefs.edit().remove(KEY_INDEX).apply();
     }
 
-    // ====================================================================
-    // 5b. REORDER — Pindah Atas / Bawah
-    // ====================================================================
-
     public static boolean moveUp(Context context, String name) {
         SharedPreferences prefs = getPrefs(context);
         List<PresetIndexItem> list = getIndex(prefs);
@@ -400,10 +315,6 @@ public class PresetManager {
         saveIndex(prefs, list);
         return true;
     }
-
-    // ====================================================================
-    // 6. EXPORT — Preset ke JSON string / File / Share
-    // ====================================================================
 
     public static String exportToJson(Context context, String name) {
         OverlayPreset preset = load(context, name);
@@ -469,7 +380,6 @@ public class PresetManager {
         return false;
     }
 
-    /** Share single preset via external share intent (writes preset to Downloads and fires share) */
     public static boolean sharePreset(Activity activity, String name) {
         try {
             String json = exportToJson(activity, name);
@@ -491,7 +401,6 @@ public class PresetManager {
                 writer.flush();
                 writer.close();
 
-                // share via ACTION_SEND
                 android.content.Intent share = new android.content.Intent(android.content.Intent.ACTION_SEND);
                 share.setType("text/plain");
                 share.putExtra(android.content.Intent.EXTRA_STREAM, uri);
@@ -519,10 +428,6 @@ public class PresetManager {
             return false;
         }
     }
-
-    // ====================================================================
-    // 7. IMPORT — Preset dari JSON string / File
-    // ====================================================================
 
     public static String importFromJson(Context context, String json, String name) {
         try {
@@ -592,10 +497,6 @@ public class PresetManager {
         }
     }
 
-    // ====================================================================
-    // HISTORY — get and revert
-    // ====================================================================
-
     public static List<OverlayPreset> getHistory(Context context, String name) {
         SharedPreferences prefs = getPrefs(context);
         List<PresetIndexItem> index = getIndex(prefs);
@@ -621,14 +522,9 @@ public class PresetManager {
         List<PresetVersion> hist = getGson().fromJson(json, listType);
         if (hist == null || historyIndex < 0 || historyIndex >= hist.size()) return false;
         OverlayPreset preset = hist.get(historyIndex).preset;
-        // overwrite current (push current to history will be handled by save())
         save(context, item.name, preset);
         return true;
     }
-
-    // ====================================================================
-    // SEARCH / INDEX UTILITIES
-    // ====================================================================
 
     public static List<String> searchByNameOrTag(Context context, String query) {
         List<String> out = new ArrayList<>();
@@ -647,28 +543,10 @@ public class PresetManager {
         return out;
     }
 
-    // ====================================================================
-    // INTERFACE — Callback
-    // ====================================================================
-
-    /** Callback saat user memilih preset dari dialog daftar */
     public interface OnPresetSelectedListener {
-        /**
-         * Dipanggil saat item preset dipilih.
-         *
-         * @param name Nama preset yang dipilih
-         */
         void onPresetSelected(String name);
     }
 
-    // ====================================================================
-    // ===== Deprecated: clipboard methods removed (clipboard-based sharing disabled)
-    // ====================================================================
-
-    /**
-     * Merge helper untuk partial apply.
-     * Jika flag true maka field dari `src` akan menggantikan `base`.
-     */
     public static OverlayPreset mergePreset(OverlayPreset base, OverlayPreset src,
                                            boolean applyPosition, boolean applyAppearance,
                                            boolean applyBackground, boolean applyShadow,
@@ -709,9 +587,6 @@ public class PresetManager {
         return out;
     }
 
-    /**
-     * Get thumbnail absolute path (filesDir) for a preset name, or null.
-     */
     public static String getThumbnailPath(Context context, String name) {
         List<PresetIndexItem> index = getIndex(getPrefs(context));
         PresetIndexItem item = findByName(index, name);
@@ -720,9 +595,6 @@ public class PresetManager {
         return f.exists() ? f.getAbsolutePath() : null;
     }
 
-    /**
-     * Set tags for a preset (replace existing tags)
-     */
     public static boolean setTags(Context context, String name, List<String> tags) {
         SharedPreferences prefs = getPrefs(context);
         List<PresetIndexItem> index = getIndex(prefs);
@@ -759,9 +631,6 @@ public class PresetManager {
         return true;
     }
 
-    /**
-     * Return full index metadata (read-only copy)
-     */
     public static List<java.util.Map<String, Object>> getIndexMetadata(Context context) {
         List<java.util.Map<String, Object>> out = new ArrayList<>();
         List<PresetIndexItem> idx = getIndex(getPrefs(context));
@@ -780,14 +649,6 @@ public class PresetManager {
         return out;
     }
 
-    // ====================================================================
-    // DIALOG — Show Preset List (Load / Rename / Delete)
-    // ====================================================================
-
-    /**
-     * Tampilkan dialog daftar preset dengan radio button untuk single select.
-     * Klik item → panggil listener dengan nama preset.
-     */
     public static void showLoadPresetDialog(Activity activity, String activePresetName,
                                             OnPresetSelectedListener listener) {
         List<String> names = getAllNames(activity);
@@ -816,9 +677,6 @@ public class PresetManager {
         });
     }
 
-    /**
-     * Tampilkan dialog daftar preset (legacy method for backward compatibility).
-     */
     public static void showPresetListDialog(Activity activity, String title,
                                             OnPresetSelectedListener listener) {
         List<String> names = getAllNames(activity);
@@ -846,9 +704,6 @@ public class PresetManager {
         });
     }
 
-    /**
-     * Tampilkan dialog konfirmasi hapus preset.
-     */
     public static void showDeleteConfirmDialog(Activity activity, String name, Runnable callback) {
         new AlertDialog.Builder(activity)
                 .setTitle("Hapus Preset")
