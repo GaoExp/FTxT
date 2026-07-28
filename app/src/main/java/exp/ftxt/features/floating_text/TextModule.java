@@ -330,6 +330,31 @@ public class TextModule {
         return view != null;
     }
 
+    /**
+     * Sembunyikan overlay tanpa stop module.
+     */
+    public void hide() {
+        if (view != null) view.setVisibility(View.GONE);
+        if (sealView != null) sealView.setVisibility(View.GONE);
+    }
+
+    /**
+     * Tampilkan overlay kembali.
+     */
+    public void show() {
+        if (view != null) view.setVisibility(View.VISIBLE);
+        if (sealView != null) sealView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Cek apakah overlay sedang tersembunyi.
+     */
+    public boolean isHidden() {
+        if (view != null) return view.getVisibility() == View.GONE;
+        if (sealView != null) return sealView.getVisibility() == View.GONE;
+        return false;
+    }
+
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;

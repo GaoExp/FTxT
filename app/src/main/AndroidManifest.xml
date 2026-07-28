@@ -75,6 +75,17 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".core.NotificationActionReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="exp.ftxt.ACTION_TOGGLE_OVERLAY"/>
+                <action android:name="exp.ftxt.ACTION_KILL_SERVICE"/>
+                <action android:name="exp.ftxt.ACTION_OPEN_APP"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

@@ -40,7 +40,8 @@ FTxT/
     │   ├── java/exp/ftxt/
     │   │   ├── core/
     │   │   │   ├── FloatingService.java     — Foreground service: kelola semua overlay via WindowManager
-    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service
+    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews)
+    │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
     │   │   │   └── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
     │   │   │
     │   │   ├── features/
@@ -136,6 +137,12 @@ FTxT/
     │       │   ├── ic_launcher_foreground.png   — Foreground launcher adaptive icon
     │       │   ├── ic_launcher_bg.png       — Background ikon aplikasi
     │       │   ├── ic_launcher_foreground_alt.png — Foreground ikon alternatif
+    │       │   ├── ic_notification_invisible.xml — Ikon mata tertutup untuk toggle hide
+    │       │   ├── ic_notification_open.xml — Ikon buka aplikasi untuk notifikasi
+    │       │   ├── ic_notification_stop.xml — Ikon kill service untuk notifikasi
+    │       │   ├── ic_notification_toggle.xml — Ikon toggle untuk notifikasi
+    │       │   ├── ic_notification_toggle_off.xml — Ikon toggle off untuk notifikasi
+    │       │   ├── ic_notification_visible.xml — Ikon mata terbuka untuk toggle show
     │       │   ├── ic_screen_rotation.xml   — Ikon orientasi layar (toolbar)
     │       │   ├── ic_settings.xml          — Ikon gear untuk settings
     │       │   ├── ic_star_filled.xml       — Ikon bintang solid (favorit)
@@ -171,6 +178,7 @@ FTxT/
     │       │   ├── dialog_color_picker.xml      — Dialog color picker gabungan wheel + sliders
     │       │   ├── dialog_preset_browser.xml    — Dialog browser preset dengan search & list
     │       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
+    │       │   ├── notification_custom.xml      — Custom notification layout (RemoteViews + ImageButton)
     │   │   ├── nav_header.xml               — Header navigation drawer: logo + versi
     │   │   ├── panel_text.xml               — Panel konfigurasi Floating Text
     │   │   ├── panel_fps.xml                — Panel konfigurasi FPS Display
@@ -213,9 +221,9 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 56 |
-| Layout XML | 20 |
-| Drawable XML | 24 |
+| Java source | 57 |
+| Layout XML | 21 |
+| Drawable XML | 30 |
 | Drawable PNG | 14 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -227,5 +235,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~151** |
+| **Total file** | **~159** |
 | **Total direktori** | **~44** |

@@ -682,6 +682,74 @@ public class FloatingService extends Service {
         if (networkModule != null && networkModule.isRunning()) networkModule.reloadPosition();
     }
 
+    /**
+     * Update notifikasi foreground service.
+     * Dipanggil oleh NotificationActionReceiver saat user toggle overlay.
+     */
+    public static void updateNotification() {
+        if (instance != null) {
+            NotificationHelper.updateNotification(instance);
+        }
+    }
+
+    /**
+     * Stop semua modul overlay.
+     * Dipanggil oleh NotificationActionReceiver.
+     */
+    public static void stopAllModules() {
+        if (instance == null) return;
+        if (instance.textModule != null) instance.textModule.destroyOverlay();
+        if (instance.fpsModule != null) instance.fpsModule.stop();
+        if (instance.clockModule != null) instance.clockModule.stop();
+        if (instance.batteryModule != null) instance.batteryModule.stop();
+        if (instance.batteryPercentageModule != null) instance.batteryPercentageModule.stop();
+        if (instance.batteryCurrentModule != null) instance.batteryCurrentModule.stop();
+        if (instance.networkModule != null) instance.networkModule.stop();
+    }
+
+    /**
+     * Sembunyikan semua overlay tanpa stop module.
+     */
+    public static void hideAllOverlays() {
+        if (instance == null) return;
+        if (instance.textModule != null) instance.textModule.hide();
+        if (instance.fpsModule != null) instance.fpsModule.hide();
+        if (instance.clockModule != null) instance.clockModule.hide();
+        if (instance.batteryModule != null) instance.batteryModule.hide();
+        if (instance.batteryPercentageModule != null) instance.batteryPercentageModule.hide();
+        if (instance.batteryCurrentModule != null) instance.batteryCurrentModule.hide();
+        if (instance.networkModule != null) instance.networkModule.hide();
+    }
+
+    /**
+     * Tampilkan semua overlay kembali.
+     */
+    public static void showAllOverlays() {
+        if (instance == null) return;
+        if (instance.textModule != null) instance.textModule.show();
+        if (instance.fpsModule != null) instance.fpsModule.show();
+        if (instance.clockModule != null) instance.clockModule.show();
+        if (instance.batteryModule != null) instance.batteryModule.show();
+        if (instance.batteryPercentageModule != null) instance.batteryPercentageModule.show();
+        if (instance.batteryCurrentModule != null) instance.batteryCurrentModule.show();
+        if (instance.networkModule != null) instance.networkModule.show();
+    }
+
+    /**
+     * Cek apakah semua overlay sedang tersembunyi.
+     */
+    public static boolean areAllOverlaysHidden() {
+        if (instance == null) return true;
+        if (instance.textModule != null && instance.textModule.isActive() && !instance.textModule.isHidden()) return false;
+        if (instance.fpsModule != null && instance.fpsModule.isRunning() && !instance.fpsModule.isHidden()) return false;
+        if (instance.clockModule != null && instance.clockModule.isRunning() && !instance.clockModule.isHidden()) return false;
+        if (instance.batteryModule != null && instance.batteryModule.isRunning() && !instance.batteryModule.isHidden()) return false;
+        if (instance.batteryPercentageModule != null && instance.batteryPercentageModule.isRunning() && !instance.batteryPercentageModule.isHidden()) return false;
+        if (instance.batteryCurrentModule != null && instance.batteryCurrentModule.isRunning() && !instance.batteryCurrentModule.isHidden()) return false;
+        if (instance.networkModule != null && instance.networkModule.isRunning() && !instance.networkModule.isHidden()) return false;
+        return true;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;

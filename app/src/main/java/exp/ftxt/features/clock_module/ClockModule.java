@@ -150,6 +150,28 @@ public class ClockModule {
         return running;
     }
 
+    /**
+     * Sembunyikan overlay tanpa stop module.
+     */
+    public void hide() {
+        if (view != null) view.setVisibility(android.view.View.GONE);
+    }
+
+    /**
+     * Tampilkan overlay kembali.
+     */
+    public void show() {
+        if (view != null) view.setVisibility(android.view.View.VISIBLE);
+    }
+
+    /**
+     * Cek apakah overlay sedang tersembunyi.
+     */
+    public boolean isHidden() {
+        if (view != null) return view.getVisibility() == android.view.View.GONE;
+        return false;
+    }
+
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;

@@ -1,3 +1,45 @@
+# [4.83.0] - 2026-07-23
+### ✨ Fitur Baru
+- **Notification Actions — aksi langsung dari notifikasi** — Tambahkan 3 tombol aksi di notifikasi foreground service: **Toggle** (show/hide semua overlay), **Kill** (hentikan service + tutup app), **Buka** (launch aplikasi). User bisa kontrol overlay tanpa membuka aplikasi. Toggle hanya menyembunyikan/menampilkan overlay tanpa mengubah status modul.
+### 🐞 Bug Fixes
+- **Ikon aksi notifikasi tidak tampil** — Ganti dari `NotificationCompat.Action` ke **custom notification layout** dengan `RemoteViews` + `ImageButton`. Ikon vector drawable sekarang tampil dengan benar. Toggle menggunakan ikon mata (visible/invisible), Kill pakai X, Buka pakai ikon open. Terinspirasi dari sampel res aplikasi Crosshair Hero.
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/core/NotificationActionReceiver.java` — Handle aksi notifikasi (toggle, kill, open app)
+- `app/src/main/res/layout/notification_custom.xml` — Custom notification layout dengan RemoteViews + ImageButton
+- `app/src/main/res/drawable/ic_notification_visible.xml` — Ikon mata terbuka untuk toggle show (dari sampel Crosshair Hero)
+- `app/src/main/res/drawable/ic_notification_invisible.xml` — Ikon mata tertutup untuk toggle hide (dari sampel Crosshair Hero)
+- `app/src/main/res/drawable/ic_notification_toggle.xml` — Icon toggle overlay untuk notifikasi (mata terbuka)
+- `app/src/main/res/drawable/ic_notification_toggle_off.xml` — Icon toggle off untuk notifikasi (mata tertutup)
+- `app/src/main/res/drawable/ic_notification_stop.xml` — Icon kill service untuk notifikasi
+- `app/src/main/res/drawable/ic_notification_open.xml` — Icon buka aplikasi untuk notifikasi
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 172, versionName 4.83.0
+- `CHANGELOG.md` — Entry 4.83.0 baru (notification actions)
+- `app/src/main/AndroidManifest.xml` — Register NotificationActionReceiver
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateNotification() + stopAllModules() + hideAllOverlays() + showAllOverlays() + areAllOverlaysHidden()
+- `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Ganti ke custom RemoteViews layout + onClickPendingIntent + setImageViewResource + hapus addAction
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Tambah hide() + show() + isHidden()
+- `app/src/main/res/drawable/ic_notification_toggle.xml` — Hapus tint textColorPrimary
+- `app/src/main/res/drawable/ic_notification_toggle_off.xml` — Hapus tint textColorPrimary
+- `app/src/main/res/drawable/ic_notification_stop.xml` — Hapus tint textColorPrimary
+- `app/src/main/res/drawable/ic_notification_open.xml` — Hapus tint textColorPrimary
+- `README.md` — Update versi ke 4.83.0, tanggal 2026-07-28
+- `STRUKTUR.md` — Update statistik (Java 57, Layout 21, Drawable XML 30) + tree (NotificationActionReceiver, notification_custom, ic_notification visible/invisible)
+- `.gitignore` — Tambah `/_temp/`
+- `app/src/main/assets/CHANGELOG.md` — Sync dari root
+- `app/src/main/assets/README.md` — Sync dari root
+- `app/src/main/assets/STRUKTUR.md` — Sync dari root
+### 🔢 Version
+`4.82.4` → `4.83.0`
+
+---
+
 # [4.82.4] - 2026-07-12
 ### ✨ Fitur Baru
 - **BootReceiver — auto-start overlay setelah reboot** — `BroadcastReceiver` baru yang otomatis memulai `FloatingService` saat HP reboot, jika sebelumnya ada modul overlay yang aktif. Config enabled flags di-load dari SharedPreferences sebelum memulai service.
