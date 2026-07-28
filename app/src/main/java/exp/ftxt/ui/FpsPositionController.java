@@ -107,12 +107,12 @@ public class FpsPositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateFpsPositionStatic();
-            FloatingService.updateFpsSizeStatic();
-            FloatingService.updateFpsColorStatic();
-            FloatingService.updateFpsShadowStatic();
-            FloatingService.updateFpsBackgroundStatic();
-            FloatingService.updateFpsLabelColorStatic();
+            FloatingService.updatePositionForModule(FloatingService.fpsModule());
+            FloatingService.updateSizeForModule(FloatingService.fpsModule(), FpsConfig.size);
+            FloatingService.updateColorForModule(FloatingService.fpsModule(), FpsConfig.color);
+            FloatingService.updateShadowForModule(FloatingService.fpsModule());
+            FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
+            FloatingService.updateLabelColorForModule(FloatingService.fpsModule(), FpsConfig.labelColor);
         }
     };
 
@@ -124,7 +124,7 @@ public class FpsPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setFpsOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.fpsModule(), currentOrientation);
 
         bindViews();
 
@@ -145,7 +145,7 @@ public class FpsPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateFpsPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.fpsModule());
     }
 
     private void bindViews() {
@@ -176,7 +176,7 @@ public class FpsPositionController {
         FpsConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateFpsPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.fpsModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -187,7 +187,7 @@ public class FpsPositionController {
 
     public void cleanup() {
         FpsModule.onPositionUpdate = null;
-        FloatingService.setFpsOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.fpsModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -215,7 +215,7 @@ public class FpsPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getFpsCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.fpsModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];

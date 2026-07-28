@@ -214,7 +214,7 @@ public class TextPanelController {
                 if (progress < 1) { progress = 1; sb.setProgress(progress); }
                 TextConfig.size = progress;
                 textSizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateTextSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.textModule(), TextConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -224,7 +224,7 @@ public class TextPanelController {
             ColorPickerDialog.show(activity, "Pilih Warna", TextConfig.color, color -> {
                 TextConfig.color = color;
                 colorPreview.setBackgroundColor(color);
-                FloatingService.updateTextColorStatic();
+                FloatingService.updateColorForModule(FloatingService.textModule(), TextConfig.color);
             });
         });
 
@@ -267,7 +267,7 @@ public class TextPanelController {
             TextConfig.touchPassthrough = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_lock", isChecked).apply();
-            FloatingService.updateTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.textModule());
         });
 
         textSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -283,7 +283,7 @@ public class TextPanelController {
             bgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("text_bg_enabled", isChecked).apply();
-            FloatingService.updateTextBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.textModule());
         });
 
         bgColorPreview.setOnClickListener(v -> {
@@ -292,7 +292,7 @@ public class TextPanelController {
                 bgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_color", color).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             });
         });
 
@@ -303,7 +303,7 @@ public class TextPanelController {
                 bgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_padding", progress).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -316,7 +316,7 @@ public class TextPanelController {
                 bgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_offset_x", offset).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -329,7 +329,7 @@ public class TextPanelController {
                 bgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_offset_y", offset).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -341,7 +341,7 @@ public class TextPanelController {
                 bgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_margin", progress).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -353,7 +353,7 @@ public class TextPanelController {
                 bgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("text_bg_radius", progress).apply();
-                FloatingService.updateTextBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -366,7 +366,7 @@ public class TextPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("shadow_enabled", isChecked).apply();
             saveShadowPrefs();
-            FloatingService.updateShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.textModule());
         });
 
         shadowColorPreview.setOnClickListener(v -> {
@@ -375,7 +375,7 @@ public class TextPanelController {
                 shadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("shadow_color", color).apply();
-                FloatingService.updateShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.textModule());
             });
         });
 
@@ -385,7 +385,7 @@ public class TextPanelController {
                 shadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("shadow_blur", (float) progress).apply();
-                FloatingService.updateShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -398,7 +398,7 @@ public class TextPanelController {
                 shadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("shadow_offset_x", (float) offset).apply();
-                FloatingService.updateShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -411,7 +411,7 @@ public class TextPanelController {
                 shadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("shadow_offset_y", (float) offset).apply();
-                FloatingService.updateShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.textModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}

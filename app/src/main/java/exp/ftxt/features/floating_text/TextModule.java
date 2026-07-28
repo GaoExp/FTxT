@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
@@ -29,7 +30,7 @@ import exp.ftxt.shared.ui.ShadowTextView;
  * - FloatingService → core/FloatingService.java (static delegates)
  * - TextConfig      → features/floating_text/TextConfig.java (konfigurasi statis)
  */
-public class TextModule {
+public class TextModule implements OverlayModule {
 
     private ShadowTextView view;
     private SealPatternView sealView;
@@ -45,10 +46,12 @@ public class TextModule {
 
     public static Runnable onPositionUpdate;
 
+    @Override
     public void setOrientationSuffix(String suffix) {
         this.orientationSuffix = suffix;
     }
 
+    @Override
     public void init(WindowManager windowManager, Context ctx,
                      SharedPreferences sp) {
         wm = windowManager;
@@ -61,6 +64,12 @@ public class TextModule {
         screenWidth = metrics.widthPixels;
         screenHeight = metrics.heightPixels;
         loadPosition(prefs);
+    }
+
+    @Override
+    public void start(WindowManager windowManager, Context ctx) {
+        init(windowManager, ctx, ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE));
+        createOverlay();
     }
 
     public void createOverlay() {
@@ -166,21 +175,37 @@ public class TextModule {
         if (sealView != null) sealView.invalidate();
     }
 
+    @Override
+    public void stop() {
+        destroyOverlay();
+    }
+
+    @Override
     public void updateSize(float size) {
         if (view != null) view.setTextSize(size);
         if (sealView != null) sealView.invalidate();
     }
 
+    @Override
     public void updateColor(int color) {
         if (view != null) view.setTextColor(color);
         if (sealView != null) sealView.invalidate();
     }
 
+    @Override
+    public void updateLabelColor(int color) {
+        TextConfig.labelColor = color;
+        if (view != null) view.setTextColor(color);
+        if (sealView != null) sealView.invalidate();
+    }
+
+    @Override
     public void updateShadow() {
         if (view != null) view.setShadowConfig(TextConfig.shadow);
         OverlayShadow.apply(view, params, wm, TextConfig.shadow, 8f);
     }
 
+    @Override
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
             DisplayMetrics metrics = new DisplayMetrics();
@@ -204,6 +229,7 @@ public class TextModule {
         }
     }
 
+    @Override
     public void updateBackground() {
         applyBackground();
     }
@@ -224,6 +250,7 @@ public class TextModule {
         view.setBgRadius(TextConfig.bg.radius);
     }
 
+    @Override
     public void updateTouchFlags() {
         if (params == null || view == null) return;
 
@@ -320,19 +347,22 @@ public class TextModule {
         }
     }
 
+    @Override
     public void reloadPosition() {
         orientationSuffix = null;
         loadPosition(prefs);
         updatePosition();
     }
 
-    public boolean isActive() {
+    @Override
+    public boolean isRunning() {
         return view != null;
     }
 
     /**
      * Sembunyikan overlay tanpa stop module.
      */
+    @Override
     public void hide() {
         if (view != null) view.setVisibility(View.GONE);
         if (sealView != null) sealView.setVisibility(View.GONE);
@@ -341,6 +371,7 @@ public class TextModule {
     /**
      * Tampilkan overlay kembali.
      */
+    @Override
     public void show() {
         if (view != null) view.setVisibility(View.VISIBLE);
         if (sealView != null) sealView.setVisibility(View.VISIBLE);
@@ -349,12 +380,14 @@ public class TextModule {
     /**
      * Cek apakah overlay sedang tersembunyi.
      */
+    @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == View.GONE;
         if (sealView != null) return sealView.getVisibility() == View.GONE;
         return false;
     }
 
+    @Override
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;

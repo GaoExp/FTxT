@@ -88,6 +88,7 @@ FTxT/
     │   │   │       ├── ShadowConfig.java          — Model data shadow (enable, color, blur, offset)
     │   │   │       ├── ShadowTextView.java        — Custom TextView dengan shadow + background di onDraw()
     │   │   │       ├── OverlayDragHandler.java    — Touch listener untuk drag overlay
+    │   │   │       ├── OverlayModule.java         — Interface untuk menyeragamkan method semua modul overlay
     │   │   │       ├── OverlayShadow.java         — Apply elevation-based shadow ke overlay
     │   │   │       ├── ColorPickerDialog.java     — Dialog color picker: wheel, sliders, HEX/ARGB
     │   │   │       ├── DpadController.java        — Kontrol D-Pad dengan repeat untuk fine position
@@ -221,7 +222,7 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 57 |
+| Java source | 58 |
 | Layout XML | 21 |
 | Drawable XML | 30 |
 | Drawable PNG | 14 |

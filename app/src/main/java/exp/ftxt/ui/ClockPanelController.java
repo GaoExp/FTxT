@@ -170,12 +170,12 @@ public class ClockPanelController {
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startClockStatic();
+                    FloatingService.startModule(FloatingService.clockModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopClockStatic();
+                FloatingService.stopModule(FloatingService.clockModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -188,7 +188,7 @@ public class ClockPanelController {
                 if (progress > 200) { progress = 200; sb.setProgress(progress); }
                 ClockConfig.size = progress;
                 clockSizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateClockSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.clockModule(), ClockConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -200,7 +200,7 @@ public class ClockPanelController {
                 clockColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_color", color).apply();
-                FloatingService.updateClockColorStatic();
+                FloatingService.updateColorForModule(FloatingService.clockModule(), ClockConfig.color);
             });
         });
 
@@ -210,7 +210,7 @@ public class ClockPanelController {
             clockBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_bg_enabled", isChecked).apply();
-            FloatingService.updateClockBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.clockModule());
         });
 
         clockBgColorPreview.setOnClickListener(v -> {
@@ -219,7 +219,7 @@ public class ClockPanelController {
                 clockBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_color", color).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             });
         });
 
@@ -230,7 +230,7 @@ public class ClockPanelController {
                 clockBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_padding", progress).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -243,7 +243,7 @@ public class ClockPanelController {
                 clockBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_offset_x", offset).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -256,7 +256,7 @@ public class ClockPanelController {
                 clockBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_offset_y", offset).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -268,7 +268,7 @@ public class ClockPanelController {
                 clockBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_margin", progress).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -280,7 +280,7 @@ public class ClockPanelController {
                 clockBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_bg_radius", progress).apply();
-                FloatingService.updateClockBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -293,7 +293,7 @@ public class ClockPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_shadow_enabled", isChecked).apply();
             saveClockShadowPrefs();
-            FloatingService.updateClockShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.clockModule());
         });
 
         clockShadowColorPreview.setOnClickListener(v -> {
@@ -302,7 +302,7 @@ public class ClockPanelController {
                 clockShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("clock_shadow_color", color).apply();
-                FloatingService.updateClockShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.clockModule());
             });
         });
 
@@ -312,7 +312,7 @@ public class ClockPanelController {
                 clockShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("clock_shadow_blur", (float) progress).apply();
-                FloatingService.updateClockShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -325,7 +325,7 @@ public class ClockPanelController {
                 clockShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("clock_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateClockShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -338,7 +338,7 @@ public class ClockPanelController {
                 clockShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("clock_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateClockShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.clockModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -349,7 +349,7 @@ public class ClockPanelController {
             activity.applyCheckboxTint(clockLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_lock", isChecked).apply();
-            FloatingService.updateClockTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.clockModule());
         });
 
         clockSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {

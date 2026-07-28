@@ -103,12 +103,12 @@ public class BatteryPercentagePositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateBatteryPercentagePositionStatic();
-            FloatingService.updateBatteryPercentageSizeStatic();
-            FloatingService.updateBatteryPercentageColorStatic();
-            FloatingService.updateBatteryPercentageLabelColorStatic();
-            FloatingService.updateBatteryPercentageShadowStatic();
-            FloatingService.updateBatteryPercentageBackgroundStatic();
+            FloatingService.updatePositionForModule(FloatingService.batteryPercentageModule());
+            FloatingService.updateSizeForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.size);
+            FloatingService.updateColorForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.color);
+            FloatingService.updateLabelColorForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.labelColor);
+            FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
+            FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
         }
     };
 
@@ -120,7 +120,7 @@ public class BatteryPercentagePositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setBatteryPercentageOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryPercentageModule(), currentOrientation);
 
         bindViews();
 
@@ -141,7 +141,7 @@ public class BatteryPercentagePositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateBatteryPercentagePositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.batteryPercentageModule());
     }
 
     private void bindViews() {
@@ -172,7 +172,7 @@ public class BatteryPercentagePositionController {
         BatteryPercentageConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateBatteryPercentagePositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.batteryPercentageModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -183,7 +183,7 @@ public class BatteryPercentagePositionController {
 
     public void cleanup() {
         BatteryPercentageModule.onPositionUpdate = null;
-        FloatingService.setBatteryPercentageOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryPercentageModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -211,7 +211,7 @@ public class BatteryPercentagePositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getBatteryPercentageCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.batteryPercentageModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];

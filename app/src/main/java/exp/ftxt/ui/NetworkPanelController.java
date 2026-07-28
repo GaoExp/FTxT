@@ -191,12 +191,12 @@ public class NetworkPanelController {
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startNetworkStatic();
+                    FloatingService.startModule(FloatingService.networkModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopNetworkStatic();
+                FloatingService.stopModule(FloatingService.networkModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -209,7 +209,7 @@ public class NetworkPanelController {
                 if (progress > 100) { progress = 100; sb.setProgress(progress); }
                 NetworkConfig.size = progress;
                 networkSizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateNetworkSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.networkModule(), NetworkConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -221,7 +221,7 @@ public class NetworkPanelController {
                 networkColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_color", color).apply();
-                FloatingService.updateNetworkColorStatic();
+                FloatingService.updateColorForModule(FloatingService.networkModule(), NetworkConfig.color);
             });
         });
 
@@ -231,7 +231,7 @@ public class NetworkPanelController {
                 networkLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_label_color", color).apply();
-                FloatingService.updateNetworkLabelColorStatic();
+                FloatingService.updateLabelColorForModule(FloatingService.networkModule(), NetworkConfig.labelColor);
             });
         });
 
@@ -241,7 +241,7 @@ public class NetworkPanelController {
             networkBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_bg_enabled", isChecked).apply();
-            FloatingService.updateNetworkBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.networkModule());
         });
 
         networkBgColorPreview.setOnClickListener(v -> {
@@ -250,7 +250,7 @@ public class NetworkPanelController {
                 networkBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_color", color).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             });
         });
 
@@ -261,7 +261,7 @@ public class NetworkPanelController {
                 networkBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_padding", progress).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -274,7 +274,7 @@ public class NetworkPanelController {
                 networkBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_offset_x", offset).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -287,7 +287,7 @@ public class NetworkPanelController {
                 networkBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_offset_y", offset).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -299,7 +299,7 @@ public class NetworkPanelController {
                 networkBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_margin", progress).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -311,7 +311,7 @@ public class NetworkPanelController {
                 networkBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_bg_radius", progress).apply();
-                FloatingService.updateNetworkBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -324,7 +324,7 @@ public class NetworkPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_shadow_enabled", isChecked).apply();
             saveNetworkShadowPrefs();
-            FloatingService.updateNetworkShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.networkModule());
         });
 
         networkShadowColorPreview.setOnClickListener(v -> {
@@ -333,7 +333,7 @@ public class NetworkPanelController {
                 networkShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("network_shadow_color", color).apply();
-                FloatingService.updateNetworkShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.networkModule());
             });
         });
 
@@ -343,7 +343,7 @@ public class NetworkPanelController {
                 networkShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("network_shadow_blur", (float) progress).apply();
-                FloatingService.updateNetworkShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -356,7 +356,7 @@ public class NetworkPanelController {
                 networkShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("network_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateNetworkShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -369,7 +369,7 @@ public class NetworkPanelController {
                 networkShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("network_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateNetworkShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.networkModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -380,14 +380,14 @@ public class NetworkPanelController {
             activity.applyCheckboxTint(networkLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_lock", isChecked).apply();
-            FloatingService.updateNetworkTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.networkModule());
         });
 
         networkValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             NetworkConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_show_only_value", isChecked).apply();
-            FloatingService.updateNetworkColorStatic();
+            FloatingService.updateColorForModule(FloatingService.networkModule(), NetworkConfig.color);
         });
 
         networkSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -452,7 +452,7 @@ public class NetworkPanelController {
             item.setOnClickListener(v -> {
                 NetworkConfig.updateInterval = INTERVAL_STEPS[idx];
                 updateIntervalDisplay();
-                FloatingService.updateNetworkUpdateIntervalStatic();
+                FloatingService.restartModule(FloatingService.networkModule());
                 if (intervalPopup != null) intervalPopup.dismiss();
             });
             content.addView(item);

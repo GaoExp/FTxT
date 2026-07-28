@@ -9,6 +9,7 @@ public class TextConfig {
     public static String text = "FunText";
     public static float size = 12f;
     public static int color = Color.GREEN;
+    public static int labelColor = Color.GREEN;
     public static boolean touchPassthrough = true;
     public static boolean safeArea = true;
     public static ShadowConfig shadow = new ShadowConfig();

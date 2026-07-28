@@ -197,12 +197,12 @@ public class BatteryCurrentPanelController {
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startBatteryCurrentStatic();
+                    FloatingService.startModule(FloatingService.batteryCurrentModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopBatteryCurrentStatic();
+                FloatingService.stopModule(FloatingService.batteryCurrentModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -213,7 +213,7 @@ public class BatteryCurrentPanelController {
             BatteryCurrentConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_only_value", isChecked).apply();
-            FloatingService.updateBatteryCurrentColorStatic();
+            FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
         });
 
         batCurSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -222,7 +222,7 @@ public class BatteryCurrentPanelController {
                 if (progress > 140) { progress = 140; sb.setProgress(progress); }
                 BatteryCurrentConfig.size = progress;
                 batCurSizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateBatteryCurrentSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -234,7 +234,7 @@ public class BatteryCurrentPanelController {
                 batCurColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_color", color).apply();
-                FloatingService.updateBatteryCurrentColorStatic();
+                FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
             });
         });
 
@@ -244,7 +244,7 @@ public class BatteryCurrentPanelController {
                 batCurLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_label_color", color).apply();
-                FloatingService.updateBatteryCurrentLabelColorStatic();
+                FloatingService.updateLabelColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.labelColor);
             });
         });
 
@@ -254,7 +254,7 @@ public class BatteryCurrentPanelController {
             batCurBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_bg_enabled", isChecked).apply();
-            FloatingService.updateBatteryCurrentBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
         });
 
         batCurBgColorPreview.setOnClickListener(v -> {
@@ -263,7 +263,7 @@ public class BatteryCurrentPanelController {
                 batCurBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_color", color).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             });
         });
 
@@ -274,7 +274,7 @@ public class BatteryCurrentPanelController {
                 batCurBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_padding", progress).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -287,7 +287,7 @@ public class BatteryCurrentPanelController {
                 batCurBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_offset_x", offset).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -300,7 +300,7 @@ public class BatteryCurrentPanelController {
                 batCurBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_offset_y", offset).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -312,7 +312,7 @@ public class BatteryCurrentPanelController {
                 batCurBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_margin", progress).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -324,7 +324,7 @@ public class BatteryCurrentPanelController {
                 batCurBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_bg_radius", progress).apply();
-                FloatingService.updateBatteryCurrentBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -337,7 +337,7 @@ public class BatteryCurrentPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_shadow_enabled", isChecked).apply();
             saveBatCurShadowPrefs();
-            FloatingService.updateBatteryCurrentShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
         });
 
         batCurShadowColorPreview.setOnClickListener(v -> {
@@ -346,7 +346,7 @@ public class BatteryCurrentPanelController {
                 batCurShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_shadow_color", color).apply();
-                FloatingService.updateBatteryCurrentShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
             });
         });
 
@@ -356,7 +356,7 @@ public class BatteryCurrentPanelController {
                 batCurShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("batcur_shadow_blur", (float) progress).apply();
-                FloatingService.updateBatteryCurrentShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -369,7 +369,7 @@ public class BatteryCurrentPanelController {
                 batCurShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("batcur_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateBatteryCurrentShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -382,7 +382,7 @@ public class BatteryCurrentPanelController {
                 batCurShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("batcur_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateBatteryCurrentShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -393,7 +393,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_lock", isChecked).apply();
-            FloatingService.updateBatteryCurrentTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.batteryCurrentModule());
         });
 
         batCurShowVoltage.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -401,7 +401,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowVoltage, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_voltage", isChecked).apply();
-            FloatingService.updateBatteryCurrentColorStatic();
+            FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
         });
 
         batCurShowCurrent.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -409,7 +409,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowCurrent, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_current", isChecked).apply();
-            FloatingService.updateBatteryCurrentColorStatic();
+            FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
         });
 
         batCurShowPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -417,7 +417,7 @@ public class BatteryCurrentPanelController {
             activity.applyCheckboxTint(batCurShowPower, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_show_power", isChecked).apply();
-            FloatingService.updateBatteryCurrentColorStatic();
+            FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
         });
 
         batCurSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -482,7 +482,7 @@ public class BatteryCurrentPanelController {
             item.setOnClickListener(v -> {
                 BatteryCurrentConfig.updateInterval = INTERVAL_STEPS[idx];
                 updateIntervalDisplay();
-                FloatingService.updateBatteryCurrentUpdateIntervalStatic();
+                FloatingService.restartModule(FloatingService.batteryCurrentModule());
                 if (intervalPopup != null) intervalPopup.dismiss();
             });
             content.addView(item);

@@ -216,11 +216,11 @@ public class PresetExampleActivity {
      * Memanggil static delegate method di FloatingService.
      */
     private static void syncPresetToOverlay() {
-        FloatingService.updateTextPositionStatic();
-        FloatingService.updateTextSizeStatic();
-        FloatingService.updateTextColorStatic();
-        FloatingService.updateShadowStatic();
-        FloatingService.updateTextBackgroundStatic();
+        FloatingService.updatePositionForModule(FloatingService.textModule());
+        FloatingService.updateSizeForModule(FloatingService.textModule(), TextConfig.size);
+        FloatingService.updateColorForModule(FloatingService.textModule(), TextConfig.color);
+        FloatingService.updateShadowForModule(FloatingService.textModule());
+        FloatingService.updateBackgroundForModule(FloatingService.textModule());
     }
 
     // ====================================================================

@@ -123,12 +123,12 @@ public class BatteryPositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateBatteryPositionStatic();
-            FloatingService.updateBatterySizeStatic();
-            FloatingService.updateBatteryColorStatic();
-            FloatingService.updateBatteryLabelColorStatic();
-            FloatingService.updateBatteryShadowStatic();
-            FloatingService.updateBatteryBackgroundStatic();
+            FloatingService.updatePositionForModule(FloatingService.batteryModule());
+            FloatingService.updateSizeForModule(FloatingService.batteryModule(), BatteryConfig.size);
+            FloatingService.updateColorForModule(FloatingService.batteryModule(), BatteryConfig.color);
+            FloatingService.updateLabelColorForModule(FloatingService.batteryModule(), BatteryConfig.labelColor);
+            FloatingService.updateShadowForModule(FloatingService.batteryModule());
+            FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
         }
     };
 
@@ -140,7 +140,7 @@ public class BatteryPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setBatteryOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryModule(), currentOrientation);
 
         bindViews();
 
@@ -161,7 +161,7 @@ public class BatteryPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateBatteryPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.batteryModule());
     }
 
     private void bindViews() {
@@ -192,7 +192,7 @@ public class BatteryPositionController {
         BatteryConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateBatteryPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.batteryModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -203,7 +203,7 @@ public class BatteryPositionController {
 
     public void cleanup() {
         BatteryModule.onPositionUpdate = null;
-        FloatingService.setBatteryOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -231,7 +231,7 @@ public class BatteryPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getBatteryCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.batteryModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];

@@ -187,12 +187,12 @@ public class FpsPanelController {
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startFpsStatic();
+                    FloatingService.startModule(FloatingService.fpsModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopFpsStatic();
+                FloatingService.stopModule(FloatingService.fpsModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -205,7 +205,7 @@ public class FpsPanelController {
                 if (progress > 140) { progress = 140; sb.setProgress(progress); }
                 FpsConfig.size = progress;
                 fpsSizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateFpsSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.fpsModule(), FpsConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -217,7 +217,7 @@ public class FpsPanelController {
                 fpsColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_color", color).apply();
-                FloatingService.updateFpsColorStatic();
+                FloatingService.updateColorForModule(FloatingService.fpsModule(), FpsConfig.color);
             });
         });
 
@@ -227,7 +227,7 @@ public class FpsPanelController {
                 fpsLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_label_color", color).apply();
-                FloatingService.updateFpsLabelColorStatic();
+                FloatingService.updateLabelColorForModule(FloatingService.fpsModule(), FpsConfig.labelColor);
             });
         });
 
@@ -237,7 +237,7 @@ public class FpsPanelController {
             fpsBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_bg_enabled", isChecked).apply();
-            FloatingService.updateFpsBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
         });
 
         fpsBgColorPreview.setOnClickListener(v -> {
@@ -246,7 +246,7 @@ public class FpsPanelController {
                 fpsBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_color", color).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             });
         });
 
@@ -257,7 +257,7 @@ public class FpsPanelController {
                 fpsBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_padding", progress).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -270,7 +270,7 @@ public class FpsPanelController {
                 fpsBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_offset_x", offset).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -283,7 +283,7 @@ public class FpsPanelController {
                 fpsBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_offset_y", offset).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -295,7 +295,7 @@ public class FpsPanelController {
                 fpsBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_margin", progress).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -307,7 +307,7 @@ public class FpsPanelController {
                 fpsBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_bg_radius", progress).apply();
-                FloatingService.updateFpsBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -320,7 +320,7 @@ public class FpsPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_shadow_enabled", isChecked).apply();
             saveFpsShadowPrefs();
-            FloatingService.updateFpsShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.fpsModule());
         });
 
         fpsShadowColorPreview.setOnClickListener(v -> {
@@ -329,7 +329,7 @@ public class FpsPanelController {
                 fpsShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("fps_shadow_color", color).apply();
-                FloatingService.updateFpsShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.fpsModule());
             });
         });
 
@@ -339,7 +339,7 @@ public class FpsPanelController {
                 fpsShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("fps_shadow_blur", (float) progress).apply();
-                FloatingService.updateFpsShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -352,7 +352,7 @@ public class FpsPanelController {
                 fpsShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("fps_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateFpsShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -365,7 +365,7 @@ public class FpsPanelController {
                 fpsShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("fps_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateFpsShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.fpsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -376,14 +376,14 @@ public class FpsPanelController {
             activity.applyCheckboxTint(fpsLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_lock", isChecked).apply();
-            FloatingService.updateFpsTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.fpsModule());
         });
 
         fpsValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             FpsConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("fps_show_only_value", isChecked).apply();
-            FloatingService.updateFpsDisplayStatic();
+            FloatingService.fpsModule().updateDisplay();
         });
 
         fpsSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -467,7 +467,7 @@ public class FpsPanelController {
             item.setOnClickListener(v -> {
                 FpsConfig.updateInterval = INTERVAL_STEPS[idx];
                 updateIntervalDisplay();
-                FloatingService.updateFpsUpdateIntervalStatic();
+                FloatingService.restartModule(FloatingService.fpsModule());
                 if (intervalPopup != null) intervalPopup.dismiss();
             });
             content.addView(item);

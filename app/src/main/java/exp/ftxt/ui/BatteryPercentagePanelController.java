@@ -171,12 +171,12 @@ public class BatteryPercentagePanelController {
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startBatteryPercentageStatic();
+                    FloatingService.startModule(FloatingService.batteryPercentageModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopBatteryPercentageStatic();
+                FloatingService.stopModule(FloatingService.batteryPercentageModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -191,7 +191,7 @@ public class BatteryPercentagePanelController {
                 batPctSizeLabel.setText("Ukuran Teks: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battpct_size", (float) progress).apply();
-                FloatingService.updateBatteryPercentageSizeStatic();
+                FloatingService.updateSizeForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -203,7 +203,7 @@ public class BatteryPercentagePanelController {
                 batPctColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_color", color).apply();
-                FloatingService.updateBatteryPercentageColorStatic();
+                FloatingService.updateColorForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.color);
             });
         });
 
@@ -213,7 +213,7 @@ public class BatteryPercentagePanelController {
                 batPctLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_label_color", color).apply();
-                FloatingService.updateBatteryPercentageLabelColorStatic();
+                FloatingService.updateLabelColorForModule(FloatingService.batteryPercentageModule(), BatteryPercentageConfig.labelColor);
             });
         });
 
@@ -223,7 +223,7 @@ public class BatteryPercentagePanelController {
             batPctBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battpct_bg_enabled", isChecked).apply();
-            FloatingService.updateBatteryPercentageBackgroundStatic();
+            FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
         });
 
         batPctBgColorPreview.setOnClickListener(v -> {
@@ -232,7 +232,7 @@ public class BatteryPercentagePanelController {
                 batPctBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_color", color).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             });
         });
 
@@ -243,7 +243,7 @@ public class BatteryPercentagePanelController {
                 batPctBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_padding", progress).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -256,7 +256,7 @@ public class BatteryPercentagePanelController {
                 batPctBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_offset_x", offset).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -269,7 +269,7 @@ public class BatteryPercentagePanelController {
                 batPctBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_offset_y", offset).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -281,7 +281,7 @@ public class BatteryPercentagePanelController {
                 batPctBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_margin", progress).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -293,7 +293,7 @@ public class BatteryPercentagePanelController {
                 batPctBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_bg_radius", progress).apply();
-                FloatingService.updateBatteryPercentageBackgroundStatic();
+                FloatingService.updateBackgroundForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -306,7 +306,7 @@ public class BatteryPercentagePanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battpct_shadow_enabled", isChecked).apply();
             saveBatPctShadowPrefs();
-            FloatingService.updateBatteryPercentageShadowStatic();
+            FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
         });
 
         batPctShadowColorPreview.setOnClickListener(v -> {
@@ -315,7 +315,7 @@ public class BatteryPercentagePanelController {
                 batPctShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battpct_shadow_color", color).apply();
-                FloatingService.updateBatteryPercentageShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
             });
         });
 
@@ -325,7 +325,7 @@ public class BatteryPercentagePanelController {
                 batPctShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battpct_shadow_blur", (float) progress).apply();
-                FloatingService.updateBatteryPercentageShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -338,7 +338,7 @@ public class BatteryPercentagePanelController {
                 batPctShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battpct_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateBatteryPercentageShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -351,7 +351,7 @@ public class BatteryPercentagePanelController {
                 batPctShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battpct_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateBatteryPercentageShadowStatic();
+                FloatingService.updateShadowForModule(FloatingService.batteryPercentageModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -362,7 +362,7 @@ public class BatteryPercentagePanelController {
             activity.applyCheckboxTint(batPctLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battpct_lock", isChecked).apply();
-            FloatingService.updateBatteryPercentageTouchFlagsStatic();
+            FloatingService.updateTouchFlagsForModule(FloatingService.batteryPercentageModule());
         });
     }
 

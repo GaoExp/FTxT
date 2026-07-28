@@ -1,3 +1,37 @@
+# [4.83.1] - 2026-07-28
+### 🔧 Optimasi & Penyesuaian
+- **Refactor FloatingService — Hapus Duplikasi Kode (Langkah 1-4)** — Buat interface `OverlayModule` untuk menyeragamkan semua modul overlay. Implement di 7 modul. Hapus ~430 baris static delegates di FloatingService, ganti dengan method generik berbasis loop (`startModule`, `stopModule`, `updateColorForModule`, `updateSizeForModule`, dll). FloatingService turun dari 785 → 351 baris (-55%). Update semua 14 UI controllers (7 PanelController + 7 PositionController) untuk pakai method generik baru.
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/shared/ui/OverlayModule.java` — Interface untuk menyeragamkan method semua modul overlay
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 173, versionName 4.83.1
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Hapus ~430 baris static delegates, tambah method generik + static getters, pakai loop di onCreate/onDestroy
+- `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — Implement OverlayModule: +start() +stop() +isRunning() +updateLabelColor() +@Override
+- `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — Implement OverlayModule: +init() overload +@Override
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Implement OverlayModule: +init() +updateLabelColor() +@Override
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java` — Implement OverlayModule: +init() +@Override
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Implement OverlayModule: +init() +@Override
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Implement OverlayModule: +init() +@Override
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Implement OverlayModule: +init() +@Override
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/FpsPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Ganti static delegates ke method generik
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Ganti static delegates ke method generik
+### 🔢 Version
+`4.83.0` → `4.83.1`
+
+---
+
 # [4.83.0] - 2026-07-23
 ### ✨ Fitur Baru
 - **Notification Actions — aksi langsung dari notifikasi** — Tambahkan 3 tombol aksi di notifikasi foreground service: **Toggle** (show/hide semua overlay), **Kill** (hentikan service + tutup app), **Buka** (launch aplikasi). User bisa kontrol overlay tanpa membuka aplikasi. Toggle hanya menyembunyikan/menampilkan overlay tanpa mengubah status modul.

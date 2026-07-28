@@ -103,11 +103,11 @@ public class ClockPositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateClockPositionStatic();
-            FloatingService.updateClockSizeStatic();
-            FloatingService.updateClockColorStatic();
-            FloatingService.updateClockShadowStatic();
-            FloatingService.updateClockBackgroundStatic();
+            FloatingService.updatePositionForModule(FloatingService.clockModule());
+            FloatingService.updateSizeForModule(FloatingService.clockModule(), ClockConfig.size);
+            FloatingService.updateColorForModule(FloatingService.clockModule(), ClockConfig.color);
+            FloatingService.updateShadowForModule(FloatingService.clockModule());
+            FloatingService.updateBackgroundForModule(FloatingService.clockModule());
         }
     };
 
@@ -119,7 +119,7 @@ public class ClockPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setClockOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.clockModule(), currentOrientation);
 
         bindViews();
 
@@ -140,7 +140,7 @@ public class ClockPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateClockPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.clockModule());
     }
 
     private void bindViews() {
@@ -171,7 +171,7 @@ public class ClockPositionController {
         ClockConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateClockPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.clockModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -182,7 +182,7 @@ public class ClockPositionController {
 
     public void cleanup() {
         ClockModule.onPositionUpdate = null;
-        FloatingService.setClockOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.clockModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -210,7 +210,7 @@ public class ClockPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getClockCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.clockModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];

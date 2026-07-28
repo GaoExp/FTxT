@@ -18,10 +18,11 @@ import android.view.WindowManager;
 import java.lang.reflect.Field;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-public class BatteryCurrentModule {
+public class BatteryCurrentModule implements OverlayModule {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -34,10 +35,20 @@ public class BatteryCurrentModule {
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
 
+    @Override
     public void setOrientationSuffix(String suffix) {
         this.orientationSuffix = suffix;
     }
 
+    @Override
+    public void init(WindowManager windowManager, Context ctx, SharedPreferences sp) {
+        wm = windowManager;
+        context = ctx;
+        prefs = sp;
+        orientationSuffix = null;
+    }
+
+    @Override
     public void start(WindowManager windowManager, Context ctx) {
         if (running) return;
         wm = windowManager;
@@ -80,6 +91,7 @@ public class BatteryCurrentModule {
         handler.post(tickRunnable);
     }
 
+    @Override
     public void stop() {
         running = false;
         handler.removeCallbacks(tickRunnable);
@@ -93,26 +105,31 @@ public class BatteryCurrentModule {
         }
     }
 
+    @Override
     public void updateSize(float size) {
         BatteryCurrentConfig.size = size;
         if (view != null) view.setTextSize(size);
     }
 
+    @Override
     public void updateColor(int color) {
         BatteryCurrentConfig.color = color;
         updateDisplay();
     }
 
+    @Override
     public void updateLabelColor(int color) {
         BatteryCurrentConfig.labelColor = color;
         updateDisplay();
     }
 
+    @Override
     public void updateShadow() {
         if (view != null) view.setShadowConfig(BatteryCurrentConfig.shadow);
         OverlayShadow.apply(view, params, wm, BatteryCurrentConfig.shadow, 4f);
     }
 
+    @Override
     public void updateBackground() {
         applyBackground();
     }
@@ -130,11 +147,13 @@ public class BatteryCurrentModule {
         updatePosition();
     }
 
+    @Override
     public void reloadPosition() {
         orientationSuffix = null;
         loadPosition();
     }
 
+    @Override
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
             params.x = (int)(BatteryCurrentConfig.posX * getScreenWidth());
@@ -154,6 +173,7 @@ public class BatteryCurrentModule {
         }
     }
 
+    @Override
     public boolean isRunning() {
         return running;
     }
@@ -161,6 +181,7 @@ public class BatteryCurrentModule {
     /**
      * Sembunyikan overlay tanpa stop module.
      */
+    @Override
     public void hide() {
         if (view != null) view.setVisibility(android.view.View.GONE);
     }
@@ -168,6 +189,7 @@ public class BatteryCurrentModule {
     /**
      * Tampilkan overlay kembali.
      */
+    @Override
     public void show() {
         if (view != null) view.setVisibility(android.view.View.VISIBLE);
     }
@@ -175,11 +197,13 @@ public class BatteryCurrentModule {
     /**
      * Cek apakah overlay sedang tersembunyi.
      */
+    @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == android.view.View.GONE;
         return false;
     }
 
+    @Override
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;
@@ -201,6 +225,7 @@ public class BatteryCurrentModule {
         view.setBgRadius(BatteryCurrentConfig.bg.radius);
     }
 
+    @Override
     public void updateTouchFlags() {
         if (params == null || view == null || wm == null) return;
 

@@ -108,12 +108,12 @@ public class NetworkPositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateNetworkPositionStatic();
-            FloatingService.updateNetworkSizeStatic();
-            FloatingService.updateNetworkColorStatic();
-            FloatingService.updateNetworkLabelColorStatic();
-            FloatingService.updateNetworkShadowStatic();
-            FloatingService.updateNetworkBackgroundStatic();
+            FloatingService.updatePositionForModule(FloatingService.networkModule());
+            FloatingService.updateSizeForModule(FloatingService.networkModule(), NetworkConfig.size);
+            FloatingService.updateColorForModule(FloatingService.networkModule(), NetworkConfig.color);
+            FloatingService.updateLabelColorForModule(FloatingService.networkModule(), NetworkConfig.labelColor);
+            FloatingService.updateShadowForModule(FloatingService.networkModule());
+            FloatingService.updateBackgroundForModule(FloatingService.networkModule());
         }
     };
 
@@ -125,7 +125,7 @@ public class NetworkPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setNetworkOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.networkModule(), currentOrientation);
 
         bindViews();
 
@@ -146,7 +146,7 @@ public class NetworkPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateNetworkPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.networkModule());
     }
 
     private void bindViews() {
@@ -177,7 +177,7 @@ public class NetworkPositionController {
         NetworkConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateNetworkPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.networkModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -188,7 +188,7 @@ public class NetworkPositionController {
 
     public void cleanup() {
         NetworkModule.onPositionUpdate = null;
-        FloatingService.setNetworkOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.networkModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -216,7 +216,7 @@ public class NetworkPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getNetworkCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.networkModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];

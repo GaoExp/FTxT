@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
         }
         autoRequestAndStart();
         requestRemainingPermissions();
-        FloatingService.updateTextPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.textModule());
     }
 
     private void requestRemainingPermissions() {

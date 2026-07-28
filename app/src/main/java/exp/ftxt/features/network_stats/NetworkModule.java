@@ -13,10 +13,11 @@ import android.view.Gravity;
 import android.view.WindowManager;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-public class NetworkModule {
+public class NetworkModule implements OverlayModule {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -33,10 +34,20 @@ public class NetworkModule {
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
 
+    @Override
     public void setOrientationSuffix(String suffix) {
         this.orientationSuffix = suffix;
     }
 
+    @Override
+    public void init(WindowManager windowManager, Context ctx, SharedPreferences sp) {
+        wm = windowManager;
+        context = ctx;
+        prefs = sp;
+        orientationSuffix = null;
+    }
+
+    @Override
     public void start(WindowManager windowManager, Context ctx) {
         if (running) return;
         wm = windowManager;
@@ -84,6 +95,7 @@ public class NetworkModule {
         handler.post(tickRunnable);
     }
 
+    @Override
     public void stop() {
         running = false;
         handler.removeCallbacks(tickRunnable);
@@ -97,26 +109,31 @@ public class NetworkModule {
         }
     }
 
+    @Override
     public void updateSize(float size) {
         NetworkConfig.size = size;
         if (view != null) view.setTextSize(size);
     }
 
+    @Override
     public void updateColor(int color) {
         NetworkConfig.color = color;
         updateDisplay();
     }
 
+    @Override
     public void updateLabelColor(int color) {
         NetworkConfig.labelColor = color;
         updateDisplay();
     }
 
+    @Override
     public void updateShadow() {
         if (view != null) view.setShadowConfig(NetworkConfig.shadow);
         OverlayShadow.apply(view, params, wm, NetworkConfig.shadow, 4f);
     }
 
+    @Override
     public void updateBackground() {
         applyBackground();
     }
@@ -134,11 +151,13 @@ public class NetworkModule {
         updatePosition();
     }
 
+    @Override
     public void reloadPosition() {
         orientationSuffix = null;
         loadPosition();
     }
 
+    @Override
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
             params.x = (int)(NetworkConfig.posX * getScreenWidth());
@@ -158,6 +177,7 @@ public class NetworkModule {
         }
     }
 
+    @Override
     public boolean isRunning() {
         return running;
     }
@@ -165,6 +185,7 @@ public class NetworkModule {
     /**
      * Sembunyikan overlay tanpa stop module.
      */
+    @Override
     public void hide() {
         if (view != null) view.setVisibility(android.view.View.GONE);
     }
@@ -172,6 +193,7 @@ public class NetworkModule {
     /**
      * Tampilkan overlay kembali.
      */
+    @Override
     public void show() {
         if (view != null) view.setVisibility(android.view.View.VISIBLE);
     }
@@ -179,16 +201,19 @@ public class NetworkModule {
     /**
      * Cek apakah overlay sedang tersembunyi.
      */
+    @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == android.view.View.GONE;
         return false;
     }
 
+    @Override
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;
     }
 
+    @Override
     public void updateTouchFlags() {
         if (params == null || view == null || wm == null) return;
 

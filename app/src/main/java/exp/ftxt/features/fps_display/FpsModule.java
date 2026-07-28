@@ -12,10 +12,11 @@ import android.view.Gravity;
 import android.view.WindowManager;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
+import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-public class FpsModule {
+public class FpsModule implements OverlayModule {
 
     private static final int FRAME_WINDOW_SIZE = 60;
 
@@ -39,10 +40,12 @@ public class FpsModule {
 
     public static Runnable onPositionUpdate;
 
+    @Override
     public void setOrientationSuffix(String suffix) {
         this.orientationSuffix = suffix;
     }
 
+    @Override
     public void init(WindowManager windowManager, Context ctx,
                      SharedPreferences sp) {
         wm = windowManager;
@@ -57,6 +60,7 @@ public class FpsModule {
         loadPosition(prefs);
     }
 
+    @Override
     public void start(WindowManager windowManager, Context ctx) {
         if (running) return;
         wm = windowManager;
@@ -107,6 +111,7 @@ public class FpsModule {
         choreographer.postFrameCallback(frameCallback);
     }
 
+    @Override
     public void stop() {
         running = false;
         if (choreographer != null) {
@@ -123,30 +128,36 @@ public class FpsModule {
         }
     }
 
+    @Override
     public void updateSize(float size) {
         FpsConfig.size = size;
         if (view != null) view.setTextSize(size);
     }
 
+    @Override
     public void updateColor(int color) {
         FpsConfig.color = color;
         updateDisplay();
     }
 
+    @Override
     public void updateLabelColor(int color) {
         FpsConfig.labelColor = color;
         updateDisplay();
     }
 
+    @Override
     public void updateShadow() {
         if (view != null) view.setShadowConfig(FpsConfig.shadow);
         OverlayShadow.apply(view, params, wm, FpsConfig.shadow, 4f);
     }
 
+    @Override
     public void updateBackground() {
         applyBackground();
     }
 
+    @Override
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
             DisplayMetrics metrics = new DisplayMetrics();
@@ -205,6 +216,7 @@ public class FpsModule {
         view.setBgRadius(FpsConfig.bg.radius);
     }
 
+    @Override
     public void updateTouchFlags() {
         if (params == null || view == null || wm == null) return;
 
@@ -236,12 +248,14 @@ public class FpsModule {
         try { wm.updateViewLayout(view, params); } catch (Exception e) { e.printStackTrace(); }
     }
 
+    @Override
     public void reloadPosition() {
         orientationSuffix = null;
         loadPosition(prefs);
         updatePosition();
     }
 
+    @Override
     public boolean isRunning() {
         return running;
     }
@@ -249,6 +263,7 @@ public class FpsModule {
     /**
      * Sembunyikan overlay tanpa stop module.
      */
+    @Override
     public void hide() {
         if (view != null) view.setVisibility(android.view.View.GONE);
     }
@@ -256,6 +271,7 @@ public class FpsModule {
     /**
      * Tampilkan overlay kembali.
      */
+    @Override
     public void show() {
         if (view != null) view.setVisibility(android.view.View.VISIBLE);
     }
@@ -263,11 +279,13 @@ public class FpsModule {
     /**
      * Cek apakah overlay sedang tersembunyi.
      */
+    @Override
     public boolean isHidden() {
         if (view != null) return view.getVisibility() == android.view.View.GONE;
         return false;
     }
 
+    @Override
     public int[] getCurrentPosition() {
         if (params != null) return new int[]{params.x, params.y};
         return null;

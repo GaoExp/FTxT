@@ -102,11 +102,11 @@ public class TextPositionController {
 
         @Override
         public void syncToService() {
-            FloatingService.updateTextPositionStatic();
-            FloatingService.updateTextSizeStatic();
-            FloatingService.updateTextColorStatic();
-            FloatingService.updateShadowStatic();
-            FloatingService.updateTextBackgroundStatic();
+            FloatingService.updatePositionForModule(FloatingService.textModule());
+            FloatingService.updateSizeForModule(FloatingService.textModule(), TextConfig.size);
+            FloatingService.updateColorForModule(FloatingService.textModule(), TextConfig.color);
+            FloatingService.updateShadowForModule(FloatingService.textModule());
+            FloatingService.updateBackgroundForModule(FloatingService.textModule());
         }
     };
 
@@ -118,7 +118,7 @@ public class TextPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setTextOrientationSuffixStatic(currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.textModule(), currentOrientation);
 
         bindViews();
 
@@ -139,7 +139,7 @@ public class TextPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updateTextPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.textModule());
     }
 
     private void bindViews() {
@@ -170,7 +170,7 @@ public class TextPositionController {
         TextConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updateTextPositionStatic();
+        FloatingService.updatePositionForModule(FloatingService.textModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
@@ -181,7 +181,7 @@ public class TextPositionController {
 
     public void cleanup() {
         TextModule.onPositionUpdate = null;
-        FloatingService.setTextOrientationSuffixStatic(null);
+        FloatingService.setOrientationSuffixForModule(FloatingService.textModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -209,7 +209,7 @@ public class TextPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getTextCurrentPosition();
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.textModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];
