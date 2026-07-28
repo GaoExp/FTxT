@@ -121,7 +121,7 @@
 - [ ] Refactor ColorPickerDialog (ColorPickerConfig builder)
 
 **Tahap 3: Fitur Baru**
-- [ ] Notification Actions (tombol aksi di notifikasi)
+- [✓] Notification Actions (tombol aksi di notifikasi)
 
 **Tahap 4: Refactor Lanjutan**
 - [ ] Panel Navigation Fragment (jika diperlukan)
