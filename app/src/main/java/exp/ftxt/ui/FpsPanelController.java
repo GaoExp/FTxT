@@ -63,6 +63,14 @@ public class FpsPanelController {
         fpsPositionController = new FpsPositionController(activity);
     }
 
+    public FpsPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        fpsPositionController = new FpsPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (fpsPositionController != null) {
             fpsPositionController.refresh();
@@ -83,52 +91,56 @@ public class FpsPanelController {
     }
 
     private void bindViews() {
-        fpsSwitch = activity.findViewById(R.id.fpsSwitch);
-        fpsSizeSeekBar = activity.findViewById(R.id.fpsSizeSeekBar);
-        fpsColorPreview = activity.findViewById(R.id.fpsColorPreview);
-        fpsLabelColorPreview = activity.findViewById(R.id.fpsLabelColorPreview);
-        fpsShadowSwitch = activity.findViewById(R.id.fpsShadowSwitch);
-        fpsShadowConfigContainer = activity.findViewById(R.id.shadowConfigFps);
-        fpsShadowColorPreview = activity.findViewById(R.id.fpsShadowColorPreview);
-        fpsShadowBlurSeekBar = activity.findViewById(R.id.fpsShadowBlurSeekBar);
-        fpsShadowOffsetXSeekBar = activity.findViewById(R.id.fpsShadowOffsetXSeekBar);
-        fpsShadowOffsetYSeekBar = activity.findViewById(R.id.fpsShadowOffsetYSeekBar);
-        fpsLockSwitch = activity.findViewById(R.id.fpsLockSwitch);
-        fpsValueOnlyCheck = activity.findViewById(R.id.fpsValueOnlyCheck);
-        fpsSafeArea = activity.findViewById(R.id.fpsSafeArea);
-        fpsBgSwitch = activity.findViewById(R.id.fpsBgSwitch);
-        fpsBgConfigContainer = activity.findViewById(R.id.bgConfigFps);
-        fpsBgColorPreview = activity.findViewById(R.id.fpsBgColorPreview);
-        fpsBgPaddingSeekBar = activity.findViewById(R.id.fpsBgPaddingSeekBar);
-        fpsBgOffsetXSeekBar = activity.findViewById(R.id.fpsBgOffsetXSeekBar);
-        fpsBgOffsetYSeekBar = activity.findViewById(R.id.fpsBgOffsetYSeekBar);
-        fpsBgMarginSeekBar = activity.findViewById(R.id.fpsBgMarginSeekBar);
-        fpsBgRadiusSeekBar = activity.findViewById(R.id.fpsBgRadiusSeekBar);
-        fpsSizeLabel = activity.findViewById(R.id.fpsSizeLabel);
-        fpsBgPaddingLabel = activity.findViewById(R.id.fpsBgPaddingLabel);
-        fpsBgOffsetXLabel = activity.findViewById(R.id.fpsBgOffsetXLabel);
-        fpsBgOffsetYLabel = activity.findViewById(R.id.fpsBgOffsetYLabel);
-        fpsBgMarginLabel = activity.findViewById(R.id.fpsBgMarginLabel);
-        fpsBgRadiusLabel = activity.findViewById(R.id.fpsBgRadiusLabel);
-        fpsShadowBlurLabel = activity.findViewById(R.id.fpsShadowBlurLabel);
-        fpsShadowOffsetXLabel = activity.findViewById(R.id.fpsShadowOffsetXLabel);
-        fpsShadowOffsetYLabel = activity.findViewById(R.id.fpsShadowOffsetYLabel);
-        fpsIntervalValue = activity.findViewById(R.id.fpsIntervalValue);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.fps_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.fps_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        fpsSwitch = rootView.findViewById(R.id.fpsSwitch);
+        fpsSizeSeekBar = rootView.findViewById(R.id.fpsSizeSeekBar);
+        fpsColorPreview = rootView.findViewById(R.id.fpsColorPreview);
+        fpsLabelColorPreview = rootView.findViewById(R.id.fpsLabelColorPreview);
+        fpsShadowSwitch = rootView.findViewById(R.id.fpsShadowSwitch);
+        fpsShadowConfigContainer = rootView.findViewById(R.id.shadowConfigFps);
+        fpsShadowColorPreview = rootView.findViewById(R.id.fpsShadowColorPreview);
+        fpsShadowBlurSeekBar = rootView.findViewById(R.id.fpsShadowBlurSeekBar);
+        fpsShadowOffsetXSeekBar = rootView.findViewById(R.id.fpsShadowOffsetXSeekBar);
+        fpsShadowOffsetYSeekBar = rootView.findViewById(R.id.fpsShadowOffsetYSeekBar);
+        fpsLockSwitch = rootView.findViewById(R.id.fpsLockSwitch);
+        fpsValueOnlyCheck = rootView.findViewById(R.id.fpsValueOnlyCheck);
+        fpsSafeArea = rootView.findViewById(R.id.fpsSafeArea);
+        fpsBgSwitch = rootView.findViewById(R.id.fpsBgSwitch);
+        fpsBgConfigContainer = rootView.findViewById(R.id.bgConfigFps);
+        fpsBgColorPreview = rootView.findViewById(R.id.fpsBgColorPreview);
+        fpsBgPaddingSeekBar = rootView.findViewById(R.id.fpsBgPaddingSeekBar);
+        fpsBgOffsetXSeekBar = rootView.findViewById(R.id.fpsBgOffsetXSeekBar);
+        fpsBgOffsetYSeekBar = rootView.findViewById(R.id.fpsBgOffsetYSeekBar);
+        fpsBgMarginSeekBar = rootView.findViewById(R.id.fpsBgMarginSeekBar);
+        fpsBgRadiusSeekBar = rootView.findViewById(R.id.fpsBgRadiusSeekBar);
+        fpsSizeLabel = rootView.findViewById(R.id.fpsSizeLabel);
+        fpsBgPaddingLabel = rootView.findViewById(R.id.fpsBgPaddingLabel);
+        fpsBgOffsetXLabel = rootView.findViewById(R.id.fpsBgOffsetXLabel);
+        fpsBgOffsetYLabel = rootView.findViewById(R.id.fpsBgOffsetYLabel);
+        fpsBgMarginLabel = rootView.findViewById(R.id.fpsBgMarginLabel);
+        fpsBgRadiusLabel = rootView.findViewById(R.id.fpsBgRadiusLabel);
+        fpsShadowBlurLabel = rootView.findViewById(R.id.fpsShadowBlurLabel);
+        fpsShadowOffsetXLabel = rootView.findViewById(R.id.fpsShadowOffsetXLabel);
+        fpsShadowOffsetYLabel = rootView.findViewById(R.id.fpsShadowOffsetYLabel);
+        fpsIntervalValue = rootView.findViewById(R.id.fpsIntervalValue);
+
+        View sectionDisplay = rootView.findViewById(R.id.fps_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.fps_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.fps_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.fps_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.fps_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.fps_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.fps_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.fps_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.fps_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.fps_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.fps_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.fps_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.fps_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.fps_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

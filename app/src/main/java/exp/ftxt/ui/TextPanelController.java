@@ -67,6 +67,15 @@ public class TextPanelController {
         positionController = new TextPositionController(activity);
     }
 
+    public TextPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        applyInitialTints();
+        positionController = new TextPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (positionController != null) {
             positionController.refresh();
@@ -102,60 +111,64 @@ public class TextPanelController {
     }
 
     private void bindViews() {
-        editText = activity.findViewById(R.id.editText);
-        seekBar = activity.findViewById(R.id.textSizeSeekBar);
-        colorPreview = activity.findViewById(R.id.colorPreview);
-        overlaySwitch = activity.findViewById(R.id.overlaySwitch);
-        touchPassthroughSwitch = activity.findViewById(R.id.touchPassthroughSwitch);
-        textSafeArea = activity.findViewById(R.id.textSafeArea);
-        shadowSwitch = activity.findViewById(R.id.shadowSwitch);
-        shadowConfigContainer = activity.findViewById(R.id.shadowConfigText);
-        shadowColorPreview = activity.findViewById(R.id.shadowColorPreview);
-        shadowBlurSeekBar = activity.findViewById(R.id.shadowBlurSeekBar);
-        shadowOffsetXSeekBar = activity.findViewById(R.id.shadowOffsetXSeekBar);
-        shadowOffsetYSeekBar = activity.findViewById(R.id.shadowOffsetYSeekBar);
-        bgSwitch = activity.findViewById(R.id.bgSwitch);
-        bgConfigContainer = activity.findViewById(R.id.bgConfigText);
-        bgColorPreview = activity.findViewById(R.id.bgColorPreview);
-        bgPaddingSeekBar = activity.findViewById(R.id.bgPaddingSeekBar);
-        bgOffsetXSeekBar = activity.findViewById(R.id.bgOffsetXSeekBar);
-        bgOffsetYSeekBar = activity.findViewById(R.id.bgOffsetYSeekBar);
-        bgMarginSeekBar = activity.findViewById(R.id.bgMarginSeekBar);
-        bgRadiusSeekBar = activity.findViewById(R.id.bgRadiusSeekBar);
-        textSizeLabel = activity.findViewById(R.id.textSizeLabel);
-        bgPaddingLabel = activity.findViewById(R.id.bgPaddingLabel);
-        bgOffsetXLabel = activity.findViewById(R.id.bgOffsetXLabel);
-        bgOffsetYLabel = activity.findViewById(R.id.bgOffsetYLabel);
-        bgMarginLabel = activity.findViewById(R.id.bgMarginLabel);
-        bgRadiusLabel = activity.findViewById(R.id.bgRadiusLabel);
-        shadowBlurLabel = activity.findViewById(R.id.shadowBlurLabel);
-        shadowOffsetXLabel = activity.findViewById(R.id.shadowOffsetXLabel);
-        shadowOffsetYLabel = activity.findViewById(R.id.shadowOffsetYLabel);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        textPatternSwitch = activity.findViewById(R.id.textPatternSwitch);
-        textPatternSpacingH = activity.findViewById(R.id.textPatternSpacingH);
-        textPatternSpacingV = activity.findViewById(R.id.textPatternSpacingV);
-        textPatternAngle = activity.findViewById(R.id.textPatternAngle);
-        textPatternSpacingHLabel = activity.findViewById(R.id.textPatternSpacingHLabel);
-        textPatternSpacingVLabel = activity.findViewById(R.id.textPatternSpacingVLabel);
-        textPatternAngleLabel = activity.findViewById(R.id.textPatternAngleLabel);
-        textPatternContainer = activity.findViewById(R.id.textPatternContainer);
-        textPositionContainer = activity.findViewById(R.id.textPositionContainer);
+    private void bindViews(View rootView) {
+        editText = rootView.findViewById(R.id.editText);
+        seekBar = rootView.findViewById(R.id.textSizeSeekBar);
+        colorPreview = rootView.findViewById(R.id.colorPreview);
+        overlaySwitch = rootView.findViewById(R.id.overlaySwitch);
+        touchPassthroughSwitch = rootView.findViewById(R.id.touchPassthroughSwitch);
+        textSafeArea = rootView.findViewById(R.id.textSafeArea);
+        shadowSwitch = rootView.findViewById(R.id.shadowSwitch);
+        shadowConfigContainer = rootView.findViewById(R.id.shadowConfigText);
+        shadowColorPreview = rootView.findViewById(R.id.shadowColorPreview);
+        shadowBlurSeekBar = rootView.findViewById(R.id.shadowBlurSeekBar);
+        shadowOffsetXSeekBar = rootView.findViewById(R.id.shadowOffsetXSeekBar);
+        shadowOffsetYSeekBar = rootView.findViewById(R.id.shadowOffsetYSeekBar);
+        bgSwitch = rootView.findViewById(R.id.bgSwitch);
+        bgConfigContainer = rootView.findViewById(R.id.bgConfigText);
+        bgColorPreview = rootView.findViewById(R.id.bgColorPreview);
+        bgPaddingSeekBar = rootView.findViewById(R.id.bgPaddingSeekBar);
+        bgOffsetXSeekBar = rootView.findViewById(R.id.bgOffsetXSeekBar);
+        bgOffsetYSeekBar = rootView.findViewById(R.id.bgOffsetYSeekBar);
+        bgMarginSeekBar = rootView.findViewById(R.id.bgMarginSeekBar);
+        bgRadiusSeekBar = rootView.findViewById(R.id.bgRadiusSeekBar);
+        textSizeLabel = rootView.findViewById(R.id.textSizeLabel);
+        bgPaddingLabel = rootView.findViewById(R.id.bgPaddingLabel);
+        bgOffsetXLabel = rootView.findViewById(R.id.bgOffsetXLabel);
+        bgOffsetYLabel = rootView.findViewById(R.id.bgOffsetYLabel);
+        bgMarginLabel = rootView.findViewById(R.id.bgMarginLabel);
+        bgRadiusLabel = rootView.findViewById(R.id.bgRadiusLabel);
+        shadowBlurLabel = rootView.findViewById(R.id.shadowBlurLabel);
+        shadowOffsetXLabel = rootView.findViewById(R.id.shadowOffsetXLabel);
+        shadowOffsetYLabel = rootView.findViewById(R.id.shadowOffsetYLabel);
 
-        View sectionDisplay = activity.findViewById(R.id.text_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.text_sectionDisplayHeader);
+        textPatternSwitch = rootView.findViewById(R.id.textPatternSwitch);
+        textPatternSpacingH = rootView.findViewById(R.id.textPatternSpacingH);
+        textPatternSpacingV = rootView.findViewById(R.id.textPatternSpacingV);
+        textPatternAngle = rootView.findViewById(R.id.textPatternAngle);
+        textPatternSpacingHLabel = rootView.findViewById(R.id.textPatternSpacingHLabel);
+        textPatternSpacingVLabel = rootView.findViewById(R.id.textPatternSpacingVLabel);
+        textPatternAngleLabel = rootView.findViewById(R.id.textPatternAngleLabel);
+        textPatternContainer = rootView.findViewById(R.id.textPatternContainer);
+        textPositionContainer = rootView.findViewById(R.id.textPositionContainer);
+
+        View sectionDisplay = rootView.findViewById(R.id.text_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.text_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.text_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.text_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.text_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.text_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.text_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.text_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.text_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.text_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.text_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.text_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.text_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.text_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

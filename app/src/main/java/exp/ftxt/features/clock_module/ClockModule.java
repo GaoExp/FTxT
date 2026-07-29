@@ -60,6 +60,8 @@ public class ClockModule implements OverlayModule {
         view.setText(getCurrentTime());
         view.setTextSize(ClockConfig.size);
         view.setTextColor(ClockConfig.color);
+        view.setLineSpacing(0, 0.85f);
+        view.setIncludeFontPadding(false);
         applyBackground();
 
         params = new WindowManager.LayoutParams(
@@ -263,6 +265,11 @@ public class ClockModule implements OverlayModule {
     };
 
     private String getCurrentTime() {
-        return new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+        if (ClockConfig.showDate) {
+            String date = new SimpleDateFormat("MMM dd EEE", Locale.ENGLISH).format(new Date());
+            return time + "\n" + date;
+        }
+        return time;
     }
 }

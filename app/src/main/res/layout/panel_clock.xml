@@ -43,6 +43,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"/>
 
+                    <CheckBox
+                        android:id="@+id/clockShowDateSwitch"
+                        android:text="Tanggal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
                 </LinearLayout>
 
                 <TextView

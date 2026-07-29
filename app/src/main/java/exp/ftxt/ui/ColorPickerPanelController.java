@@ -95,59 +95,70 @@ public class ColorPickerPanelController {
         setupListeners();
     }
 
+    public ColorPickerPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+    }
+
     private void bindViews() {
-        colorWheel = activity.findViewById(R.id.cp_colorWheel);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        previewContainer = activity.findViewById(R.id.previewContainer);
-        colorPreview = activity.findViewById(R.id.cp_colorPreview);
-        hexValue = activity.findViewById(R.id.cp_hexValue);
-        hsvValue = activity.findViewById(R.id.cp_hsvValue);
-        rgbValue = activity.findViewById(R.id.cp_rgbValue);
-        hexEditButton = activity.findViewById(R.id.cp_hexEditButton);
+    private void bindViews(View rootView) {
+        colorWheel = rootView.findViewById(R.id.cp_colorWheel);
 
-        nameToggle = activity.findViewById(R.id.nameToggle);
+        previewContainer = rootView.findViewById(R.id.previewContainer);
+        colorPreview = rootView.findViewById(R.id.cp_colorPreview);
+        hexValue = rootView.findViewById(R.id.cp_hexValue);
+        hsvValue = rootView.findViewById(R.id.cp_hsvValue);
+        rgbValue = rootView.findViewById(R.id.cp_rgbValue);
+        hexEditButton = rootView.findViewById(R.id.cp_hexEditButton);
 
-        alphaSeek = activity.findViewById(R.id.alphaSeek);
+        nameToggle = rootView.findViewById(R.id.nameToggle);
 
-        hueThumb = activity.findViewById(R.id.cp_hueThumb);
-        saturationThumb = activity.findViewById(R.id.cp_saturationThumb);
-        valueThumb = activity.findViewById(R.id.valueThumb);
-        alphaThumb = activity.findViewById(R.id.cp_alphaThumb);
-        hueTouchArea = activity.findViewById(R.id.cp_hueTouchArea);
-        saturationTouchArea = activity.findViewById(R.id.cp_saturationTouchArea);
-        valueTouchArea = activity.findViewById(R.id.valueTouchArea);
-        alphaTouchArea = activity.findViewById(R.id.cp_alphaTouchArea);
-        hueGradientBg = activity.findViewById(R.id.cp_hueGradientBg);
-        saturationGradientBg = activity.findViewById(R.id.cp_saturationGradientBg);
-        valueGradientBg = activity.findViewById(R.id.valueGradientBg);
-        alphaGradientBg = activity.findViewById(R.id.cp_alphaGradientBg);
-        hueLabel = activity.findViewById(R.id.cp_hueLabel);
-        saturationLabel = activity.findViewById(R.id.cp_saturationLabel);
-        valueLabel = activity.findViewById(R.id.valueLabel);
-        alphaLabel = activity.findViewById(R.id.cp_alphaLabel);
+        alphaSeek = rootView.findViewById(R.id.alphaSeek);
 
-        redThumb = activity.findViewById(R.id.redThumb);
-        greenThumb = activity.findViewById(R.id.greenThumb);
-        blueThumb = activity.findViewById(R.id.blueThumb);
-        redTouchArea = activity.findViewById(R.id.redTouchArea);
-        greenTouchArea = activity.findViewById(R.id.greenTouchArea);
-        blueTouchArea = activity.findViewById(R.id.blueTouchArea);
-        redGradientBg = activity.findViewById(R.id.redGradientBg);
-        greenGradientBg = activity.findViewById(R.id.greenGradientBg);
-        blueGradientBg = activity.findViewById(R.id.blueGradientBg);
-        redValLabel = activity.findViewById(R.id.redValLabel);
-        greenValLabel = activity.findViewById(R.id.greenValLabel);
-        blueValLabel = activity.findViewById(R.id.blueValLabel);
+        hueThumb = rootView.findViewById(R.id.cp_hueThumb);
+        saturationThumb = rootView.findViewById(R.id.cp_saturationThumb);
+        valueThumb = rootView.findViewById(R.id.valueThumb);
+        alphaThumb = rootView.findViewById(R.id.cp_alphaThumb);
+        hueTouchArea = rootView.findViewById(R.id.cp_hueTouchArea);
+        saturationTouchArea = rootView.findViewById(R.id.cp_saturationTouchArea);
+        valueTouchArea = rootView.findViewById(R.id.valueTouchArea);
+        alphaTouchArea = rootView.findViewById(R.id.cp_alphaTouchArea);
+        hueGradientBg = rootView.findViewById(R.id.cp_hueGradientBg);
+        saturationGradientBg = rootView.findViewById(R.id.cp_saturationGradientBg);
+        valueGradientBg = rootView.findViewById(R.id.valueGradientBg);
+        alphaGradientBg = rootView.findViewById(R.id.cp_alphaGradientBg);
+        hueLabel = rootView.findViewById(R.id.cp_hueLabel);
+        saturationLabel = rootView.findViewById(R.id.cp_saturationLabel);
+        valueLabel = rootView.findViewById(R.id.valueLabel);
+        alphaLabel = rootView.findViewById(R.id.cp_alphaLabel);
 
-        savedColorsGrid = activity.findViewById(R.id.cp_savedColorsGrid);
-        savedColorsCount = activity.findViewById(R.id.cp_savedColorsCount);
-        addSavedColor = activity.findViewById(R.id.cp_addSavedColor);
-        collapseToggle = activity.findViewById(R.id.cp_collapseToggle);
-        savedColorsHeader = activity.findViewById(R.id.savedColorsHeader);
+        redThumb = rootView.findViewById(R.id.redThumb);
+        greenThumb = rootView.findViewById(R.id.greenThumb);
+        blueThumb = rootView.findViewById(R.id.blueThumb);
+        redTouchArea = rootView.findViewById(R.id.redTouchArea);
+        greenTouchArea = rootView.findViewById(R.id.greenTouchArea);
+        blueTouchArea = rootView.findViewById(R.id.blueTouchArea);
+        redGradientBg = rootView.findViewById(R.id.redGradientBg);
+        greenGradientBg = rootView.findViewById(R.id.greenGradientBg);
+        blueGradientBg = rootView.findViewById(R.id.blueGradientBg);
+        redValLabel = rootView.findViewById(R.id.redValLabel);
+        greenValLabel = rootView.findViewById(R.id.greenValLabel);
+        blueValLabel = rootView.findViewById(R.id.blueValLabel);
+
+        savedColorsGrid = rootView.findViewById(R.id.cp_savedColorsGrid);
+        savedColorsCount = rootView.findViewById(R.id.cp_savedColorsCount);
+        addSavedColor = rootView.findViewById(R.id.cp_addSavedColor);
+        collapseToggle = rootView.findViewById(R.id.cp_collapseToggle);
+        savedColorsHeader = rootView.findViewById(R.id.savedColorsHeader);
         savedColorsGrid.setVisibility(View.GONE);
         collapseToggle.setText("\u25B2");
-        rgbSliderBody = activity.findViewById(R.id.rgbSliderBody);
-        rgbHeader = activity.findViewById(R.id.rgbHeader);
+        rgbSliderBody = rootView.findViewById(R.id.rgbSliderBody);
+        rgbHeader = rootView.findViewById(R.id.rgbHeader);
     }
 
     private void loadConfig() {

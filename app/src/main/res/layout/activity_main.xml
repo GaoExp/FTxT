@@ -20,30 +20,9 @@
             android:background="@drawable/toolbar_bg"/>
 
         <FrameLayout
+            android:id="@+id/panel_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <include layout="@layout/panel_text"/>
-
-            <include layout="@layout/panel_fps"/>
-
-            <include layout="@layout/panel_clock"/>
-
-            <include layout="@layout/panel_battery"/>
-
-            <include layout="@layout/panel_battery_percentage"/>
-
-            <include layout="@layout/panel_battery_current"/>
-
-            <include layout="@layout/panel_network"/>
-
-            <include layout="@layout/panel_crosshair"/>
-
-            <include layout="@layout/panel_logo"/>
-
-            <include layout="@layout/panel_color_picker"/>
-
-        </FrameLayout>
+            android:layout_height="match_parent" />
 
     </LinearLayout>
 

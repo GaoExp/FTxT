@@ -15,4 +15,5 @@ public class ClockConfig {
     public static boolean safeArea = true;
     public static float posX = 0.5f;
     public static float posY = 0.05f;
+    public static boolean showDate = true;
 }

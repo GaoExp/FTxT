@@ -63,6 +63,14 @@ public class BatteryPanelController {
         batteryPositionController = new BatteryPositionController(activity);
     }
 
+    public BatteryPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        batteryPositionController = new BatteryPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (batteryPositionController != null) {
             batteryPositionController.refresh();
@@ -83,54 +91,58 @@ public class BatteryPanelController {
     }
 
     private void bindViews() {
-        batterySwitch = activity.findViewById(R.id.batterySwitch);
-        batterySizeSeekBar = activity.findViewById(R.id.batterySizeSeekBar);
-        batteryColorPreview = activity.findViewById(R.id.batteryColorPreview);
-        batteryLabelColorPreview = activity.findViewById(R.id.batteryLabelColorPreview);
-        batteryShadowSwitch = activity.findViewById(R.id.batteryShadowSwitch);
-        batteryShadowConfigContainer = activity.findViewById(R.id.shadowConfigBattery);
-        batteryShadowColorPreview = activity.findViewById(R.id.batteryShadowColorPreview);
-        batteryShadowBlurSeekBar = activity.findViewById(R.id.batteryShadowBlurSeekBar);
-        batteryShadowOffsetXSeekBar = activity.findViewById(R.id.batteryShadowOffsetXSeekBar);
-        batteryShadowOffsetYSeekBar = activity.findViewById(R.id.batteryShadowOffsetYSeekBar);
-        batteryLockSwitch = activity.findViewById(R.id.batteryLockSwitch);
-        batteryValueOnlyCheck = activity.findViewById(R.id.batteryValueOnlyCheck);
-        batteryShowTempCheck = activity.findViewById(R.id.batteryShowTempCheck);
-        batteryShowPctCheck = activity.findViewById(R.id.batteryShowPctCheck);
-        batterySafeArea = activity.findViewById(R.id.batterySafeArea);
-        batteryBgSwitch = activity.findViewById(R.id.batteryBgSwitch);
-        batteryBgConfigContainer = activity.findViewById(R.id.bgConfigBattery);
-        batteryBgColorPreview = activity.findViewById(R.id.batteryBgColorPreview);
-        batteryBgPaddingSeekBar = activity.findViewById(R.id.batteryBgPaddingSeekBar);
-        batteryBgOffsetXSeekBar = activity.findViewById(R.id.batteryBgOffsetXSeekBar);
-        batteryBgOffsetYSeekBar = activity.findViewById(R.id.batteryBgOffsetYSeekBar);
-        batteryBgMarginSeekBar = activity.findViewById(R.id.batteryBgMarginSeekBar);
-        batteryBgRadiusSeekBar = activity.findViewById(R.id.batteryBgRadiusSeekBar);
-        batterySizeLabel = activity.findViewById(R.id.batterySizeLabel);
-        batteryBgPaddingLabel = activity.findViewById(R.id.batteryBgPaddingLabel);
-        batteryBgOffsetXLabel = activity.findViewById(R.id.batteryBgOffsetXLabel);
-        batteryBgOffsetYLabel = activity.findViewById(R.id.batteryBgOffsetYLabel);
-        batteryBgMarginLabel = activity.findViewById(R.id.batteryBgMarginLabel);
-        batteryBgRadiusLabel = activity.findViewById(R.id.batteryBgRadiusLabel);
-        batteryShadowBlurLabel = activity.findViewById(R.id.batteryShadowBlurLabel);
-        batteryShadowOffsetXLabel = activity.findViewById(R.id.batteryShadowOffsetXLabel);
-        batteryShadowOffsetYLabel = activity.findViewById(R.id.batteryShadowOffsetYLabel);
-        batteryIntervalValue = activity.findViewById(R.id.batteryIntervalValue);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.battery_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.battery_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        batterySwitch = rootView.findViewById(R.id.batterySwitch);
+        batterySizeSeekBar = rootView.findViewById(R.id.batterySizeSeekBar);
+        batteryColorPreview = rootView.findViewById(R.id.batteryColorPreview);
+        batteryLabelColorPreview = rootView.findViewById(R.id.batteryLabelColorPreview);
+        batteryShadowSwitch = rootView.findViewById(R.id.batteryShadowSwitch);
+        batteryShadowConfigContainer = rootView.findViewById(R.id.shadowConfigBattery);
+        batteryShadowColorPreview = rootView.findViewById(R.id.batteryShadowColorPreview);
+        batteryShadowBlurSeekBar = rootView.findViewById(R.id.batteryShadowBlurSeekBar);
+        batteryShadowOffsetXSeekBar = rootView.findViewById(R.id.batteryShadowOffsetXSeekBar);
+        batteryShadowOffsetYSeekBar = rootView.findViewById(R.id.batteryShadowOffsetYSeekBar);
+        batteryLockSwitch = rootView.findViewById(R.id.batteryLockSwitch);
+        batteryValueOnlyCheck = rootView.findViewById(R.id.batteryValueOnlyCheck);
+        batteryShowTempCheck = rootView.findViewById(R.id.batteryShowTempCheck);
+        batteryShowPctCheck = rootView.findViewById(R.id.batteryShowPctCheck);
+        batterySafeArea = rootView.findViewById(R.id.batterySafeArea);
+        batteryBgSwitch = rootView.findViewById(R.id.batteryBgSwitch);
+        batteryBgConfigContainer = rootView.findViewById(R.id.bgConfigBattery);
+        batteryBgColorPreview = rootView.findViewById(R.id.batteryBgColorPreview);
+        batteryBgPaddingSeekBar = rootView.findViewById(R.id.batteryBgPaddingSeekBar);
+        batteryBgOffsetXSeekBar = rootView.findViewById(R.id.batteryBgOffsetXSeekBar);
+        batteryBgOffsetYSeekBar = rootView.findViewById(R.id.batteryBgOffsetYSeekBar);
+        batteryBgMarginSeekBar = rootView.findViewById(R.id.batteryBgMarginSeekBar);
+        batteryBgRadiusSeekBar = rootView.findViewById(R.id.batteryBgRadiusSeekBar);
+        batterySizeLabel = rootView.findViewById(R.id.batterySizeLabel);
+        batteryBgPaddingLabel = rootView.findViewById(R.id.batteryBgPaddingLabel);
+        batteryBgOffsetXLabel = rootView.findViewById(R.id.batteryBgOffsetXLabel);
+        batteryBgOffsetYLabel = rootView.findViewById(R.id.batteryBgOffsetYLabel);
+        batteryBgMarginLabel = rootView.findViewById(R.id.batteryBgMarginLabel);
+        batteryBgRadiusLabel = rootView.findViewById(R.id.batteryBgRadiusLabel);
+        batteryShadowBlurLabel = rootView.findViewById(R.id.batteryShadowBlurLabel);
+        batteryShadowOffsetXLabel = rootView.findViewById(R.id.batteryShadowOffsetXLabel);
+        batteryShadowOffsetYLabel = rootView.findViewById(R.id.batteryShadowOffsetYLabel);
+        batteryIntervalValue = rootView.findViewById(R.id.batteryIntervalValue);
+
+        View sectionDisplay = rootView.findViewById(R.id.battery_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.battery_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.battery_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.battery_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.battery_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.battery_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.battery_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.battery_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.battery_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.battery_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.battery_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.battery_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.battery_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.battery_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

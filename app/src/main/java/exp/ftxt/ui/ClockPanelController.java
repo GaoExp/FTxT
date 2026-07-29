@@ -30,6 +30,7 @@ public class ClockPanelController {
     private SeekBar clockShadowOffsetXSeekBar;
     private SeekBar clockShadowOffsetYSeekBar;
     private CheckBox clockLockSwitch;
+    private CheckBox clockShowDateSwitch;
     private CheckBox clockSafeArea;
     private CheckBox clockBgSwitch;
     private LinearLayout clockBgConfigContainer;
@@ -52,6 +53,14 @@ public class ClockPanelController {
         clockPositionController = new ClockPositionController(activity);
     }
 
+    public ClockPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        clockPositionController = new ClockPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (clockPositionController != null) {
             clockPositionController.refresh();
@@ -72,49 +81,54 @@ public class ClockPanelController {
     }
 
     private void bindViews() {
-        clockSwitch = activity.findViewById(R.id.clockSwitch);
-        clockSizeSeekBar = activity.findViewById(R.id.clockSizeSeekBar);
-        clockColorPreview = activity.findViewById(R.id.clockColorPreview);
-        clockShadowSwitch = activity.findViewById(R.id.clockShadowSwitch);
-        clockShadowConfigContainer = activity.findViewById(R.id.shadowConfigClock);
-        clockShadowColorPreview = activity.findViewById(R.id.clockShadowColorPreview);
-        clockShadowBlurSeekBar = activity.findViewById(R.id.clockShadowBlurSeekBar);
-        clockShadowOffsetXSeekBar = activity.findViewById(R.id.clockShadowOffsetXSeekBar);
-        clockShadowOffsetYSeekBar = activity.findViewById(R.id.clockShadowOffsetYSeekBar);
-        clockLockSwitch = activity.findViewById(R.id.clockLockSwitch);
-        clockSafeArea = activity.findViewById(R.id.clockSafeArea);
-        clockBgSwitch = activity.findViewById(R.id.clockBgSwitch);
-        clockBgConfigContainer = activity.findViewById(R.id.bgConfigClock);
-        clockBgColorPreview = activity.findViewById(R.id.clockBgColorPreview);
-        clockBgPaddingSeekBar = activity.findViewById(R.id.clockBgPaddingSeekBar);
-        clockBgOffsetXSeekBar = activity.findViewById(R.id.clockBgOffsetXSeekBar);
-        clockBgOffsetYSeekBar = activity.findViewById(R.id.clockBgOffsetYSeekBar);
-        clockBgMarginSeekBar = activity.findViewById(R.id.clockBgMarginSeekBar);
-        clockBgRadiusSeekBar = activity.findViewById(R.id.clockBgRadiusSeekBar);
-        clockSizeLabel = activity.findViewById(R.id.clockSizeLabel);
-        clockBgPaddingLabel = activity.findViewById(R.id.clockBgPaddingLabel);
-        clockBgOffsetXLabel = activity.findViewById(R.id.clockBgOffsetXLabel);
-        clockBgOffsetYLabel = activity.findViewById(R.id.clockBgOffsetYLabel);
-        clockBgMarginLabel = activity.findViewById(R.id.clockBgMarginLabel);
-        clockBgRadiusLabel = activity.findViewById(R.id.clockBgRadiusLabel);
-        clockShadowBlurLabel = activity.findViewById(R.id.clockShadowBlurLabel);
-        clockShadowOffsetXLabel = activity.findViewById(R.id.clockShadowOffsetXLabel);
-        clockShadowOffsetYLabel = activity.findViewById(R.id.clockShadowOffsetYLabel);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.clock_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.clock_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        clockSwitch = rootView.findViewById(R.id.clockSwitch);
+        clockSizeSeekBar = rootView.findViewById(R.id.clockSizeSeekBar);
+        clockColorPreview = rootView.findViewById(R.id.clockColorPreview);
+        clockShadowSwitch = rootView.findViewById(R.id.clockShadowSwitch);
+        clockShadowConfigContainer = rootView.findViewById(R.id.shadowConfigClock);
+        clockShadowColorPreview = rootView.findViewById(R.id.clockShadowColorPreview);
+        clockShadowBlurSeekBar = rootView.findViewById(R.id.clockShadowBlurSeekBar);
+        clockShadowOffsetXSeekBar = rootView.findViewById(R.id.clockShadowOffsetXSeekBar);
+        clockShadowOffsetYSeekBar = rootView.findViewById(R.id.clockShadowOffsetYSeekBar);
+        clockLockSwitch = rootView.findViewById(R.id.clockLockSwitch);
+        clockShowDateSwitch = rootView.findViewById(R.id.clockShowDateSwitch);
+        clockSafeArea = rootView.findViewById(R.id.clockSafeArea);
+        clockBgSwitch = rootView.findViewById(R.id.clockBgSwitch);
+        clockBgConfigContainer = rootView.findViewById(R.id.bgConfigClock);
+        clockBgColorPreview = rootView.findViewById(R.id.clockBgColorPreview);
+        clockBgPaddingSeekBar = rootView.findViewById(R.id.clockBgPaddingSeekBar);
+        clockBgOffsetXSeekBar = rootView.findViewById(R.id.clockBgOffsetXSeekBar);
+        clockBgOffsetYSeekBar = rootView.findViewById(R.id.clockBgOffsetYSeekBar);
+        clockBgMarginSeekBar = rootView.findViewById(R.id.clockBgMarginSeekBar);
+        clockBgRadiusSeekBar = rootView.findViewById(R.id.clockBgRadiusSeekBar);
+        clockSizeLabel = rootView.findViewById(R.id.clockSizeLabel);
+        clockBgPaddingLabel = rootView.findViewById(R.id.clockBgPaddingLabel);
+        clockBgOffsetXLabel = rootView.findViewById(R.id.clockBgOffsetXLabel);
+        clockBgOffsetYLabel = rootView.findViewById(R.id.clockBgOffsetYLabel);
+        clockBgMarginLabel = rootView.findViewById(R.id.clockBgMarginLabel);
+        clockBgRadiusLabel = rootView.findViewById(R.id.clockBgRadiusLabel);
+        clockShadowBlurLabel = rootView.findViewById(R.id.clockShadowBlurLabel);
+        clockShadowOffsetXLabel = rootView.findViewById(R.id.clockShadowOffsetXLabel);
+        clockShadowOffsetYLabel = rootView.findViewById(R.id.clockShadowOffsetYLabel);
+
+        View sectionDisplay = rootView.findViewById(R.id.clock_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.clock_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.clock_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.clock_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.clock_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.clock_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.clock_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.clock_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.clock_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.clock_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.clock_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.clock_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.clock_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.clock_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 
@@ -138,6 +152,8 @@ public class ClockPanelController {
         clockShadowOffsetYSeekBar.setProgress((int) ClockConfig.shadow.offsetY + 60);
         clockLockSwitch.setChecked(ClockConfig.touchPassthrough);
         activity.applyCheckboxTint(clockLockSwitch, ClockConfig.touchPassthrough);
+        clockShowDateSwitch.setChecked(ClockConfig.showDate);
+        activity.applyCheckboxTint(clockShowDateSwitch, ClockConfig.showDate);
         clockSafeArea.setChecked(ClockConfig.safeArea);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
         clockColorPreview.setBackgroundColor(ClockConfig.color);
@@ -350,6 +366,13 @@ public class ClockPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_lock", isChecked).apply();
             FloatingService.updateTouchFlagsForModule(FloatingService.clockModule());
+        });
+
+        clockShowDateSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            ClockConfig.showDate = isChecked;
+            activity.applyCheckboxTint(clockShowDateSwitch, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("clock_show_date", isChecked).apply();
         });
 
         clockSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {

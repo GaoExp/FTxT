@@ -64,6 +64,14 @@ public class BatteryCurrentPanelController {
         batCurPositionController = new BatteryCurrentPositionController(activity);
     }
 
+    public BatteryCurrentPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        batCurPositionController = new BatteryCurrentPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (batCurPositionController != null) {
             batCurPositionController.refresh();
@@ -84,55 +92,59 @@ public class BatteryCurrentPanelController {
     }
 
     private void bindViews() {
-        batCurSwitch = activity.findViewById(R.id.batCurSwitch);
-        batCurValueOnlyCheck = activity.findViewById(R.id.batCurValueOnlyCheck);
-        batCurSizeSeekBar = activity.findViewById(R.id.batCurSizeSeekBar);
-        batCurColorPreview = activity.findViewById(R.id.batCurColorPreview);
-        batCurLabelColorPreview = activity.findViewById(R.id.batCurLabelColorPreview);
-        batCurShadowSwitch = activity.findViewById(R.id.batCurShadowSwitch);
-        batCurShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryCurrent);
-        batCurShadowColorPreview = activity.findViewById(R.id.batCurShadowColorPreview);
-        batCurShadowBlurSeekBar = activity.findViewById(R.id.batCurShadowBlurSeekBar);
-        batCurShadowOffsetXSeekBar = activity.findViewById(R.id.batCurShadowOffsetXSeekBar);
-        batCurShadowOffsetYSeekBar = activity.findViewById(R.id.batCurShadowOffsetYSeekBar);
-        batCurLockSwitch = activity.findViewById(R.id.batCurLockSwitch);
-        batCurShowVoltage = activity.findViewById(R.id.batCurShowVoltage);
-        batCurShowCurrent = activity.findViewById(R.id.batCurShowCurrent);
-        batCurShowPower = activity.findViewById(R.id.batCurShowPower);
-        batCurSafeArea = activity.findViewById(R.id.batCurSafeArea);
-        batCurBgSwitch = activity.findViewById(R.id.batCurBgSwitch);
-        batCurBgConfigContainer = activity.findViewById(R.id.bgConfigBatteryCurrent);
-        batCurBgColorPreview = activity.findViewById(R.id.batCurBgColorPreview);
-        batCurBgPaddingSeekBar = activity.findViewById(R.id.batCurBgPaddingSeekBar);
-        batCurBgOffsetXSeekBar = activity.findViewById(R.id.batCurBgOffsetXSeekBar);
-        batCurBgOffsetYSeekBar = activity.findViewById(R.id.batCurBgOffsetYSeekBar);
-        batCurBgMarginSeekBar = activity.findViewById(R.id.batCurBgMarginSeekBar);
-        batCurBgRadiusSeekBar = activity.findViewById(R.id.batCurBgRadiusSeekBar);
-        batCurSizeLabel = activity.findViewById(R.id.batCurSizeLabel);
-        batCurBgPaddingLabel = activity.findViewById(R.id.batCurBgPaddingLabel);
-        batCurBgOffsetXLabel = activity.findViewById(R.id.batCurBgOffsetXLabel);
-        batCurBgOffsetYLabel = activity.findViewById(R.id.batCurBgOffsetYLabel);
-        batCurBgMarginLabel = activity.findViewById(R.id.batCurBgMarginLabel);
-        batCurBgRadiusLabel = activity.findViewById(R.id.batCurBgRadiusLabel);
-        batCurShadowBlurLabel = activity.findViewById(R.id.batCurShadowBlurLabel);
-        batCurShadowOffsetXLabel = activity.findViewById(R.id.batCurShadowOffsetXLabel);
-        batCurShadowOffsetYLabel = activity.findViewById(R.id.batCurShadowOffsetYLabel);
-        batCurIntervalValue = activity.findViewById(R.id.batCurIntervalValue);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.batCur_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.batCur_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        batCurSwitch = rootView.findViewById(R.id.batCurSwitch);
+        batCurValueOnlyCheck = rootView.findViewById(R.id.batCurValueOnlyCheck);
+        batCurSizeSeekBar = rootView.findViewById(R.id.batCurSizeSeekBar);
+        batCurColorPreview = rootView.findViewById(R.id.batCurColorPreview);
+        batCurLabelColorPreview = rootView.findViewById(R.id.batCurLabelColorPreview);
+        batCurShadowSwitch = rootView.findViewById(R.id.batCurShadowSwitch);
+        batCurShadowConfigContainer = rootView.findViewById(R.id.shadowConfigBatteryCurrent);
+        batCurShadowColorPreview = rootView.findViewById(R.id.batCurShadowColorPreview);
+        batCurShadowBlurSeekBar = rootView.findViewById(R.id.batCurShadowBlurSeekBar);
+        batCurShadowOffsetXSeekBar = rootView.findViewById(R.id.batCurShadowOffsetXSeekBar);
+        batCurShadowOffsetYSeekBar = rootView.findViewById(R.id.batCurShadowOffsetYSeekBar);
+        batCurLockSwitch = rootView.findViewById(R.id.batCurLockSwitch);
+        batCurShowVoltage = rootView.findViewById(R.id.batCurShowVoltage);
+        batCurShowCurrent = rootView.findViewById(R.id.batCurShowCurrent);
+        batCurShowPower = rootView.findViewById(R.id.batCurShowPower);
+        batCurSafeArea = rootView.findViewById(R.id.batCurSafeArea);
+        batCurBgSwitch = rootView.findViewById(R.id.batCurBgSwitch);
+        batCurBgConfigContainer = rootView.findViewById(R.id.bgConfigBatteryCurrent);
+        batCurBgColorPreview = rootView.findViewById(R.id.batCurBgColorPreview);
+        batCurBgPaddingSeekBar = rootView.findViewById(R.id.batCurBgPaddingSeekBar);
+        batCurBgOffsetXSeekBar = rootView.findViewById(R.id.batCurBgOffsetXSeekBar);
+        batCurBgOffsetYSeekBar = rootView.findViewById(R.id.batCurBgOffsetYSeekBar);
+        batCurBgMarginSeekBar = rootView.findViewById(R.id.batCurBgMarginSeekBar);
+        batCurBgRadiusSeekBar = rootView.findViewById(R.id.batCurBgRadiusSeekBar);
+        batCurSizeLabel = rootView.findViewById(R.id.batCurSizeLabel);
+        batCurBgPaddingLabel = rootView.findViewById(R.id.batCurBgPaddingLabel);
+        batCurBgOffsetXLabel = rootView.findViewById(R.id.batCurBgOffsetXLabel);
+        batCurBgOffsetYLabel = rootView.findViewById(R.id.batCurBgOffsetYLabel);
+        batCurBgMarginLabel = rootView.findViewById(R.id.batCurBgMarginLabel);
+        batCurBgRadiusLabel = rootView.findViewById(R.id.batCurBgRadiusLabel);
+        batCurShadowBlurLabel = rootView.findViewById(R.id.batCurShadowBlurLabel);
+        batCurShadowOffsetXLabel = rootView.findViewById(R.id.batCurShadowOffsetXLabel);
+        batCurShadowOffsetYLabel = rootView.findViewById(R.id.batCurShadowOffsetYLabel);
+        batCurIntervalValue = rootView.findViewById(R.id.batCurIntervalValue);
+
+        View sectionDisplay = rootView.findViewById(R.id.batCur_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.batCur_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.batCur_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.batCur_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.batCur_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.batCur_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.batCur_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.batCur_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.batCur_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.batCur_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.batCur_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.batCur_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.batCur_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.batCur_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

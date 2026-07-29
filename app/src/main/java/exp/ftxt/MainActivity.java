@@ -14,8 +14,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupMenu;
 import android.widget.CheckBox;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -43,34 +44,12 @@ import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
-import exp.ftxt.ui.BatteryPanelController;
-import exp.ftxt.ui.BatteryCurrentPanelController;
-
-import exp.ftxt.ui.ClockPanelController;
-import exp.ftxt.ui.FpsPanelController;
-import exp.ftxt.ui.NetworkPanelController;
-import exp.ftxt.ui.TextPanelController;
-import exp.ftxt.ui.ColorPickerPanelController;
+import exp.ftxt.ui.PanelManager;
 import exp.ftxt.utils.PermissionHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    View panelText;
-    View panelFps;
-    View panelClock;
-    View panelBattery;
-    View panelBatteryCurrent;
-    View panelNetwork;
-    private TextPanelController textPanel;
-    private FpsPanelController fpsPanel;
-    private ClockPanelController clockPanel;
-    private BatteryPanelController batteryPanel;
-    private BatteryCurrentPanelController batteryCurrentPanel;
-    private NetworkPanelController networkPanel;
-    private View panelCrosshair;
-    private View panelLogo;
-    private View panelColorPicker;
-    private ColorPickerPanelController colorPickerPanel;
+    private PanelManager panelManager;
 
     private RecyclerView navItemContainer;
     private SidebarAdapter sidebarAdapter;
@@ -113,41 +92,14 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        panelText = findViewById(R.id.panel_text);
-        panelFps = findViewById(R.id.panel_fps);
-        panelClock = findViewById(R.id.panel_clock);
-        panelBattery = findViewById(R.id.panel_battery);
-        panelBatteryCurrent = findViewById(R.id.panel_battery_current);
-        panelNetwork = findViewById(R.id.panel_network);
-        panelCrosshair = findViewById(R.id.panel_crosshair);
-        panelLogo = findViewById(R.id.panel_logo);
-        panelColorPicker = findViewById(R.id.panel_color_picker);
+        panelManager = new PanelManager(this, R.id.panel_container);
+
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
         int savedNavItem = prefs.getInt("nav_selected_item", R.id.navFloatingText);
-        if (savedNavItem == R.id.navFps) {
-            panelText.setVisibility(View.GONE);
-            panelFps.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_fps);
-        } else if (savedNavItem == R.id.navBattery) {
-            panelText.setVisibility(View.GONE);
-            panelBattery.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_battery);
-        } else if (savedNavItem == R.id.navClock) {
-            panelText.setVisibility(View.GONE);
-            panelClock.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_clock);
-        } else if (savedNavItem == R.id.navBatteryCurrent) {
-            panelText.setVisibility(View.GONE);
-            panelBatteryCurrent.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_battery_current);
-        } else if (savedNavItem == R.id.navNetwork) {
-            panelText.setVisibility(View.GONE);
-            panelNetwork.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_network);
-        } else if (savedNavItem == R.id.navColorPicker) {
-            panelText.setVisibility(View.GONE);
-            panelColorPicker.setVisibility(View.VISIBLE);
-            getSupportActionBar().setTitle(R.string.nav_color_picker);
+        String savedPanel = panelIdToName(savedNavItem);
+        if (savedPanel != null) {
+            panelManager.showPanel(savedPanel);
+            updateActionBarTitle(savedNavItem);
         }
 
         TextView navTitle = findViewById(R.id.navHeaderTitle);
@@ -166,14 +118,6 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.navKeluar).setOnClickListener(v -> finishAffinity());
 
         loadShadowConfigs();
-
-        textPanel = new TextPanelController(this);
-        fpsPanel = new FpsPanelController(this);
-        clockPanel = new ClockPanelController(this);
-        batteryPanel = new BatteryPanelController(this);
-        batteryCurrentPanel = new BatteryCurrentPanelController(this);
-        networkPanel = new NetworkPanelController(this);
-        colorPickerPanel = new ColorPickerPanelController(this);
 
         requestAllPermissionsOnFirstLaunch();
     }
@@ -203,26 +147,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (textPanel != null && panelText.getVisibility() == View.VISIBLE) {
-            textPanel.onPanelShown();
-        }
-        if (fpsPanel != null && panelFps.getVisibility() == View.VISIBLE) {
-            fpsPanel.onPanelShown();
-        }
-        if (clockPanel != null && panelClock.getVisibility() == View.VISIBLE) {
-            clockPanel.onPanelShown();
-        }
-        if (batteryPanel != null && panelBattery.getVisibility() == View.VISIBLE) {
-            batteryPanel.onPanelShown();
-        }
-        if (batteryCurrentPanel != null && panelBatteryCurrent.getVisibility() == View.VISIBLE) {
-            batteryCurrentPanel.onPanelShown();
-        }
-        if (networkPanel != null && panelNetwork.getVisibility() == View.VISIBLE) {
-            networkPanel.onPanelShown();
-        }
-        if (colorPickerPanel != null && panelColorPicker.getVisibility() == View.VISIBLE) {
-            colorPickerPanel.onPanelShown();
+        if (panelManager != null) {
+            panelManager.onPanelShown();
         }
         autoRequestAndStart();
         requestRemainingPermissions();
@@ -378,18 +304,8 @@ public class MainActivity extends AppCompatActivity {
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if (title.equals("Muat Preset")) {
-                if (panelFps.getVisibility() == View.VISIBLE) {
-                    fpsPanel.showLoadPresetDialog();
-                } else if (panelClock.getVisibility() == View.VISIBLE) {
-                    clockPanel.showLoadPresetDialog();
-                } else if (panelBattery.getVisibility() == View.VISIBLE) {
-                    batteryPanel.showLoadPresetDialog();
-                } else if (panelBatteryCurrent.getVisibility() == View.VISIBLE) {
-                    batteryCurrentPanel.showLoadPresetDialog();
-                } else if (panelNetwork.getVisibility() == View.VISIBLE) {
-                    networkPanel.showLoadPresetDialog();
-                } else {
-                    textPanel.showLoadPresetDialog();
+                if (panelManager != null) {
+                    panelManager.showLoadPresetDialog();
                 }
             } else if (title.equals("Konfigurasi")) {
                 startActivity(new Intent(this, SettingsActivity.class));
@@ -471,6 +387,7 @@ public class MainActivity extends AppCompatActivity {
         ClockConfig.shadow.offsetY = prefs.getFloat("clock_shadow_offset_y", 3f);
         ClockConfig.safeArea = prefs.getBoolean("clock_safe_area", true);
         ClockConfig.touchPassthrough = prefs.getBoolean("clock_lock", true);
+        ClockConfig.showDate = prefs.getBoolean("clock_show_date", true);
         ClockConfig.bg.enabled = prefs.getBoolean("clock_bg_enabled", false);
         ClockConfig.bg.color = prefs.getInt("clock_bg_color", 0xCC000000);
         ClockConfig.bg.padding = prefs.getInt("clock_bg_padding", 10);
@@ -703,34 +620,10 @@ public class MainActivity extends AppCompatActivity {
                     updateNavSelection(itemId);
                     getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
                             .edit().putInt("nav_selected_item", itemId).apply();
-                    hideAllPanels();
-                    if (itemId == R.id.navFps) {
-                        panelFps.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_fps);
-                    } else if (itemId == R.id.navBattery) {
-                        panelBattery.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_battery);
-                    } else if (itemId == R.id.navBatteryCurrent) {
-                        panelBatteryCurrent.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_battery_current);
-                    } else if (itemId == R.id.navClock) {
-                        panelClock.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_clock);
-                    } else if (itemId == R.id.navNetwork) {
-                        panelNetwork.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_network);
-                    } else if (itemId == R.id.navCrosshair) {
-                        panelCrosshair.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle("Crosshair");
-                    } else if (itemId == R.id.navLogo) {
-                        panelLogo.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle("Logo Display");
-                    } else if (itemId == R.id.navColorPicker) {
-                        panelColorPicker.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_color_picker);
-                    } else {
-                        panelText.setVisibility(View.VISIBLE);
-                        getSupportActionBar().setTitle(R.string.nav_floating_text);
+                    String panelName = panelIdToName(itemId);
+                    if (panelName != null) {
+                        panelManager.showPanel(panelName);
+                        updateActionBarTitle(itemId);
                     }
                     DrawerLayout drawer = findViewById(R.id.drawerLayout);
                     drawer.closeDrawers();
@@ -769,28 +662,34 @@ public class MainActivity extends AppCompatActivity {
         public int getItemCount() { return items.size(); }
     }
 
-    private void hideAllPanels() {
-        panelText.setVisibility(View.GONE);
-        panelFps.setVisibility(View.GONE);
-        panelClock.setVisibility(View.GONE);
-        panelBattery.setVisibility(View.GONE);
-        panelBatteryCurrent.setVisibility(View.GONE);
-        panelNetwork.setVisibility(View.GONE);
-        panelCrosshair.setVisibility(View.GONE);
-        panelLogo.setVisibility(View.GONE);
-        panelColorPicker.setVisibility(View.GONE);
+    @Nullable
+    private String panelIdToName(int itemId) {
+        if (itemId == R.id.navFloatingText) return "text";
+        if (itemId == R.id.navFps) return "fps";
+        if (itemId == R.id.navClock) return "clock";
+        if (itemId == R.id.navBattery) return "battery";
+        if (itemId == R.id.navBatteryCurrent) return "battery_cur";
+        if (itemId == R.id.navNetwork) return "network";
+        if (itemId == R.id.navColorPicker) return "color_picker";
+        return null;
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (textPanel != null) textPanel.cleanup();
-        if (fpsPanel != null) fpsPanel.cleanup();
-        if (clockPanel != null) clockPanel.cleanup();
-        if (batteryPanel != null) batteryPanel.cleanup();
-        if (batteryCurrentPanel != null) batteryCurrentPanel.cleanup();
-        if (networkPanel != null) networkPanel.cleanup();
-        if (colorPickerPanel != null) colorPickerPanel.cleanup();
+    private void updateActionBarTitle(int itemId) {
+        if (itemId == R.id.navFps) {
+            getSupportActionBar().setTitle(R.string.nav_fps);
+        } else if (itemId == R.id.navBattery) {
+            getSupportActionBar().setTitle(R.string.nav_battery);
+        } else if (itemId == R.id.navBatteryCurrent) {
+            getSupportActionBar().setTitle(R.string.nav_battery_current);
+        } else if (itemId == R.id.navClock) {
+            getSupportActionBar().setTitle(R.string.nav_clock);
+        } else if (itemId == R.id.navNetwork) {
+            getSupportActionBar().setTitle(R.string.nav_network);
+        } else if (itemId == R.id.navColorPicker) {
+            getSupportActionBar().setTitle(R.string.nav_color_picker);
+        } else {
+            getSupportActionBar().setTitle(R.string.nav_floating_text);
+        }
     }
 
     private int dp(float dp) {

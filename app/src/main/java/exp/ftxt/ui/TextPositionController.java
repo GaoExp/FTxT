@@ -142,12 +142,48 @@ public class TextPositionController {
         FloatingService.updatePositionForModule(FloatingService.textModule());
     }
 
+    public TextPositionController(Activity activity, View rootView) {
+        this.activity = activity;
+        this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int orientation = activity.getResources().getConfiguration().orientation;
+        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+        loadPositionFromPrefs(currentOrientation);
+
+        FloatingService.setOrientationSuffixForModule(FloatingService.textModule(), currentOrientation);
+
+        bindViews(rootView);
+
+        WindowManager wm = activity.getWindowManager();
+        DisplayMetrics realMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(realMetrics);
+        displayWidth = realMetrics.widthPixels;
+        displayHeight = realMetrics.heightPixels;
+
+        TextModule.onPositionUpdate = this::syncAll;
+
+        sliderController = new SliderPositionController(
+                rootView.findViewById(R.id.posXSeekBar),
+                rootView.findViewById(R.id.posYSeekBar),
+                rootView.findViewById(R.id.posXLabel),
+                rootView.findViewById(R.id.posYLabel),
+                (x, y) -> onPositionChanged(x, y)
+        );
+        setupListeners();
+        syncAll();
+        FloatingService.updatePositionForModule(FloatingService.textModule());
+    }
+
     private void bindViews() {
-        btnUp = activity.findViewById(R.id.btnUp);
-        btnDown = activity.findViewById(R.id.btnDown);
-        btnLeft = activity.findViewById(R.id.btnLeft);
-        btnRight = activity.findViewById(R.id.btnRight);
-        coordDisplay = activity.findViewById(R.id.posCoordDisplay);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
+
+    private void bindViews(View rootView) {
+        btnUp = rootView.findViewById(R.id.btnUp);
+        btnDown = rootView.findViewById(R.id.btnDown);
+        btnLeft = rootView.findViewById(R.id.btnLeft);
+        btnRight = rootView.findViewById(R.id.btnRight);
+        coordDisplay = rootView.findViewById(R.id.posCoordDisplay);
     }
 
     private void setupListeners() {

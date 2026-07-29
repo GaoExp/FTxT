@@ -1,3 +1,33 @@
+# [4.84.0] - 2026-07-28
+### ✨ Fitur Baru
+- **Tanggal di Bawah Jam — Tampilan dua baris** — Clock module sekarang menampilkan tanggal di bawah jam dalam format dua baris (`HH:mm:ss` di atas, `MMM dd EE` di bawah). Diaktifkan secara default. Bisa di-toggle via panel jam (checkbox "Tanggal").
+### ♻️ Perubahan Fitur
+- **Refactor Panel Navigation — Fragment-based** — Ubah sistem navigasi panel dari View visibility manual ke Fragment-based. Setiap panel (text, fps, clock, battery, battery_pct, battery_cur, network, color_picker) punya Fragment sendiri + PanelManager untuk mengelola show/hide. Semua PanelController & PositionController mendapat overload konstruktor dengan `(Activity, View rootView)` untuk binding di Fragment. bindViews() lama delegasi ke bindViews(rootView). MainActivity di-refactor: hapus semua field View panel, field controller, hideAllPanels(), dan if-else visibility — ganti dengan PanelManager.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 175, versionName 4.84.0
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockConfig.java` — Tambah field `showDate` (default `true`)
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Update `getCurrentTime()` untuk tampilkan tanggal via `\n` saat `showDate` aktif, tambah `setLineSpacing` & `setIncludeFontPadding(false)` untuk tampilan dua baris
+- `app/src/main/res/layout/panel_clock.xml` — Tambah checkbox "Tanggal" (`clockShowDateSwitch`)
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Bind + listener untuk `clockShowDateSwitch`, simpan ke SharedPreferences
+- `app/src/main/java/exp/ftxt/ui/PanelManager.java` — Tambah method `onPanelShown()`, `showLoadPresetDialog()`
+- `app/src/main/java/exp/ftxt/ui/BasePanelFragment.java` — Tambah method `onPanelShown()`, `showLoadPresetDialog()`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Refactor: hapus 9 field View panel + 7 field controller + hideAllPanels() + cleanup di onDestroy, ganti dengan PanelManager; tambah helper panelIdToName() & updateActionBarTitle()
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java` — Tambah konstruktor `(MainActivity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Tambah konstruktor `(Activity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Tambah konstruktor `(MainActivity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Tambah konstruktor `(Activity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Tambah konstruktor `(MainActivity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Tambah konstruktor `(Activity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/ColorPickerPanelController.java` — Tambah konstruktor `(MainActivity, View)` + overload bindViews(View)
+- `app/src/main/java/exp/ftxt/ui/fragment/BatteryPercentagePanelFragment.java` — Isi lifecycle: init controller di onViewCreated, cleanup di onDestroyView
+- `app/src/main/java/exp/ftxt/ui/fragment/BatteryCurrentPanelFragment.java` — Isi lifecycle
+- `app/src/main/java/exp/ftxt/ui/fragment/NetworkPanelFragment.java` — Isi lifecycle
+- `app/src/main/java/exp/ftxt/ui/fragment/ColorPickerPanelFragment.java` — Isi lifecycle
+### 🔢 Version
+`4.83.2` → `4.84.0`
+
+---
+
 # [4.83.2] - 2026-07-28
 ### ✨ Fitur Baru
 - **Ikon Notifikasi Dinamis — nilai suhu baterai di status bar** — Ikon notifikasi foreground service sekarang menampilkan nilai suhu baterai aktual (misal `37°`) yang di-generate secara dinamis sebagai Bitmap. Update setiap 10 detik. Title notifikasi juga menampilkan suhu (misal `FTxT 37°C`).

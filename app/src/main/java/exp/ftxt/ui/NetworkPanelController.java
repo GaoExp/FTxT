@@ -61,6 +61,14 @@ public class NetworkPanelController {
         networkPositionController = new NetworkPositionController(activity);
     }
 
+    public NetworkPanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        networkPositionController = new NetworkPositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (networkPositionController != null) {
             networkPositionController.refresh();
@@ -81,52 +89,56 @@ public class NetworkPanelController {
     }
 
     private void bindViews() {
-        networkSwitch = activity.findViewById(R.id.networkSwitch);
-        networkValueOnlyCheck = activity.findViewById(R.id.networkValueOnlyCheck);
-        networkSizeSeekBar = activity.findViewById(R.id.networkSizeSeekBar);
-        networkColorPreview = activity.findViewById(R.id.networkColorPreview);
-        networkLabelColorPreview = activity.findViewById(R.id.networkLabelColorPreview);
-        networkShadowSwitch = activity.findViewById(R.id.networkShadowSwitch);
-        networkShadowConfigContainer = activity.findViewById(R.id.shadowConfigNetwork);
-        networkShadowColorPreview = activity.findViewById(R.id.networkShadowColorPreview);
-        networkShadowBlurSeekBar = activity.findViewById(R.id.networkShadowBlurSeekBar);
-        networkShadowOffsetXSeekBar = activity.findViewById(R.id.networkShadowOffsetXSeekBar);
-        networkShadowOffsetYSeekBar = activity.findViewById(R.id.networkShadowOffsetYSeekBar);
-        networkLockSwitch = activity.findViewById(R.id.networkLockSwitch);
-        networkSafeArea = activity.findViewById(R.id.networkSafeArea);
-        networkBgSwitch = activity.findViewById(R.id.networkBgSwitch);
-        networkBgConfigContainer = activity.findViewById(R.id.bgConfigNetwork);
-        networkBgColorPreview = activity.findViewById(R.id.networkBgColorPreview);
-        networkBgPaddingSeekBar = activity.findViewById(R.id.networkBgPaddingSeekBar);
-        networkBgOffsetXSeekBar = activity.findViewById(R.id.networkBgOffsetXSeekBar);
-        networkBgOffsetYSeekBar = activity.findViewById(R.id.networkBgOffsetYSeekBar);
-        networkBgMarginSeekBar = activity.findViewById(R.id.networkBgMarginSeekBar);
-        networkBgRadiusSeekBar = activity.findViewById(R.id.networkBgRadiusSeekBar);
-        networkSizeLabel = activity.findViewById(R.id.networkSizeLabel);
-        networkBgPaddingLabel = activity.findViewById(R.id.networkBgPaddingLabel);
-        networkBgOffsetXLabel = activity.findViewById(R.id.networkBgOffsetXLabel);
-        networkBgOffsetYLabel = activity.findViewById(R.id.networkBgOffsetYLabel);
-        networkBgMarginLabel = activity.findViewById(R.id.networkBgMarginLabel);
-        networkBgRadiusLabel = activity.findViewById(R.id.networkBgRadiusLabel);
-        networkShadowBlurLabel = activity.findViewById(R.id.networkShadowBlurLabel);
-        networkShadowOffsetXLabel = activity.findViewById(R.id.networkShadowOffsetXLabel);
-        networkShadowOffsetYLabel = activity.findViewById(R.id.networkShadowOffsetYLabel);
-        networkIntervalValue = activity.findViewById(R.id.networkIntervalValue);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.network_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.network_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        networkSwitch = rootView.findViewById(R.id.networkSwitch);
+        networkValueOnlyCheck = rootView.findViewById(R.id.networkValueOnlyCheck);
+        networkSizeSeekBar = rootView.findViewById(R.id.networkSizeSeekBar);
+        networkColorPreview = rootView.findViewById(R.id.networkColorPreview);
+        networkLabelColorPreview = rootView.findViewById(R.id.networkLabelColorPreview);
+        networkShadowSwitch = rootView.findViewById(R.id.networkShadowSwitch);
+        networkShadowConfigContainer = rootView.findViewById(R.id.shadowConfigNetwork);
+        networkShadowColorPreview = rootView.findViewById(R.id.networkShadowColorPreview);
+        networkShadowBlurSeekBar = rootView.findViewById(R.id.networkShadowBlurSeekBar);
+        networkShadowOffsetXSeekBar = rootView.findViewById(R.id.networkShadowOffsetXSeekBar);
+        networkShadowOffsetYSeekBar = rootView.findViewById(R.id.networkShadowOffsetYSeekBar);
+        networkLockSwitch = rootView.findViewById(R.id.networkLockSwitch);
+        networkSafeArea = rootView.findViewById(R.id.networkSafeArea);
+        networkBgSwitch = rootView.findViewById(R.id.networkBgSwitch);
+        networkBgConfigContainer = rootView.findViewById(R.id.bgConfigNetwork);
+        networkBgColorPreview = rootView.findViewById(R.id.networkBgColorPreview);
+        networkBgPaddingSeekBar = rootView.findViewById(R.id.networkBgPaddingSeekBar);
+        networkBgOffsetXSeekBar = rootView.findViewById(R.id.networkBgOffsetXSeekBar);
+        networkBgOffsetYSeekBar = rootView.findViewById(R.id.networkBgOffsetYSeekBar);
+        networkBgMarginSeekBar = rootView.findViewById(R.id.networkBgMarginSeekBar);
+        networkBgRadiusSeekBar = rootView.findViewById(R.id.networkBgRadiusSeekBar);
+        networkSizeLabel = rootView.findViewById(R.id.networkSizeLabel);
+        networkBgPaddingLabel = rootView.findViewById(R.id.networkBgPaddingLabel);
+        networkBgOffsetXLabel = rootView.findViewById(R.id.networkBgOffsetXLabel);
+        networkBgOffsetYLabel = rootView.findViewById(R.id.networkBgOffsetYLabel);
+        networkBgMarginLabel = rootView.findViewById(R.id.networkBgMarginLabel);
+        networkBgRadiusLabel = rootView.findViewById(R.id.networkBgRadiusLabel);
+        networkShadowBlurLabel = rootView.findViewById(R.id.networkShadowBlurLabel);
+        networkShadowOffsetXLabel = rootView.findViewById(R.id.networkShadowOffsetXLabel);
+        networkShadowOffsetYLabel = rootView.findViewById(R.id.networkShadowOffsetYLabel);
+        networkIntervalValue = rootView.findViewById(R.id.networkIntervalValue);
+
+        View sectionDisplay = rootView.findViewById(R.id.network_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.network_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.network_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.network_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.network_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.network_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.network_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.network_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.network_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.network_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.network_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.network_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.network_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.network_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

@@ -143,12 +143,48 @@ public class ClockPositionController {
         FloatingService.updatePositionForModule(FloatingService.clockModule());
     }
 
+    public ClockPositionController(Activity activity, View rootView) {
+        this.activity = activity;
+        this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int orientation = activity.getResources().getConfiguration().orientation;
+        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+        loadPositionFromPrefs(currentOrientation);
+
+        FloatingService.setOrientationSuffixForModule(FloatingService.clockModule(), currentOrientation);
+
+        bindViews(rootView);
+
+        WindowManager wm = activity.getWindowManager();
+        DisplayMetrics realMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(realMetrics);
+        displayWidth = realMetrics.widthPixels;
+        displayHeight = realMetrics.heightPixels;
+
+        ClockModule.onPositionUpdate = this::syncAll;
+
+        sliderController = new SliderPositionController(
+                rootView.findViewById(R.id.clock_posXSeekBar),
+                rootView.findViewById(R.id.clock_posYSeekBar),
+                rootView.findViewById(R.id.clock_posXLabel),
+                rootView.findViewById(R.id.clock_posYLabel),
+                (x, y) -> onPositionChanged(x, y)
+        );
+        setupListeners();
+        syncAll();
+        FloatingService.updatePositionForModule(FloatingService.clockModule());
+    }
+
     private void bindViews() {
-        btnUp = activity.findViewById(R.id.clock_btnUp);
-        btnDown = activity.findViewById(R.id.clock_btnDown);
-        btnLeft = activity.findViewById(R.id.clock_btnLeft);
-        btnRight = activity.findViewById(R.id.clock_btnRight);
-        coordDisplay = activity.findViewById(R.id.clock_posCoordDisplay);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
+
+    private void bindViews(View rootView) {
+        btnUp = rootView.findViewById(R.id.clock_btnUp);
+        btnDown = rootView.findViewById(R.id.clock_btnDown);
+        btnLeft = rootView.findViewById(R.id.clock_btnLeft);
+        btnRight = rootView.findViewById(R.id.clock_btnRight);
+        coordDisplay = rootView.findViewById(R.id.clock_posCoordDisplay);
     }
 
     private void setupListeners() {

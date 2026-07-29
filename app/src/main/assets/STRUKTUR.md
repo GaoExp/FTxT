@@ -113,7 +113,18 @@ FTxT/
     │   │   │   ├── NetworkPanelController.java             — UI panel Network: switch, size, color, shadow
     │   │   │   ├── NetworkPositionController.java          — Kontrol posisi Network
     │   │   │   ├── ColorPickerPanelController.java         — UI panel Color Picker: wheel, sliders, saved colors
-    │   │   │
+    │   │   │   ├── BasePanelFragment.java                  — Abstract base Fragment untuk semua panel
+    │   │   │   ├── PanelManager.java                       — Kelola show/hide Fragment panel
+    │   │   │   ├── fragment/
+    │   │   │   │   ├── TextPanelFragment.java              — Fragment Floating Text
+    │   │   │   │   ├── FpsPanelFragment.java               — Fragment FPS Display
+    │   │   │   │   ├── ClockPanelFragment.java             — Fragment Jam Digital
+    │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Suhu Baterai
+    │   │   │   │   ├── BatteryPercentagePanelFragment.java — Fragment Battery %
+    │   │   │   │   ├── BatteryCurrentPanelFragment.java    — Fragment Battery Current
+    │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
+    │   │   │   │   └── ColorPickerPanelFragment.java       — Fragment Color Picker
+    │   │   │   │
     │   │   ├── utils/
     │   │   │   └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
     │   │   │
@@ -222,7 +233,7 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 58 |
+| Java source | 69 |
 | Layout XML | 21 |
 | Drawable XML | 30 |
 | Drawable PNG | 14 |
@@ -236,5 +247,5 @@ FTxT/
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~159** |
-| **Total direktori** | **~44** |
+| **Total file** | **~170** |
+| **Total direktori** | **~45** |

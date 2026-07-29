@@ -53,6 +53,14 @@ public class BatteryPercentagePanelController {
         batPctPositionController = new BatteryPercentagePositionController(activity);
     }
 
+    public BatteryPercentagePanelController(MainActivity activity, View rootView) {
+        this.activity = activity;
+        bindViews(rootView);
+        loadConfig();
+        setupListeners();
+        batPctPositionController = new BatteryPercentagePositionController(activity, rootView);
+    }
+
     public void onPanelShown() {
         if (batPctPositionController != null) {
             batPctPositionController.refresh();
@@ -73,49 +81,53 @@ public class BatteryPercentagePanelController {
     }
 
     private void bindViews() {
-        batPctSwitch = activity.findViewById(R.id.batPctSwitch);
-        batPctSizeSeekBar = activity.findViewById(R.id.batPctSizeSeekBar);
-        batPctColorPreview = activity.findViewById(R.id.batPctColorPreview);
-        batPctLabelColorPreview = activity.findViewById(R.id.batPctLabelColorPreview);
-        batPctShadowSwitch = activity.findViewById(R.id.batPctShadowSwitch);
-        batPctShadowConfigContainer = activity.findViewById(R.id.shadowConfigBatteryPercentage);
-        batPctShadowColorPreview = activity.findViewById(R.id.batPctShadowColorPreview);
-        batPctShadowBlurSeekBar = activity.findViewById(R.id.batPctShadowBlurSeekBar);
-        batPctShadowOffsetXSeekBar = activity.findViewById(R.id.batPctShadowOffsetXSeekBar);
-        batPctShadowOffsetYSeekBar = activity.findViewById(R.id.batPctShadowOffsetYSeekBar);
-        batPctLockSwitch = activity.findViewById(R.id.batPctLockSwitch);
-        batPctBgSwitch = activity.findViewById(R.id.batPctBgSwitch);
-        batPctBgConfigContainer = activity.findViewById(R.id.bgConfigBatteryPercentage);
-        batPctBgColorPreview = activity.findViewById(R.id.batPctBgColorPreview);
-        batPctBgPaddingSeekBar = activity.findViewById(R.id.batPctBgPaddingSeekBar);
-        batPctBgOffsetXSeekBar = activity.findViewById(R.id.batPctBgOffsetXSeekBar);
-        batPctBgOffsetYSeekBar = activity.findViewById(R.id.batPctBgOffsetYSeekBar);
-        batPctBgMarginSeekBar = activity.findViewById(R.id.batPctBgMarginSeekBar);
-        batPctBgRadiusSeekBar = activity.findViewById(R.id.batPctBgRadiusSeekBar);
-        batPctSizeLabel = activity.findViewById(R.id.batPctSizeLabel);
-        batPctBgPaddingLabel = activity.findViewById(R.id.batPctBgPaddingLabel);
-        batPctBgOffsetXLabel = activity.findViewById(R.id.batPctBgOffsetXLabel);
-        batPctBgOffsetYLabel = activity.findViewById(R.id.batPctBgOffsetYLabel);
-        batPctBgMarginLabel = activity.findViewById(R.id.batPctBgMarginLabel);
-        batPctBgRadiusLabel = activity.findViewById(R.id.batPctBgRadiusLabel);
-        batPctShadowBlurLabel = activity.findViewById(R.id.batPctShadowBlurLabel);
-        batPctShadowOffsetXLabel = activity.findViewById(R.id.batPctShadowOffsetXLabel);
-        batPctShadowOffsetYLabel = activity.findViewById(R.id.batPctShadowOffsetYLabel);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
 
-        View sectionDisplay = activity.findViewById(R.id.batPct_sectionDisplay);
-        TextView sectionDisplayHeader = activity.findViewById(R.id.batPct_sectionDisplayHeader);
+    private void bindViews(View rootView) {
+        batPctSwitch = rootView.findViewById(R.id.batPctSwitch);
+        batPctSizeSeekBar = rootView.findViewById(R.id.batPctSizeSeekBar);
+        batPctColorPreview = rootView.findViewById(R.id.batPctColorPreview);
+        batPctLabelColorPreview = rootView.findViewById(R.id.batPctLabelColorPreview);
+        batPctShadowSwitch = rootView.findViewById(R.id.batPctShadowSwitch);
+        batPctShadowConfigContainer = rootView.findViewById(R.id.shadowConfigBatteryPercentage);
+        batPctShadowColorPreview = rootView.findViewById(R.id.batPctShadowColorPreview);
+        batPctShadowBlurSeekBar = rootView.findViewById(R.id.batPctShadowBlurSeekBar);
+        batPctShadowOffsetXSeekBar = rootView.findViewById(R.id.batPctShadowOffsetXSeekBar);
+        batPctShadowOffsetYSeekBar = rootView.findViewById(R.id.batPctShadowOffsetYSeekBar);
+        batPctLockSwitch = rootView.findViewById(R.id.batPctLockSwitch);
+        batPctBgSwitch = rootView.findViewById(R.id.batPctBgSwitch);
+        batPctBgConfigContainer = rootView.findViewById(R.id.bgConfigBatteryPercentage);
+        batPctBgColorPreview = rootView.findViewById(R.id.batPctBgColorPreview);
+        batPctBgPaddingSeekBar = rootView.findViewById(R.id.batPctBgPaddingSeekBar);
+        batPctBgOffsetXSeekBar = rootView.findViewById(R.id.batPctBgOffsetXSeekBar);
+        batPctBgOffsetYSeekBar = rootView.findViewById(R.id.batPctBgOffsetYSeekBar);
+        batPctBgMarginSeekBar = rootView.findViewById(R.id.batPctBgMarginSeekBar);
+        batPctBgRadiusSeekBar = rootView.findViewById(R.id.batPctBgRadiusSeekBar);
+        batPctSizeLabel = rootView.findViewById(R.id.batPctSizeLabel);
+        batPctBgPaddingLabel = rootView.findViewById(R.id.batPctBgPaddingLabel);
+        batPctBgOffsetXLabel = rootView.findViewById(R.id.batPctBgOffsetXLabel);
+        batPctBgOffsetYLabel = rootView.findViewById(R.id.batPctBgOffsetYLabel);
+        batPctBgMarginLabel = rootView.findViewById(R.id.batPctBgMarginLabel);
+        batPctBgRadiusLabel = rootView.findViewById(R.id.batPctBgRadiusLabel);
+        batPctShadowBlurLabel = rootView.findViewById(R.id.batPctShadowBlurLabel);
+        batPctShadowOffsetXLabel = rootView.findViewById(R.id.batPctShadowOffsetXLabel);
+        batPctShadowOffsetYLabel = rootView.findViewById(R.id.batPctShadowOffsetYLabel);
+
+        View sectionDisplay = rootView.findViewById(R.id.batPct_sectionDisplay);
+        TextView sectionDisplayHeader = rootView.findViewById(R.id.batPct_sectionDisplayHeader);
         SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
 
-        View sectionPosition = activity.findViewById(R.id.batPct_sectionPosition);
-        TextView sectionPositionHeader = activity.findViewById(R.id.batPct_sectionPositionHeader);
+        View sectionPosition = rootView.findViewById(R.id.batPct_sectionPosition);
+        TextView sectionPositionHeader = rootView.findViewById(R.id.batPct_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
 
-        View sectionShadow = activity.findViewById(R.id.batPct_sectionShadow);
-        TextView sectionShadowHeader = activity.findViewById(R.id.batPct_sectionShadowHeader);
+        View sectionShadow = rootView.findViewById(R.id.batPct_sectionShadow);
+        TextView sectionShadowHeader = rootView.findViewById(R.id.batPct_sectionShadowHeader);
         SectionHelper.setupCollapsible(sectionShadowHeader, sectionShadow);
 
-        View sectionBackground = activity.findViewById(R.id.batPct_sectionBackground);
-        TextView sectionBackgroundHeader = activity.findViewById(R.id.batPct_sectionBackgroundHeader);
+        View sectionBackground = rootView.findViewById(R.id.batPct_sectionBackground);
+        TextView sectionBackgroundHeader = rootView.findViewById(R.id.batPct_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
     }
 

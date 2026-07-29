@@ -149,12 +149,48 @@ public class NetworkPositionController {
         FloatingService.updatePositionForModule(FloatingService.networkModule());
     }
 
+    public NetworkPositionController(Activity activity, View rootView) {
+        this.activity = activity;
+        this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int orientation = activity.getResources().getConfiguration().orientation;
+        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+        loadPositionFromPrefs(currentOrientation);
+
+        FloatingService.setOrientationSuffixForModule(FloatingService.networkModule(), currentOrientation);
+
+        bindViews(rootView);
+
+        WindowManager wm = activity.getWindowManager();
+        DisplayMetrics realMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(realMetrics);
+        displayWidth = realMetrics.widthPixels;
+        displayHeight = realMetrics.heightPixels;
+
+        NetworkModule.onPositionUpdate = this::syncAll;
+
+        sliderController = new SliderPositionController(
+                rootView.findViewById(R.id.network_posXSeekBar),
+                rootView.findViewById(R.id.network_posYSeekBar),
+                rootView.findViewById(R.id.network_posXLabel),
+                rootView.findViewById(R.id.network_posYLabel),
+                (x, y) -> onPositionChanged(x, y)
+        );
+        setupListeners();
+        syncAll();
+        FloatingService.updatePositionForModule(FloatingService.networkModule());
+    }
+
     private void bindViews() {
-        btnUp = activity.findViewById(R.id.network_btnUp);
-        btnDown = activity.findViewById(R.id.network_btnDown);
-        btnLeft = activity.findViewById(R.id.network_btnLeft);
-        btnRight = activity.findViewById(R.id.network_btnRight);
-        coordDisplay = activity.findViewById(R.id.network_posCoordDisplay);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
+
+    private void bindViews(View rootView) {
+        btnUp = rootView.findViewById(R.id.network_btnUp);
+        btnDown = rootView.findViewById(R.id.network_btnDown);
+        btnLeft = rootView.findViewById(R.id.network_btnLeft);
+        btnRight = rootView.findViewById(R.id.network_btnRight);
+        coordDisplay = rootView.findViewById(R.id.network_posCoordDisplay);
     }
 
     private void setupListeners() {

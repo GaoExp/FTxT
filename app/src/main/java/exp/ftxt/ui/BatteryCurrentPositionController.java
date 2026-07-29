@@ -164,12 +164,48 @@ public class BatteryCurrentPositionController {
         FloatingService.updatePositionForModule(FloatingService.batteryCurrentModule());
     }
 
+    public BatteryCurrentPositionController(Activity activity, View rootView) {
+        this.activity = activity;
+        this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        int orientation = activity.getResources().getConfiguration().orientation;
+        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
+        loadPositionFromPrefs(currentOrientation);
+
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryCurrentModule(), currentOrientation);
+
+        bindViews(rootView);
+
+        WindowManager wm = activity.getWindowManager();
+        DisplayMetrics realMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(realMetrics);
+        displayWidth = realMetrics.widthPixels;
+        displayHeight = realMetrics.heightPixels;
+
+        BatteryCurrentModule.onPositionUpdate = this::syncAll;
+
+        sliderController = new SliderPositionController(
+                rootView.findViewById(R.id.batCurPosXSeekBar),
+                rootView.findViewById(R.id.batCurPosYSeekBar),
+                rootView.findViewById(R.id.batCurPosXLabel),
+                rootView.findViewById(R.id.batCurPosYLabel),
+                (x, y) -> onPositionChanged(x, y)
+        );
+        setupListeners();
+        syncAll();
+        FloatingService.updatePositionForModule(FloatingService.batteryCurrentModule());
+    }
+
     private void bindViews() {
-        btnUp = activity.findViewById(R.id.batCurBtnUp);
-        btnDown = activity.findViewById(R.id.batCurBtnDown);
-        btnLeft = activity.findViewById(R.id.batCurBtnLeft);
-        btnRight = activity.findViewById(R.id.batCurBtnRight);
-        coordDisplay = activity.findViewById(R.id.batCurPosCoordDisplay);
+        bindViews(activity.findViewById(android.R.id.content));
+    }
+
+    private void bindViews(View rootView) {
+        btnUp = rootView.findViewById(R.id.batCurBtnUp);
+        btnDown = rootView.findViewById(R.id.batCurBtnDown);
+        btnLeft = rootView.findViewById(R.id.batCurBtnLeft);
+        btnRight = rootView.findViewById(R.id.batCurBtnRight);
+        coordDisplay = rootView.findViewById(R.id.batCurPosCoordDisplay);
     }
 
     private void setupListeners() {
