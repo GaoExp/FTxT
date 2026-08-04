@@ -97,10 +97,12 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
         int savedNavItem = prefs.getInt("nav_selected_item", R.id.navFloatingText);
         String savedPanel = panelIdToName(savedNavItem);
-        if (savedPanel != null) {
-            panelManager.showPanel(savedPanel);
-            updateActionBarTitle(savedNavItem);
+        if (savedPanel == null) {
+            savedPanel = "text";
+            savedNavItem = R.id.navFloatingText;
         }
+        panelManager.showPanel(savedPanel);
+        updateActionBarTitle(savedNavItem);
 
         TextView navTitle = findViewById(R.id.navHeaderTitle);
         try {
@@ -338,7 +340,6 @@ public class MainActivity extends AppCompatActivity {
     private void forceClose() {
         killService();
         finishAffinity();
-        System.exit(0);
     }
 
     private void loadShadowConfigs() {
@@ -671,6 +672,8 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.navBatteryCurrent) return "battery_cur";
         if (itemId == R.id.navNetwork) return "network";
         if (itemId == R.id.navColorPicker) return "color_picker";
+        if (itemId == R.id.navCrosshair) return "crosshair";
+        if (itemId == R.id.navLogo) return "logo";
         return null;
     }
 
@@ -687,6 +690,10 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.nav_network);
         } else if (itemId == R.id.navColorPicker) {
             getSupportActionBar().setTitle(R.string.nav_color_picker);
+        } else if (itemId == R.id.navCrosshair) {
+            getSupportActionBar().setTitle(R.string.nav_crosshair);
+        } else if (itemId == R.id.navLogo) {
+            getSupportActionBar().setTitle(R.string.nav_logo);
         } else {
             getSupportActionBar().setTitle(R.string.nav_floating_text);
         }

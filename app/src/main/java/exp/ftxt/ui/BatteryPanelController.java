@@ -55,14 +55,6 @@ public class BatteryPanelController {
     private TextView batteryIntervalValue;
     private PopupWindow intervalPopup;
 
-    public BatteryPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        batteryPositionController = new BatteryPositionController(activity);
-    }
-
     public BatteryPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -88,10 +80,6 @@ public class BatteryPanelController {
             batteryPositionController.cleanup();
             batteryPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

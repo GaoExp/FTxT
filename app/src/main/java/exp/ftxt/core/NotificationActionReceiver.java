@@ -44,7 +44,6 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     private void handleKillService(Context context) {
         FloatingService.stopAllModules();
         context.stopService(new Intent(context, FloatingService.class));
-        System.exit(0);
     }
 
     private void handleOpenApp(Context context) {

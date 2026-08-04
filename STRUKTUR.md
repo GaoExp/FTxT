@@ -123,7 +123,9 @@ FTxT/
     │   │   │   │   ├── BatteryPercentagePanelFragment.java — Fragment Battery %
     │   │   │   │   ├── BatteryCurrentPanelFragment.java    — Fragment Battery Current
     │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
-    │   │   │   │   └── ColorPickerPanelFragment.java       — Fragment Color Picker
+    │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
+    │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair (placeholder)
+    │   │   │   │   └── LogoPanelFragment.java              — Fragment Logo Display (placeholder)
     │   │   │   │
     │   │   ├── utils/
     │   │   │   └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
@@ -233,7 +235,7 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 69 |
+| Java source | 71 |
 | Layout XML | 21 |
 | Drawable XML | 30 |
 | Drawable PNG | 14 |

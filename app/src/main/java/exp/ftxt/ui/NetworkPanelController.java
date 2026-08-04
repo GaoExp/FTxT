@@ -53,14 +53,6 @@ public class NetworkPanelController {
     private TextView networkIntervalValue;
     private PopupWindow intervalPopup;
 
-    public NetworkPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        networkPositionController = new NetworkPositionController(activity);
-    }
-
     public NetworkPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -86,10 +78,6 @@ public class NetworkPanelController {
             networkPositionController.cleanup();
             networkPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

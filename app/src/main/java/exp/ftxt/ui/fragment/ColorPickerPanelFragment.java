@@ -31,6 +31,11 @@ public class ColorPickerPanelFragment extends BasePanelFragment {
     }
 
     @Override
+    public void onPanelShown() {
+        if (controller != null) controller.onPanelShown();
+    }
+
+    @Override
     public void onDestroyView() {
         if (controller != null) {
             controller.cleanup();

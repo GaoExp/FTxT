@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -55,14 +54,6 @@ public class FpsPanelController {
     private TextView fpsIntervalValue;
     private PopupWindow intervalPopup;
 
-    public FpsPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        fpsPositionController = new FpsPositionController(activity);
-    }
-
     public FpsPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -88,10 +79,6 @@ public class FpsPanelController {
             fpsPositionController.cleanup();
             fpsPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

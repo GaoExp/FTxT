@@ -6,7 +6,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.CheckBox;
 import android.widget.TextView;
 
 import exp.ftxt.MainActivity;
@@ -45,14 +44,6 @@ public class BatteryPercentagePanelController {
     private TextView batPctShadowBlurLabel, batPctShadowOffsetXLabel, batPctShadowOffsetYLabel;
     private BatteryPercentagePositionController batPctPositionController;
 
-    public BatteryPercentagePanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        batPctPositionController = new BatteryPercentagePositionController(activity);
-    }
-
     public BatteryPercentagePanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -78,10 +69,6 @@ public class BatteryPercentagePanelController {
             batPctPositionController.cleanup();
             batPctPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

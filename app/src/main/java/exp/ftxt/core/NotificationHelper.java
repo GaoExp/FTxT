@@ -78,7 +78,6 @@ public class NotificationHelper {
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
         RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_custom);
-        contentView.setTextViewText(R.id.noti_title, "FTxT  " + tempValue + "\u00B0C");
 
         Intent toggleIntent = new Intent(context, NotificationActionReceiver.class);
         toggleIntent.setAction(NotificationActionReceiver.ACTION_TOGGLE_OVERLAY);

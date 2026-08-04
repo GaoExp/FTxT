@@ -58,15 +58,6 @@ public class TextPanelController {
     private LinearLayout textPatternContainer;
     private LinearLayout textPositionContainer;
 
-    public TextPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        applyInitialTints();
-        positionController = new TextPositionController(activity);
-    }
-
     public TextPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -108,10 +99,6 @@ public class TextPanelController {
         } else {
             activity.startService(new android.content.Intent(activity, FloatingService.class));
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

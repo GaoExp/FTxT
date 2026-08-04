@@ -56,14 +56,6 @@ public class BatteryCurrentPanelController {
     private TextView batCurIntervalValue;
     private PopupWindow intervalPopup;
 
-    public BatteryCurrentPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        batCurPositionController = new BatteryCurrentPositionController(activity);
-    }
-
     public BatteryCurrentPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -89,10 +81,6 @@ public class BatteryCurrentPanelController {
             batCurPositionController.cleanup();
             batCurPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

@@ -116,38 +116,6 @@ public class FpsPositionController {
         }
     };
 
-    public FpsPositionController(Activity activity) {
-        this.activity = activity;
-        this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
-        int orientation = activity.getResources().getConfiguration().orientation;
-        currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
-        loadPositionFromPrefs(currentOrientation);
-
-        FloatingService.setOrientationSuffixForModule(FloatingService.fpsModule(), currentOrientation);
-
-        bindViews();
-
-        WindowManager wm = activity.getWindowManager();
-        DisplayMetrics dm = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(dm);
-        displayWidth = dm.widthPixels;
-        displayHeight = dm.heightPixels;
-
-        FpsModule.onPositionUpdate = this::syncAll;
-
-        sliderController = new SliderPositionController(
-                activity.findViewById(R.id.fps_posXSeekBar),
-                activity.findViewById(R.id.fps_posYSeekBar),
-                activity.findViewById(R.id.fps_posXLabel),
-                activity.findViewById(R.id.fps_posYLabel),
-                (x, y) -> onPositionChanged(x, y)
-        );
-        setupListeners();
-        syncAll();
-        FloatingService.updatePositionForModule(FloatingService.fpsModule());
-    }
-
     public FpsPositionController(Activity activity, View rootView) {
         this.activity = activity;
         this.prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -180,16 +148,13 @@ public class FpsPositionController {
         FloatingService.updatePositionForModule(FloatingService.fpsModule());
     }
 
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
-    }
-
     private void bindViews(View rootView) {
         btnUp = rootView.findViewById(R.id.fps_btnUp);
         btnDown = rootView.findViewById(R.id.fps_btnDown);
         btnLeft = rootView.findViewById(R.id.fps_btnLeft);
         btnRight = rootView.findViewById(R.id.fps_btnRight);
         coordDisplay = rootView.findViewById(R.id.fps_posCoordDisplay);
+        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
     }
 
     private void setupListeners() {

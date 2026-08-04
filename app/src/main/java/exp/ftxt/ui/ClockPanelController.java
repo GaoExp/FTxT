@@ -45,14 +45,6 @@ public class ClockPanelController {
     private TextView clockShadowBlurLabel, clockShadowOffsetXLabel, clockShadowOffsetYLabel;
     private ClockPositionController clockPositionController;
 
-    public ClockPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-        clockPositionController = new ClockPositionController(activity);
-    }
-
     public ClockPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -78,10 +70,6 @@ public class ClockPanelController {
             clockPositionController.cleanup();
             clockPositionController = null;
         }
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

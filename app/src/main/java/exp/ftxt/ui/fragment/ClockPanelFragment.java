@@ -31,6 +31,16 @@ public class ClockPanelFragment extends BasePanelFragment {
     }
 
     @Override
+    public void onPanelShown() {
+        if (controller != null) controller.onPanelShown();
+    }
+
+    @Override
+    public void showLoadPresetDialog() {
+        if (controller != null) controller.showLoadPresetDialog();
+    }
+
+    @Override
     public void onDestroyView() {
         if (controller != null) {
             controller.cleanup();

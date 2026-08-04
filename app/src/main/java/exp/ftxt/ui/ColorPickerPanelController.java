@@ -88,22 +88,11 @@ public class ColorPickerPanelController {
     private final int[] satColors = new int[51];
     private final int[] alphaColors = new int[2];
 
-    public ColorPickerPanelController(MainActivity activity) {
-        this.activity = activity;
-        bindViews();
-        loadConfig();
-        setupListeners();
-    }
-
     public ColorPickerPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
         loadConfig();
         setupListeners();
-    }
-
-    private void bindViews() {
-        bindViews(activity.findViewById(android.R.id.content));
     }
 
     private void bindViews(View rootView) {

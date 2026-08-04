@@ -21,8 +21,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 175
-        versionName "4.84.0"
+        versionCode 176
+        versionName "4.84.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,6 +41,8 @@ android {
     buildTypes {
 
         debug {
+            applicationIdSuffix ".debug"
+            resValue "string", "app_name", "FTxTdebug"
         }
 
         release {
