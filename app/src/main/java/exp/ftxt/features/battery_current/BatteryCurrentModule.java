@@ -125,6 +125,12 @@ public class BatteryCurrentModule implements OverlayModule {
     }
 
     @Override
+    public void updateSeparatorColor(int color) {
+        BatteryCurrentConfig.separatorColor = color;
+        updateDisplay();
+    }
+
+    @Override
     public void updateShadow() {
         if (view != null) view.setShadowConfig(BatteryCurrentConfig.shadow);
         OverlayShadow.apply(view, params, wm, BatteryCurrentConfig.shadow, 4f);
@@ -270,6 +276,9 @@ public class BatteryCurrentModule implements OverlayModule {
                 if (c == 'm' || c == 'V' || c == 'A' || c == 'W') {
                     spannable.setSpan(new ForegroundColorSpan(BatteryCurrentConfig.labelColor),
                             i, i + 1, 0);
+                } else if (c == '|') {
+                    spannable.setSpan(new ForegroundColorSpan(BatteryCurrentConfig.separatorColor),
+                            i, i + 1, 0);
                 }
             }
             view.setText(spannable);
@@ -336,11 +345,11 @@ public class BatteryCurrentModule implements OverlayModule {
             sb.append(String.format("%.1f", voltage / 1000.0));
         }
         if (BatteryCurrentConfig.showCurrent) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0) sb.append(" | ");
             sb.append(String.format("%s%d", sign, mA));
         }
         if (BatteryCurrentConfig.showPower) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0) sb.append(" | ");
             sb.append(String.format("%.1f", powerW));
         }
         return sb.length() > 0 ? sb.toString() : "N/A";
@@ -397,11 +406,11 @@ public class BatteryCurrentModule implements OverlayModule {
             sb.append(String.format("%.1fV", voltage / 1000.0));
         }
         if (BatteryCurrentConfig.showCurrent) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0) sb.append(" | ");
             sb.append(String.format("%s%dmA", sign, mA));
         }
         if (BatteryCurrentConfig.showPower) {
-            if (sb.length() > 0) sb.append(" ");
+            if (sb.length() > 0) sb.append(" | ");
             sb.append(String.format("%.1fW", powerW));
         }
         return sb.length() > 0 ? sb.toString() : "N/A";

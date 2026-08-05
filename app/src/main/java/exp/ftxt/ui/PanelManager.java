@@ -10,7 +10,6 @@ import java.util.Map;
 
 import exp.ftxt.ui.fragment.BatteryCurrentPanelFragment;
 import exp.ftxt.ui.fragment.BatteryPanelFragment;
-import exp.ftxt.ui.fragment.BatteryPercentagePanelFragment;
 import exp.ftxt.ui.fragment.ClockPanelFragment;
 import exp.ftxt.ui.fragment.ColorPickerPanelFragment;
 import exp.ftxt.ui.fragment.CrosshairPanelFragment;
@@ -34,7 +33,6 @@ public class PanelManager {
         panelMap.put("fps", FpsPanelFragment.class);
         panelMap.put("clock", ClockPanelFragment.class);
         panelMap.put("battery", BatteryPanelFragment.class);
-        panelMap.put("battery_pct", BatteryPercentagePanelFragment.class);
         panelMap.put("battery_cur", BatteryCurrentPanelFragment.class);
         panelMap.put("network", NetworkPanelFragment.class);
         panelMap.put("color_picker", ColorPickerPanelFragment.class);

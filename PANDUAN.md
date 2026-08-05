@@ -37,20 +37,23 @@ Aplikasi menggunakan **Navigation Drawer** (sidebar) yang bisa dibuka dengan:
 - Tap ikon hamburger (☰) di kiri toolbar
 - Swipe dari tepi kiri layar
 
-Drawer terdiri dari menu berikut:
+Drawer terdiri dari menu berikut (urutan default; item panel bisa di-reorder dengan long-press lalu drag):
 
-| Menu | Ikon | Fungsi |
-|------|------|--------|
-| Floating Text | T | Teks overlay kustom |
-| FPS Display | FPS | Counter FPS real-time |
-| Jam Digital | Jam | Waktu real-time 24 jam |
-| Suhu Baterai | °C | Suhu baterai dalam Celsius |
-| Battery Percentage | % | Persentase baterai |
-| Battery Current | V/A | Tegangan, arus, daya baterai |
-| Network Stats | ↓↑ | Kecepatan internet real-time |
-| Pengaturan | Gear | Pengaturan & izin aplikasi |
-| Kill Service | X | Hentikan semua layanan overlay + tutup app |
-| Keluar | → | Tutup UI aplikasi, overlay tetap berjalan |
+| Menu | Fungsi |
+|------|--------|
+| Floating Text | Teks overlay kustom |
+| FPS Display | Counter FPS real-time |
+| Network Stats | Kecepatan internet real-time |
+| Battery Stats | Suhu (°C) dan persentase (%) baterai dalam satu modul |
+| Battery Current | Tegangan, arus, daya baterai |
+| Clock Module | Waktu real-time 24 jam (Jam Digital) |
+| Crosshair | Placeholder (coming soon) |
+| Logo Display | Placeholder (coming soon) |
+| Color Picker | Color picker wheel + slider H/S/V/RGB |
+| Kill Service | Hentikan semua layanan overlay + tutup app |
+| Keluar | Tutup UI aplikasi, overlay tetap berjalan |
+
+Pengaturan & izin aplikasi diakses melalui ikon gear (⚙️) di toolbar, bukan dari drawer.
 
 ---
 
@@ -97,20 +100,18 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Ukuran default 48sp, bisa diatur warna, shadow, background
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
-### Suhu Baterai
-- Menampilkan suhu baterai dalam °C dan/atau persentase
+### Battery Stats
+- Menampilkan suhu baterai dalam °C dan/atau persentase dalam satu modul kesatuan
 - **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan °C/% terpisah dari nilai angka
-- Opsi tampilkan hanya nilai suhu, persentase
-- Interval update bisa diatur 0.2–10 detik (default 5d)
-
-### Battery Percentage
-- Menampilkan persentase baterai dalam %
-- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna label % terpisah dari nilai angka
+- **Warna Pemisah** — Saat suhu & persentase tampil bersamaan, keduanya dipisahkan tanda `|` (misal `37.4°C | 87%`) yang warnanya bisa diatur sendiri
+- Opsi toggle tampilkan suhu, persentase (bisa keduanya sekaligus), atau hanya nilai
 - Konfigurasi ukuran, warna, shadow, background, kontrol posisi
+- Interval update bisa diatur 0.2–10 detik (default 5d)
 
 ### Battery Current
 - Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
 - **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan mV/mA/W terpisah dari nilai angka
+- **Warna Pemisah** — Komponen dipisahkan tanda `|` (misal `4.1V | +120mA | 0.5W`) yang warnanya bisa diatur sendiri
 - Opsi tampilkan mV, mA, W (toggle)
 - Interval update bisa diatur 0.2–10 detik (default 1d)
 

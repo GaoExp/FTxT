@@ -262,6 +262,30 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <View
+                            android:id="@+id/batCurSeparatorColorPreview"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="#FF0000"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Pemisah"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 </LinearLayout>

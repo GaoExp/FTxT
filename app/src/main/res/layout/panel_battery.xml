@@ -30,7 +30,7 @@
 
                     <CheckBox
                         android:id="@+id/batterySwitch"
-                        android:text="Suhu Baterai"
+                        android:text="Battery Stats"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"/>
@@ -249,6 +249,30 @@
 
                         <TextView
                             android:text="Background"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <View
+                            android:id="@+id/batterySeparatorColorPreview"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="#FF0000"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Pemisah"
                             android:textSize="10sp"
                             android:layout_marginTop="2dp"
                             android:layout_width="wrap_content"

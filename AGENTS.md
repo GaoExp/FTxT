@@ -89,7 +89,11 @@ Sinkron: `cp CHANGELOG.md app/src/main/assets/` jika tidak build.
 | jawab singkat & actionable | build tanpa perintah |
 | Bahasa Indonesia | checklist panjang |
 | | push / commit tanpa izin |
+| | revert perubahan yang dilakukan user tanpa konfirmasi |
 
-**DILARANG** tulis section seperti Accomplished, Progress, Critical Context, Planning, atau ringkasan/checklist apapun di chat — langsung ke inti.
+**CHAT RULES:**
+- **JANGAN gunakan tabel markdown** di chat — tabel tidak berfungsi di UI chat ini. Gunakan list atau paragraf biasa.
 
-**Ingat: JANGAN push / commit / tag tanpa perintah user.**
+*DILARANG* tulis laporan section seperti Accomplished, Progress, Critical Context, Planning, atau ringkasan/checklist apapun di chat — langsung ke inti.
+
+**Ingat: JANGAN push / commit / tag tanpa perintah user dan JANGAN menulis laporen section apapun yangDILARANG.**

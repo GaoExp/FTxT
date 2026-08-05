@@ -68,6 +68,7 @@ public class BatteryCurrentPositionController {
             p.bgMargin = BatteryCurrentConfig.bg.margin;
             p.bgRadius = BatteryCurrentConfig.bg.radius;
             p.labelColor = BatteryCurrentConfig.labelColor;
+            p.separatorColor = BatteryCurrentConfig.separatorColor;
             p.touchPassthrough = BatteryCurrentConfig.touchPassthrough;
             p.safeArea = BatteryCurrentConfig.safeArea;
             p.showVoltage = BatteryCurrentConfig.showVoltage;
@@ -99,6 +100,10 @@ public class BatteryCurrentPositionController {
                 BatteryCurrentConfig.labelColor = p.labelColor;
                 prefs.edit().putInt("batcur_label_color", BatteryCurrentConfig.labelColor).apply();
             }
+            if (p.separatorColor != null) {
+                BatteryCurrentConfig.separatorColor = p.separatorColor;
+                prefs.edit().putInt("batcur_separator_color", BatteryCurrentConfig.separatorColor).apply();
+            }
             if (p.touchPassthrough != null) {
                 BatteryCurrentConfig.touchPassthrough = p.touchPassthrough;
                 prefs.edit().putBoolean("batcur_lock", BatteryCurrentConfig.touchPassthrough).apply();
@@ -127,6 +132,7 @@ public class BatteryCurrentPositionController {
             FloatingService.updateSizeForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.size);
             FloatingService.updateColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.color);
             FloatingService.updateLabelColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.labelColor);
+            FloatingService.updateSeparatorColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.separatorColor);
             FloatingService.updateShadowForModule(FloatingService.batteryCurrentModule());
             FloatingService.updateBackgroundForModule(FloatingService.batteryCurrentModule());
         }

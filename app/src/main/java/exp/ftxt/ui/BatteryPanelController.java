@@ -16,7 +16,7 @@ import android.widget.TextView;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.utils.PermissionHelper;
@@ -29,6 +29,7 @@ public class BatteryPanelController {
     private SeekBar batterySizeSeekBar;
     private View batteryColorPreview;
     private View batteryLabelColorPreview;
+    private View batterySeparatorColorPreview;
     private CheckBox batteryShadowSwitch;
     private LinearLayout batteryShadowConfigContainer;
     private View batteryShadowColorPreview;
@@ -87,6 +88,7 @@ public class BatteryPanelController {
         batterySizeSeekBar = rootView.findViewById(R.id.batterySizeSeekBar);
         batteryColorPreview = rootView.findViewById(R.id.batteryColorPreview);
         batteryLabelColorPreview = rootView.findViewById(R.id.batteryLabelColorPreview);
+        batterySeparatorColorPreview = rootView.findViewById(R.id.batterySeparatorColorPreview);
         batteryShadowSwitch = rootView.findViewById(R.id.batteryShadowSwitch);
         batteryShadowConfigContainer = rootView.findViewById(R.id.shadowConfigBattery);
         batteryShadowColorPreview = rootView.findViewById(R.id.batteryShadowColorPreview);
@@ -135,43 +137,44 @@ public class BatteryPanelController {
     }
 
     private void loadConfig() {
-        batterySwitch.setChecked(BatteryConfig.enabled);
-        activity.applyCheckboxTint(batterySwitch, BatteryConfig.enabled);
-        batterySizeSeekBar.setProgress((int) BatteryConfig.size);
-        batteryColorPreview.setBackgroundColor(BatteryConfig.color);
-        batteryLabelColorPreview.setBackgroundColor(BatteryConfig.labelColor);
-        batteryBgSwitch.setChecked(BatteryConfig.bg.enabled);
-        activity.applyCheckboxTint(batteryBgSwitch, BatteryConfig.bg.enabled);
-        batteryBgConfigContainer.setVisibility(BatteryConfig.bg.enabled ? View.VISIBLE : View.GONE);
-        batteryBgPaddingSeekBar.setProgress(BatteryConfig.bg.padding);
-        batteryBgOffsetXSeekBar.setProgress(BatteryConfig.bg.offsetX + 60);
-        batteryBgOffsetYSeekBar.setProgress(BatteryConfig.bg.offsetY + 60);
-        batteryBgMarginSeekBar.setProgress(BatteryConfig.bg.margin);
-        batteryBgRadiusSeekBar.setProgress(BatteryConfig.bg.radius);
-        batteryShadowSwitch.setChecked(BatteryConfig.shadow.enabled);
-        activity.applyCheckboxTint(batteryShadowSwitch, BatteryConfig.shadow.enabled);
-        batteryShadowConfigContainer.setVisibility(BatteryConfig.shadow.enabled ? View.VISIBLE : View.GONE);
-        batteryShadowBlurSeekBar.setProgress((int) BatteryConfig.shadow.blur);
-        batteryShadowOffsetXSeekBar.setProgress((int) BatteryConfig.shadow.offsetX + 60);
-        batteryShadowOffsetYSeekBar.setProgress((int) BatteryConfig.shadow.offsetY + 60);
-        batteryLockSwitch.setChecked(BatteryConfig.touchPassthrough);
-        activity.applyCheckboxTint(batteryLockSwitch, BatteryConfig.touchPassthrough);
-        batteryValueOnlyCheck.setChecked(BatteryConfig.showOnlyValue);
-        batteryShowTempCheck.setChecked(BatteryConfig.showTemperature);
-        batteryShowPctCheck.setChecked(BatteryConfig.showPercentage);
-        batterySafeArea.setChecked(BatteryConfig.safeArea);
-        batterySizeLabel.setText("Ukuran Teks: " + (int) BatteryConfig.size);
-        batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryConfig.bg.padding);
-        batteryBgOffsetXLabel.setText("Offset X: " + BatteryConfig.bg.offsetX);
-        batteryBgOffsetYLabel.setText("Offset Y: " + BatteryConfig.bg.offsetY);
-        batteryBgColorPreview.setBackgroundColor(BatteryConfig.bg.color);
-        batteryBgMarginLabel.setText("Margin: " + BatteryConfig.bg.margin);
-        batteryBgRadiusLabel.setText("Radius: " + BatteryConfig.bg.radius);
-        batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryConfig.shadow.blur);
-        batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryConfig.shadow.offsetX);
-        batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryConfig.shadow.offsetY);
-        batteryShadowColorPreview.setBackgroundColor(BatteryConfig.shadow.color);
-        batteryIntervalValue.setText(formatIntervalValue(BatteryConfig.updateInterval));
+        batterySwitch.setChecked(BatteryStatsConfig.enabled);
+        activity.applyCheckboxTint(batterySwitch, BatteryStatsConfig.enabled);
+        batterySizeSeekBar.setProgress((int) BatteryStatsConfig.size);
+        batteryColorPreview.setBackgroundColor(BatteryStatsConfig.color);
+        batteryLabelColorPreview.setBackgroundColor(BatteryStatsConfig.labelColor);
+        batterySeparatorColorPreview.setBackgroundColor(BatteryStatsConfig.separatorColor);
+        batteryBgSwitch.setChecked(BatteryStatsConfig.bg.enabled);
+        activity.applyCheckboxTint(batteryBgSwitch, BatteryStatsConfig.bg.enabled);
+        batteryBgConfigContainer.setVisibility(BatteryStatsConfig.bg.enabled ? View.VISIBLE : View.GONE);
+        batteryBgPaddingSeekBar.setProgress(BatteryStatsConfig.bg.padding);
+        batteryBgOffsetXSeekBar.setProgress(BatteryStatsConfig.bg.offsetX + 60);
+        batteryBgOffsetYSeekBar.setProgress(BatteryStatsConfig.bg.offsetY + 60);
+        batteryBgMarginSeekBar.setProgress(BatteryStatsConfig.bg.margin);
+        batteryBgRadiusSeekBar.setProgress(BatteryStatsConfig.bg.radius);
+        batteryShadowSwitch.setChecked(BatteryStatsConfig.shadow.enabled);
+        activity.applyCheckboxTint(batteryShadowSwitch, BatteryStatsConfig.shadow.enabled);
+        batteryShadowConfigContainer.setVisibility(BatteryStatsConfig.shadow.enabled ? View.VISIBLE : View.GONE);
+        batteryShadowBlurSeekBar.setProgress((int) BatteryStatsConfig.shadow.blur);
+        batteryShadowOffsetXSeekBar.setProgress((int) BatteryStatsConfig.shadow.offsetX + 60);
+        batteryShadowOffsetYSeekBar.setProgress((int) BatteryStatsConfig.shadow.offsetY + 60);
+        batteryLockSwitch.setChecked(BatteryStatsConfig.touchPassthrough);
+        activity.applyCheckboxTint(batteryLockSwitch, BatteryStatsConfig.touchPassthrough);
+        batteryValueOnlyCheck.setChecked(BatteryStatsConfig.showOnlyValue);
+        batteryShowTempCheck.setChecked(BatteryStatsConfig.showTemperature);
+        batteryShowPctCheck.setChecked(BatteryStatsConfig.showPercentage);
+        batterySafeArea.setChecked(BatteryStatsConfig.safeArea);
+        batterySizeLabel.setText("Ukuran Teks: " + (int) BatteryStatsConfig.size);
+        batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryStatsConfig.bg.padding);
+        batteryBgOffsetXLabel.setText("Offset X: " + BatteryStatsConfig.bg.offsetX);
+        batteryBgOffsetYLabel.setText("Offset Y: " + BatteryStatsConfig.bg.offsetY);
+        batteryBgColorPreview.setBackgroundColor(BatteryStatsConfig.bg.color);
+        batteryBgMarginLabel.setText("Margin: " + BatteryStatsConfig.bg.margin);
+        batteryBgRadiusLabel.setText("Radius: " + BatteryStatsConfig.bg.radius);
+        batteryShadowBlurLabel.setText("Blur Shadow: " + (int) BatteryStatsConfig.shadow.blur);
+        batteryShadowOffsetXLabel.setText("Shadow X: " + (int) BatteryStatsConfig.shadow.offsetX);
+        batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryStatsConfig.shadow.offsetY);
+        batteryShadowColorPreview.setBackgroundColor(BatteryStatsConfig.shadow.color);
+        batteryIntervalValue.setText(formatIntervalValue(BatteryStatsConfig.updateInterval));
     }
 
     private void setupListeners() {
@@ -184,19 +187,19 @@ public class BatteryPanelController {
                 return;
             }
 
-            BatteryConfig.enabled = isChecked;
+            BatteryStatsConfig.enabled = isChecked;
             activity.applyCheckboxTint(batterySwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_enabled", isChecked).apply();
 
             if (isChecked) {
                 if (FloatingService.instance != null) {
-                    FloatingService.startModule(FloatingService.batteryModule());
+                    FloatingService.startModule(FloatingService.batteryStatsModule());
                 } else {
                     activity.startService(new Intent(activity, FloatingService.class));
                 }
             } else {
-                FloatingService.stopModule(FloatingService.batteryModule());
+                FloatingService.stopModule(FloatingService.batteryStatsModule());
                 if (!activity.isAnyModuleActive()) {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
@@ -207,61 +210,71 @@ public class BatteryPanelController {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 5) { progress = 5; sb.setProgress(progress); }
                 if (progress > 140) { progress = 140; sb.setProgress(progress); }
-                BatteryConfig.size = progress;
+                BatteryStatsConfig.size = progress;
                 batterySizeLabel.setText("Ukuran Teks: " + progress);
-                FloatingService.updateSizeForModule(FloatingService.batteryModule(), BatteryConfig.size);
+                FloatingService.updateSizeForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         batteryColorPreview.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Pilih Warna Baterai", BatteryConfig.color, color -> {
-                BatteryConfig.color = color;
+            ColorPickerDialog.show(activity, "Pilih Warna Baterai", BatteryStatsConfig.color, color -> {
+                BatteryStatsConfig.color = color;
                 batteryColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_color", color).apply();
-                FloatingService.updateColorForModule(FloatingService.batteryModule(), BatteryConfig.color);
+                FloatingService.updateColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.color);
             });
         });
 
         batteryLabelColorPreview.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Pilih Warna Label", BatteryConfig.labelColor, color -> {
-                BatteryConfig.labelColor = color;
+            ColorPickerDialog.show(activity, "Pilih Warna Label", BatteryStatsConfig.labelColor, color -> {
+                BatteryStatsConfig.labelColor = color;
                 batteryLabelColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_label_color", color).apply();
-                FloatingService.updateLabelColorForModule(FloatingService.batteryModule(), BatteryConfig.labelColor);
+                FloatingService.updateLabelColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.labelColor);
+            });
+        });
+
+        batterySeparatorColorPreview.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Pilih Warna Pemisah", BatteryStatsConfig.separatorColor, color -> {
+                BatteryStatsConfig.separatorColor = color;
+                batterySeparatorColorPreview.setBackgroundColor(color);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("battery_separator_color", color).apply();
+                FloatingService.updateSeparatorColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.separatorColor);
             });
         });
 
         batteryBgSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.bg.enabled = isChecked;
+            BatteryStatsConfig.bg.enabled = isChecked;
             activity.applyCheckboxTint(batteryBgSwitch, isChecked);
             batteryBgConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_bg_enabled", isChecked).apply();
-            FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+            FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
         });
 
         batteryBgColorPreview.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Background Baterai", BatteryConfig.bg.color, color -> {
-                BatteryConfig.bg.color = color;
+            ColorPickerDialog.show(activity, "Warna Background Baterai", BatteryStatsConfig.bg.color, color -> {
+                BatteryStatsConfig.bg.color = color;
                 batteryBgColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_color", color).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             });
         });
 
         batteryBgPaddingSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 if (progress < 0) progress = 0;
-                BatteryConfig.bg.padding = progress;
+                BatteryStatsConfig.bg.padding = progress;
                 batteryBgPaddingLabel.setText("Ukuran Background: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_padding", progress).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -270,11 +283,11 @@ public class BatteryPanelController {
         batteryBgOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryConfig.bg.offsetX = offset;
+                BatteryStatsConfig.bg.offsetX = offset;
                 batteryBgOffsetXLabel.setText("Offset X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_offset_x", offset).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -283,11 +296,11 @@ public class BatteryPanelController {
         batteryBgOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryConfig.bg.offsetY = offset;
+                BatteryStatsConfig.bg.offsetY = offset;
                 batteryBgOffsetYLabel.setText("Offset Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_offset_y", offset).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -295,11 +308,11 @@ public class BatteryPanelController {
 
         batteryBgMarginSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                BatteryConfig.bg.margin = progress;
+                BatteryStatsConfig.bg.margin = progress;
                 batteryBgMarginLabel.setText("Margin: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_margin", progress).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -307,43 +320,43 @@ public class BatteryPanelController {
 
         batteryBgRadiusSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                BatteryConfig.bg.radius = progress;
+                BatteryStatsConfig.bg.radius = progress;
                 batteryBgRadiusLabel.setText("Radius: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_bg_radius", progress).apply();
-                FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+                FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         batteryShadowSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.shadow.enabled = isChecked;
+            BatteryStatsConfig.shadow.enabled = isChecked;
             activity.applyCheckboxTint(batteryShadowSwitch, isChecked);
             batteryShadowConfigContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_shadow_enabled", isChecked).apply();
             saveBatteryShadowPrefs();
-            FloatingService.updateShadowForModule(FloatingService.batteryModule());
+            FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
         });
 
         batteryShadowColorPreview.setOnClickListener(v -> {
-            ColorPickerDialog.show(activity, "Warna Shadow Baterai", BatteryConfig.shadow.color, color -> {
-                BatteryConfig.shadow.color = color;
+            ColorPickerDialog.show(activity, "Warna Shadow Baterai", BatteryStatsConfig.shadow.color, color -> {
+                BatteryStatsConfig.shadow.color = color;
                 batteryShadowColorPreview.setBackgroundColor(color);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("battery_shadow_color", color).apply();
-                FloatingService.updateShadowForModule(FloatingService.batteryModule());
+                FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
             });
         });
 
         batteryShadowBlurSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                BatteryConfig.shadow.blur = progress;
+                BatteryStatsConfig.shadow.blur = progress;
                 batteryShadowBlurLabel.setText("Blur Shadow: " + progress);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battery_shadow_blur", (float) progress).apply();
-                FloatingService.updateShadowForModule(FloatingService.batteryModule());
+                FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -352,11 +365,11 @@ public class BatteryPanelController {
         batteryShadowOffsetXSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryConfig.shadow.offsetX = offset;
+                BatteryStatsConfig.shadow.offsetX = offset;
                 batteryShadowOffsetXLabel.setText("Shadow X: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battery_shadow_offset_x", (float) offset).apply();
-                FloatingService.updateShadowForModule(FloatingService.batteryModule());
+                FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -365,44 +378,44 @@ public class BatteryPanelController {
         batteryShadowOffsetYSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 int offset = progress - 60;
-                BatteryConfig.shadow.offsetY = offset;
+                BatteryStatsConfig.shadow.offsetY = offset;
                 batteryShadowOffsetYLabel.setText("Shadow Y: " + offset);
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putFloat("battery_shadow_offset_y", (float) offset).apply();
-                FloatingService.updateShadowForModule(FloatingService.batteryModule());
+                FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
         });
 
         batteryLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.touchPassthrough = isChecked;
+            BatteryStatsConfig.touchPassthrough = isChecked;
             activity.applyCheckboxTint(batteryLockSwitch, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_lock", isChecked).apply();
-            FloatingService.updateTouchFlagsForModule(FloatingService.batteryModule());
+            FloatingService.updateTouchFlagsForModule(FloatingService.batteryStatsModule());
         });
 
         batteryValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.showOnlyValue = isChecked;
+            BatteryStatsConfig.showOnlyValue = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_show_only_value", isChecked).apply();
         });
 
         batteryShowTempCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.showTemperature = isChecked;
+            BatteryStatsConfig.showTemperature = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_show_temperature", isChecked).apply();
         });
 
         batteryShowPctCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.showPercentage = isChecked;
+            BatteryStatsConfig.showPercentage = isChecked;
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_show_percentage", isChecked).apply();
         });
 
         batterySafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryConfig.safeArea = isChecked;
+            BatteryStatsConfig.safeArea = isChecked;
             activity.applyCheckboxTint(batterySafeArea, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_safe_area", isChecked).apply();
@@ -413,10 +426,10 @@ public class BatteryPanelController {
 
     private void saveBatteryShadowPrefs() {
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE).edit()
-                .putInt("battery_shadow_color", BatteryConfig.shadow.color)
-                .putFloat("battery_shadow_blur", BatteryConfig.shadow.blur)
-                .putFloat("battery_shadow_offset_x", BatteryConfig.shadow.offsetX)
-                .putFloat("battery_shadow_offset_y", BatteryConfig.shadow.offsetY)
+                .putInt("battery_shadow_color", BatteryStatsConfig.shadow.color)
+                .putFloat("battery_shadow_blur", BatteryStatsConfig.shadow.blur)
+                .putFloat("battery_shadow_offset_x", BatteryStatsConfig.shadow.offsetX)
+                .putFloat("battery_shadow_offset_y", BatteryStatsConfig.shadow.offsetY)
                 .apply();
     }
 
@@ -434,7 +447,7 @@ public class BatteryPanelController {
 
         int currentIdx = -1;
         for (int i = 0; i < INTERVAL_STEPS.length; i++) {
-            if (INTERVAL_STEPS[i] == BatteryConfig.updateInterval) {
+            if (INTERVAL_STEPS[i] == BatteryStatsConfig.updateInterval) {
                 currentIdx = i;
                 break;
             }
@@ -461,9 +474,9 @@ public class BatteryPanelController {
 
             final int idx = i;
             item.setOnClickListener(v -> {
-                BatteryConfig.updateInterval = INTERVAL_STEPS[idx];
+                BatteryStatsConfig.updateInterval = INTERVAL_STEPS[idx];
                 updateIntervalDisplay();
-                FloatingService.restartModule(FloatingService.batteryModule());
+                FloatingService.restartModule(FloatingService.batteryStatsModule());
                 if (intervalPopup != null) intervalPopup.dismiss();
             });
             content.addView(item);
@@ -482,9 +495,9 @@ public class BatteryPanelController {
     }
 
     private void updateIntervalDisplay() {
-        batteryIntervalValue.setText(formatIntervalValue(BatteryConfig.updateInterval));
+        batteryIntervalValue.setText(formatIntervalValue(BatteryStatsConfig.updateInterval));
         activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                .edit().putFloat("battery_update_interval", BatteryConfig.updateInterval).apply();
+                .edit().putFloat("battery_update_interval", BatteryStatsConfig.updateInterval).apply();
     }
 
     private String formatIntervalValue(float v) {

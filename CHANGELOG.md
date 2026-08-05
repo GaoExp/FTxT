@@ -1,3 +1,69 @@
+# [4.85.0] - 2026-08-04
+### ✨ Fitur Baru
+- **Battery Stats — suhu & persentase jadi satu kesatuan modul** — Modul `features/battery_stats` (BatteryStatsConfig + BatteryStatsModule) menggabungkan komponen suhu (°C) dan persentase (%) menjadi satu modul utuh, persis pola Battery Current yang menggabungkan tegangan/arus/daya. Satu overlay, satu panel, satu konfigurasi (warna, label, shadow, background, posisi, safe area, interval 0.2–10 detik), satu preset, satu key prefs (`battery_*`). Checkbox **°C** dan **%** di panel mengontrol komponen yang tampil; keduanya bisa tampil bersamaan dalam satu overlay.
+### 🚮 Fitur Dihapus
+- **Modul Battery Percentage terpisah dihapus** — Seluruh lapisan `features/battery_percentage` (BatteryPercentageConfig, BatteryPercentageModule), `BatteryPercentagePanelController`, `BatteryPercentagePositionController`, `BatteryPercentagePanelFragment`, dan `panel_battery_percentage.xml` dihapus total. Fungsinya kini menjadi bagian dari modul Battery Stats.
+- **Modul Battery Temperature dihapus** — Seluruh lapisan `features/battery_temperature` (BatteryConfig, BatteryModule) dihapus, digantikan modul Battery Stats yang meneruskan perilakunya.
+### ♻️ Perubahan Fitur
+- **Desimal suhu hanya tampil saat data tersedia** — Nilai mentah `EXTRA_TEMPERATURE` (0,1°C) ditampilkan tanpa desimal (misal `37°C`) saat kelipatan 10, dan dengan 1 desimal (misal `37.4°C`) saat sensor mengirim nilai non-kelipatan-10. Overlay tetap bersih di perangkat yang sensornya hanya melaporkan step 1°C. Berlaku untuk mode label maupun value-only.
+- **Pemisah "|" antara suhu dan persentase** — Saat komponen suhu dan persentase tampil bersamaan, keduanya kini dipisahkan tanda `|` (misal `37.4°C | 87%`), menggantikan pemisah spasi.
+- **Warna pemisah bisa diatur sendiri** — Tombol warna "Pemisah" baru di panel Battery Stats (di samping Warna, Label, Shadow, Background). Pemisah `|` kini punya warna terpisah (`separatorColor`, default abu-abu) yang tersimpan di prefs `battery_separator_color` dan ikut serta dalam preset.
+- **Pemisah "|" + warna di Battery Current** — Pemisah antar komponen tegangan/arus/daya diganti dari spasi menjadi `|` (misal `4.1V | +120mA | 0.5W`), konsisten dengan Battery Stats. Tombol warna "Pemisah" baru di panel Battery Current (`separatorColor`, default abu-abu), tersimpan di prefs `batcur_separator_color` dan ikut serta dalam preset.
+### 🐞 Bug Fixes
+- **Panel Battery Percentage tidak bisa diakses dari sidebar** — `battery_pct` terdaftar di `PanelManager` tanpa id sidebar (`navBatteryPercentage`), sehingga tidak pernah bisa diakses dari navigasi. Karena suhu & persen kini digabung menjadi satu panel "Battery Stats" (`navBattery`), panel duplikat `battery_pct` dihapus total — penyebab bug hilang bersama modulnya.
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsConfig.java` — Config modul gabungan (enabled, size, color, labelColor, shadow, bg, safeArea, showTemperature, showPercentage, showOnlyValue, posX, posY, updateInterval)
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Modul overlay satu kesatuan: tampilkan suhu °C dan/atau persen %, update per interval, dukungan safe area & drag
+- `app/src/debug/res/values/strings.xml` — Resource `app_name` "FTxTdebug" untuk build type debug
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 177, versionName 4.85.0
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Format suhu dinamis: integer tanpa desimal saat nilai kelipatan 10, 1 desimal `%.1f°C` saat non-kelipatan-10
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsConfig.java` — Tambah field `separatorColor` (default abu-abu)
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Render pemisah `|` dengan warna `separatorColor` + method `updateSeparatorColor()`
+- `app/src/main/java/exp/ftxt/shared/ui/OverlayModule.java` — Tambah default method `updateSeparatorColor(int)`
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah `updateSeparatorColorForModule()`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Load prefs `battery_separator_color`
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Tambah field `separatorColor`
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Preset save/apply + sync warna pemisah
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Binding & listener tombol warna pemisah
+- `app/src/main/res/layout/panel_battery.xml` — Tombol warna "Pemisah"
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentConfig.java` — Tambah field `separatorColor` (default abu-abu)
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Pemisah `|` antar tegangan/arus/daya + render warna `separatorColor` + method `updateSeparatorColor()`
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Load prefs `batcur_separator_color`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Preset save/apply + sync warna pemisah
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Binding & listener tombol warna pemisah
+- `app/src/main/res/layout/panel_battery_current.xml` — Tombol warna "Pemisah"
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Pemisah `|` antara suhu & persentase (ganti spasi)
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — Ganti `batteryModule` + `batteryPercentageModule` menjadi satu `batteryStatsModule` (`batteryStatsModule()`, `ensureBatteryStatsModule()`)
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Import & `isAnyModuleActive()` pakai `BatteryStatsConfig`; `loadShadowConfigs()`: blok `battpct_*` dihapus, blok `BatteryConfig` → `BatteryStatsConfig` + lengkapi load `size`, `bg.offsetX/Y`, `bg.margin`, `bg.radius`
+- `app/src/main/java/exp/ftxt/core/BootReceiver.java` — Cek aktif pakai `BatteryStatsConfig`
+- `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Cek aktif & label notifikasi pakai `BatteryStatsConfig` (label "Battery")
+- `app/src/main/java/exp/ftxt/ui/PanelManager.java` — Hapus entry `battery_pct` dari `panelMap` + import `BatteryPercentagePanelFragment`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — `BatteryConfig` → `BatteryStatsConfig`, `batteryModule()` → `batteryStatsModule()`
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — `BatteryConfig`/`BatteryModule` → `BatteryStatsConfig`/`BatteryStatsModule`, `moduleLabel` → "Battery Stats"
+- `app/src/main/res/layout/panel_battery.xml` — Label checkbox modul "Suhu Baterai" → "Battery Stats"
+- `app/src/main/res/values/strings.xml` — Hapus string `nav_battery_percentage`
+- `app/src/main/res/menu/drawer_menu.xml` — Hapus item `nav_battery_percentage`
+- `README.md`, `PANDUAN.md`, `STRUKTUR.md`, `CHANGELOG.md` + `app/src/main/assets/*` — Update modul Battery Stats
+- `PANDUAN.md` — Sinkronisasi daftar & urutan item navigasi drawer dengan implementasi aktual + info tombol warna "Pemisah" di Battery Stats & Battery Current
+### 🔥 File Removed
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java`
+- `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java`
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageConfig.java`
+- `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java`
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePanelController.java`
+- `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java`
+- `app/src/main/java/exp/ftxt/ui/fragment/BatteryPercentagePanelFragment.java`
+- `app/src/main/res/layout/panel_battery_percentage.xml`
+- `_schedule/BUG_REFACTOR_PANEL_NAVIGATION.md` — Dokumen jadwal refactor yang sudah selesai
+- `_schedule/PANEL_NAVIGATION_FRAGMENT.md` — Dokumen jadwal refactor yang sudah selesai
+- `_schedule/REFACTOR_FLOATING_SERVICE.md` — Dokumen jadwal refactor yang sudah selesai
+- `_schedule/REFACTOR_PANEL_FRAGMENT.md` — Dokumen jadwal refactor yang sudah selesai
+### 🔢 Version
+`4.84.1` → `4.85.0`
+
+---
+
 # [4.84.1] - 2026-08-04
 ### 🐞 Bug Fixes
 - **Layar panel kosong saat start** — Saat nilai `nav_selected_item` tidak dikenal, aplikasi tidak menampilkan panel apa pun. Sekarang ada fallback: jika panel tidak ditemukan di `panelIdToName()`, default ke panel **Floating Text** + `R.id.navFloatingText`.

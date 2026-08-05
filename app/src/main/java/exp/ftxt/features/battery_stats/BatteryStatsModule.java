@@ -1,4 +1,4 @@
-package exp.ftxt.features.battery_percentage;
+package exp.ftxt.features.battery_stats;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +19,7 @@ import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
 
-public class BatteryPercentageModule implements OverlayModule {
+public class BatteryStatsModule implements OverlayModule {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -53,8 +53,8 @@ public class BatteryPercentageModule implements OverlayModule {
         prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
         view = new ShadowTextView(ctx);
-        view.setShadowConfig(BatteryPercentageConfig.shadow);
-        view.setTextSize(BatteryPercentageConfig.size);
+        view.setShadowConfig(BatteryStatsConfig.shadow);
+        view.setTextSize(BatteryStatsConfig.size);
         applyBackground();
         updateDisplay();
 
@@ -69,10 +69,10 @@ public class BatteryPercentageModule implements OverlayModule {
         );
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = (int)(BatteryPercentageConfig.posX * getScreenWidth());
-        params.y = (int)(BatteryPercentageConfig.posY * getScreenHeight());
+        params.x = (int)(BatteryStatsConfig.posX * getScreenWidth());
+        params.y = (int)(BatteryStatsConfig.posY * getScreenHeight());
 
-        OverlayShadow.apply(view, params, wm, BatteryPercentageConfig.shadow, 4f);
+        OverlayShadow.apply(view, params, wm, BatteryStatsConfig.shadow, 4f);
         updateTouchFlags();
 
         try {
@@ -83,6 +83,7 @@ public class BatteryPercentageModule implements OverlayModule {
             return;
         }
 
+        view.post(this::updatePosition);
         running = true;
         handler.post(tickRunnable);
     }
@@ -104,26 +105,32 @@ public class BatteryPercentageModule implements OverlayModule {
 
     @Override
     public void updateSize(float size) {
-        BatteryPercentageConfig.size = size;
+        BatteryStatsConfig.size = size;
         if (view != null) view.setTextSize(size);
     }
 
     @Override
     public void updateColor(int color) {
-        BatteryPercentageConfig.color = color;
+        BatteryStatsConfig.color = color;
         updateDisplay();
     }
 
     @Override
     public void updateLabelColor(int color) {
-        BatteryPercentageConfig.labelColor = color;
+        BatteryStatsConfig.labelColor = color;
+        updateDisplay();
+    }
+
+    @Override
+    public void updateSeparatorColor(int color) {
+        BatteryStatsConfig.separatorColor = color;
         updateDisplay();
     }
 
     @Override
     public void updateShadow() {
-        if (view != null) view.setShadowConfig(BatteryPercentageConfig.shadow);
-        OverlayShadow.apply(view, params, wm, BatteryPercentageConfig.shadow, 4f);
+        if (view != null) view.setShadowConfig(BatteryStatsConfig.shadow);
+        OverlayShadow.apply(view, params, wm, BatteryStatsConfig.shadow, 4f);
     }
 
     @Override
@@ -139,8 +146,8 @@ public class BatteryPercentageModule implements OverlayModule {
 
     public void loadPosition() {
         String sfx = posSuffix();
-        BatteryPercentageConfig.posX = prefs.getFloat("battpct_pos_x" + sfx, 0.5f);
-        BatteryPercentageConfig.posY = prefs.getFloat("battpct_pos_y" + sfx, 0.5f);
+        BatteryStatsConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
+        BatteryStatsConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
         updatePosition();
     }
 
@@ -153,8 +160,14 @@ public class BatteryPercentageModule implements OverlayModule {
     @Override
     public void updatePosition() {
         if (view != null && params != null && wm != null) {
-            params.x = (int)(BatteryPercentageConfig.posX * getScreenWidth());
-            params.y = (int)(BatteryPercentageConfig.posY * getScreenHeight());
+            params.x = (int)(BatteryStatsConfig.posX * getScreenWidth());
+            params.y = (int)(BatteryStatsConfig.posY * getScreenHeight());
+            if (BatteryStatsConfig.safeArea && view.getWidth() > 0 && view.getHeight() > 0) {
+                int maxX = Math.max(0, getScreenWidth() - view.getWidth());
+                int maxY = Math.max(0, getScreenHeight() - view.getHeight());
+                params.x = Math.max(0, Math.min(params.x, maxX));
+                params.y = Math.max(0, Math.min(params.y, maxY));
+            }
             try {
                 wm.updateViewLayout(view, params);
             } catch (Exception e) {
@@ -193,25 +206,25 @@ public class BatteryPercentageModule implements OverlayModule {
 
     private void applyBackground() {
         if (view == null) return;
-        if (BatteryPercentageConfig.bg.enabled) {
-            int pad = BatteryPercentageConfig.bg.padding;
+        if (BatteryStatsConfig.bg.enabled) {
+            int pad = BatteryStatsConfig.bg.padding;
             view.setPadding(pad, pad, pad, pad);
         } else {
             view.setPadding(0, 0, 0, 0);
         }
-        view.setBgEnabled(BatteryPercentageConfig.bg.enabled);
-        view.setBgColor(BatteryPercentageConfig.bg.color);
-        view.setBgOffsetX(BatteryPercentageConfig.bg.offsetX);
-        view.setBgOffsetY(BatteryPercentageConfig.bg.offsetY);
-        view.setBgMargin(BatteryPercentageConfig.bg.margin);
-        view.setBgRadius(BatteryPercentageConfig.bg.radius);
+        view.setBgEnabled(BatteryStatsConfig.bg.enabled);
+        view.setBgColor(BatteryStatsConfig.bg.color);
+        view.setBgOffsetX(BatteryStatsConfig.bg.offsetX);
+        view.setBgOffsetY(BatteryStatsConfig.bg.offsetY);
+        view.setBgMargin(BatteryStatsConfig.bg.margin);
+        view.setBgRadius(BatteryStatsConfig.bg.radius);
     }
 
     @Override
     public void updateTouchFlags() {
         if (params == null || view == null || wm == null) return;
 
-        if (BatteryPercentageConfig.touchPassthrough) {
+        if (BatteryStatsConfig.touchPassthrough) {
             params.flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             view.setOnTouchListener(null);
         } else {
@@ -219,9 +232,13 @@ public class BatteryPercentageModule implements OverlayModule {
             view.setOnTouchListener(new OverlayDragHandler(params, wm,
                     null,
                     () -> {
+                        if (BatteryStatsConfig.safeArea && view != null && view.getWidth() > 0 && view.getHeight() > 0) {
+                            params.x = Math.max(0, Math.min(params.x, getScreenWidth() - view.getWidth()));
+                            params.y = Math.max(0, Math.min(params.y, getScreenHeight() - view.getHeight()));
+                        }
                         if (params != null) {
-                            BatteryPercentageConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
-                            BatteryPercentageConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
+                            BatteryStatsConfig.posX = Math.max(0, Math.min(1, (float) params.x / getScreenWidth()));
+                            BatteryStatsConfig.posY = Math.max(0, Math.min(1, (float) params.y / getScreenHeight()));
                         }
                         if (onPositionUpdate != null) onPositionUpdate.run();
                     }));
@@ -244,15 +261,25 @@ public class BatteryPercentageModule implements OverlayModule {
 
     private void updateDisplay() {
         if (view == null) return;
-        String text = getBatteryPercentText();
-        view.setTextColor(BatteryPercentageConfig.color);
-        SpannableString spannable = new SpannableString(text);
-        int pctIndex = text.indexOf('%');
-        if (pctIndex > 0) {
-            spannable.setSpan(new ForegroundColorSpan(BatteryPercentageConfig.labelColor),
-                    pctIndex, text.length(), 0);
+        String text = getBatteryStatsText();
+        if (BatteryStatsConfig.showOnlyValue) {
+            view.setTextColor(BatteryStatsConfig.color);
+            view.setText(text);
+        } else {
+            view.setTextColor(BatteryStatsConfig.color);
+            SpannableString spannable = new SpannableString(text);
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                if (c == '°' || c == 'C' || c == '%') {
+                    spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.labelColor),
+                            i, i + 1, 0);
+                } else if (c == '|') {
+                    spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.separatorColor),
+                            i, i + 1, 0);
+                }
+            }
+            view.setText(spannable);
         }
-        view.setText(spannable);
     }
 
     private final Runnable tickRunnable = new Runnable() {
@@ -260,19 +287,39 @@ public class BatteryPercentageModule implements OverlayModule {
         public void run() {
             if (!running) return;
             updateDisplay();
-            handler.postDelayed(this, 5000);
+            handler.postDelayed(this, (long)(BatteryStatsConfig.updateInterval * 1000));
         }
     };
 
-    private String getBatteryPercentText() {
+    private String getBatteryStatsText() {
         try {
             Intent batteryIntent = context.registerReceiver(null,
                     new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
             if (batteryIntent == null) return "N/A";
-            int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-            int percent = (level * 100) / scale;
-            return String.format("%d%%", percent);
+            StringBuilder sb = new StringBuilder();
+            if (BatteryStatsConfig.showTemperature) {
+                int temp = batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0);
+                String tempText = (temp % 10 == 0)
+                        ? String.valueOf(temp / 10)
+                        : String.format("%.1f", temp / 10f);
+                if (BatteryStatsConfig.showOnlyValue) {
+                    sb.append(tempText);
+                } else {
+                    sb.append(tempText).append("°C");
+                }
+            }
+            if (BatteryStatsConfig.showPercentage) {
+                int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+                int percent = (level * 100) / scale;
+                if (sb.length() > 0) sb.append(" | ");
+                if (BatteryStatsConfig.showOnlyValue) {
+                    sb.append(percent);
+                } else {
+                    sb.append(String.format("%d%%", percent));
+                }
+            }
+            return sb.length() == 0 ? "" : sb.toString();
         } catch (Exception e) {
             return "ERR";
         }

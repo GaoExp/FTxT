@@ -16,10 +16,8 @@ import java.util.List;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_current.BatteryCurrentModule;
-import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
-import exp.ftxt.features.battery_percentage.BatteryPercentageModule;
-import exp.ftxt.features.battery_temperature.BatteryConfig;
-import exp.ftxt.features.battery_temperature.BatteryModule;
+import exp.ftxt.features.battery_stats.BatteryStatsConfig;
+import exp.ftxt.features.battery_stats.BatteryStatsModule;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.clock_module.ClockModule;
 import exp.ftxt.features.fps_display.FpsConfig;
@@ -41,8 +39,7 @@ public class FloatingService extends Service {
     private TextModule textModule;
     private FpsModule fpsModule;
     private ClockModule clockModule;
-    private BatteryModule batteryModule;
-    private BatteryPercentageModule batteryPercentageModule;
+    private BatteryStatsModule batteryStatsModule;
     private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
     private final List<OverlayModule> allModules = new ArrayList<>();
@@ -51,8 +48,7 @@ public class FloatingService extends Service {
     public TextModule getTextModule() { return textModule; }
     public FpsModule getFpsModule() { return fpsModule; }
     public ClockModule getClockModule() { return clockModule; }
-    public BatteryModule getBatteryModule() { return batteryModule; }
-    public BatteryPercentageModule getBatteryPercentageModule() { return batteryPercentageModule; }
+    public BatteryStatsModule getBatteryStatsModule() { return batteryStatsModule; }
     public BatteryCurrentModule getBatteryCurrentModule() { return batteryCurrentModule; }
     public NetworkModule getNetworkModule() { return networkModule; }
 
@@ -68,13 +64,9 @@ public class FloatingService extends Service {
         if (instance != null) instance.ensureClockModule();
         return instance != null ? instance.clockModule : null;
     }
-    public static BatteryModule batteryModule() {
-        if (instance != null) instance.ensureBatteryModule();
-        return instance != null ? instance.batteryModule : null;
-    }
-    public static BatteryPercentageModule batteryPercentageModule() {
-        if (instance != null) instance.ensureBatteryPercentageModule();
-        return instance != null ? instance.batteryPercentageModule : null;
+    public static BatteryStatsModule batteryStatsModule() {
+        if (instance != null) instance.ensureBatteryStatsModule();
+        return instance != null ? instance.batteryStatsModule : null;
     }
     public static BatteryCurrentModule batteryCurrentModule() {
         if (instance != null) instance.ensureBatteryCurrentModule();
@@ -109,19 +101,11 @@ public class FloatingService extends Service {
         }
     }
 
-    private void ensureBatteryModule() {
-        if (batteryModule == null) {
-            batteryModule = new BatteryModule();
-            allModules.add(batteryModule);
-            batteryModule.init(windowManager, this, prefs);
-        }
-    }
-
-    private void ensureBatteryPercentageModule() {
-        if (batteryPercentageModule == null) {
-            batteryPercentageModule = new BatteryPercentageModule();
-            allModules.add(batteryPercentageModule);
-            batteryPercentageModule.init(windowManager, this, prefs);
+    private void ensureBatteryStatsModule() {
+        if (batteryStatsModule == null) {
+            batteryStatsModule = new BatteryStatsModule();
+            allModules.add(batteryStatsModule);
+            batteryStatsModule.init(windowManager, this, prefs);
         }
     }
 
@@ -213,8 +197,7 @@ public class FloatingService extends Service {
                 textModule.createOverlay();
             }
             if (ClockConfig.enabled) { ensureClockModule(); clockModule.start(windowManager, this); }
-            if (BatteryConfig.enabled) { ensureBatteryModule(); batteryModule.start(windowManager, this); }
-            if (BatteryPercentageConfig.enabled) { ensureBatteryPercentageModule(); batteryPercentageModule.start(windowManager, this); }
+            if (BatteryStatsConfig.enabled) { ensureBatteryStatsModule(); batteryStatsModule.start(windowManager, this); }
             if (BatteryCurrentConfig.enabled) { ensureBatteryCurrentModule(); batteryCurrentModule.start(windowManager, this); }
             if (NetworkConfig.enabled) { ensureNetworkModule(); networkModule.start(windowManager, this); }
             if (FpsConfig.enabled) { ensureFpsModule(); fpsModule.start(windowManager, this); }
@@ -284,6 +267,12 @@ public class FloatingService extends Service {
     public static void updateLabelColorForModule(OverlayModule module, int color) {
         if (instance != null && module != null && module.isRunning()) {
             module.updateLabelColor(color);
+        }
+    }
+
+    public static void updateSeparatorColorForModule(OverlayModule module, int color) {
+        if (instance != null && module != null && module.isRunning()) {
+            module.updateSeparatorColor(color);
         }
     }
 

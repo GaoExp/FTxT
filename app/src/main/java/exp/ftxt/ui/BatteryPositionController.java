@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
-import exp.ftxt.features.battery_temperature.BatteryConfig;
-import exp.ftxt.features.battery_temperature.BatteryModule;
+import exp.ftxt.features.battery_stats.BatteryStatsConfig;
+import exp.ftxt.features.battery_stats.BatteryStatsModule;
 import exp.ftxt.shared.preset.OverlayPreset;
 import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.preset.PresetManager;
@@ -43,7 +43,7 @@ public class BatteryPositionController {
 
     private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
         @Override
-        public String moduleLabel() { return "Baterai"; }
+        public String moduleLabel() { return "Battery Stats"; }
         @Override
         public String touchPassthroughPrefKey() { return "battery_lock"; }
         @Override
@@ -55,80 +55,86 @@ public class BatteryPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
-            p.posX = BatteryConfig.posX;
-            p.posY = BatteryConfig.posY;
-            p.size = BatteryConfig.size;
-            p.color = BatteryConfig.color;
-            p.shadow = PresetHandler.copyShadow(BatteryConfig.shadow);
-            p.bgEnabled = BatteryConfig.bg.enabled;
-            p.bgColor = BatteryConfig.bg.color;
-            p.bgPadding = BatteryConfig.bg.padding;
-            p.bgOffsetX = BatteryConfig.bg.offsetX;
-            p.bgOffsetY = BatteryConfig.bg.offsetY;
-            p.bgMargin = BatteryConfig.bg.margin;
-            p.bgRadius = BatteryConfig.bg.radius;
-            p.touchPassthrough = BatteryConfig.touchPassthrough;
-            p.safeArea = BatteryConfig.safeArea;
-            p.showOnlyValue = BatteryConfig.showOnlyValue;
-            p.labelColor = BatteryConfig.labelColor;
-            p.showTemperature = BatteryConfig.showTemperature;
-            p.showPercentage = BatteryConfig.showPercentage;
+            p.posX = BatteryStatsConfig.posX;
+            p.posY = BatteryStatsConfig.posY;
+            p.size = BatteryStatsConfig.size;
+            p.color = BatteryStatsConfig.color;
+            p.shadow = PresetHandler.copyShadow(BatteryStatsConfig.shadow);
+            p.bgEnabled = BatteryStatsConfig.bg.enabled;
+            p.bgColor = BatteryStatsConfig.bg.color;
+            p.bgPadding = BatteryStatsConfig.bg.padding;
+            p.bgOffsetX = BatteryStatsConfig.bg.offsetX;
+            p.bgOffsetY = BatteryStatsConfig.bg.offsetY;
+            p.bgMargin = BatteryStatsConfig.bg.margin;
+            p.bgRadius = BatteryStatsConfig.bg.radius;
+            p.touchPassthrough = BatteryStatsConfig.touchPassthrough;
+            p.safeArea = BatteryStatsConfig.safeArea;
+            p.showOnlyValue = BatteryStatsConfig.showOnlyValue;
+            p.labelColor = BatteryStatsConfig.labelColor;
+            p.separatorColor = BatteryStatsConfig.separatorColor;
+            p.showTemperature = BatteryStatsConfig.showTemperature;
+            p.showPercentage = BatteryStatsConfig.showPercentage;
         }
 
         @Override
         public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
-            BatteryConfig.posX = p.posX;
-            BatteryConfig.posY = p.posY;
-            BatteryConfig.size = p.size;
-            BatteryConfig.color = p.color;
+            BatteryStatsConfig.posX = p.posX;
+            BatteryStatsConfig.posY = p.posY;
+            BatteryStatsConfig.size = p.size;
+            BatteryStatsConfig.color = p.color;
             if (p.shadow != null) {
-                BatteryConfig.shadow.enabled = p.shadow.enabled;
-                BatteryConfig.shadow.color = p.shadow.color;
-                BatteryConfig.shadow.blur = p.shadow.blur;
-                BatteryConfig.shadow.offsetX = p.shadow.offsetX;
-                BatteryConfig.shadow.offsetY = p.shadow.offsetY;
+                BatteryStatsConfig.shadow.enabled = p.shadow.enabled;
+                BatteryStatsConfig.shadow.color = p.shadow.color;
+                BatteryStatsConfig.shadow.blur = p.shadow.blur;
+                BatteryStatsConfig.shadow.offsetX = p.shadow.offsetX;
+                BatteryStatsConfig.shadow.offsetY = p.shadow.offsetY;
             }
-            BatteryConfig.bg.enabled = p.bgEnabled;
-            BatteryConfig.bg.color = p.bgColor;
-            BatteryConfig.bg.padding = p.bgPadding;
-            BatteryConfig.bg.offsetX = p.bgOffsetX;
-            BatteryConfig.bg.offsetY = p.bgOffsetY;
-            BatteryConfig.bg.margin = p.bgMargin;
-            BatteryConfig.bg.radius = p.bgRadius;
+            BatteryStatsConfig.bg.enabled = p.bgEnabled;
+            BatteryStatsConfig.bg.color = p.bgColor;
+            BatteryStatsConfig.bg.padding = p.bgPadding;
+            BatteryStatsConfig.bg.offsetX = p.bgOffsetX;
+            BatteryStatsConfig.bg.offsetY = p.bgOffsetY;
+            BatteryStatsConfig.bg.margin = p.bgMargin;
+            BatteryStatsConfig.bg.radius = p.bgRadius;
             if (p.touchPassthrough != null) {
-                BatteryConfig.touchPassthrough = p.touchPassthrough;
-                prefs.edit().putBoolean("battery_lock", BatteryConfig.touchPassthrough).apply();
+                BatteryStatsConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("battery_lock", BatteryStatsConfig.touchPassthrough).apply();
             }
             if (p.safeArea != null) {
-                BatteryConfig.safeArea = p.safeArea;
-                prefs.edit().putBoolean("battery_safe_area", BatteryConfig.safeArea).apply();
+                BatteryStatsConfig.safeArea = p.safeArea;
+                prefs.edit().putBoolean("battery_safe_area", BatteryStatsConfig.safeArea).apply();
             }
             if (p.showOnlyValue != null) {
-                BatteryConfig.showOnlyValue = p.showOnlyValue;
-                prefs.edit().putBoolean("battery_show_only_value", BatteryConfig.showOnlyValue).apply();
+                BatteryStatsConfig.showOnlyValue = p.showOnlyValue;
+                prefs.edit().putBoolean("battery_show_only_value", BatteryStatsConfig.showOnlyValue).apply();
             }
             if (p.labelColor != null) {
-                BatteryConfig.labelColor = p.labelColor;
-                prefs.edit().putInt("battery_label_color", BatteryConfig.labelColor).apply();
+                BatteryStatsConfig.labelColor = p.labelColor;
+                prefs.edit().putInt("battery_label_color", BatteryStatsConfig.labelColor).apply();
+            }
+            if (p.separatorColor != null) {
+                BatteryStatsConfig.separatorColor = p.separatorColor;
+                prefs.edit().putInt("battery_separator_color", BatteryStatsConfig.separatorColor).apply();
             }
             if (p.showTemperature != null) {
-                BatteryConfig.showTemperature = p.showTemperature;
-                prefs.edit().putBoolean("battery_show_temperature", BatteryConfig.showTemperature).apply();
+                BatteryStatsConfig.showTemperature = p.showTemperature;
+                prefs.edit().putBoolean("battery_show_temperature", BatteryStatsConfig.showTemperature).apply();
             }
             if (p.showPercentage != null) {
-                BatteryConfig.showPercentage = p.showPercentage;
-                prefs.edit().putBoolean("battery_show_percentage", BatteryConfig.showPercentage).apply();
+                BatteryStatsConfig.showPercentage = p.showPercentage;
+                prefs.edit().putBoolean("battery_show_percentage", BatteryStatsConfig.showPercentage).apply();
             }
         }
 
         @Override
         public void syncToService() {
-            FloatingService.updatePositionForModule(FloatingService.batteryModule());
-            FloatingService.updateSizeForModule(FloatingService.batteryModule(), BatteryConfig.size);
-            FloatingService.updateColorForModule(FloatingService.batteryModule(), BatteryConfig.color);
-            FloatingService.updateLabelColorForModule(FloatingService.batteryModule(), BatteryConfig.labelColor);
-            FloatingService.updateShadowForModule(FloatingService.batteryModule());
-            FloatingService.updateBackgroundForModule(FloatingService.batteryModule());
+            FloatingService.updatePositionForModule(FloatingService.batteryStatsModule());
+            FloatingService.updateSizeForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.size);
+            FloatingService.updateColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.color);
+            FloatingService.updateLabelColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.labelColor);
+            FloatingService.updateSeparatorColorForModule(FloatingService.batteryStatsModule(), BatteryStatsConfig.separatorColor);
+            FloatingService.updateShadowForModule(FloatingService.batteryStatsModule());
+            FloatingService.updateBackgroundForModule(FloatingService.batteryStatsModule());
         }
     };
 
@@ -140,7 +146,7 @@ public class BatteryPositionController {
         currentOrientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "land" : "port";
         loadPositionFromPrefs(currentOrientation);
 
-        FloatingService.setOrientationSuffixForModule(FloatingService.batteryModule(), currentOrientation);
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryStatsModule(), currentOrientation);
 
         bindViews(rootView);
 
@@ -150,7 +156,7 @@ public class BatteryPositionController {
         displayWidth = realMetrics.widthPixels;
         displayHeight = realMetrics.heightPixels;
 
-        BatteryModule.onPositionUpdate = this::syncAll;
+        BatteryStatsModule.onPositionUpdate = this::syncAll;
 
         sliderController = new SliderPositionController(
                 rootView.findViewById(R.id.battery_posXSeekBar),
@@ -161,7 +167,7 @@ public class BatteryPositionController {
         );
         setupListeners();
         syncAll();
-        FloatingService.updatePositionForModule(FloatingService.batteryModule());
+        FloatingService.updatePositionForModule(FloatingService.batteryStatsModule());
     }
 
     private void bindViews(View rootView) {
@@ -175,7 +181,7 @@ public class BatteryPositionController {
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
-            onPositionChanged(clamp(BatteryConfig.posX + dx), clamp(BatteryConfig.posY + dy));
+            onPositionChanged(clamp(BatteryStatsConfig.posX + dx), clamp(BatteryStatsConfig.posY + dy));
         });
     }
 
@@ -189,22 +195,22 @@ public class BatteryPositionController {
     }
 
     private void onPositionChanged(float x, float y) {
-        BatteryConfig.posX = x;
-        BatteryConfig.posY = y;
+        BatteryStatsConfig.posX = x;
+        BatteryStatsConfig.posY = y;
         syncAll();
         PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
-        FloatingService.updatePositionForModule(FloatingService.batteryModule());
+        FloatingService.updatePositionForModule(FloatingService.batteryStatsModule());
     }
 
     private void loadPositionFromPrefs(String orient) {
         String sfx = "_" + orient;
-        BatteryConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
-        BatteryConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
+        BatteryStatsConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
+        BatteryStatsConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
     }
 
     public void cleanup() {
-        BatteryModule.onPositionUpdate = null;
-        FloatingService.setOrientationSuffixForModule(FloatingService.batteryModule(), null);
+        BatteryStatsModule.onPositionUpdate = null;
+        FloatingService.setOrientationSuffixForModule(FloatingService.batteryStatsModule(), null);
         if (dpad != null) dpad.cleanup();
     }
 
@@ -213,7 +219,7 @@ public class BatteryPositionController {
     }
 
     public void syncAll() {
-        sliderController.sync(BatteryConfig.posX, BatteryConfig.posY);
+        sliderController.sync(BatteryStatsConfig.posX, BatteryStatsConfig.posY);
         updateCoordDisplay();
         updateActivePresetLabel();
     }
@@ -232,13 +238,13 @@ public class BatteryPositionController {
     private void updateCoordDisplay() {
         if (coordDisplay == null) return;
         int px, py;
-        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.batteryModule());
+        int[] pos = FloatingService.getCurrentPositionForModule(FloatingService.batteryStatsModule());
         if (pos != null) {
             px = pos[0];
             py = pos[1];
         } else {
-            px = Math.round(BatteryConfig.posX * displayWidth);
-            py = Math.round(BatteryConfig.posY * displayHeight);
+            px = Math.round(BatteryStatsConfig.posX * displayWidth);
+            py = Math.round(BatteryStatsConfig.posY * displayHeight);
         }
         coordDisplay.setText(px + "X" + py);
     }

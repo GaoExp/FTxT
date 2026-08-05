@@ -10,6 +10,7 @@ public class BatteryCurrentConfig {
     public static float size = 12f;
     public static int color = Color.GREEN;
     public static int labelColor = Color.CYAN;
+    public static int separatorColor = Color.GRAY;
     public static ShadowConfig shadow = new ShadowConfig();
     public static BackgroundConfig bg = new BackgroundConfig();
     public static boolean touchPassthrough = true;

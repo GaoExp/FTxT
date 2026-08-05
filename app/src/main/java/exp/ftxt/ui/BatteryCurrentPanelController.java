@@ -30,6 +30,7 @@ public class BatteryCurrentPanelController {
     private SeekBar batCurSizeSeekBar;
     private View batCurColorPreview;
     private View batCurLabelColorPreview;
+    private View batCurSeparatorColorPreview;
     private CheckBox batCurShadowSwitch;
     private LinearLayout batCurShadowConfigContainer;
     private View batCurShadowColorPreview;
@@ -89,6 +90,7 @@ public class BatteryCurrentPanelController {
         batCurSizeSeekBar = rootView.findViewById(R.id.batCurSizeSeekBar);
         batCurColorPreview = rootView.findViewById(R.id.batCurColorPreview);
         batCurLabelColorPreview = rootView.findViewById(R.id.batCurLabelColorPreview);
+        batCurSeparatorColorPreview = rootView.findViewById(R.id.batCurSeparatorColorPreview);
         batCurShadowSwitch = rootView.findViewById(R.id.batCurShadowSwitch);
         batCurShadowConfigContainer = rootView.findViewById(R.id.shadowConfigBatteryCurrent);
         batCurShadowColorPreview = rootView.findViewById(R.id.batCurShadowColorPreview);
@@ -143,6 +145,7 @@ public class BatteryCurrentPanelController {
         batCurSizeSeekBar.setProgress((int) BatteryCurrentConfig.size);
         batCurColorPreview.setBackgroundColor(BatteryCurrentConfig.color);
         batCurLabelColorPreview.setBackgroundColor(BatteryCurrentConfig.labelColor);
+        batCurSeparatorColorPreview.setBackgroundColor(BatteryCurrentConfig.separatorColor);
         batCurBgSwitch.setChecked(BatteryCurrentConfig.bg.enabled);
         activity.applyCheckboxTint(batCurBgSwitch, BatteryCurrentConfig.bg.enabled);
         batCurBgConfigContainer.setVisibility(BatteryCurrentConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -245,6 +248,16 @@ public class BatteryCurrentPanelController {
                 activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                         .edit().putInt("batcur_label_color", color).apply();
                 FloatingService.updateLabelColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.labelColor);
+            });
+        });
+
+        batCurSeparatorColorPreview.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Pemisah Bat Current", BatteryCurrentConfig.separatorColor, color -> {
+                BatteryCurrentConfig.separatorColor = color;
+                batCurSeparatorColorPreview.setBackgroundColor(color);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("batcur_separator_color", color).apply();
+                FloatingService.updateSeparatorColorForModule(FloatingService.batteryCurrentModule(), BatteryCurrentConfig.separatorColor);
             });
         });
 

@@ -26,8 +26,7 @@ import java.util.List;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
-import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
-import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
@@ -205,8 +204,7 @@ public class NotificationHelper {
         if (prefs.getBoolean("text_overlay_on", false)) return true;
         if (FpsConfig.enabled) return true;
         if (ClockConfig.enabled) return true;
-        if (BatteryConfig.enabled) return true;
-        if (BatteryPercentageConfig.enabled) return true;
+        if (BatteryStatsConfig.enabled) return true;
         if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
 
@@ -220,8 +218,7 @@ public class NotificationHelper {
         if (prefs.getBoolean("text_overlay_on", false)) active.add("Text");
         if (FpsConfig.enabled) active.add("FPS");
         if (ClockConfig.enabled) active.add("Clock");
-        if (BatteryConfig.enabled) active.add("Battery");
-        if (BatteryPercentageConfig.enabled) active.add("Battery%");
+        if (BatteryStatsConfig.enabled) active.add("Battery");
         if (BatteryCurrentConfig.enabled) active.add("Current");
         if (NetworkConfig.enabled) active.add("Network");
 

@@ -38,8 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
-import exp.ftxt.features.battery_percentage.BatteryPercentageConfig;
-import exp.ftxt.features.battery_temperature.BatteryConfig;
+import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
@@ -289,8 +288,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (FpsConfig.enabled) return true;
         if (ClockConfig.enabled) return true;
-        if (BatteryConfig.enabled) return true;
-        if (BatteryPercentageConfig.enabled) return true;
+        if (BatteryStatsConfig.enabled) return true;
         if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
 
@@ -411,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
         BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
         BatteryCurrentConfig.color = prefs.getInt("batcur_color", Color.GREEN);
         BatteryCurrentConfig.labelColor = prefs.getInt("batcur_label_color", Color.CYAN);
+        BatteryCurrentConfig.separatorColor = prefs.getInt("batcur_separator_color", Color.GRAY);
         BatteryCurrentConfig.shadow.enabled = prefs.getBoolean("batcur_shadow_enabled", false);
         BatteryCurrentConfig.shadow.color = prefs.getInt("batcur_shadow_color", Color.BLACK);
         BatteryCurrentConfig.shadow.blur = prefs.getFloat("batcur_shadow_blur", 5f);
@@ -426,40 +425,29 @@ public class MainActivity extends AppCompatActivity {
         BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
         BatteryCurrentConfig.updateInterval = readFloatPref(prefs, "batcur_update_interval", 1f);
 
-        BatteryPercentageConfig.enabled = prefs.getBoolean("battpct_enabled", false);
-        BatteryPercentageConfig.size = prefs.getFloat("battpct_size", 12f);
-        BatteryPercentageConfig.color = prefs.getInt("battpct_color", Color.GREEN);
-        BatteryPercentageConfig.shadow.enabled = prefs.getBoolean("battpct_shadow_enabled", false);
-        BatteryPercentageConfig.shadow.color = prefs.getInt("battpct_shadow_color", Color.BLACK);
-        BatteryPercentageConfig.shadow.blur = prefs.getFloat("battpct_shadow_blur", 5f);
-        BatteryPercentageConfig.shadow.offsetX = prefs.getFloat("battpct_shadow_offset_x", 3f);
-        BatteryPercentageConfig.shadow.offsetY = prefs.getFloat("battpct_shadow_offset_y", 3f);
-        BatteryPercentageConfig.touchPassthrough = prefs.getBoolean("battpct_lock", true);
-        BatteryPercentageConfig.bg.enabled = prefs.getBoolean("battpct_bg_enabled", false);
-        BatteryPercentageConfig.bg.color = prefs.getInt("battpct_bg_color", 0xCC000000);
-        BatteryPercentageConfig.bg.padding = prefs.getInt("battpct_bg_padding", 8);
-        BatteryPercentageConfig.bg.offsetX = prefs.getInt("battpct_bg_offset_x", 0);
-        BatteryPercentageConfig.bg.offsetY = prefs.getInt("battpct_bg_offset_y", 0);
-        BatteryPercentageConfig.bg.margin = prefs.getInt("battpct_bg_margin", 0);
-        BatteryPercentageConfig.bg.radius = prefs.getInt("battpct_bg_radius", 0);
-
-        BatteryConfig.enabled = prefs.getBoolean("battery_enabled", false);
-        BatteryConfig.color = prefs.getInt("battery_color", Color.GREEN);
-        BatteryConfig.shadow.enabled = prefs.getBoolean("battery_shadow_enabled", false);
-        BatteryConfig.shadow.color = prefs.getInt("battery_shadow_color", Color.BLACK);
-        BatteryConfig.shadow.blur = prefs.getFloat("battery_shadow_blur", 5f);
-        BatteryConfig.shadow.offsetX = prefs.getFloat("battery_shadow_offset_x", 3f);
-        BatteryConfig.shadow.offsetY = prefs.getFloat("battery_shadow_offset_y", 3f);
-        BatteryConfig.safeArea = prefs.getBoolean("battery_safe_area", true);
-        BatteryConfig.touchPassthrough = prefs.getBoolean("battery_lock", true);
-        BatteryConfig.showOnlyValue = prefs.getBoolean("battery_show_only_value", false);
-        BatteryConfig.showTemperature = prefs.getBoolean("battery_show_temperature", true);
-        BatteryConfig.showPercentage = prefs.getBoolean("battery_show_percentage", false);
-        BatteryConfig.bg.enabled = prefs.getBoolean("battery_bg_enabled", false);
-        BatteryConfig.bg.color = prefs.getInt("battery_bg_color", 0xCC000000);
-        BatteryConfig.bg.padding = prefs.getInt("battery_bg_padding", 8);
-        BatteryConfig.updateInterval = readFloatPref(prefs, "battery_update_interval", 5f);
-        BatteryConfig.labelColor = prefs.getInt("battery_label_color", Color.CYAN);
+        BatteryStatsConfig.enabled = prefs.getBoolean("battery_enabled", false);
+        BatteryStatsConfig.size = prefs.getFloat("battery_size", 12f);
+        BatteryStatsConfig.color = prefs.getInt("battery_color", Color.GREEN);
+        BatteryStatsConfig.labelColor = prefs.getInt("battery_label_color", Color.CYAN);
+        BatteryStatsConfig.separatorColor = prefs.getInt("battery_separator_color", Color.GRAY);
+        BatteryStatsConfig.shadow.enabled = prefs.getBoolean("battery_shadow_enabled", false);
+        BatteryStatsConfig.shadow.color = prefs.getInt("battery_shadow_color", Color.BLACK);
+        BatteryStatsConfig.shadow.blur = prefs.getFloat("battery_shadow_blur", 5f);
+        BatteryStatsConfig.shadow.offsetX = prefs.getFloat("battery_shadow_offset_x", 3f);
+        BatteryStatsConfig.shadow.offsetY = prefs.getFloat("battery_shadow_offset_y", 3f);
+        BatteryStatsConfig.safeArea = prefs.getBoolean("battery_safe_area", true);
+        BatteryStatsConfig.touchPassthrough = prefs.getBoolean("battery_lock", true);
+        BatteryStatsConfig.showOnlyValue = prefs.getBoolean("battery_show_only_value", false);
+        BatteryStatsConfig.showTemperature = prefs.getBoolean("battery_show_temperature", true);
+        BatteryStatsConfig.showPercentage = prefs.getBoolean("battery_show_percentage", false);
+        BatteryStatsConfig.bg.enabled = prefs.getBoolean("battery_bg_enabled", false);
+        BatteryStatsConfig.bg.color = prefs.getInt("battery_bg_color", 0xCC000000);
+        BatteryStatsConfig.bg.padding = prefs.getInt("battery_bg_padding", 8);
+        BatteryStatsConfig.bg.offsetX = prefs.getInt("battery_bg_offset_x", 0);
+        BatteryStatsConfig.bg.offsetY = prefs.getInt("battery_bg_offset_y", 0);
+        BatteryStatsConfig.bg.margin = prefs.getInt("battery_bg_margin", 0);
+        BatteryStatsConfig.bg.radius = prefs.getInt("battery_bg_radius", 0);
+        BatteryStatsConfig.updateInterval = readFloatPref(prefs, "battery_update_interval", 5f);
 
         TextConfig.patternEnabled = prefs.getBoolean("text_pattern_enabled", false);
         TextConfig.patternSpacingH = prefs.getFloat("text_pattern_spacing_h", 180f);

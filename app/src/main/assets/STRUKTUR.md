@@ -54,12 +54,9 @@ FTxT/
     │   │   │   ├── clock_module/
     │   │   │   │   ├── ClockConfig.java     — Konfigurasi statis Clock overlay
     │   │   │   │   └── ClockModule.java     — Jam real-time HH:mm:ss, update tiap 1 detik
-    │   │   │   ├── battery_temperature/
-    │   │   │   │   ├── BatteryConfig.java   — Konfigurasi statis Battery overlay
-    │   │   │   │   └── BatteryModule.java   — Suhu baterai °C + %, baca dari sticky broadcast
-    │   │   │   ├── battery_percentage/
-    │   │   │   │   ├── BatteryPercentageConfig.java  — Konfigurasi Battery % overlay
-    │   │   │   │   └── BatteryPercentageModule.java  — Persentase baterai, update 5 detik
+    │   │   │   ├── battery_stats/
+    │   │   │   │   ├── BatteryStatsConfig.java   — Konfigurasi statis Battery Stats overlay
+    │   │   │   │   └── BatteryStatsModule.java   — Suhu °C + persen %, baca dari sticky broadcast
     │   │   │   ├── battery_current/
     │   │   │   │   ├── BatteryCurrentConfig.java     — Konfigurasi Battery Current overlay
     │   │   │   │   └── BatteryCurrentModule.java     — Tegangan/arus/daya dari 3 sumber (broadcast, API 28+, sysfs)
@@ -104,10 +101,8 @@ FTxT/
     │   │   │   ├── FpsPositionController.java          — Kontrol posisi FPS dengan preset
     │   │   │   ├── ClockPanelController.java           — UI panel Clock: switch, size, color, shadow, bg
     │   │   │   ├── ClockPositionController.java        — Kontrol posisi Clock dengan preset
-    │   │   │   ├── BatteryPanelController.java         — UI panel Battery: temp/pct toggle, size, color
-    │   │   │   ├── BatteryPositionController.java      — Kontrol posisi Battery dengan preset
-    │   │   │   ├── BatteryPercentagePanelController.java   — UI panel Battery %
-    │   │   │   ├── BatteryPercentagePositionController.java— Kontrol posisi Battery %
+    │   │   │   ├── BatteryPanelController.java         — UI panel Battery: °C/% toggle, size, color
+    │   │   │   ├── BatteryPositionController.java      — Kontrol posisi Battery Stats dengan preset
     │   │   │   ├── BatteryCurrentPanelController.java      — UI panel Battery Current: volt, current, power toggle
     │   │   │   ├── BatteryCurrentPositionController.java   — Kontrol posisi Battery Current
     │   │   │   ├── NetworkPanelController.java             — UI panel Network: switch, size, color, shadow
@@ -119,8 +114,7 @@ FTxT/
     │   │   │   │   ├── TextPanelFragment.java              — Fragment Floating Text
     │   │   │   │   ├── FpsPanelFragment.java               — Fragment FPS Display
     │   │   │   │   ├── ClockPanelFragment.java             — Fragment Jam Digital
-    │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Suhu Baterai
-    │   │   │   │   ├── BatteryPercentagePanelFragment.java — Fragment Battery %
+    │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Battery Stats
     │   │   │   │   ├── BatteryCurrentPanelFragment.java    — Fragment Battery Current
     │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
     │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
@@ -197,8 +191,7 @@ FTxT/
     │   │   ├── panel_text.xml               — Panel konfigurasi Floating Text
     │   │   ├── panel_fps.xml                — Panel konfigurasi FPS Display
     │   │   ├── panel_clock.xml              — Panel konfigurasi Jam Digital
-    │   │   ├── panel_battery.xml            — Panel konfigurasi Suhu Baterai
-    │   │   ├── panel_battery_percentage.xml — Panel konfigurasi Battery Percentage
+    │   │   ├── panel_battery.xml            — Panel konfigurasi Battery Stats
     │   │   ├── panel_battery_current.xml    — Panel konfigurasi Battery Current
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
     │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
@@ -235,19 +228,19 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 71 |
-| Layout XML | 21 |
+| Java source | 66 |
+| Layout XML | 20 |
 | Drawable XML | 30 |
-| Drawable PNG | 14 |
+| Drawable PNG | 13 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
 | Menu XML | 2 |
 | Anim XML | 2 |
 | XML lainnya (Manifest) | 1 |
-| Assets (md) | 4 |
+| Assets (md) | 5 |
 | Root dokumen | 5 |
 | Root konfigurasi | 7 |
 | Gradle & wrapper | 5 |
 | CI/CD | 1 |
-| **Total file** | **~170** |
-| **Total direktori** | **~45** |
+| **Total file** | **~232** |
+| **Total direktori** | **~60** |
