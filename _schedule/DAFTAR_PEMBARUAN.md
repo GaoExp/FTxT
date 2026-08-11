@@ -5,7 +5,7 @@
 ## Prioritas (Urgent → Tidak Urgent)
 
 ### 1. MASALAH_MEMORI_DAN_PROSES
-**Status:** Paling Urgent
+**Status:** Sebagian besar selesai (5/6) — tersisa: hapus static instance FloatingService
 **Dampak:** Stabilitas & performa aplikasi
 **Masalah:**
 - WakeLock selalu aktif → menguras baterai
@@ -22,7 +22,7 @@
 ---
 
 ### 2. REFACTOR_FLOATING_SERVICE
-**Status:** Urgent
+**Status:** Selesai — interface OverlayModule (v4.83.1)
 **Dampak:** Maintainability & scalability
 **Masalah:**
 - 717 baris kode dengan 70+ method delegasi statis duplikasi
@@ -53,7 +53,7 @@
 ---
 
 ### 4. NOTIFICATION_ACTIONS
-**Status:** Penting
+**Status:** Selesai — aksi tombol di notifikasi (v4.83.0)
 **Dampak:** User experience
 **Manfaat:**
 - Toggle overlay tanpa buka aplikasi
@@ -69,7 +69,7 @@
 ---
 
 ### 5. PANEL_NAVIGATION_FRAGMENT
-**Status:** Penting tapi Tidak Urgent
+**Status:** Selesai — Refactor Panel Navigation ke Fragment (v4.84.0)
 **Dampak:** Code organization
 **Masalah:**
 - 9 variable View terpisah
@@ -111,6 +111,19 @@
 
 ---
 
+### 8. BYPASS_CHARGING_SHIZUKU
+**Status:** Rencana — belum dikerjakan
+**Dampak:** Akurasi deteksi mode pengisian bypass di Battery Bar / Battery Stats
+**Kompleksitas:**
+- Integrasi Shizuku SDK (dipakai bersama SHIZUKU_FPS_READER)
+- Baca `dumpsys battery` / `dumpsys power` (butuh izin shell)
+- Baca sysfs yang diproteksi (`current_now`, `charge_type`)
+- Heuristik gabungan: broadcast + sysfs + dumpsys
+- Butuh device pendukung bypass untuk verifikasi
+- Detail: `_schedule/BYPASS_CHARGING_SHIZUKU.md`
+
+---
+
 ## Ringkasan Eksekusi
 
 **Tahap 1: Stabilitas**
@@ -124,8 +137,9 @@
 - [✓] Notification Actions (tombol aksi di notifikasi)
 
 **Tahap 4: Refactor Lanjutan**
-- [ ] Panel Navigation Fragment (jika diperlukan)
+- [✓] Panel Navigation Fragment (jika diperlukan)
 
 **Tahap 5: Fitur Opsional**
 - [ ] Grouped Overlay Position
 - [ ] Shizuku FPS Reader (eksperimental)
+- [ ] Deteksi Bypass Charging via Shizuku (BYPASS_CHARGING_SHIZUKU)
