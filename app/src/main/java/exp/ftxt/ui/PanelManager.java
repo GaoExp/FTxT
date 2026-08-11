@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentTransaction;
 import java.util.HashMap;
 import java.util.Map;
 
+import exp.ftxt.ui.fragment.BatteryBarPanelFragment;
 import exp.ftxt.ui.fragment.BatteryCurrentPanelFragment;
 import exp.ftxt.ui.fragment.BatteryPanelFragment;
 import exp.ftxt.ui.fragment.ClockPanelFragment;
@@ -34,6 +35,7 @@ public class PanelManager {
         panelMap.put("clock", ClockPanelFragment.class);
         panelMap.put("battery", BatteryPanelFragment.class);
         panelMap.put("battery_cur", BatteryCurrentPanelFragment.class);
+        panelMap.put("battery_bar", BatteryBarPanelFragment.class);
         panelMap.put("network", NetworkPanelFragment.class);
         panelMap.put("color_picker", ColorPickerPanelFragment.class);
         panelMap.put("crosshair", CrosshairPanelFragment.class);

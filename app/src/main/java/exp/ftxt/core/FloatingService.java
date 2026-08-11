@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exp.ftxt.R;
+import exp.ftxt.features.battery_bar.BatteryBarConfig;
+import exp.ftxt.features.battery_bar.BatteryBarModule;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_current.BatteryCurrentModule;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
@@ -42,6 +44,7 @@ public class FloatingService extends Service {
     private BatteryStatsModule batteryStatsModule;
     private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
+    private BatteryBarModule batteryBarModule;
     private final List<OverlayModule> allModules = new ArrayList<>();
     private BroadcastReceiver configChangeReceiver;
 
@@ -51,6 +54,7 @@ public class FloatingService extends Service {
     public BatteryStatsModule getBatteryStatsModule() { return batteryStatsModule; }
     public BatteryCurrentModule getBatteryCurrentModule() { return batteryCurrentModule; }
     public NetworkModule getNetworkModule() { return networkModule; }
+    public BatteryBarModule getBatteryBarModule() { return batteryBarModule; }
 
     public static TextModule textModule() {
         if (instance != null) instance.ensureTextModule();
@@ -75,6 +79,10 @@ public class FloatingService extends Service {
     public static NetworkModule networkModule() {
         if (instance != null) instance.ensureNetworkModule();
         return instance != null ? instance.networkModule : null;
+    }
+    public static BatteryBarModule batteryBarModule() {
+        if (instance != null) instance.ensureBatteryBarModule();
+        return instance != null ? instance.batteryBarModule : null;
     }
 
     private void ensureTextModule() {
@@ -122,6 +130,14 @@ public class FloatingService extends Service {
             networkModule = new NetworkModule();
             allModules.add(networkModule);
             networkModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureBatteryBarModule() {
+        if (batteryBarModule == null) {
+            batteryBarModule = new BatteryBarModule();
+            allModules.add(batteryBarModule);
+            batteryBarModule.init(windowManager, this, prefs);
         }
     }
 
@@ -201,6 +217,7 @@ public class FloatingService extends Service {
             if (BatteryCurrentConfig.enabled) { ensureBatteryCurrentModule(); batteryCurrentModule.start(windowManager, this); }
             if (NetworkConfig.enabled) { ensureNetworkModule(); networkModule.start(windowManager, this); }
             if (FpsConfig.enabled) { ensureFpsModule(); fpsModule.start(windowManager, this); }
+            if (BatteryBarConfig.enabled) { ensureBatteryBarModule(); batteryBarModule.start(windowManager, this); }
 
             acquireWakeLockIfNeeded();
             if (isAnyModuleActive()) registerConfigReceiver();
@@ -323,8 +340,7 @@ public class FloatingService extends Service {
     private void reloadAllPositions() {
         for (OverlayModule module : allModules) {
             if (module.isRunning()) {
-                module.setOrientationSuffix(null);
-                module.updatePosition();
+                module.reloadPosition();
             }
         }
     }

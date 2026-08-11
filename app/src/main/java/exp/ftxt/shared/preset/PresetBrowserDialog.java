@@ -43,6 +43,7 @@ public class PresetBrowserDialog extends DialogFragment {
     private final OnPresetSelectedListener listener;
     private final Runnable onDismissListener;
     private final Consumer<Runnable> onSaveClick;
+    private final String moduleType;
 
     private List<Map<String, Object>> fullMetadata;
     private List<Map<String, Object>> filteredMetadata;
@@ -61,14 +62,19 @@ public class PresetBrowserDialog extends DialogFragment {
     private ActivityResultLauncher<String[]> importLauncher;
 
     public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener) {
-        this(activity, listener, onDismissListener, null);
+        this(activity, listener, onDismissListener, null, null);
     }
 
     public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener, Consumer<Runnable> onSaveClick) {
+        this(activity, listener, onDismissListener, onSaveClick, null);
+    }
+
+    public PresetBrowserDialog(Activity activity, OnPresetSelectedListener listener, Runnable onDismissListener, Consumer<Runnable> onSaveClick, String moduleType) {
         this.activity = activity;
         this.listener = listener;
         this.onDismissListener = onDismissListener;
         this.onSaveClick = onSaveClick;
+        this.moduleType = moduleType;
     }
 
     @Override
@@ -101,7 +107,7 @@ public class PresetBrowserDialog extends DialogFragment {
         btnBagikan = view.findViewById(R.id.btnBagikan);
         btnEkspor = view.findViewById(R.id.btnEkspor);
 
-        fullMetadata = PresetManager.getIndexMetadata(activity);
+        fullMetadata = PresetManager.getIndexMetadata(activity, moduleType);
         filteredMetadata = new ArrayList<>(fullMetadata);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(activity));
@@ -338,7 +344,7 @@ public class PresetBrowserDialog extends DialogFragment {
     }
 
     private void refreshData() {
-        fullMetadata = PresetManager.getIndexMetadata(activity);
+        fullMetadata = PresetManager.getIndexMetadata(activity, moduleType);
         filter(searchBar.getText().toString());
     }
 

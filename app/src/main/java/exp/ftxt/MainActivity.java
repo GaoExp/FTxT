@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         "{\"id\":\"navBattery\",\"l\":\"Battery Stats\"}," +
 
         "{\"id\":\"navBatteryCurrent\",\"l\":\"Battery Current\"}," +
+        "{\"id\":\"navBatteryBar\",\"l\":\"Battery Bar\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
         "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
         "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}," +
@@ -291,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
         if (BatteryStatsConfig.enabled) return true;
         if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
+        if (BatteryBarConfig.enabled) return true;
 
         return false;
     }
@@ -449,6 +452,24 @@ public class MainActivity extends AppCompatActivity {
         BatteryStatsConfig.bg.radius = prefs.getInt("battery_bg_radius", 0);
         BatteryStatsConfig.updateInterval = readFloatPref(prefs, "battery_update_interval", 5f);
 
+        BatteryBarConfig.enabled = prefs.getBoolean("batbar_enabled", false);
+        BatteryBarConfig.quickMode = prefs.getBoolean("batbar_quick_mode", true);
+        BatteryBarConfig.quickSide = prefs.getString("batbar_quick_side", "top");
+        BatteryBarConfig.horizontal = prefs.getBoolean("batbar_horizontal", true);
+        BatteryBarConfig.length = prefs.getFloat("batbar_length", 0.5f);
+        BatteryBarConfig.thickness = prefs.getInt("batbar_thickness", 8);
+        BatteryBarConfig.color = prefs.getInt("batbar_color", Color.GREEN);
+        BatteryBarConfig.autoColor = prefs.getBoolean("batbar_auto_color", false);
+        BatteryBarConfig.lowColor = prefs.getInt("batbar_low_color", Color.YELLOW);
+        BatteryBarConfig.lowThreshold = prefs.getInt("batbar_low_threshold", 40);
+        BatteryBarConfig.showEmptyStrip = prefs.getBoolean("batbar_show_empty_strip", true);
+        BatteryBarConfig.emptyColor = prefs.getInt("batbar_empty_color", 0x66000000);
+        BatteryBarConfig.radius = prefs.getInt("batbar_radius", 8);
+        BatteryBarConfig.fadeSpeed = prefs.getInt("batbar_fade_speed", 5);
+        BatteryBarConfig.updateInterval = readFloatPref(prefs, "batbar_update_interval", 1f);
+        BatteryBarConfig.safeArea = prefs.getBoolean("batbar_safe_area", true);
+        BatteryBarConfig.touchPassthrough = prefs.getBoolean("batbar_lock", true);
+
         TextConfig.patternEnabled = prefs.getBoolean("text_pattern_enabled", false);
         TextConfig.patternSpacingH = prefs.getFloat("text_pattern_spacing_h", 180f);
         TextConfig.patternSpacingV = prefs.getFloat("text_pattern_spacing_v", 220f);
@@ -467,7 +488,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavSelection(int selectedId) {
         int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navBatteryCurrent, R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker};
+                R.id.navBatteryCurrent, R.id.navBatteryBar, R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker};
         for (int id : allIds) {
             View v = findViewById(id);
             if (v != null) {
@@ -537,7 +558,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e2) { }
         }
+        addMissingDefaultItems(list);
         return list;
+    }
+
+    private void addMissingDefaultItems(List<SidebarItem> list) {
+        List<String> existing = new ArrayList<>();
+        for (SidebarItem i : list) existing.add(i.id);
+        try {
+            JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
+            for (int i = 0; i < def.length(); i++) {
+                JSONObject o = def.getJSONObject(i);
+                String id = o.optString("id", null);
+                if (id != null && !existing.contains(id)) {
+                    list.add(new SidebarItem(o.getString("l"), id));
+                    existing.add(id);
+                }
+            }
+        } catch (Exception e) { }
     }
 
     private void rebuildSidebar() {
@@ -658,6 +696,7 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.navClock) return "clock";
         if (itemId == R.id.navBattery) return "battery";
         if (itemId == R.id.navBatteryCurrent) return "battery_cur";
+        if (itemId == R.id.navBatteryBar) return "battery_bar";
         if (itemId == R.id.navNetwork) return "network";
         if (itemId == R.id.navColorPicker) return "color_picker";
         if (itemId == R.id.navCrosshair) return "crosshair";
@@ -672,6 +711,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.nav_battery);
         } else if (itemId == R.id.navBatteryCurrent) {
             getSupportActionBar().setTitle(R.string.nav_battery_current);
+        } else if (itemId == R.id.navBatteryBar) {
+            getSupportActionBar().setTitle(R.string.nav_battery_bar);
         } else if (itemId == R.id.navClock) {
             getSupportActionBar().setTitle(R.string.nav_clock);
         } else if (itemId == R.id.navNetwork) {

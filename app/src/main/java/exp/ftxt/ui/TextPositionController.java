@@ -39,6 +39,8 @@ public class TextPositionController {
         @Override
         public String moduleLabel() { return "teks"; }
         @Override
+        public String moduleType() { return "text"; }
+        @Override
         public String touchPassthroughPrefKey() { return "text_lock"; }
         @Override
         public String safeAreaPrefKey() { return "text_safe_area"; }
@@ -49,6 +51,7 @@ public class TextPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
+            p.moduleType = moduleType();
             p.posX = TextConfig.posX;
             p.posY = TextConfig.posY;
             p.size = TextConfig.size;

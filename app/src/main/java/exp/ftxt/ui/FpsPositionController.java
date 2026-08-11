@@ -39,6 +39,8 @@ public class FpsPositionController {
         @Override
         public String moduleLabel() { return "FPS"; }
         @Override
+        public String moduleType() { return "fps"; }
+        @Override
         public String touchPassthroughPrefKey() { return "fps_lock"; }
         @Override
         public String safeAreaPrefKey() { return "fps_safe_area"; }
@@ -49,6 +51,7 @@ public class FpsPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
+            p.moduleType = moduleType();
             p.posX = FpsConfig.posX;
             p.posY = FpsConfig.posY;
             p.size = FpsConfig.size;

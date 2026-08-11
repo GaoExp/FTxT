@@ -42,6 +42,7 @@ public class ClockModule implements OverlayModule {
         context = ctx;
         prefs = sp;
         orientationSuffix = null;
+        loadPosition();
     }
 
     @Override

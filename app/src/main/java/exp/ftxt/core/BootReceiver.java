@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -25,10 +26,12 @@ public class BootReceiver extends BroadcastReceiver {
         BatteryStatsConfig.enabled = prefs.getBoolean("battery_enabled", false);
         BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
         NetworkConfig.enabled = prefs.getBoolean("network_enabled", false);
+        BatteryBarConfig.enabled = prefs.getBoolean("batbar_enabled", false);
 
         boolean anyActive = textOn || FpsConfig.enabled || ClockConfig.enabled
                 || BatteryStatsConfig.enabled
-                || BatteryCurrentConfig.enabled || NetworkConfig.enabled;
+                || BatteryCurrentConfig.enabled || NetworkConfig.enabled
+                || BatteryBarConfig.enabled;
 
         if (anyActive) {
             context.startForegroundService(new Intent(context, FloatingService.class));

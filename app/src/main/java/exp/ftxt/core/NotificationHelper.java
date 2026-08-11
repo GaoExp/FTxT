@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exp.ftxt.R;
+import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -207,6 +208,7 @@ public class NotificationHelper {
         if (BatteryStatsConfig.enabled) return true;
         if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
+        if (BatteryBarConfig.enabled) return true;
 
         return false;
     }
@@ -221,6 +223,7 @@ public class NotificationHelper {
         if (BatteryStatsConfig.enabled) active.add("Battery");
         if (BatteryCurrentConfig.enabled) active.add("Current");
         if (NetworkConfig.enabled) active.add("Network");
+        if (BatteryBarConfig.enabled) active.add("Bar");
 
         if (active.isEmpty()) return "Tidak ada overlay aktif";
         return String.join(", ", active) + " aktif";

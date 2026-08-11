@@ -36,6 +36,10 @@
             android:title="@string/nav_battery_current"/>
 
         <item
+            android:id="@+id/nav_battery_bar"
+            android:title="@string/nav_battery_bar"/>
+
+        <item
             android:id="@+id/nav_logo"
             android:title="@string/nav_logo"/>
 

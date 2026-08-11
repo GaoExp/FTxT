@@ -45,6 +45,8 @@ public class NetworkPositionController {
         @Override
         public String moduleLabel() { return "Network"; }
         @Override
+        public String moduleType() { return "network"; }
+        @Override
         public String touchPassthroughPrefKey() { return "network_lock"; }
         @Override
         public String safeAreaPrefKey() { return "network_safe_area"; }
@@ -55,6 +57,7 @@ public class NetworkPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
+            p.moduleType = moduleType();
             p.posX = NetworkConfig.posX;
             p.posY = NetworkConfig.posY;
             p.size = NetworkConfig.size;

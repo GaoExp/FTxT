@@ -45,6 +45,7 @@ public class NetworkModule implements OverlayModule {
         context = ctx;
         prefs = sp;
         orientationSuffix = null;
+        loadPosition();
     }
 
     @Override

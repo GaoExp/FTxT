@@ -46,6 +46,7 @@ Drawer terdiri dari menu berikut (urutan default; item panel bisa di-reorder den
 | Network Stats | Kecepatan internet real-time |
 | Battery Stats | Suhu (°C) dan persentase (%) baterai dalam satu modul |
 | Battery Current | Tegangan, arus, daya baterai |
+| Battery Bar | Bar baterai fleksibel (snap ke sisi atau manual) |
 | Clock Module | Waktu real-time 24 jam (Jam Digital) |
 | Crosshair | Placeholder (coming soon) |
 | Logo Display | Placeholder (coming soon) |
@@ -114,6 +115,16 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - **Warna Pemisah** — Komponen dipisahkan tanda `|` (misal `4.1V | +120mA | 0.5W`) yang warnanya bisa diatur sendiri
 - Opsi tampilkan mV, mA, W (toggle)
 - Interval update bisa diatur 0.2–10 detik (default 1d)
+
+### Battery Bar
+- Menampilkan bar baterai sebagai strip di layar (level mengikuti persentase baterai)
+- **Mode Cepat** — Bar menempel penuh di salah satu sisi layar (Atas/Bawah/Kiri/Kanan). Posisi & panjang otomatis mengikuti sisi yang dipilih. Kontrol posisi manual nonaktif dalam mode ini.
+- **Mode Manual** — Matikan "Mode Cepat" untuk mengatur panjang bar (0–100%) dan posisi bebas (slider X/Y, D-Pad) per orientasi layar.
+- **Warna Otomatis** — Bar berubah hijau → kuning → merah mengikuti level baterai; atau pilih warna tetap.
+- **Baterai Rendah** — Atur ambang low (default 40%); saat level di bawah ambang bar berubah ke warna Low dan berkedip (kecepatan fade bisa diatur).
+- **Strip Kosong** — Tampilkan sisa strip di belakang bar dengan warna terpisah.
+- **Charging** — Bar menampilkan animasi shine saat perangkat di-charge.
+- Pengaturan lain: ketebalan, radius sudut, shadow, kunci posisi, area aman.
 
 ### Network Speed
 - Kecepatan internet real-time format `↓128KB/s ↑128KB/s`

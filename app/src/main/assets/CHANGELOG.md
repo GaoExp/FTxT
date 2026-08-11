@@ -1,3 +1,53 @@
+# [4.85.1] - 2026-08-11
+### ✨ Fitur Baru
+- **Modul Battery Bar** — Modul overlay baru `features/battery_bar` (BatteryBarConfig + BatteryBarView + BatteryBarModule) menampilkan bar baterai sebagai strip di layar. Dua mode: **Mode Cepat** (snap ke sisi atas/bawah/kiri/kanan dengan panjang penuh sisi, pilih sisi lewat popup) dan **Mode Manual** (panjang 0–100% + posisi bebas per orientasi `_port`/`_land`). Orientasi bar (horizontal/vertikal) otomatis mengikuti mode. Fitur panel: ketebalan, warna fill, strip kosong + warna, radius sudut, auto-color (hijau→kuning→merah mengikuti level), warna low + ambang low (fade berkedip saat rendah), kecepatan fade, animasi shine saat charging, shadow, kunci posisi (touch passthrough), area aman, dan preset khusus `moduleType "battery_bar"` dengan field bar tersendiri.
+### ♻️ Perubahan Fitur
+- **Preset terpisah per modul** — `OverlayPreset` kini punya field `moduleType` (text, fps, clock, battery, batcur, network). Setiap `PositionController` mengisi `moduleType` saat menyimpan preset. Browser preset (`PresetBrowserDialog`) dan `PresetManager.getAllNames/getIndexMetadata` memfilter daftar preset per panel, sehingga preset dari modul lain tidak lagi muncul/tumpang tindih di panel berbeda. Preset lama tanpa `moduleType` tetap tampil di semua panel (backward compatible) dan ditolak saat di-apply ke modul yang salah.
+- **Guard lintas modul saat apply preset** — `PresetHandler.applyPreset()` menolak preset yang `moduleType`-nya tidak cocok dengan panel aktif (toast "Preset ini untuk modul ..."), mencegah konfigurasi modul lain menimpa modul aktif. Tidak ada lagi "preset tidak sengaja mengubah semua overlay".
+- **Posisi preset dihormati per orientasi** — Saat apply preset, posisi kini ditulis ke prefs orientasi yang tersimpan di preset (`_land`/`_port`), bukan selalu orientasi layar saat ini. Format orientasi preset disamakan menjadi `land`/`port` (sebelumnya `landscape`/`portrait`), dengan normalisasi otomatis untuk preset lama.
+### 🔧 Optimasi & Penyesuaian
+- **Filter preset per panel di dialog** — `PresetBrowserDialog` menerima `moduleType` dari `PresetHandler.Delegate.moduleType()` dan hanya menampilkan preset milik modul tersebut (plus preset lama tanpa modul). Metadata index preset menyimpan `moduleType` agar filter tanpa harus me-load seluruh payload.
+### 🐞 Bug Fixes
+- **Item sidebar modul baru tidak muncul** — Sidebar dimuat dari state tersimpan (`sidebar_state`) yang belum berisi item baru seperti `navBatteryBar`, sehingga "Battery Bar" tidak tampil walau sudah ada di `DEFAULT_SIDEBAR_JSON`. Sekarang `parseSidebarJson()` menggabungkan (merge) item default yang belum ada di state tersimpan, jadi setiap modul baru otomatis muncul di drawer walau sidebar pernah di-reorder.
+- **Posisi overlay reset ke default setelah service restart / kill service** — Modul Clock, Battery Stats, Battery Current, dan Network tidak membaca posisi tersimpan (`*_pos_x/_port`, `*_pos_y/_port`, dan varian `_land`) saat modul dibuat (`init()`), sehingga memakai nilai default Config sampai panel modul dibuka di activity. Sekarang keempat modul memanggil `loadPosition()` di `init()`, konsisten dengan pola Text & FPS.
+- **Posisi salah saat rotasi layar (reload pakai nilai orientasi lama)** — `reloadAllPositions()` di `FloatingService` sebelumnya hanya `setOrientationSuffix(null)` + `updatePosition()` yang memakai `Config.posX/posY` dari orientasi lama. Sekarang `reloadAllPositions()` memanggil `reloadPosition()` per modul yang membaca ulang posisi dari prefs sesuai orientasi baru (`_land`/`_port`).
+### 🗒️ File Added
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarConfig.java` — Config modul (enabled, quickMode, quickSide, horizontal, length, thickness, color, autoColor, lowColor, lowThreshold, showEmptyStrip, emptyColor, radius, fadeSpeed, shadow, touchPassthrough, safeArea, posX, posY, updateInterval)
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarView.java` — Custom View rendering bar horizontal/vertikal + empty strip + fade saat low + shine saat charging
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarModule.java` — Modul overlay (quick snap & manual position, drag handler, tick update interval, baca level/status via `ACTION_BATTERY_CHANGED`)
+- `app/src/main/java/exp/ftxt/ui/BatteryBarPanelController.java` — Controller panel Battery Bar
+- `app/src/main/java/exp/ftxt/ui/BatteryBarPositionController.java` — Controller posisi + preset (`moduleType "battery_bar"`)
+- `app/src/main/java/exp/ftxt/ui/fragment/BatteryBarPanelFragment.java` — Fragment panel
+- `app/src/main/res/layout/panel_battery_bar.xml` — Layout panel
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 178, versionName 4.85.1
+- `app/src/main/java/exp/ftxt/core/FloatingService.java` — `reloadAllPositions()` panggil `module.reloadPosition()`; field/getter/`ensureBatteryBarModule()`/start modul Battery Bar
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Load prefs `batbar_*`, import `BatteryBarConfig`, item sidebar `navBatteryBar`, `panelIdToName` → `battery_bar`, judul toolbar, `isAnyModuleActive()` cek `BatteryBarConfig`, merge item default yang hilang ke sidebar tersimpan (`addMissingDefaultItems()`)
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Tambah field `moduleType` + field preset Battery Bar (quickMode, quickSide, barHorizontal, barLength, barThickness, autoColor, lowColor, lowThreshold, showEmptyStrip, emptyColor, barRadius, fadeSpeed)
+- `app/src/main/java/exp/ftxt/shared/preset/PresetHandler.java` — Method `moduleType()` di interface `Delegate`; simpan orientasi preset `land`/`port`; hormati `preset.orientation` saat apply + normalisasi orientasi lama; guard lintas modul; teruskan `moduleType` ke `PresetBrowserDialog`
+- `app/src/main/java/exp/ftxt/shared/preset/PresetManager.java` — Field `moduleType` di `PresetIndexItem`; `getAllNames()`/`getIndexMetadata()` overload dengan filter `moduleType`
+- `app/src/main/java/exp/ftxt/shared/preset/PresetBrowserDialog.java` — Parameter `moduleType` (overload konstruktor) + filter daftar preset
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Implement `moduleType()` ("text") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/ui/FpsPositionController.java` — Implement `moduleType()` ("fps") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/ui/ClockPositionController.java` — Implement `moduleType()` ("clock") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/ui/BatteryPositionController.java` — Implement `moduleType()` ("battery") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Implement `moduleType()` ("batcur") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Implement `moduleType()` ("network") + `p.moduleType` di `saveToPreset()`
+- `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Panggil `loadPosition()` di `init()`
+- `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Panggil `loadPosition()` di `init()`
+- `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Panggil `loadPosition()` di `init()`
+- `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Panggil `loadPosition()` di `init()`
+- `app/src/main/java/exp/ftxt/ui/PanelManager.java` — Daftarkan `battery_bar` → `BatteryBarPanelFragment`
+- `app/src/main/res/values/ids.xml` + `values/strings.xml` + `menu/drawer_menu.xml` — Item `nav_battery_bar` / string `nav_battery_bar`
+- `app/src/main/java/exp/ftxt/core/BootReceiver.java` — Load `batbar_enabled` + cek aktif
+- `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Cek aktif & label "Bar"
+- `app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java` — Parameter `View` (sebelumnya `TextView`) agar cocok dengan BatteryBarView
+- `gradle.properties` — `android.aapt2FromMavenOverride=/usr/bin/aapt2` (aapt2 Maven AGP x86-64 tidak bisa jalan di sistem aarch64)
+### 🔢 Version
+`4.85.0` → `4.85.1`
+
+---
+
 # [4.85.0] - 2026-08-04
 ### ✨ Fitur Baru
 - **Battery Stats — suhu & persentase jadi satu kesatuan modul** — Modul `features/battery_stats` (BatteryStatsConfig + BatteryStatsModule) menggabungkan komponen suhu (°C) dan persentase (%) menjadi satu modul utuh, persis pola Battery Current yang menggabungkan tegangan/arus/daya. Satu overlay, satu panel, satu konfigurasi (warna, label, shadow, background, posisi, safe area, interval 0.2–10 detik), satu preset, satu key prefs (`battery_*`). Checkbox **°C** dan **%** di panel mengontrol komponen yang tampil; keduanya bisa tampil bersamaan dalam satu overlay.
@@ -44,8 +94,6 @@
 - `app/src/main/res/layout/panel_battery.xml` — Label checkbox modul "Suhu Baterai" → "Battery Stats"
 - `app/src/main/res/values/strings.xml` — Hapus string `nav_battery_percentage`
 - `app/src/main/res/menu/drawer_menu.xml` — Hapus item `nav_battery_percentage`
-- `README.md`, `PANDUAN.md`, `STRUKTUR.md`, `CHANGELOG.md` + `app/src/main/assets/*` — Update modul Battery Stats
-- `PANDUAN.md` — Sinkronisasi daftar & urutan item navigasi drawer dengan implementasi aktual + info tombol warna "Pemisah" di Battery Stats & Battery Current
 ### 🔥 File Removed
 - `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryConfig.java`
 - `app/src/main/java/exp/ftxt/features/battery_temperature/BatteryModule.java`
@@ -55,10 +103,6 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java`
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryPercentagePanelFragment.java`
 - `app/src/main/res/layout/panel_battery_percentage.xml`
-- `_schedule/BUG_REFACTOR_PANEL_NAVIGATION.md` — Dokumen jadwal refactor yang sudah selesai
-- `_schedule/PANEL_NAVIGATION_FRAGMENT.md` — Dokumen jadwal refactor yang sudah selesai
-- `_schedule/REFACTOR_FLOATING_SERVICE.md` — Dokumen jadwal refactor yang sudah selesai
-- `_schedule/REFACTOR_PANEL_FRAGMENT.md` — Dokumen jadwal refactor yang sudah selesai
 ### 🔢 Version
 `4.84.1` → `4.85.0`
 
@@ -219,7 +263,6 @@
 - `app/src/main/res/drawable/ic_notification_open.xml` — Icon buka aplikasi untuk notifikasi
 ### ✏️ File Changed
 - `app/build.gradle` — versionCode 172, versionName 4.83.0
-- `CHANGELOG.md` — Entry 4.83.0 baru (notification actions)
 - `app/src/main/AndroidManifest.xml` — Register NotificationActionReceiver
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateNotification() + stopAllModules() + hideAllOverlays() + showAllOverlays() + areAllOverlaysHidden()
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Ganti ke custom RemoteViews layout + onClickPendingIntent + setImageViewResource + hapus addAction
@@ -234,12 +277,7 @@
 - `app/src/main/res/drawable/ic_notification_toggle_off.xml` — Hapus tint textColorPrimary
 - `app/src/main/res/drawable/ic_notification_stop.xml` — Hapus tint textColorPrimary
 - `app/src/main/res/drawable/ic_notification_open.xml` — Hapus tint textColorPrimary
-- `README.md` — Update versi ke 4.83.0, tanggal 2026-07-28
-- `STRUKTUR.md` — Update statistik (Java 57, Layout 21, Drawable XML 30) + tree (NotificationActionReceiver, notification_custom, ic_notification visible/invisible)
 - `.gitignore` — Tambah `/_temp/`
-- `app/src/main/assets/CHANGELOG.md` — Sync dari root
-- `app/src/main/assets/README.md` — Sync dari root
-- `app/src/main/assets/STRUKTUR.md` — Sync dari root
 ### 🔢 Version
 `4.82.4` → `4.83.0`
 
@@ -375,19 +413,13 @@ Menggabungkan 5 release.
 ### ♻️ Perubahan Fitur
 - **Collapsible Section Grouping** — Semua 8 panel: section Tampilan, Posisi, Shadow, Background collapsible dengan SectionHelper.
 - **release.yml decode keystore** — Tambah step decode & mkdir untuk CI.
-- **CHANGELOG.md entry header** — Tambah catatan Major 1; hapus duplikasi.
 ### 🔧 Optimasi & Penyesuaian
 - **Refactor layout ekstrak panel** — Pisahkan 8 panel dari `activity_main.xml` ke file `<include>` terpisah.
-- **Dokumentasi konsolidasi** — STRUKTUR/DEVELOPMENT/TENTANG dihapus, merge ke README.
-- **README.md struktur lengkap** — Semua file + direktori punya deskripsi.
-- **syncDocs 3 file** — Hanya README/CHANGELOG/PANDUAN; txt dikelola manual.
 ### 🐞 Bug Fixes
 - **release.yml restore** — Kembalikan workflow ke versi kerja (Java 17, secret names benar).
 ### 🗒️ File Added
 - `panel_text.xml`, `panel_fps.xml`, `panel_clock.xml`, `panel_battery_current.xml`, `panel_network.xml`, `panel_crosshair.xml`, `panel_watermark.xml`, `panel_logo.xml`
 - `SectionHelper.java`, `key/.gitkeep`
-### 🔥 File Removed
-- `STRUKTUR.md`, `DEVELOPMENT.md`, `TENTANG.md` + assets .txt
 ### 🔢 Version
 versionCode: 139 → 143
 versionName: 3.9.3.69.1 → 3.9.3.69.5
@@ -478,7 +510,6 @@ Menggabungkan 5 entry CHANGELOG (masing-masing sudah merger 5 release = ~25 rele
 - **Popup settings di bawah ikon** — PopupMenu + Gravity.END.
 - **SettingsActivity → Konfigurasi** — Ringkas, hanya izin.
 - **Dokumentasi via popup** — Dipindah dari Settings.
-- **README dipecah** — STRUKTUR, PANDUAN, DEVELOPMENT, TENTANG.
 - **Offset range -60–60**; default shadow offset 0.
 ### 🚮 Fitur Dihapus
 - **XY Pad → karantina** — Digantikan Slider + D-Pad.

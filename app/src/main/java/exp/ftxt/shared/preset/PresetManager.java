@@ -63,6 +63,7 @@ public class PresetManager {
     private static class PresetIndexItem {
         String uuid;
         String name;
+        String moduleType;
         long createdAt;
         long updatedAt;
         List<String> tags;
@@ -191,6 +192,7 @@ public class PresetManager {
         prefs.edit().putString(KEY_PREFIX + item.uuid, json).apply();
 
         item.color = preset.color;
+        item.moduleType = preset.moduleType;
 
         try {
             String thumbPath = "presets/thumb_" + item.uuid + ".png";
@@ -253,10 +255,22 @@ public class PresetManager {
     }
 
     public static List<String> getAllNames(Context context) {
+        return getAllNames(context, null);
+    }
+
+    public static List<String> getAllNames(Context context, String moduleType) {
         List<String> out = new ArrayList<>();
         List<PresetIndexItem> index = getIndex(getPrefs(context));
-        for (PresetIndexItem it : index) out.add(it.name);
+        for (PresetIndexItem it : index) {
+            if (matchesModule(it, moduleType)) out.add(it.name);
+        }
         return out;
+    }
+
+    private static boolean matchesModule(PresetIndexItem item, String moduleType) {
+        if (moduleType == null || moduleType.isEmpty()) return true;
+        if (item.moduleType == null || item.moduleType.isEmpty()) return true;
+        return item.moduleType.equals(moduleType);
     }
 
     public static void delete(Context context, String name) {
@@ -632,9 +646,14 @@ public class PresetManager {
     }
 
     public static List<java.util.Map<String, Object>> getIndexMetadata(Context context) {
+        return getIndexMetadata(context, null);
+    }
+
+    public static List<java.util.Map<String, Object>> getIndexMetadata(Context context, String moduleType) {
         List<java.util.Map<String, Object>> out = new ArrayList<>();
         List<PresetIndexItem> idx = getIndex(getPrefs(context));
         for (PresetIndexItem it : idx) {
+            if (!matchesModule(it, moduleType)) continue;
             java.util.Map<String, Object> m = new java.util.HashMap<>();
             m.put("name", it.name);
             m.put("uuid", it.uuid);

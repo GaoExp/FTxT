@@ -1,12 +1,12 @@
 package exp.ftxt.shared.ui;
 
 import android.os.Build;
+import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 public class OverlayShadow {
 
-    public static void apply(TextView view, WindowManager.LayoutParams params, WindowManager wm,
+    public static void apply(View view, WindowManager.LayoutParams params, WindowManager wm,
                              ShadowConfig config, float elevation) {
         if (view == null) return;
 

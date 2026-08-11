@@ -22,6 +22,8 @@ public class OverlayPreset {
 
     public String orientation;
 
+    public String moduleType;
+
     public Boolean touchPassthrough;
     public Boolean safeArea;
 
@@ -38,6 +40,19 @@ public class OverlayPreset {
     public Boolean showVoltage;
     public Boolean showCurrent;
     public Boolean showPower;
+
+    public Boolean quickMode;
+    public String quickSide;
+    public Boolean barHorizontal;
+    public Float barLength;
+    public Integer barThickness;
+    public Boolean autoColor;
+    public Integer lowColor;
+    public Integer lowThreshold;
+    public Boolean showEmptyStrip;
+    public Integer emptyColor;
+    public Integer barRadius;
+    public Integer fadeSpeed;
 
     public OverlayPreset() {
         shadow = new ShadowConfig();

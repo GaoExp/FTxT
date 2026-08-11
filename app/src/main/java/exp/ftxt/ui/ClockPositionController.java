@@ -45,6 +45,8 @@ public class ClockPositionController {
         @Override
         public String moduleLabel() { return "Jam"; }
         @Override
+        public String moduleType() { return "clock"; }
+        @Override
         public String touchPassthroughPrefKey() { return "clock_lock"; }
         @Override
         public String safeAreaPrefKey() { return "clock_safe_area"; }
@@ -55,6 +57,7 @@ public class ClockPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
+            p.moduleType = moduleType();
             p.posX = ClockConfig.posX;
             p.posY = ClockConfig.posY;
             p.size = ClockConfig.size;

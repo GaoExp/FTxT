@@ -20,6 +20,7 @@ public class PresetHandler {
 
     public interface Delegate {
         String moduleLabel();
+        String moduleType();
         String touchPassthroughPrefKey();
         String safeAreaPrefKey();
         String posXPrefKey();
@@ -63,8 +64,7 @@ public class PresetHandler {
     private static void doSavePreset(Activity activity, String name, Delegate delegate, Runnable onSaved) {
         OverlayPreset preset = new OverlayPreset();
         delegate.saveToPreset(preset);
-        int orientation = activity.getResources().getConfiguration().orientation;
-        preset.orientation = (orientation == Configuration.ORIENTATION_LANDSCAPE) ? "landscape" : "portrait";
+        preset.orientation = getCurrentOrientation(activity);
         PresetManager.save(activity, name, preset);
         Toast.makeText(activity, "Preset \"" + name + "\" tersimpan", Toast.LENGTH_SHORT).show();
         if (onSaved != null) onSaved.run();
@@ -85,7 +85,7 @@ public class PresetHandler {
         }
         new PresetBrowserDialog(activity, name -> {
             doLoadPreset(activity, name, delegate, activePresetName, postApply);
-        }, null, onSaveClick).show(((FragmentActivity) activity).getSupportFragmentManager(), "PresetBrowserDialog");
+        }, null, onSaveClick, delegate.moduleType()).show(((FragmentActivity) activity).getSupportFragmentManager(), "PresetBrowserDialog");
     }
 
     private static void doLoadPreset(Activity activity, String name, Delegate delegate,
@@ -100,17 +100,34 @@ public class PresetHandler {
             Toast.makeText(activity, "Gagal memuat preset", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (!applyPreset(activity, preset, delegate)) {
+            return;
+        }
         activePresetName.value = name;
-        applyPreset(activity, preset, delegate);
         if (postApply != null) postApply.run();
         Toast.makeText(activity, "Preset \"" + name + "\" diterapkan", Toast.LENGTH_SHORT).show();
     }
 
-    private static void applyPreset(Activity activity, OverlayPreset preset, Delegate delegate) {
+    private static boolean applyPreset(Activity activity, OverlayPreset preset, Delegate delegate) {
         SharedPreferences prefs = activity.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+        String delegateType = delegate.moduleType();
+        String presetType = preset.moduleType;
+        if (presetType != null && !presetType.isEmpty() && !presetType.equals(delegateType)) {
+            Toast.makeText(activity, "Preset ini untuk modul \"" + presetType + "\"", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         delegate.applyFromPreset(activity, preset, prefs);
-        savePositionToPrefs(prefs, delegate, getCurrentOrientation(activity), preset.posX, preset.posY);
+        String orient = normalizeOrientation(preset.orientation);
+        if (orient == null) orient = getCurrentOrientation(activity);
+        savePositionToPrefs(prefs, delegate, orient, preset.posX, preset.posY);
         delegate.syncToService();
+        return true;
+    }
+
+    private static String normalizeOrientation(String orient) {
+        if ("land".equals(orient) || "landscape".equals(orient)) return "land";
+        if ("port".equals(orient) || "portrait".equals(orient)) return "port";
+        return null;
     }
 
     public static void savePositionToPrefs(SharedPreferences prefs, Delegate delegate,

@@ -46,6 +46,7 @@ public class BatteryCurrentModule implements OverlayModule {
         context = ctx;
         prefs = sp;
         orientationSuffix = null;
+        loadPosition();
     }
 
     @Override

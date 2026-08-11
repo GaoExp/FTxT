@@ -60,6 +60,10 @@ FTxT/
     │   │   │   ├── battery_current/
     │   │   │   │   ├── BatteryCurrentConfig.java     — Konfigurasi Battery Current overlay
     │   │   │   │   └── BatteryCurrentModule.java     — Tegangan/arus/daya dari 3 sumber (broadcast, API 28+, sysfs)
+    │   │   │   ├── battery_bar/
+    │   │   │   │   ├── BatteryBarConfig.java         — Konfigurasi Battery Bar overlay
+    │   │   │   │   ├── BatteryBarView.java           — Custom View bar baterai H/V (empty strip, fade, shine)
+    │   │   │   │   └── BatteryBarModule.java         — Bar baterai: mode cepat (snap sisi) & manual, update interval
     │   │   │   ├── network_stats/
     │   │   │   │   ├── NetworkConfig.java  — Konfigurasi statis Network overlay
     │   │   │   │   └── NetworkModule.java  — Kecepatan internet ↓↑ via TrafficStats, 1 detik
@@ -105,6 +109,8 @@ FTxT/
     │   │   │   ├── BatteryPositionController.java      — Kontrol posisi Battery Stats dengan preset
     │   │   │   ├── BatteryCurrentPanelController.java      — UI panel Battery Current: volt, current, power toggle
     │   │   │   ├── BatteryCurrentPositionController.java   — Kontrol posisi Battery Current
+    │   │   │   ├── BatteryBarPanelController.java          — UI panel Battery Bar: quick/manual mode, warna, shadow
+    │   │   │   ├── BatteryBarPositionController.java       — Kontrol posisi Battery Bar + preset
     │   │   │   ├── NetworkPanelController.java             — UI panel Network: switch, size, color, shadow
     │   │   │   ├── NetworkPositionController.java          — Kontrol posisi Network
     │   │   │   ├── ColorPickerPanelController.java         — UI panel Color Picker: wheel, sliders, saved colors
@@ -116,6 +122,7 @@ FTxT/
     │   │   │   │   ├── ClockPanelFragment.java             — Fragment Jam Digital
     │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Battery Stats
     │   │   │   │   ├── BatteryCurrentPanelFragment.java    — Fragment Battery Current
+    │   │   │   │   ├── BatteryBarPanelFragment.java        — Fragment Battery Bar
     │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
     │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
     │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair (placeholder)
@@ -160,10 +167,12 @@ FTxT/
     │       │   ├── ic_theme.xml             — Ikon tema gelap/terang
     │       │   ├── seekbar_thumb.xml        — Thumb slider lingkaran 12×12dp
     │       │   ├── splash_screen.xml        — Splash screen drawable
-    │       │   ├── bg_alt_light2.png        — Background drawer tema terang
-    │       │   ├── bg_main_light2.png       — Background layar utama tema terang
-    │       │   ├── appbar_light.png         — Background toolbar tema terang
-    │       │   ├── drawbar_light.png        — Background header drawer tema terang
+│       │       ├── bg_alt_light.png         — Background drawer tema terang (varian 1)
+│       │       ├── bg_alt_light2.png        — Background drawer tema terang (varian 2)
+│       │       ├── bg_main_light.png        — Background layar utama tema terang (varian 1)
+│       │       ├── bg_main_light2.png       — Background layar utama tema terang (varian 2)
+│       │       ├── appbar_light.png         — Background toolbar tema terang
+│       │       ├── drawbar_light.png        — Background header drawer tema terang
     │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg terang
     │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer terang
     │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg terang
@@ -193,6 +202,7 @@ FTxT/
     │   │   ├── panel_clock.xml              — Panel konfigurasi Jam Digital
     │   │   ├── panel_battery.xml            — Panel konfigurasi Battery Stats
     │   │   ├── panel_battery_current.xml    — Panel konfigurasi Battery Current
+    │   │   ├── panel_battery_bar.xml        — Panel konfigurasi Battery Bar
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
     │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
     │   │   ├── panel_logo.xml               — Placeholder Logo Display (coming soon)
@@ -228,9 +238,9 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 66 |
-| Layout XML | 20 |
-| Drawable XML | 30 |
+| Java source | 72 |
+| Layout XML | 21 |
+| Drawable XML | 34 |
 | Drawable PNG | 13 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -239,8 +249,8 @@ FTxT/
 | XML lainnya (Manifest) | 1 |
 | Assets (md) | 5 |
 | Root dokumen | 5 |
-| Root konfigurasi | 7 |
-| Gradle & wrapper | 5 |
+| Root konfigurasi | 5 |
+| Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~232** |
-| **Total direktori** | **~60** |
+| **Total file** | **~243** |
+| **Total direktori** | **~61** |

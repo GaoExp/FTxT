@@ -1,7 +1,7 @@
 # FTxT (FunText) — Floating Text Overlay
 
->**Current Release:** `4.85.0` **Beta** 
-**Last Updated:** `2026-08-04`
+>**Current Release:** `4.85.1` **Beta** 
+**Last Updated:** `2026-08-11`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -14,6 +14,7 @@
 - **Jam Digital Overlay** — Waktu real-time 24 jam `HH:mm:ss`, update tiap 1 detik
 - **Battery Stats Overlay** — Suhu baterai (°C) dan persentase (%) dalam satu modul utuh dengan warna nilai & label terpisah, interval update bisa diatur
 - **Battery Current Overlay** — Tegangan (mV), arus (mA), dan daya (W) dengan warna nilai & satuan terpisah
+- **Battery Bar Overlay** — Bar baterai fleksibel di layar: Mode Cepat (snap ke sisi atas/bawah/kiri/kanan) atau Mode Manual (panjang & posisi bebas), warna fill + strip kosong, auto-color, animasi fade saat low & shine saat charging
 - **Network Speed Meter Overlay** — Kecepatan internet real-time (↓ ↑) dengan warna nilai & label terpisah
 - **Color Wheel & Hue Slider** — Dua mode color picker: Classic Color Wheel dengan crosshair + ARGB slider, atau Hue/Saturation/Brightness/Alpha slider. Two-way sync, color name auto-detection, HEX edit manual, saved colors
 - **Safe Area** — Batasi posisi overlay agar tidak masuk area notch/cutout

@@ -12,6 +12,7 @@
     <string name="nav_cpu">CPU Monitor</string>
     <string name="nav_crosshair">Crosshair</string>
     <string name="nav_battery_current">Battery Current</string>
+    <string name="nav_battery_bar">Battery Bar</string>
     <string name="nav_logo">Logo Display</string>
     <string name="nav_color_picker">Color Picker</string>
 

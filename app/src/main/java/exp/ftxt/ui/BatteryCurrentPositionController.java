@@ -45,6 +45,8 @@ public class BatteryCurrentPositionController {
         @Override
         public String moduleLabel() { return "Battery Current"; }
         @Override
+        public String moduleType() { return "batcur"; }
+        @Override
         public String touchPassthroughPrefKey() { return "batcur_lock"; }
         @Override
         public String safeAreaPrefKey() { return "batcur_safe_area"; }
@@ -55,6 +57,7 @@ public class BatteryCurrentPositionController {
 
         @Override
         public void saveToPreset(OverlayPreset p) {
+            p.moduleType = moduleType();
             p.posX = BatteryCurrentConfig.posX;
             p.posY = BatteryCurrentConfig.posY;
             p.size = BatteryCurrentConfig.size;
