@@ -118,12 +118,13 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 
 ### Battery Bar
 - Menampilkan bar baterai sebagai strip di layar (level mengikuti persentase baterai)
-- **Mode Cepat** — Bar menempel penuh di salah satu sisi layar (Atas/Bawah/Kiri/Kanan). Posisi & panjang otomatis mengikuti sisi yang dipilih. Kontrol posisi manual nonaktif dalam mode ini.
-- **Mode Manual** — Matikan "Mode Cepat" untuk mengatur panjang bar (0–100%) dan posisi bebas (slider X/Y, D-Pad) per orientasi layar.
-- **Warna Otomatis** — Bar berubah hijau → kuning → merah mengikuti level baterai; atau pilih warna tetap.
-- **Baterai Rendah** — Atur ambang low (default 40%); saat level di bawah ambang bar berubah ke warna Low dan berkedip (kecepatan fade bisa diatur).
+- **Mode Cepat** — Bar menempel penuh di salah satu sisi layar (Atas/Bawah/Kiri/Kanan). Posisi & panjang otomatis mengikuti sisi yang dipilih. Kontrol posisi manual nonaktif dalam mode ini. Bar menempel penuh di tepi tanpa jarak — **margin 8dp dihilangkan** sehingga tidak ada gap antara bar dan sisi layar, namun **Area Aman tetap terkunci aktif** (checkbox tercentang, disabled).
+- **Mode Manual** — Matikan "Mode Cepat" untuk mengatur panjang bar (0–100%) dan posisi bebas (slider X/Y, D-Pad) per orientasi layar. **Area Aman otomatis terkunci aktif** dalam mode ini — bar tidak bisa masuk area notch/cutout dan posisi selalu di-clamp dalam batas layar. Checkbox Area Aman **selalu terkunci aktif** (tercentang, disabled) di kedua mode.
+- **Warna Level** — Pemilih skema warna otomatis berdasarkan level baterai: **Tanpa Skema** (warna tetap pilihan user), **Klasik 3-warna** (hijau >20%, kuning ≤20%, merah ≤10%), **Hue Gradien** (warna bergradasi per segmen: 0–20% hue `1°` S70%, 21–50% hue `2°→100°` S70%, 51–100% hue `102°→260°` dengan saturasi naik `71%→100%`). Saat skema dipilih, langsung aktif.
+- **Baterai Rendah** — Atur ambang low (default 40%); saat level di bawah ambang bar berubah ke warna Low dan berkedip (kecepatan fade bisa diatur 0,2–2,0 detik). **Warna Low hanya berfungsi saat skema Tanpa Skema** — jika skema Klasik 3-warna atau Hue Gradien aktif, pemilih Warna Low diburamkan & nonaktif karena skema sudah memetakan warna di level rendah.
 - **Strip Kosong** — Tampilkan sisa strip di belakang bar dengan warna terpisah.
-- **Charging** — Bar menampilkan animasi shine saat perangkat di-charge.
+- **Charging** — Bar menampilkan animasi shine saat perangkat di-charge. Efek ini bisa disesuaikan di section **Animasi Pengisian Daya**: **Animasi Shine** (on/off, default nonaktif), **Kecepatan Shine** (0,2–2,0 detik per sapuan, step 0,1 detik, default 1,8 detik), dan **Lebar Band** (2–98% dari panjang bar, default 25%). Section ini juga berisi **Animasi Wave saat charging** (gelombang mengalir sepanjang bar): **Animasi Wave** (on/off, default nonaktif), **Kecepatan Wave** (0,2–2,0 detik per siklus, step 0,1 detik, default 1,0 detik), dan **Intensitas Wave** (10–100%, default 60%).
+- **Baterai Rendah** — Saat level di bawah ambang low, bar menampilkan **animasi Wave** (kedutan gelombang): pola gelombang sinus yang menjalar sepanjang bar, berjalan bersamaan dengan animasi fade. Sesuaikan di section **Animasi Baterai Rendah**: **Animasi Wave** (on/off, default nonaktif), **Kecepatan Wave** (0,2–2,0 detik per siklus, step 0,1 detik, default 1,0 detik), dan **Intensitas Wave** (10–100%, default 60% — menentukan kontras gelap-terang gelombang). Section ini juga berisi Warna Low, Ambang Low, **Animasi Fade** (on/off, default nonaktif), dan Kecepatan Fade.
 - Pengaturan lain: ketebalan, radius sudut, shadow, kunci posisi, area aman.
 
 ### Network Speed

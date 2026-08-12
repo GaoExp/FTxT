@@ -1,4 +1,48 @@
-# [4.85.1] - 2026-08-11
+# [4.85.2] - 2026-08-11 versionCode 179
+### ✨ Fitur Baru
+- **Kontrol animasi Shine Battery Bar** — Efek shine saat charging kini bisa disesuaikan dari section **Animasi Pengisian Daya**: **Checkbox "Animasi Shine"** untuk menyalakan/mematikan efek (default nonaktif — harus diaktifkan manual); **slider Kecepatan Shine** 0,2–2,0 detik (step 0,1 detik, default 1,8 detik, durasi satu sapuan band); **slider Lebar Band** 2–98% dari panjang bar (default 25%). Nilai tersimpan di prefs `batbar_shine_enabled`, `batbar_shine_speed`, `batbar_shine_width` dan ikut serta dalam preset (`shineEnabled`/`shineSpeed`/`shineWidth`).
+- **Animasi Wave (kedutan gelombang) saat baterai rendah** — Efek animasi baru di section **Animasi Baterai Rendah**: saat level baterai di bawah ambang low (dan tidak charging), warna isi bar digambar berlapis dengan pola gelombang sinus yang **menjalar** sepanjang bar (2 siklus), terlihat seperti denyut energi yang merambat. Dikontrol lewat **Checkbox "Animasi Wave"** (default nonaktif — harus diaktifkan manual), **slider Kecepatan Wave** 0,2–2,0 detik (step 0,1 detik, default 1,0 detik, durasi satu siklus gelombang), dan **slider Intensitas Wave** 10–100% (default 60%, menentukan kontras gelap-terang gelombang). Berjalan bersamaan dengan animasi fade low. Nilai tersimpan di prefs `batbar_wave_enabled`, `batbar_wave_speed`, `batbar_wave_amplitude` dan ikut serta dalam preset (`waveEnabled`/`waveSpeed`/`waveAmplitude`).
+### ♻️ Perubahan Fitur
+- **Area Aman selalu terkunci aktif di kedua mode Battery Bar** — Checkbox **Area Aman** kini **selalu terkunci aktif** (tercentang, disabled + diburamkan alpha 30%) di kedua mode: `safeArea` dipaksa `true` di Mode Cepat maupun Mode Manual, tersimpan ke prefs `batbar_safe_area`, dan preset selalu memaksanya `true` saat di-apply. Khusus di **Mode Cepat**, margin 8dp yang sebelumnya menyisakan celah antara bar dan tepi layar **dihilangkan** (`applyLayout` memakai margin 0) sehingga bar menempel penuh ke sisi layar tanpa gap — area aman tetap aktif namun tidak lagi menambah jarak. Di **Mode Manual**, area aman tetap berfungsi clamp posisi agar bar tidak masuk area notch/cutout.
+- **UI Mode Cepat/Manual Battery Bar di-redesign** — Checkbox "Mode Cepat" diubah berurutan menjadi **satu Switch** di antara dua label **"Mode Cepat" (kiri)** dan **"Manual" (kanan)**, lalu akhirnya menjadi **segment button**: dua tombol dalam satu kontrol terkelompok (tombol aktif background biru `#4A90D9` dengan teks putih, tombol non-aktif transparan dengan teks abu-abu). Perilaku akhir: klik "Mode Cepat" = Mode Cepat aktif, klik "Manual" = Mode Manual aktif. Saat Mode Cepat aktif: pemilih **Posisi Sisi** (Atas/Bawah/Kiri/Kanan) tampil, section **Mode Manual** otomatis tertutup (chevron ▸) dan kontrol manual diburamkan (alpha 30%) + kontrol posisi dikunci. Saat Manual aktif: pemilih posisi sisi disembunyikan dan section Mode Manual terbuka (chevron ▾). **Chevron "Posisi" dihapus dan kontrol posisi dipindah ke bawah panjang bar** (slider X/Y + D-Pad + area aman), sehingga urutan panel menjadi panjang → posisi → tampilan → baterai rendah.
+- **Checkbox "Gunakan Area Aman" dipindah ke section Tampilan** — Sebelumnya checkbox area aman berada di dalam section **Mode Manual** sehingga tidak tampil saat Mode Cepat aktif, padahal margin safe area (8dp) tetap diterapkan di mode cepat tanpa bisa diubah. Kini checkbox dipindah ke section **Tampilan**, sebaris dengan **"Tampilkan Strip Kosong"** (label disingkat "Area Aman"), sehingga bisa diatur di kedua mode.
+- **Checkbox "Kunci Posisi" Battery Bar terkunci default** — Checkbox Kunci Posisi kini **disabled & diburamkan** (alpha 30%) dengan label `Kunci Posisi (tidak tersedia)`, sesuai keputusan desain: bar tidak bisa di-drag sehingga posisi diandalkan ke slider + D-Pad dan sentuhan selalu tembus (touch passthrough). Listener checkbox dihapus, nilai `batbar_lock` tetap tersimpan/terbaca dari prefs namun tidak lagi bisa diubah user lewat panel.
+- **Pemilih orientasi bar jadi radio button** — Checkbox "Horizontal" diganti **RadioGroup** dengan dua opsi **Horizontal** / **Vertikal** di section Tampilan. Perilaku sama: pilihan menentukan `BatteryBarConfig.horizontal`, tersimpan di prefs `batbar_horizontal`, dan bar langsung di-restart (orientasi vertikal mengisi dari bawah ke atas).
+- **Kontrol "Invert" arah pengisian Battery Bar** — Checkbox **Invert** ditambahkan di baris yang sama dengan opsi orientasi (sebelah "Vertikal") di section Tampilan. Saat aktif, arah pengisian bar dibalik: horizontal mengisi dari **kanan ke kiri** (normal: kiri → kanan), vertikal mengisi dari **atas ke bawah** (normal: bawah → atas). Animasi shine saat charging ikut searah dengan pengisian: horizontal menyapu kanan → kiri, vertikal menyapu atas → bawah. Tersimpan di prefs `batbar_invert` dan disertakan ke preset (`barInvert`).
+- **Section "Baterai Rendah" diganti nama jadi "Efek dan Animasi"** — Header collapsible section (chevron) di panel Battery Bar yang sebelumnya bertuliskan **"Baterai Rendah"** kini **"Efek dan Animasi"**, karena isi section (warna otomatis, ambang low, kecepatan fade, strip kosong, animasi shine charging) mencakup seluruh efek & animasi bar, bukan hanya perilaku baterai rendah. id & perilaku collapsible tidak berubah.
+- **Fitur "Warna Level" jadi pemilih skema warna otomatis** — Checkbox on/off diganti **tombol pemilih skema** di section Tampilan (label `Warna Level:` + tombol menampilkan skema aktif, style seperti tombol Posisi Sisi). Klik → popup daftar skema: **Tanpa Skema** (paling atas, nonaktif), **Klasik 3-warna** (hijau >20%, kuning ≤20%, merah ≤10% — perilaku lama), **Hue Gradien** (warna dihitung per segmen level, lihat bullet "Penyesuaian rentang warna Hue Gradien" di bawah). Saat skema dipilih langsung aktif. Disimpan di prefs `batbar_color_scheme` (migrasi otomatis dari `batbar_auto_color` lama) dan ikut preset (`barColorScheme`). `BatteryBarConfig.autoColor` diganti `colorScheme` + konstanta `SCHEME_NONE`/`SCHEME_CLASSIC`/`SCHEME_HUE` + helper `isAutoColor()`.
+- **Penyesuaian rentang warna skema Hue Gradien** — Gradien Hue tidak lagi linier penuh `hue = level × 2` (0–200°) melainkan dibagi 3 segmen: **0–20%**: hue tetap `1°`, saturasi 70% (merah muda); **21–50%**: hue linear `2° → 100°` (kuning → hijau) dengan saturasi tetap 70%; **51–100%**: hue linear `102° → 260°` (hijau → teal → biru) dengan saturasi naik linear `71% → 100%`. Brightness tetap 100% di semua segmen.
+- **Section animasi Battery Bar dipecah menjadi dua** — Section **"Efek dan Animasi"** dipecah menjadi dua chevron: **"Animasi Pengisian Daya"** (id `batbar_sectionChargeHeader`/`batbar_sectionCharge`) berisi kontrol animasi saat charging (Animasi Shine, Kecepatan Shine, Lebar Band, Wave saat charging), dan **"Animasi Baterai Rendah"** (id `batbar_sectionLowAnimHeader`/`batbar_sectionLowAnim`) berisi kontrol terkait baterai rendah (Warna Low, Ambang Low, Kecepatan Fade, Animasi Wave + Kecepatan & Intensitas Wave). Penamaan section kini mencerminkan isi, tidak lagi mengelompokkan semua efek dalam satu section.
+- **Kontrol Warna Low dinonaktifkan saat skema warna aktif** — Saat skema **Klasik 3-warna** atau **Hue Gradien** dipilih, pemilih **Warna Low** (preview + label) diburamkan (alpha 30%) dan tidak bisa diklik, karena warna low tidak dipakai oleh skema (skema sudah memetakan warna merah di level rendah). Label berubah jadi **"Warna Low (tidak aktif saat skema)"**. Warna low kembali aktif saat skema **Tanpa Skema** dipilih.
+- **Arah gelombang Animasi Wave saat charging dibalik** — Gelombang sinus yang menjalar pada animasi **Wave saat charging** sebelumnya bergerak berlawanan arah pengisian (misal horizontal bergerak kanan→kiri); kini arah offset dibalik sehingga gelombang menjalar **searah pengisian** (horizontal kiri→kanan, vertikal menyesuaikan).
+- **Default animasi charging & baterai rendah jadi nonaktif** — Semua animasi efek di Battery Bar sekarang **default OFF** (harus diaktifkan manual): **Animasi Shine** (`shineEnabled`), **Wave saat charging** (`chargeWaveEnabled`), **Animasi Fade** (`fadeEnabled`), dan **Wave saat low** (`waveEnabled`). Mencegah animasi saling menimpa satu sama lain saat aplikasi pertama kali digunakan.
+### 🔧 Optimasi & Penyesuaian
+- **Slider Kecepatan Fade & Shine memakai satuan detik** — Kedua slider animasi (Fade & Shine) diubah ke satuan **detik** dengan rentang **0,2–2,0 detik** dan **step 0,1 detik** per geseran (sebelumnya Fade memakai skala abstrak 1–20, Shine memakai 400–4000ms — sulit memilih nilai presisi). Nilai disimpan internal sebagai durasi ms (200–2000). Preset lama dengan `fadeSpeed` skala 1–20 akan di-clamp ke rentang baru (nilai <200ms menjadi 200ms).
+### 🐞 Bug Fixes
+- **Kontrol "Animasi Wave" saat charging & "Animasi Fade" tidak berfungsi** — Checkbox **Animasi Wave (gelombang mengalir ke kanan)** di section **Animasi Pengisian Daya** dan checkbox **Animasi Fade** di section **Animasi Baterai Rendah** hanya dideklarasikan sebagai field di `BatteryBarPanelController` tanpa binding, load, dan listener — sehingga tampil di panel tapi tidak membaca nilai tersimpan maupun menyimpan perubahan. Kini keduanya di-bind, di-load, dan diberi listener lengkap: checkbox + slider Kecepatan/Intensitas Wave charging tersimpan di prefs `batbar_charge_wave_enabled`/`batbar_charge_wave_speed`/`batbar_charge_wave_amplitude`, checkbox Animasi Fade tersimpan di `batbar_fade_enabled`. Keduanya ikut serta dalam preset (`chargeWaveEnabled`/`chargeWaveSpeed`/`chargeWaveAmplitude` + `fadeEnabled`).
+- **Arah animasi shine vertikal terbalik** — Pada bar vertikal, band shine sebelumnya menyapu dari **atas ke bawah** (`top = shinePos * h`), berlawanan dengan arah pengisian bar yang **dari bawah ke atas**. Sekarang posisi band dihitung dengan `(1f - shinePos) * h` sehingga menyapu dari **bawah ke atas**, searah dengan pengisian. Pemotongan segmen area terisi (alpha 100%) / kosong (alpha 40%) tetap sama.
+- **Teks Floating Text kembali ke default "FunText" secara tiba-tiba** — `TextConfig.text` tidak pernah disimpan ke SharedPreferences saat diedit dan `editText` tidak pernah diisi ulang dari nilai tersimpan. Akibatnya saat Activity/panel dibuat ulang (rotasi layar, buka dokumentasi, atau proses di-recreate) atau service overlay di-restart, teks kembali ke nilai default. Sekarang teks **disimpan ke prefs `text_content`** setiap kali berubah (onTextChanged, saat overlay diaktifkan, autoStart, dan saat preset di-apply) serta **dimuat ulang** di `TextPanelController.loadConfig()` dan `MainActivity.loadShadowConfigs()` — EditText ikut diisi nilai tersimpan sehingga panel dan overlay konsisten.
+- **Efek shine charging hanya terlihat di area bar kosong** — Band shine digambar dengan blending normal (putih 40% alpha) sehingga di atas warna fill terang (misal hijau) hampir tidak terlihat; efek hanya jelas di strip kosong. Sekarang band shine dipotong per segmen berdasarkan level: bagian yang menimpa area **terisi** digambar `PorterDuff.Mode.SCREEN` alpha **100%** (putih pekat, jelas di atas warna fill), sedangkan bagian di area **kosong** tetap alpha 40%. Shine tampak menyapu seluruh bar dari awal sampai akhir dengan intensitas berbeda per area.
+### 🗒️ File Added
+- `app/src/main/res/drawable/bg_segment_container.xml` — Background container segment button (rounded, `#444444`)
+- `app/src/main/res/drawable/bg_segment_active.xml` — Background tombol segment aktif (rounded, `#4A90D9`)
+- `app/src/main/res/drawable/bg_segment_inactive.xml` — Background tombol segment non-aktif (transparan, rounded)
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 179, versionName 4.85.2
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarConfig.java` — Field `invert` (arah pengisian dibalik); ganti `autoColor` → `colorScheme` (konstanta `SCHEME_NONE`/`SCHEME_CLASSIC`/`SCHEME_HUE`) + helper `isAutoColor()`; field `shineEnabled`/`shineSpeed`/`shineWidth` (kontrol animasi shine); `fadeSpeed` diubah makna jadi durasi ms (default 1800); tambah field `waveEnabled`/`waveSpeed`/`waveAmplitude`; default animasi (`fadeEnabled`/`shineEnabled`/`waveEnabled`/`chargeWaveEnabled`) jadi `false`, default `safeArea` tetap `true`
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarView.java` — Method `setInvert()`; logika fill & band shine dibalik saat invert (horizontal isi kanan→kiri, vertikal isi atas→bawah, shine searah); band shine dipotong per segmen sesuai level: area terisi `PorterDuff.Mode.SCREEN` alpha 100%, area kosong alpha 40%; arah shine vertikal dibalik menyapu bawah → atas (searah pengisian); render warna skema **Klasik** (ambang 20/10) & **Hue Gradien** 3 segmen (0–20% hue 1° S70%; 21–50% hue 2°→100° S70%; 51–100% hue 102°→260° S71%→100%); method `setShineConfig()` + durasi shine dinamis (`shineSpeed`) + lebar band dinamis (`shineWidthPercent`); `setFadeSpeed()`/`startFade()` memakai durasi langsung ms (clamp 200–2000); tambah `setWaveConfig()`; animator wave (0–1, durasi `waveSpeed`, INFINITE); render fill berlapis saat low: dasar alpha `fillAlpha×(1-amp)` + overlay segmen gelombang sinus menjalar (`drawWaveFill()`, 2 siklus, alpha boost per segmen, arah mengikuti orientasi & invert); `stopWave()` di `onDetachedFromWindow()`; arah gelombang wave charging dibalik (offset negatif, menjalar searah pengisian)
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarModule.java` — Teruskan `BatteryBarConfig.invert` & `colorScheme` ke view di `start()`/`applyAppearance()`/`reloadLayout()`; teruskan `shineEnabled`/`shineSpeed`/`shineWidth`; teruskan `setWaveConfig()` di `start()`/`applyAppearance()`; margin 8dp dihapus di Mode Cepat (margin 0, bar menempel penuh ke sisi)
+- `app/src/main/java/exp/ftxt/ui/BatteryBarPanelController.java` — Switch pemilih mode diganti **segment button** (klik "Mode Cepat" = quickMode ON, klik "Manual" = quickMode OFF), hapus collapsible section Posisi, checkbox Kunci Posisi dinonaktifkan (disabled + alpha 30%, listener dihapus), CheckBox "Horizontal" diganti **RadioGroup Horizontal/Vertikal**, tambah **Checkbox Invert** (bind, load, listener `batbar_invert`), checkbox Warna Level diganti **tombol pemilih skema** (`batbarSchemeSelector` + popup Tanpa Skema/Klasik/Hue, simpan `batbar_color_scheme`); tambah binding & listener **Checkbox Shine** + **slider Kecepatan/Lebar Shine** (`batbar_shine_*`); pemilih **Warna Low** diburamkan + dinonaktifkan saat skema warna aktif (`updateLowColorEnabled()`, label "Warna Low (tidak aktif saat skema)"); slider Fade & Shine memakai satuan detik (`formatSec()`, nilai = 200 + progress×100); lengkapi bind + load + listener **Checkbox Animasi Fade** (`batbar_fade_enabled`) dan kontrol **Wave saat charging** (`batbarChargeWaveCheck`/`batbarChargeWaveSpeedSeekBar`/`batbarChargeWaveAmplitudeSeekBar` → prefs `batbar_charge_wave_*`); **Area Aman terkunci aktif di kedua mode** (`updateSafeAreaLock()`: paksa `safeArea=true` + simpan prefs, checkbox disabled + alpha 30%); binding + load + listener kontrol Wave (`batbar_wave_*`)
+- `app/src/main/java/exp/ftxt/ui/BatteryBarPositionController.java` — Kontrol posisi diburamkan (alpha) saat dinonaktifkan di Mode Cepat; preset simpan/terapkan `barInvert` + `barColorScheme` (fallback `autoColor` preset lama) + `shineEnabled`/`shineSpeed`/`shineWidth` + `waveEnabled`/`waveSpeed`/`waveAmplitude` + `chargeWaveEnabled`/`chargeWaveSpeed`/`chargeWaveAmplitude` + `fadeEnabled`; preset apply selalu paksa `safeArea` `true`
+- `app/src/main/java/exp/ftxt/ui/TextPanelController.java` — Muat teks tersimpan ke `editText` + `TextConfig.text` di `loadConfig()`, simpan teks ke prefs `text_content` saat diedit / overlay aktif / autoStart
+- `app/src/main/java/exp/ftxt/ui/TextPositionController.java` — Simpan `text_content` ke prefs saat preset teks di-apply
+- `app/src/main/java/exp/ftxt/MainActivity.java` — Muat `TextConfig.text` dari prefs `text_content` di `loadShadowConfigs()`; muat prefs `batbar_invert` ke `BatteryBarConfig.invert`; load `batbar_color_scheme` dengan migrasi otomatis dari `batbar_auto_color` lama; load prefs `batbar_shine_enabled`/`batbar_shine_speed`/`batbar_shine_width`; default `batbar_fade_speed` diubah ke 1800; load prefs `batbar_wave_enabled`/`batbar_wave_speed`/`batbar_wave_amplitude`; default load prefs animasi jadi `false`; `safeArea` selalu dipaksa `true`
+- `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Field `barInvert` + `barColorScheme` untuk preset Battery Bar + `shineEnabled`/`shineSpeed`/`shineWidth` + `waveEnabled`/`waveSpeed`/`waveAmplitude`
+- `app/src/main/res/layout/panel_battery_bar.xml` — Baris switch label dua sisi "Mode Cepat [switch] Manual" diganti **segment button** dua tombol, chevron Posisi dihapus, kontrol posisi dipindah ke bawah panjang bar, checkbox Kunci Posisi disabled + alpha 30% dengan label "(tidak tersedia)", CheckBox "Horizontal" diganti **RadioGroup Horizontal/Vertikal**, **Checkbox Invert** diletakkan sebaris di samping opsi Vertikal, header section **"Baterai Rendah" → "Efek dan Animasi"**, checkbox **Warna Level** diganti **label + tombol pemilih skema** (`batbarColorSchemeLabel` + `batbarSchemeSelector`); tambah kontrol **Animasi Shine** di section Efek dan Animasi (`batbarShineCheck`, `batbarShineSpeedLabel`+`batbarShineSpeedSeekBar` 0,2–2,0 dtk, `batbarShineWidthLabel`+`batbarShineWidthSeekBar` 2–98%); slider `batbarFadeSpeedSeekBar` & `batbarShineSpeedSeekBar` max 18 (0,2–2,0 detik step 0,1); tambah id `batbarLowColorLabel` untuk label Warna Low; checkbox `batbarSafeAreaCheck` dipindah dari section Mode Manual ke section Tampilan sebaris dengan `batbarShowEmptyStripCheck` (label "Area Aman"); tambah kontrol **Animasi Wave** di section **Animasi Baterai Rendah** (`batbarWaveCheck`, `batbarWaveSpeedLabel`+`batbarWaveSpeedSeekBar` 0,2–2,0 dtk, `batbarWaveAmplitudeLabel`+`batbarWaveAmplitudeSeekBar` 10–100%); tambah kontrol **Wave saat charging** di section **Animasi Pengisian Daya** (`batbarChargeWaveCheck`, `batbarChargeWaveSpeedLabel`+`batbarChargeWaveSpeedSeekBar` 0,2–2,0 dtk, `batbarChargeWaveAmplitudeLabel`+`batbarChargeWaveAmplitudeSeekBar` 10–100%) + checkbox **Animasi Fade** (`batbarFadeCheck`); section **"Efek dan Animasi"** dipecah jadi dua chevron: **"Animasi Pengisian Daya"** (`batbar_sectionChargeHeader`/`batbar_sectionCharge` — shine check + kecepatan + lebar band + charge wave) dan **"Animasi Baterai Rendah"** (`batbar_sectionLowAnimHeader`/`batbar_sectionLowAnim` — warna low, ambang low, fade, wave)
+
+---
+
+# [4.85.1] - 2026-08-11 versionCode 178
 ### ✨ Fitur Baru
 - **Modul Battery Bar** — Modul overlay baru `features/battery_bar` (BatteryBarConfig + BatteryBarView + BatteryBarModule) menampilkan bar baterai sebagai strip di layar. Dua mode: **Mode Cepat** (snap ke sisi atas/bawah/kiri/kanan dengan panjang penuh sisi, pilih sisi lewat popup) dan **Mode Manual** (panjang 0–100% + posisi bebas per orientasi `_port`/`_land`). Orientasi bar (horizontal/vertikal) otomatis mengikuti mode. Fitur panel: ketebalan, warna fill, strip kosong + warna, radius sudut, auto-color (hijau→kuning→merah mengikuti level), warna low + ambang low (fade berkedip saat rendah), kecepatan fade, animasi shine saat charging, shadow, kunci posisi (touch passthrough), area aman, dan preset khusus `moduleType "battery_bar"` dengan field bar tersendiri.
 ### ♻️ Perubahan Fitur
@@ -43,12 +87,10 @@
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Cek aktif & label "Bar"
 - `app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java` — Parameter `View` (sebelumnya `TextView`) agar cocok dengan BatteryBarView
 - `gradle.properties` — `android.aapt2FromMavenOverride=/usr/bin/aapt2` (aapt2 Maven AGP x86-64 tidak bisa jalan di sistem aarch64)
-### 🔢 Version
-`4.85.0` → `4.85.1`
 
 ---
 
-# [4.85.0] - 2026-08-04
+# [4.85.0] - 2026-08-04 versionCode 177
 ### ✨ Fitur Baru
 - **Battery Stats — suhu & persentase jadi satu kesatuan modul** — Modul `features/battery_stats` (BatteryStatsConfig + BatteryStatsModule) menggabungkan komponen suhu (°C) dan persentase (%) menjadi satu modul utuh, persis pola Battery Current yang menggabungkan tegangan/arus/daya. Satu overlay, satu panel, satu konfigurasi (warna, label, shadow, background, posisi, safe area, interval 0.2–10 detik), satu preset, satu key prefs (`battery_*`). Checkbox **°C** dan **%** di panel mengontrol komponen yang tampil; keduanya bisa tampil bersamaan dalam satu overlay.
 ### 🚮 Fitur Dihapus
@@ -103,12 +145,13 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java`
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryPercentagePanelFragment.java`
 - `app/src/main/res/layout/panel_battery_percentage.xml`
-### 🔢 Version
-`4.84.1` → `4.85.0`
 
 ---
 
-# [4.84.1] - 2026-08-04
+# [4.84.1] - 2026-08-04 versionCode 176
+### 🔧 Optimasi & Penyesuaian
+- **Hapus dead code konstruktor lama `(Activity)`** — Semua PositionController & PanelController punya konstruktor lama yang sudah tidak dipakai setelah refactor ke fragment. Konstruktor lama berpotensi NPE karena `findViewById(android.R.id.content)` mengembalikan `null`. 15 konstruktor + 13 method `bindViews()` tanpa parameter dihapus dari 15 file controller.
+- **Hapus import `CheckBox` ganda** — Import duplikat dihapus dari `FpsPanelController.java` dan `BatteryPercentagePanelController.java`.
 ### 🐞 Bug Fixes
 - **Layar panel kosong saat start** — Saat nilai `nav_selected_item` tidak dikenal, aplikasi tidak menampilkan panel apa pun. Sekarang ada fallback: jika panel tidak ditemukan di `panelIdToName()`, default ke panel **Floating Text** + `R.id.navFloatingText`.
 - **Panel Crosshair & Logo tidak bisa diakses** — `navCrosshair` dan `navLogo` tidak terdaftar di `panelIdToName()` sehingga klik sidebar tidak menampilkan panel apa pun. Sekarang keduanya dipetakan ke panel `crosshair` / `logo` + judul toolbar yang benar.
@@ -118,9 +161,6 @@
 - **Crash `BadForegroundServiceNotificationException` — `ImageButton doesn't have method: setText`** — `setTextViewText(R.id.noti_title, ...)` dihapus dari `buildNotificationDynamic()`. Teks suhu baterai tetap tampil via `setContentTitle()` di header notifikasi (`DecoratedCustomViewStyle`), jadi tidak ada lagi perintah `setText` pada RemoteViews yang berisiko menarget view tipe salah.
 - **Panel kosong saat memilih modul di sidebar** — Semua layout panel (kecuali `panel_text.xml`) masih membawa `android:visibility="gone"` di root (sisa era View-visibility manual). Setelah refactor ke fragment, tidak ada lagi `setVisibility(VISIBLE)` manual sehingga panel yang dipilih tampil kosong. Sekarang atribut `gone` di root dihapus dari 9 layout panel; visibilitas dikelola sepenuhnya oleh FragmentTransaction.
 - **Posisi overlay reset ke default setelah Kill Service / Tutup Aplikasi** — `System.exit(0)` di `NotificationActionReceiver.handleKillService()` dan `MainActivity.forceClose()` membunuh proses secara paksa sebelum `SharedPreferences.apply()` (async) selesai di-flush ke disk, sehingga posisi yang baru disesuaikan hilang dan overlay kembali ke default (0.5/0.8) saat service start ulang. `System.exit(0)` dihapus dari kedua lokasi — `stopService`/`finishAffinity` sudah cukup; data prefs aman dan posisi dipertahankan.
-### 🔧 Optimasi & Penyesuaian
-- **Hapus dead code konstruktor lama `(Activity)`** — Semua PositionController & PanelController punya konstruktor lama yang sudah tidak dipakai setelah refactor ke fragment. Konstruktor lama berpotensi NPE karena `findViewById(android.R.id.content)` mengembalikan `null`. 15 konstruktor + 13 method `bindViews()` tanpa parameter dihapus dari 15 file controller.
-- **Hapus import `CheckBox` ganda** — Import duplikat dihapus dari `FpsPanelController.java` dan `BatteryPercentagePanelController.java`.
 ### 🗒️ File Added
 - `app/src/main/java/exp/ftxt/ui/fragment/CrosshairPanelFragment.java` — Fragment untuk panel Crosshair (placeholder)
 - `app/src/main/java/exp/ftxt/ui/fragment/LogoPanelFragment.java` — Fragment untuk panel Logo (placeholder)
@@ -156,12 +196,10 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
 - `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
-### 🔢 Version
-`4.84.0` → `4.84.1`
 
 ---
 
-# [4.84.0] - 2026-07-28
+# [4.84.0] - 2026-07-28 versionCode 175
 ### ✨ Fitur Baru
 - **Tanggal di Bawah Jam — Tampilan dua baris** — Clock module sekarang menampilkan tanggal di bawah jam dalam format dua baris (`HH:mm:ss` di atas, `MMM dd EE` di bawah). Diaktifkan secara default. Bisa di-toggle via panel jam (checkbox "Tanggal").
 ### ♻️ Perubahan Fitur
@@ -186,12 +224,10 @@
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryCurrentPanelFragment.java` — Isi lifecycle
 - `app/src/main/java/exp/ftxt/ui/fragment/NetworkPanelFragment.java` — Isi lifecycle
 - `app/src/main/java/exp/ftxt/ui/fragment/ColorPickerPanelFragment.java` — Isi lifecycle
-### 🔢 Version
-`4.83.2` → `4.84.0`
 
 ---
 
-# [4.83.2] - 2026-07-28
+# [4.83.2] - 2026-07-28 versionCode 174
 ### ✨ Fitur Baru
 - **Ikon Notifikasi Dinamis — nilai suhu baterai di status bar** — Ikon notifikasi foreground service sekarang menampilkan nilai suhu baterai aktual (misal `37°`) yang di-generate secara dinamis sebagai Bitmap. Update setiap 10 detik. Title notifikasi juga menampilkan suhu (misal `FTxT 37°C`).
 ### 🔧 Optimasi & Penyesuaian
@@ -208,8 +244,6 @@
 - `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Tambah `params = null` di `stop()`
 - `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah `params = null` di `stop()`
 - `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Tambah `params = null` di `stop()`
-### 🔢 Version
-`4.83.1` → `4.83.2`
 
 ---
 
@@ -305,8 +339,6 @@
 - **Slider Color Picker tersendat & terintercept scroll** — Tambah `requestDisallowInterceptTouchEvent`, pakai `getRawX()`.
 - **Triangle & Ring color wheel terintercept scroll** — `TriangleColorPickerView` & `HSVColorPickerView` mencegah NestedScrollView meng-intercept touch event.
 - **Overlay hilang/off-screen saat orientasi berubah** — Semua PositionController panggil `updatePositionStatic()` di akhir konstruktor.
-### 🔢 Version
-`3.12.4.80.0` → `4.82.4`
 
 ---
 
@@ -337,30 +369,25 @@
 - **Build gagal: cannot find symbol Animator** — Import `android.animation.Animator` ditambahkan.
 - **Edit HEX di Hue Slider mode force close (NPE)** — Null check di `setThumbPos()`.
 - **Posisi overlay antar orientasi saling menimpa** — Reset `orientationSuffix` di `cleanup()` semua PositionController.
-### 🔢 Version
-`3.11.3.78.0` → `3.12.4.80.0`
 
 ---
 
 # [3.11.3.78.0 – 3.9.3.74.2] - 2026-06-12–13
 Menggabungkan 5 release.
-### 🚮 Fitur Dihapus
-- **Tombol Ekspor Semua di dialog preset** — Dihapus dari bottom bar browser preset.
-- **Tombol Simpan/Muat Preset dari panel posisi** — Semua 8 panel: tombol Simpan/Muat/label preset dihapus. Fungsi via gear → "Muat Preset".
 ### ✨ Fitur Baru
 - **Mode Tandai & aksi batch preset** — Tombol Tandai/Tandai Semua, aksi batch (Hapus/Favorit/Bagikan/Ekspor), opsi Gunakan Preset, drag reorder.
 - **Opsi Ganti Ikon Aplikasi** — Toggle Default/Alternatif di Konfigurasi.
 - **Background tema gelap & terang** — Drawer, header, toolbar, layar utama punya background gambar sendiri per tema.
 - **1.351 Color Names** — ColorNameResolver: 148 CSS + 254 Material + 949 XKCD colors.
+### 🚮 Fitur Dihapus
+- **Tombol Ekspor Semua di dialog preset** — Dihapus dari bottom bar browser preset.
+- **Tombol Simpan/Muat Preset dari panel posisi** — Semua 8 panel: tombol Simpan/Muat/label preset dihapus. Fungsi via gear → "Muat Preset".
 ### ♻️ Perubahan Fitur
 - **Dialog preset terpusat** — PresetBrowserDialog punya tombol Simpan, title di XML header, preset baru di urutan teratas.
 - **Tutup Aplikasi pindah nav drawer** — Kill Service + Keluar di drawer; Konfirmasi Keluar jadi default.
 ### 🐞 Bug Fixes
 - **Preset baru tidak muncul** — `onSaveClick` async diperbaiki dengan `Consumer<Runnable>` callback.
 - **Overlay tidak restart setelah Kill Service** — `isAnyModuleActive()` sekarang cek semua modul.
-### 🔢 Version
-versionCode: 156 → 160
-versionName: 3.9.3.74.2 → 3.11.3.78.0
 
 ---
 
@@ -384,9 +411,6 @@ Menggabungkan 5 release.
 - **Checkbox V/mA/W tidak refresh overlay** — Setiap toggle panggil `updateBatteryCurrentColorStatic()`.
 - **Battery Temperature labelColor span kelebihan** — Perbaiki setSpan per karakter label bukan sampai akhir.
 - **Network showOnlyValue** — Refactor pakai `updateNetworkColorStatic()`.
-### 🔢 Version
-versionCode: 151 → 155
-versionName: 3.9.3.72.0 → 3.9.3.74.1
 
 ---
 
@@ -402,9 +426,6 @@ Menggabungkan 5 release.
 - **Semua modul ikut nonaktif saat satu dimatikan** — `isAnyModuleActive()` cek semua 7 modul, bukan 1–2.
 - **CI signing path dobel app/app/** — storeFile `app/release.jks` → `release.jks`.
 - **APK release tidak signed** — Tambah step generate keystore.properties di workflow.
-### 🔢 Version
-versionCode: 144 → 149
-versionName: 3.9.3.69.6 → 3.9.3.71.0
 
 ---
 
@@ -420,9 +441,6 @@ Menggabungkan 5 release.
 ### 🗒️ File Added
 - `panel_text.xml`, `panel_fps.xml`, `panel_clock.xml`, `panel_battery_current.xml`, `panel_network.xml`, `panel_crosshair.xml`, `panel_watermark.xml`, `panel_logo.xml`
 - `SectionHelper.java`, `key/.gitkeep`
-### 🔢 Version
-versionCode: 139 → 143
-versionName: 3.9.3.69.1 → 3.9.3.69.5
 
 ---
 
@@ -444,9 +462,6 @@ Menggabungkan 5 release.
 ### 🐞 Bug Fixes
 - **CI build gagal** — SDK license, platform 35, AAPT2, local.properties.
 - **Import FC PresetBrowserDialog** — `registerForActivityResult` pindah ke `onCreate`.
-### 🔢 Version
-versionCode: 134 → 138
-versionName: 3.9.3.67.0 → 3.9.3.69.0
 
 ---
 
@@ -461,6 +476,11 @@ Menggabungkan 5 entry CHANGELOG (1 individual + 4 merger).
 - **Preset GSON full-config** — Simpan/muat seluruh konfigurasi overlay via PresetManager.
 - **Tombol Muat di Semua Panel** — Tombol "Muat Preset" fisik di layout setiap panel.
 - **Auto-request izin saat pertama buka**.
+### 🚮 Fitur Dihapus
+- **Grid Posisi 3×3** — Dari FPS, Clock, Battery, Text.
+- **Auto Preset Aplikasi** — Berdasarkan orientasi/aplikasi.
+- **PositionPresetManager** — Digantikan PresetManager GSON.
+- **Clipboard export/import**.
 ### ♻️ Perubahan Fitur
 - **Restruktur folder features** — 9 folder di-rename (battery→battery_temperature, dll).
 - **Tema default mode malam**.
@@ -468,18 +488,10 @@ Menggabungkan 5 entry CHANGELOG (1 individual + 4 merger).
 - **Tombol orientasi pindah ke toolbar**, hapus dari panel posisi.
 - **Export/Import clipboard → file**; Bagikan Preset di semua panel.
 - **Battery Monitor → Battery Temperature**.
-### 🚮 Fitur Dihapus
-- **Grid Posisi 3×3** — Dari FPS, Clock, Battery, Text.
-- **Auto Preset Aplikasi** — Berdasarkan orientasi/aplikasi.
-- **PositionPresetManager** — Digantikan PresetManager GSON.
-- **Clipboard export/import**.
 ### 🐞 Bug Fixes
 - **TextPositionController extra brace** — 28 error kompilasi.
 - **Slider posisi tidak sinkron** — Saat drag.
 - **Padding background mendorong teks** — Padding hanya saat bg enabled.
-### 🔢 Version
-versionCode: 106 → 127
-versionName: 2.6.2.48.0 → 3.9.3.66.0
 
 ---
 
@@ -505,18 +517,18 @@ Menggabungkan 5 entry CHANGELOG (masing-masing sudah merger 5 release = ~25 rele
 - **Android SplashScreen API**.
 - **Toggle tema gelap/terang** — Via ikon bulan di toolbar kanan.
 - **SettingsActivity membaca assets** — Assets sebagai single source of truth.
-### ♻️ Perubahan Fitur
-- **modules/ → features/** — Refactor package structure.
-- **Popup settings di bawah ikon** — PopupMenu + Gravity.END.
-- **SettingsActivity → Konfigurasi** — Ringkas, hanya izin.
-- **Dokumentasi via popup** — Dipindah dari Settings.
-- **Offset range -60–60**; default shadow offset 0.
 ### 🚮 Fitur Dihapus
 - **XY Pad → karantina** — Digantikan Slider + D-Pad.
 - **Sistem Grup Sidebar** — Flat list.
 - **Hardcoded background** — Background dan shadow terpisah.
 - **Shadow Opacity** — Alpha via color picker.
 - **Module temp/** — Hapus folder deprecated.
+### ♻️ Perubahan Fitur
+- **modules/ → features/** — Refactor package structure.
+- **Popup settings di bawah ikon** — PopupMenu + Gravity.END.
+- **SettingsActivity → Konfigurasi** — Ringkas, hanya izin.
+- **Dokumentasi via popup** — Dipindah dari Settings.
+- **Offset range -60–60**; default shadow offset 0.
 ### 🔧 Optimasi & Penyesuaian
 - **Ekstrak shared component** — DPadController, PositionPresetManager, SliderPositionController, SliderLabelEditor.
 - **Ukuran teks diperluas** — Text 1–150sp, FPS 5–140sp.
@@ -529,9 +541,6 @@ Menggabungkan 5 entry CHANGELOG (masing-masing sudah merger 5 release = ~25 rele
 - **SettingsActivity back arrow**.
 - **FPS tidak tampil** — Service standalone tanpa text overlay.
 - **TextConfig.size** — Posisi overlay gagal termuat.
-### 🔢 Version
-versionCode: 51 → 96
-versionName: 2.3.1.15.0 → 2.6.1.42.0
 
 ---
 

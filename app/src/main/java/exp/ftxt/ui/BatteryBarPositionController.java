@@ -65,16 +65,28 @@ public class BatteryBarPositionController {
             p.quickMode = BatteryBarConfig.quickMode;
             p.quickSide = BatteryBarConfig.quickSide;
             p.barHorizontal = BatteryBarConfig.horizontal;
+            p.barInvert = BatteryBarConfig.invert;
             p.barLength = BatteryBarConfig.length;
             p.barThickness = BatteryBarConfig.thickness;
             p.color = BatteryBarConfig.color;
-            p.autoColor = BatteryBarConfig.autoColor;
+            p.autoColor = BatteryBarConfig.isAutoColor();
+            p.barColorScheme = BatteryBarConfig.colorScheme;
             p.lowColor = BatteryBarConfig.lowColor;
             p.lowThreshold = BatteryBarConfig.lowThreshold;
             p.showEmptyStrip = BatteryBarConfig.showEmptyStrip;
             p.emptyColor = BatteryBarConfig.emptyColor;
             p.barRadius = BatteryBarConfig.radius;
             p.fadeSpeed = BatteryBarConfig.fadeSpeed;
+            p.fadeEnabled = BatteryBarConfig.fadeEnabled;
+            p.shineEnabled = BatteryBarConfig.shineEnabled;
+            p.shineSpeed = BatteryBarConfig.shineSpeed;
+            p.shineWidth = BatteryBarConfig.shineWidth;
+            p.waveEnabled = BatteryBarConfig.waveEnabled;
+            p.waveSpeed = BatteryBarConfig.waveSpeed;
+            p.waveAmplitude = BatteryBarConfig.waveAmplitude;
+            p.chargeWaveEnabled = BatteryBarConfig.chargeWaveEnabled;
+            p.chargeWaveSpeed = BatteryBarConfig.chargeWaveSpeed;
+            p.chargeWaveAmplitude = BatteryBarConfig.chargeWaveAmplitude;
         }
 
         @Override
@@ -93,6 +105,8 @@ public class BatteryBarPositionController {
                 BatteryBarConfig.quickMode = p.quickMode;
                 prefs.edit().putBoolean("batbar_quick_mode", BatteryBarConfig.quickMode).apply();
             }
+            BatteryBarConfig.safeArea = true;
+            prefs.edit().putBoolean("batbar_safe_area", true).apply();
             if (p.quickSide != null) {
                 BatteryBarConfig.quickSide = p.quickSide;
                 prefs.edit().putString("batbar_quick_side", BatteryBarConfig.quickSide).apply();
@@ -100,6 +114,10 @@ public class BatteryBarPositionController {
             if (p.barHorizontal != null) {
                 BatteryBarConfig.horizontal = p.barHorizontal;
                 prefs.edit().putBoolean("batbar_horizontal", BatteryBarConfig.horizontal).apply();
+            }
+            if (p.barInvert != null) {
+                BatteryBarConfig.invert = p.barInvert;
+                prefs.edit().putBoolean("batbar_invert", BatteryBarConfig.invert).apply();
             }
             if (p.barLength != null) {
                 BatteryBarConfig.length = p.barLength;
@@ -111,9 +129,12 @@ public class BatteryBarPositionController {
             }
             BatteryBarConfig.color = p.color;
             prefs.edit().putInt("batbar_color", BatteryBarConfig.color).apply();
-            if (p.autoColor != null) {
-                BatteryBarConfig.autoColor = p.autoColor;
-                prefs.edit().putBoolean("batbar_auto_color", BatteryBarConfig.autoColor).apply();
+            if (p.barColorScheme != null) {
+                BatteryBarConfig.colorScheme = p.barColorScheme;
+                prefs.edit().putInt("batbar_color_scheme", BatteryBarConfig.colorScheme).apply();
+            } else if (p.autoColor != null) {
+                BatteryBarConfig.colorScheme = p.autoColor ? BatteryBarConfig.SCHEME_CLASSIC : BatteryBarConfig.SCHEME_NONE;
+                prefs.edit().putInt("batbar_color_scheme", BatteryBarConfig.colorScheme).apply();
             }
             if (p.lowColor != null) {
                 BatteryBarConfig.lowColor = p.lowColor;
@@ -138,6 +159,46 @@ public class BatteryBarPositionController {
             if (p.fadeSpeed != null) {
                 BatteryBarConfig.fadeSpeed = p.fadeSpeed;
                 prefs.edit().putInt("batbar_fade_speed", BatteryBarConfig.fadeSpeed).apply();
+            }
+            if (p.fadeEnabled != null) {
+                BatteryBarConfig.fadeEnabled = p.fadeEnabled;
+                prefs.edit().putBoolean("batbar_fade_enabled", BatteryBarConfig.fadeEnabled).apply();
+            }
+            if (p.shineEnabled != null) {
+                BatteryBarConfig.shineEnabled = p.shineEnabled;
+                prefs.edit().putBoolean("batbar_shine_enabled", BatteryBarConfig.shineEnabled).apply();
+            }
+            if (p.shineSpeed != null) {
+                BatteryBarConfig.shineSpeed = p.shineSpeed;
+                prefs.edit().putInt("batbar_shine_speed", BatteryBarConfig.shineSpeed).apply();
+            }
+            if (p.shineWidth != null) {
+                BatteryBarConfig.shineWidth = p.shineWidth;
+                prefs.edit().putInt("batbar_shine_width", BatteryBarConfig.shineWidth).apply();
+            }
+            if (p.waveEnabled != null) {
+                BatteryBarConfig.waveEnabled = p.waveEnabled;
+                prefs.edit().putBoolean("batbar_wave_enabled", BatteryBarConfig.waveEnabled).apply();
+            }
+            if (p.waveSpeed != null) {
+                BatteryBarConfig.waveSpeed = p.waveSpeed;
+                prefs.edit().putInt("batbar_wave_speed", BatteryBarConfig.waveSpeed).apply();
+            }
+            if (p.waveAmplitude != null) {
+                BatteryBarConfig.waveAmplitude = p.waveAmplitude;
+                prefs.edit().putInt("batbar_wave_amplitude", BatteryBarConfig.waveAmplitude).apply();
+            }
+            if (p.chargeWaveEnabled != null) {
+                BatteryBarConfig.chargeWaveEnabled = p.chargeWaveEnabled;
+                prefs.edit().putBoolean("batbar_charge_wave_enabled", BatteryBarConfig.chargeWaveEnabled).apply();
+            }
+            if (p.chargeWaveSpeed != null) {
+                BatteryBarConfig.chargeWaveSpeed = p.chargeWaveSpeed;
+                prefs.edit().putInt("batbar_charge_wave_speed", BatteryBarConfig.chargeWaveSpeed).apply();
+            }
+            if (p.chargeWaveAmplitude != null) {
+                BatteryBarConfig.chargeWaveAmplitude = p.chargeWaveAmplitude;
+                prefs.edit().putInt("batbar_charge_wave_amplitude", BatteryBarConfig.chargeWaveAmplitude).apply();
             }
         }
 
@@ -204,12 +265,25 @@ public class BatteryBarPositionController {
 
     public void setPositionControlsEnabled(boolean enabled) {
         if (sliderController == null) return;
-        setViewEnabled(rootViewId(R.id.batbar_posXSeekBar), enabled);
-        setViewEnabled(rootViewId(R.id.batbar_posYSeekBar), enabled);
+        float alpha = enabled ? 1f : 0.3f;
+        View xSeek = rootViewId(R.id.batbar_posXSeekBar);
+        View ySeek = rootViewId(R.id.batbar_posYSeekBar);
+        View xLabel = rootViewId(R.id.batbar_posXLabel);
+        View yLabel = rootViewId(R.id.batbar_posYLabel);
+        setViewEnabled(xSeek, enabled);
+        setViewEnabled(ySeek, enabled);
+        if (xSeek != null) xSeek.setAlpha(alpha);
+        if (ySeek != null) ySeek.setAlpha(alpha);
+        if (xLabel != null) xLabel.setAlpha(alpha);
+        if (yLabel != null) yLabel.setAlpha(alpha);
         btnUp.setEnabled(enabled);
         btnDown.setEnabled(enabled);
         btnLeft.setEnabled(enabled);
         btnRight.setEnabled(enabled);
+        btnUp.setAlpha(alpha);
+        btnDown.setAlpha(alpha);
+        btnLeft.setAlpha(alpha);
+        btnRight.setAlpha(alpha);
     }
 
     private View rootViewId(int id) {

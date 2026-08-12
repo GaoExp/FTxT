@@ -52,8 +52,13 @@ public class BatteryBarModule implements OverlayModule {
         view = new BatteryBarView(ctx);
         view.setBarConfig(BatteryBarConfig.color, BatteryBarConfig.emptyColor,
                 BatteryBarConfig.showEmptyStrip, dp(BatteryBarConfig.radius),
-                BatteryBarConfig.autoColor, BatteryBarConfig.lowColor, isHorizontalBar());
+                BatteryBarConfig.colorScheme, BatteryBarConfig.lowColor, isHorizontalBar());
+        view.setInvert(BatteryBarConfig.invert);
         view.setFadeSpeed(BatteryBarConfig.fadeSpeed);
+        view.setFadeEnabled(BatteryBarConfig.fadeEnabled);
+        view.setShineConfig(BatteryBarConfig.shineEnabled, BatteryBarConfig.shineSpeed, BatteryBarConfig.shineWidth);
+        view.setWaveConfig(BatteryBarConfig.waveEnabled, BatteryBarConfig.waveSpeed, BatteryBarConfig.waveAmplitude);
+        view.setChargeWaveConfig(BatteryBarConfig.chargeWaveEnabled, BatteryBarConfig.chargeWaveSpeed, BatteryBarConfig.chargeWaveAmplitude);
 
         params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -197,14 +202,20 @@ public class BatteryBarModule implements OverlayModule {
         if (view == null) return;
         view.setBarConfig(BatteryBarConfig.color, BatteryBarConfig.emptyColor,
                 BatteryBarConfig.showEmptyStrip, dp(BatteryBarConfig.radius),
-                BatteryBarConfig.autoColor, BatteryBarConfig.lowColor, isHorizontalBar());
+                BatteryBarConfig.colorScheme, BatteryBarConfig.lowColor, isHorizontalBar());
+        view.setInvert(BatteryBarConfig.invert);
         view.setFadeSpeed(BatteryBarConfig.fadeSpeed);
+        view.setFadeEnabled(BatteryBarConfig.fadeEnabled);
+        view.setShineConfig(BatteryBarConfig.shineEnabled, BatteryBarConfig.shineSpeed, BatteryBarConfig.shineWidth);
+        view.setWaveConfig(BatteryBarConfig.waveEnabled, BatteryBarConfig.waveSpeed, BatteryBarConfig.waveAmplitude);
+        view.setChargeWaveConfig(BatteryBarConfig.chargeWaveEnabled, BatteryBarConfig.chargeWaveSpeed, BatteryBarConfig.chargeWaveAmplitude);
         updateDisplay();
     }
 
     public void reloadLayout() {
         if (view != null && params != null && wm != null) {
             view.setBarOrientation(isHorizontalBar());
+            view.setInvert(BatteryBarConfig.invert);
             applyLayout();
         }
     }
@@ -222,7 +233,7 @@ public class BatteryBarModule implements OverlayModule {
             int lenPx = hSide ? sw : sh;
             params.width = hSide ? lenPx : thicknessPx;
             params.height = hSide ? thicknessPx : lenPx;
-            int margin = BatteryBarConfig.safeArea ? dp(8) : 0;
+            int margin = 0;
             switch (side) {
                 case "bottom":
                     params.x = 0;

@@ -44,15 +44,27 @@ public class OverlayPreset {
     public Boolean quickMode;
     public String quickSide;
     public Boolean barHorizontal;
+    public Boolean barInvert;
     public Float barLength;
     public Integer barThickness;
     public Boolean autoColor;
+    public Integer barColorScheme;
     public Integer lowColor;
     public Integer lowThreshold;
     public Boolean showEmptyStrip;
     public Integer emptyColor;
     public Integer barRadius;
     public Integer fadeSpeed;
+    public Boolean fadeEnabled;
+    public Boolean shineEnabled;
+    public Integer shineSpeed;
+    public Integer shineWidth;
+    public Boolean waveEnabled;
+    public Integer waveSpeed;
+    public Integer waveAmplitude;
+    public Boolean chargeWaveEnabled;
+    public Integer chargeWaveSpeed;
+    public Integer chargeWaveAmplitude;
 
     public OverlayPreset() {
         shadow = new ShadowConfig();

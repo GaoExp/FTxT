@@ -43,8 +43,11 @@ Entry dicatat di **versi berjalan** (bukan entry baru). Urutan section WAJIB:
 🗒️ File Added
 ✏️ File Changed
 🔥 File Removed
-🔢 Version
 ```
+
+**Format judul entry:** `# [x.x.x] - yyyy-mm-dd versionCode xxx` — versionName & versionCode dicatat di judul, **tanpa section 🔢 Version** di isi entry.
+
+**Entry yang di-merge** (beberapa versi digabung dalam satu entry): section **🗒️ File Added**, **✏️ File Changed**, dan **🔥 File Removed** diabaikan (tidak ditulis).
 
 **WAJIB:** cek git log untuk tahu status push. **JANGAN** buat entry baru sebelum commit di-push.
 

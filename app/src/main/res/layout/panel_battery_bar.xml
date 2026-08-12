@@ -1,387 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-            <!-- Battery Bar Panel -->
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/panel_battery_bar"
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<!-- Battery Bar Panel -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/panel_battery_bar"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-            <androidx.core.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="always"
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Battery Bar + Kunci Posisi -->
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:overScrollMode="always"
-                android:scrollbars="vertical"
-                android:fillViewport="true">
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <CheckBox
+                    android:id="@+id/batbarSwitch"
+                    android:text="Battery Bar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <CheckBox
+                    android:id="@+id/batbarLockSwitch"
+                    android:text="Kunci Posisi (tidak tersedia)"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:enabled="false"
+                    android:alpha="0.3"/>
+
+            </LinearLayout>
+
+            <!-- Mode Cepat / Manual: segment button (satu pilihan aktif) -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_segment_container"
+                android:padding="3dp">
+
+                <TextView
+                    android:id="@+id/batbar_segmentQuick"
+                    android:text="Mode Cepat"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingVertical="8dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/bg_segment_active"/>
+
+                <TextView
+                    android:id="@+id/batbar_segmentManual"
+                    android:text="Manual"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingVertical="8dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/bg_segment_inactive"/>
+
+            </LinearLayout>
+
+            <!-- Posisi Sisi (hanya tampil saat Mode Cepat) -->
+            <LinearLayout
+                android:id="@+id/batbar_quickSideRow"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="Posisi Sisi:"
+                    android:textSize="14sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarQuickSideValue"
+                    android:text="Atas (Top)"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="3dp"
+                    android:background="#555555"
+                    android:textColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginStart="8dp"
+                    android:minWidth="120dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!-- Mode Manual -->
+            <TextView
+                android:id="@+id/batbar_sectionManualHeader"
+                android:text="▾ Mode Manual"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <LinearLayout
+                android:id="@+id/batbar_sectionManual"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Battery Bar + Kunci Posisi -->
+                <TextView
+                    android:id="@+id/batbarLengthLabel"
+                    android:text="Panjang: 50%"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarLengthSeekBar"
+                    android:max="100"
+                    android:progress="50"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <!-- Kontrol Posisi (di bawah panjang bar, tanpa chevron) -->
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical">
-
-                    <CheckBox
-                        android:id="@+id/batbarSwitch"
-                        android:text="Battery Bar"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
-
-                    <CheckBox
-                        android:id="@+id/batbarLockSwitch"
-                        android:text="Kunci Posisi"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
-
-                </LinearLayout>
-
-                <!-- Quick Mode -->
-                <TextView
-                    android:id="@+id/batbar_sectionQuickHeader"
-                    android:text="▾ Mode Cepat"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:id="@+id/batbar_sectionQuick"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <CheckBox
-                        android:id="@+id/batbarQuickModeCheck"
-                        android:text="Mode Cepat (snap ke sisi)"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:text="Posisi Sisi:"
-                            android:textSize="14sp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                        <TextView
-                            android:id="@+id/batbarQuickSideValue"
-                            android:text="Atas (Top)"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="3dp"
-                            android:background="#555555"
-                            android:textColor="#FFFFFF"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginStart="8dp"
-                            android:minWidth="120dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Manual Mode -->
-                <TextView
-                    android:id="@+id/batbar_sectionManualHeader"
-                    android:text="▾ Mode Manual"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:id="@+id/batbar_sectionManual"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/batbarLengthLabel"
-                        android:text="Panjang: 50%"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <SeekBar
-                        android:id="@+id/batbarLengthSeekBar"
-                        android:max="100"
-                        android:progress="50"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <!-- Appearance -->
-                <TextView
-                    android:id="@+id/batbar_sectionAppearanceHeader"
-                    android:text="▾ Tampilan"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:id="@+id/batbar_sectionAppearance"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <CheckBox
-                        android:id="@+id/batbarHorizontalCheck"
-                        android:text="Horizontal"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batbarThicknessLabel"
-                        android:text="Ketebalan: 8px"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <SeekBar
-                        android:id="@+id/batbarThicknessSeekBar"
-                        android:max="50"
-                        android:progress="8"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_marginTop="12dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical">
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1">
-
-                            <View
-                                android:id="@+id/batbarColorPreview"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:background="#00FF00"
-                                android:clickable="true"
-                                android:focusable="true"/>
-
-                            <TextView
-                                android:text="Warna"
-                                android:textSize="10sp"
-                                android:layout_marginTop="2dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1">
-
-                            <View
-                                android:id="@+id/batbarEmptyColorPreview"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:background="#66000000"
-                                android:clickable="true"
-                                android:focusable="true"/>
-
-                            <TextView
-                                android:text="Strip Kosong"
-                                android:textSize="10sp"
-                                android:layout_marginTop="2dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <CheckBox
-                        android:id="@+id/batbarShowEmptyStripCheck"
-                        android:text="Tampilkan Strip Kosong"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <TextView
-                        android:id="@+id/batbarRadiusLabel"
-                        android:text="Radius Sudut: 8px"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <SeekBar
-                        android:id="@+id/batbarRadiusSeekBar"
-                        android:max="50"
-                        android:progress="8"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <!-- Low Battery -->
-                <TextView
-                    android:id="@+id/batbar_sectionLowBatteryHeader"
-                    android:text="▾ Baterai Rendah"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingVertical="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:id="@+id/batbar_sectionLowBattery"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <CheckBox
-                        android:id="@+id/batbarAutoColorCheck"
-                        android:text="Warna Otomatis (hijau/kuning/merah)"
-                        android:layout_marginTop="4dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <View
-                                android:id="@+id/batbarLowColorPreview"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:background="#FFFF00"
-                                android:clickable="true"
-                                android:focusable="true"/>
-
-                            <TextView
-                                android:text="Warna Low"
-                                android:textSize="10sp"
-                                android:layout_marginTop="2dp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="16dp">
-
-                            <TextView
-                                android:id="@+id/batbarLowThresholdLabel"
-                                android:text="Ambang Low: 40%"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"/>
-
-                            <SeekBar
-                                android:id="@+id/batbarLowThresholdSeekBar"
-                                android:max="100"
-                                android:progress="40"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/batbarFadeSpeedLabel"
-                        android:text="Kecepatan Fade: 5"
-                        android:layout_marginTop="8dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <SeekBar
-                        android:id="@+id/batbarFadeSpeedSeekBar"
-                        android:max="10"
-                        android:progress="5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                </LinearLayout>
-
-                <View
-                    android:layout_height="1dp"
-                    android:background="#CCC"
-                    android:layout_marginVertical="8dp"
-                    android:layout_width="match_parent"/>
-
-                <TextView
-                    android:id="@+id/batbar_sectionPositionHeader"
-                    android:text="▾ Posisi"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:paddingVertical="8dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-                <LinearLayout
-                    android:id="@+id/batbar_sectionPosition"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                <!-- Battery Bar Position Controls -->
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical">
@@ -507,17 +282,424 @@
 
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <!-- Tampilan -->
+            <TextView
+                android:id="@+id/batbar_sectionAppearanceHeader"
+                android:text="▾ Tampilan"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/batbar_sectionAppearance"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioGroup
+                        android:id="@+id/batbar_orientationGroup"
+                        android:orientation="horizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <RadioButton
+                            android:id="@+id/batbar_orientationH"
+                            android:text="Horizontal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"/>
+
+                        <RadioButton
+                            android:id="@+id/batbar_orientationV"
+                            android:text="Vertikal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"/>
+
+                    </RadioGroup>
+
+                    <CheckBox
+                        android:id="@+id/batbarInvertCheck"
+                        android:text="Invert"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/batbarThicknessLabel"
+                    android:text="Ketebalan: 8px"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarThicknessSeekBar"
+                    android:max="50"
+                    android:progress="8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <View
+                            android:id="@+id/batbarColorPreview"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="#00FF00"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Warna"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <View
+                            android:id="@+id/batbarEmptyColorPreview"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="#66000000"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:text="Strip Kosong"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/batbarShowEmptyStripCheck"
+                        android:text="Tampilkan Strip Kosong"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <CheckBox
+                        android:id="@+id/batbarSafeAreaCheck"
+                        android:text="Area Aman"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/batbarColorSchemeLabel"
+                    android:text="Warna Level:"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarSchemeSelector"
+                    android:text="Tanpa Skema"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:background="#555555"
+                    android:textColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarRadiusLabel"
+                    android:text="Radius Sudut: 8px"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarRadiusSeekBar"
+                    android:max="50"
+                    android:progress="8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!-- Animasi Pengisian Daya -->
+            <TextView
+                android:id="@+id/batbar_sectionChargeHeader"
+                android:text="▾ Animasi Pengisian Daya"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/batbar_sectionCharge"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
                 <CheckBox
-                    android:id="@+id/batbarSafeAreaCheck"
-                    android:text="Gunakan Area Aman"
+                    android:id="@+id/batbarShineCheck"
+                    android:text="Animasi Shine"
                     android:layout_marginTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <TextView
+                    android:id="@+id/batbarShineSpeedLabel"
+                    android:text="Kecepatan Shine: 1.8s"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarShineSpeedSeekBar"
+                    android:max="18"
+                    android:progress="16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarShineWidthLabel"
+                    android:text="Lebar Band: 25%"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarShineWidthSeekBar"
+                    android:max="96"
+                    android:progress="23"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <CheckBox
+                    android:id="@+id/batbarChargeWaveCheck"
+                    android:text="Animasi Wave (gelombang mengalir ke kanan)"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarChargeWaveSpeedLabel"
+                    android:text="Kecepatan Wave: 1.0s"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarChargeWaveSpeedSeekBar"
+                    android:max="18"
+                    android:progress="8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarChargeWaveAmplitudeLabel"
+                    android:text="Intensitas Wave: 60%"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarChargeWaveAmplitudeSeekBar"
+                    android:max="90"
+                    android:progress="50"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <!-- Animasi Baterai Rendah -->
+            <TextView
+                android:id="@+id/batbar_sectionLowAnimHeader"
+                android:text="▾ Animasi Baterai Rendah"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingVertical="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <LinearLayout
+                android:id="@+id/batbar_sectionLowAnim"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <View
+                            android:id="@+id/batbarLowColorPreview"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="#FFFF00"
+                            android:clickable="true"
+                            android:focusable="true"/>
+
+                        <TextView
+                            android:id="@+id/batbarLowColorLabel"
+                            android:text="Warna Low"
+                            android:textSize="10sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp">
+
+                        <TextView
+                            android:id="@+id/batbarLowThresholdLabel"
+                            android:text="Ambang Low: 40%"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <SeekBar
+                            android:id="@+id/batbarLowThresholdSeekBar"
+                            android:max="100"
+                            android:progress="40"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
+                <CheckBox
+                    android:id="@+id/batbarFadeCheck"
+                    android:text="Animasi Fade"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarFadeSpeedLabel"
+                    android:text="Kecepatan Fade: 1.8s"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarFadeSpeedSeekBar"
+                    android:max="18"
+                    android:progress="16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <CheckBox
+                    android:id="@+id/batbarWaveCheck"
+                    android:text="Animasi Wave (kedutan gelombang)"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarWaveSpeedLabel"
+                    android:text="Kecepatan Wave: 1.0s"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarWaveSpeedSeekBar"
+                    android:max="18"
+                    android:progress="8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/batbarWaveAmplitudeLabel"
+                    android:text="Intensitas Wave: 60%"
+                    android:layout_marginTop="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <SeekBar
+                    android:id="@+id/batbarWaveAmplitudeSeekBar"
+                    android:max="90"
+                    android:progress="50"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
             </LinearLayout>
 
-            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
 
-            </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

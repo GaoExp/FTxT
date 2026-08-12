@@ -99,6 +99,7 @@ public class TextPositionController {
             }
             if (p.textContent != null && !p.textContent.isEmpty()) {
                 TextConfig.text = p.textContent;
+                prefs.edit().putString("text_content", p.textContent).apply();
                 FloatingService.updateTextStatic();
             }
         }

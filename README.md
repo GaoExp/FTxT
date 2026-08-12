@@ -14,7 +14,7 @@
 - **Jam Digital Overlay** — Waktu real-time 24 jam `HH:mm:ss`, update tiap 1 detik
 - **Battery Stats Overlay** — Suhu baterai (°C) dan persentase (%) dalam satu modul utuh dengan warna nilai & label terpisah, interval update bisa diatur
 - **Battery Current Overlay** — Tegangan (mV), arus (mA), dan daya (W) dengan warna nilai & satuan terpisah
-- **Battery Bar Overlay** — Bar baterai fleksibel di layar: Mode Cepat (snap ke sisi atas/bawah/kiri/kanan) atau Mode Manual (panjang & posisi bebas), warna fill + strip kosong, auto-color, animasi fade saat low & shine saat charging
+- **Battery Bar Overlay** — Bar baterai fleksibel di layar: Mode Cepat (snap ke sisi atas/bawah/kiri/kanan) atau Mode Manual (panjang & posisi bebas), warna fill + strip kosong, skema warna level (Klasik 3-warna / Hue Gradien), animasi fade + wave (kedutan gelombang) saat low & shine saat charging (kecepatan, lebar band, intensitas bisa diatur)
 - **Network Speed Meter Overlay** — Kecepatan internet real-time (↓ ↑) dengan warna nilai & label terpisah
 - **Color Wheel & Hue Slider** — Dua mode color picker: Classic Color Wheel dengan crosshair + ARGB slider, atau Hue/Saturation/Brightness/Alpha slider. Two-way sync, color name auto-detection, HEX edit manual, saved colors
 - **Safe Area** — Batasi posisi overlay agar tidak masuk area notch/cutout
@@ -112,7 +112,10 @@ Project ini menggunakan Semantic Versioning: `major.minor.patch`
 | 🗒️ File Added | File baru |
 | ✏️ File Changed | File diubah |
 | 🔥 File Removed | File dihapus |
-| 🔢 Version | versionCode & versionName |
+
+Format judul entry: `# [x.x.x] - yyyy-mm-dd versionCode xxx` — versionName & versionCode dicatat di judul, tanpa section 🔢 Version.
+
+Entry yang di-merge (beberapa versi digabung dalam satu entry): section 🗒️ File Added, ✏️ File Changed, dan 🔥 File Removed diabaikan (tidak ditulis).
 
 ### Dependencies
 

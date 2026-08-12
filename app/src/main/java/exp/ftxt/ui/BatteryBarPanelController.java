@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -25,26 +27,49 @@ public class BatteryBarPanelController {
     private final MainActivity activity;
 
     private CheckBox barSwitch;
-    private CheckBox barQuickModeCheck;
+    private TextView segmentQuick;
+    private TextView segmentManual;
+    private View quickSideRow;
     private TextView barQuickSideValue;
-    private CheckBox barHorizontalCheck;
+    private RadioGroup barOrientationGroup;
+    private RadioButton barOrientationH;
+    private RadioButton barOrientationV;
+    private CheckBox barInvertCheck;
     private SeekBar barThicknessSeekBar;
     private TextView barThicknessLabel;
     private SeekBar barLengthSeekBar;
     private TextView barLengthLabel;
     private View barColorPreview;
-    private CheckBox barAutoColorCheck;
+    private TextView barSchemeSelector;
     private View barLowColorPreview;
+    private TextView barLowColorLabel;
     private SeekBar barLowThresholdSeekBar;
     private TextView barLowThresholdLabel;
     private CheckBox barShowEmptyStripCheck;
     private View barEmptyColorPreview;
     private SeekBar barRadiusSeekBar;
     private TextView barRadiusLabel;
+    private CheckBox barFadeCheck;
     private SeekBar barFadeSpeedSeekBar;
     private TextView barFadeSpeedLabel;
+    private CheckBox barShineCheck;
+    private SeekBar barShineSpeedSeekBar;
+    private TextView barShineSpeedLabel;
+    private SeekBar barShineWidthSeekBar;
+    private TextView barShineWidthLabel;
+    private CheckBox barWaveCheck;
+    private SeekBar barWaveSpeedSeekBar;
+    private TextView barWaveSpeedLabel;
+    private SeekBar barWaveAmplitudeSeekBar;
+    private TextView barWaveAmplitudeLabel;
+    private CheckBox barChargeWaveCheck;
+    private SeekBar barChargeWaveSpeedSeekBar;
+    private TextView barChargeWaveSpeedLabel;
+    private SeekBar barChargeWaveAmplitudeSeekBar;
+    private TextView barChargeWaveAmplitudeLabel;
     private CheckBox barLockSwitch;
     private CheckBox barSafeAreaCheck;
+    private boolean savedSafeArea = true;
 
     private View manualSection;
     private TextView manualSectionHeader;
@@ -82,24 +107,46 @@ public class BatteryBarPanelController {
 
     private void bindViews(View rootView) {
         barSwitch = rootView.findViewById(R.id.batbarSwitch);
-        barQuickModeCheck = rootView.findViewById(R.id.batbarQuickModeCheck);
+        segmentQuick = rootView.findViewById(R.id.batbar_segmentQuick);
+        segmentManual = rootView.findViewById(R.id.batbar_segmentManual);
+        quickSideRow = rootView.findViewById(R.id.batbar_quickSideRow);
         barQuickSideValue = rootView.findViewById(R.id.batbarQuickSideValue);
-        barHorizontalCheck = rootView.findViewById(R.id.batbarHorizontalCheck);
+        barOrientationGroup = rootView.findViewById(R.id.batbar_orientationGroup);
+        barOrientationH = rootView.findViewById(R.id.batbar_orientationH);
+        barOrientationV = rootView.findViewById(R.id.batbar_orientationV);
+        barInvertCheck = rootView.findViewById(R.id.batbarInvertCheck);
         barThicknessSeekBar = rootView.findViewById(R.id.batbarThicknessSeekBar);
         barThicknessLabel = rootView.findViewById(R.id.batbarThicknessLabel);
         barLengthSeekBar = rootView.findViewById(R.id.batbarLengthSeekBar);
         barLengthLabel = rootView.findViewById(R.id.batbarLengthLabel);
         barColorPreview = rootView.findViewById(R.id.batbarColorPreview);
-        barAutoColorCheck = rootView.findViewById(R.id.batbarAutoColorCheck);
+        barSchemeSelector = rootView.findViewById(R.id.batbarSchemeSelector);
         barLowColorPreview = rootView.findViewById(R.id.batbarLowColorPreview);
+        barLowColorLabel = rootView.findViewById(R.id.batbarLowColorLabel);
         barLowThresholdSeekBar = rootView.findViewById(R.id.batbarLowThresholdSeekBar);
         barLowThresholdLabel = rootView.findViewById(R.id.batbarLowThresholdLabel);
         barShowEmptyStripCheck = rootView.findViewById(R.id.batbarShowEmptyStripCheck);
         barEmptyColorPreview = rootView.findViewById(R.id.batbarEmptyColorPreview);
         barRadiusSeekBar = rootView.findViewById(R.id.batbarRadiusSeekBar);
         barRadiusLabel = rootView.findViewById(R.id.batbarRadiusLabel);
+        barFadeCheck = rootView.findViewById(R.id.batbarFadeCheck);
         barFadeSpeedSeekBar = rootView.findViewById(R.id.batbarFadeSpeedSeekBar);
         barFadeSpeedLabel = rootView.findViewById(R.id.batbarFadeSpeedLabel);
+        barShineCheck = rootView.findViewById(R.id.batbarShineCheck);
+        barShineSpeedSeekBar = rootView.findViewById(R.id.batbarShineSpeedSeekBar);
+        barShineSpeedLabel = rootView.findViewById(R.id.batbarShineSpeedLabel);
+        barShineWidthSeekBar = rootView.findViewById(R.id.batbarShineWidthSeekBar);
+        barShineWidthLabel = rootView.findViewById(R.id.batbarShineWidthLabel);
+        barWaveCheck = rootView.findViewById(R.id.batbarWaveCheck);
+        barWaveSpeedSeekBar = rootView.findViewById(R.id.batbarWaveSpeedSeekBar);
+        barWaveSpeedLabel = rootView.findViewById(R.id.batbarWaveSpeedLabel);
+        barWaveAmplitudeSeekBar = rootView.findViewById(R.id.batbarWaveAmplitudeSeekBar);
+        barWaveAmplitudeLabel = rootView.findViewById(R.id.batbarWaveAmplitudeLabel);
+        barChargeWaveCheck = rootView.findViewById(R.id.batbarChargeWaveCheck);
+        barChargeWaveSpeedSeekBar = rootView.findViewById(R.id.batbarChargeWaveSpeedSeekBar);
+        barChargeWaveSpeedLabel = rootView.findViewById(R.id.batbarChargeWaveSpeedLabel);
+        barChargeWaveAmplitudeSeekBar = rootView.findViewById(R.id.batbarChargeWaveAmplitudeSeekBar);
+        barChargeWaveAmplitudeLabel = rootView.findViewById(R.id.batbarChargeWaveAmplitudeLabel);
         barLockSwitch = rootView.findViewById(R.id.batbarLockSwitch);
         barSafeAreaCheck = rootView.findViewById(R.id.batbarSafeAreaCheck);
 
@@ -107,38 +154,51 @@ public class BatteryBarPanelController {
         manualSectionHeader = rootView.findViewById(R.id.batbar_sectionManualHeader);
         SectionHelper.setupCollapsible(manualSectionHeader, manualSection);
 
-        SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionQuickHeader),
-                rootView.findViewById(R.id.batbar_sectionQuick));
         SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionAppearanceHeader),
                 rootView.findViewById(R.id.batbar_sectionAppearance));
-        SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionLowBatteryHeader),
-                rootView.findViewById(R.id.batbar_sectionLowBattery));
-        SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionPositionHeader),
-                rootView.findViewById(R.id.batbar_sectionPosition));
+        SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionChargeHeader),
+                rootView.findViewById(R.id.batbar_sectionCharge));
+        SectionHelper.setupCollapsible(rootView.findViewById(R.id.batbar_sectionLowAnimHeader),
+                rootView.findViewById(R.id.batbar_sectionLowAnim));
     }
 
     private void loadConfig() {
         barSwitch.setChecked(BatteryBarConfig.enabled);
         activity.applyCheckboxTint(barSwitch, BatteryBarConfig.enabled);
-        barQuickModeCheck.setChecked(BatteryBarConfig.quickMode);
-        activity.applyCheckboxTint(barQuickModeCheck, BatteryBarConfig.quickMode);
+        updateModeSegment();
         barQuickSideValue.setText(sideLabel(BatteryBarConfig.quickSide));
-        barHorizontalCheck.setChecked(BatteryBarConfig.horizontal);
-        activity.applyCheckboxTint(barHorizontalCheck, BatteryBarConfig.horizontal);
+        barOrientationH.setChecked(BatteryBarConfig.horizontal);
+        barOrientationV.setChecked(!BatteryBarConfig.horizontal);
+        barInvertCheck.setChecked(BatteryBarConfig.invert);
+        activity.applyCheckboxTint(barInvertCheck, BatteryBarConfig.invert);
         barThicknessSeekBar.setProgress(BatteryBarConfig.thickness);
         barLengthSeekBar.setProgress((int) (BatteryBarConfig.length * 100));
         barColorPreview.setBackgroundColor(BatteryBarConfig.color);
-        barAutoColorCheck.setChecked(BatteryBarConfig.autoColor);
-        activity.applyCheckboxTint(barAutoColorCheck, BatteryBarConfig.autoColor);
+        barSchemeSelector.setText(schemeLabel(BatteryBarConfig.colorScheme));
         barLowColorPreview.setBackgroundColor(BatteryBarConfig.lowColor);
         barLowThresholdSeekBar.setProgress(BatteryBarConfig.lowThreshold);
         barShowEmptyStripCheck.setChecked(BatteryBarConfig.showEmptyStrip);
         activity.applyCheckboxTint(barShowEmptyStripCheck, BatteryBarConfig.showEmptyStrip);
         barEmptyColorPreview.setBackgroundColor(BatteryBarConfig.emptyColor);
         barRadiusSeekBar.setProgress(BatteryBarConfig.radius);
-        barFadeSpeedSeekBar.setProgress(BatteryBarConfig.fadeSpeed);
+        barFadeSpeedSeekBar.setProgress((BatteryBarConfig.fadeSpeed - 200) / 100);
+        barFadeCheck.setChecked(BatteryBarConfig.fadeEnabled);
+        activity.applyCheckboxTint(barFadeCheck, BatteryBarConfig.fadeEnabled);
+        barShineCheck.setChecked(BatteryBarConfig.shineEnabled);
+        activity.applyCheckboxTint(barShineCheck, BatteryBarConfig.shineEnabled);
+        barShineSpeedSeekBar.setProgress((BatteryBarConfig.shineSpeed - 200) / 100);
+        barShineWidthSeekBar.setProgress(BatteryBarConfig.shineWidth - 2);
+        barWaveCheck.setChecked(BatteryBarConfig.waveEnabled);
+        activity.applyCheckboxTint(barWaveCheck, BatteryBarConfig.waveEnabled);
+        barWaveSpeedSeekBar.setProgress((BatteryBarConfig.waveSpeed - 200) / 100);
+        barWaveAmplitudeSeekBar.setProgress(BatteryBarConfig.waveAmplitude - 10);
+        barChargeWaveCheck.setChecked(BatteryBarConfig.chargeWaveEnabled);
+        activity.applyCheckboxTint(barChargeWaveCheck, BatteryBarConfig.chargeWaveEnabled);
+        barChargeWaveSpeedSeekBar.setProgress((BatteryBarConfig.chargeWaveSpeed - 200) / 100);
+        barChargeWaveAmplitudeSeekBar.setProgress(BatteryBarConfig.chargeWaveAmplitude - 10);
         barLockSwitch.setChecked(BatteryBarConfig.touchPassthrough);
-        activity.applyCheckboxTint(barLockSwitch, BatteryBarConfig.touchPassthrough);
+        barLockSwitch.setEnabled(false);
+        barLockSwitch.setAlpha(0.3f);
         barSafeAreaCheck.setChecked(BatteryBarConfig.safeArea);
         activity.applyCheckboxTint(barSafeAreaCheck, BatteryBarConfig.safeArea);
 
@@ -146,7 +206,27 @@ public class BatteryBarPanelController {
         barLengthLabel.setText("Panjang: " + Math.round(BatteryBarConfig.length * 100) + "%");
         barLowThresholdLabel.setText("Ambang Low: " + BatteryBarConfig.lowThreshold + "%");
         barRadiusLabel.setText("Radius Sudut: " + BatteryBarConfig.radius + "px");
-        barFadeSpeedLabel.setText("Kecepatan Fade: " + BatteryBarConfig.fadeSpeed);
+        barFadeSpeedLabel.setText("Kecepatan Fade: " + formatSec(BatteryBarConfig.fadeSpeed));
+        barShineSpeedLabel.setText("Kecepatan Shine: " + formatSec(BatteryBarConfig.shineSpeed));
+        barShineWidthLabel.setText("Lebar Band: " + BatteryBarConfig.shineWidth + "%");
+        barWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.waveSpeed));
+        barWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.waveAmplitude + "%");
+        barChargeWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.chargeWaveSpeed));
+        barChargeWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.chargeWaveAmplitude + "%");
+        updateLowColorEnabled();
+    }
+
+    private String formatSec(int ms) {
+        return String.format(java.util.Locale.US, "%.1fs", ms / 1000.0);
+    }
+
+    private void updateLowColorEnabled() {
+        boolean schemeActive = BatteryBarConfig.colorScheme != BatteryBarConfig.SCHEME_NONE;
+        float alpha = schemeActive ? 0.3f : 1f;
+        barLowColorPreview.setAlpha(alpha);
+        barLowColorPreview.setEnabled(!schemeActive);
+        barLowColorLabel.setAlpha(alpha);
+        barLowColorLabel.setText(schemeActive ? "Warna Low (tidak aktif saat skema)" : "Warna Low");
     }
 
     private void setupListeners() {
@@ -174,20 +254,22 @@ public class BatteryBarPanelController {
             }
         });
 
-        barQuickModeCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryBarConfig.quickMode = isChecked;
-            activity.applyCheckboxTint(barQuickModeCheck, isChecked);
-            prefs().edit().putBoolean("batbar_quick_mode", isChecked).apply();
-            updateManualVisibility();
-            restart();
-        });
+        segmentQuick.setOnClickListener(v -> setQuickMode(true));
+        segmentManual.setOnClickListener(v -> setQuickMode(false));
 
         barQuickSideValue.setOnClickListener(v -> showSidePopup(v));
 
-        barHorizontalCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryBarConfig.horizontal = isChecked;
-            activity.applyCheckboxTint(barHorizontalCheck, isChecked);
-            prefs().edit().putBoolean("batbar_horizontal", isChecked).apply();
+        barOrientationGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            boolean horizontal = checkedId == R.id.batbar_orientationH;
+            BatteryBarConfig.horizontal = horizontal;
+            prefs().edit().putBoolean("batbar_horizontal", horizontal).apply();
+            restart();
+        });
+
+        barInvertCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryBarConfig.invert = isChecked;
+            activity.applyCheckboxTint(barInvertCheck, isChecked);
+            prefs().edit().putBoolean("batbar_invert", isChecked).apply();
             restart();
         });
 
@@ -214,12 +296,7 @@ public class BatteryBarPanelController {
             });
         });
 
-        barAutoColorCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryBarConfig.autoColor = isChecked;
-            activity.applyCheckboxTint(barAutoColorCheck, isChecked);
-            prefs().edit().putBoolean("batbar_auto_color", isChecked).apply();
-            restart();
-        });
+        barSchemeSelector.setOnClickListener(v -> showSchemePopup(v));
 
         barLowColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Warna Saat Low", BatteryBarConfig.lowColor, color -> {
@@ -261,18 +338,81 @@ public class BatteryBarPanelController {
         }));
 
         barFadeSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.fadeSpeed = progress;
-            barFadeSpeedLabel.setText("Kecepatan Fade: " + progress);
-            prefs().edit().putInt("batbar_fade_speed", progress).apply();
+            BatteryBarConfig.fadeSpeed = 200 + progress * 100;
+            barFadeSpeedLabel.setText("Kecepatan Fade: " + formatSec(BatteryBarConfig.fadeSpeed));
+            prefs().edit().putInt("batbar_fade_speed", BatteryBarConfig.fadeSpeed).apply();
             restart();
         }));
 
-        barLockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryBarConfig.touchPassthrough = isChecked;
-            activity.applyCheckboxTint(barLockSwitch, isChecked);
-            prefs().edit().putBoolean("batbar_lock", isChecked).apply();
-            FloatingService.updateTouchFlagsForModule(FloatingService.batteryBarModule());
+        barFadeCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryBarConfig.fadeEnabled = isChecked;
+            activity.applyCheckboxTint(barFadeCheck, isChecked);
+            prefs().edit().putBoolean("batbar_fade_enabled", isChecked).apply();
+            restart();
         });
+
+        barShineCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryBarConfig.shineEnabled = isChecked;
+            activity.applyCheckboxTint(barShineCheck, isChecked);
+            prefs().edit().putBoolean("batbar_shine_enabled", isChecked).apply();
+            restart();
+        });
+
+        barShineSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.shineSpeed = 200 + progress * 100;
+            barShineSpeedLabel.setText("Kecepatan Shine: " + formatSec(BatteryBarConfig.shineSpeed));
+            prefs().edit().putInt("batbar_shine_speed", BatteryBarConfig.shineSpeed).apply();
+            restart();
+        }));
+
+        barShineWidthSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.shineWidth = 2 + progress;
+            barShineWidthLabel.setText("Lebar Band: " + BatteryBarConfig.shineWidth + "%");
+            prefs().edit().putInt("batbar_shine_width", BatteryBarConfig.shineWidth).apply();
+            restart();
+        }));
+
+        barWaveCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryBarConfig.waveEnabled = isChecked;
+            activity.applyCheckboxTint(barWaveCheck, isChecked);
+            prefs().edit().putBoolean("batbar_wave_enabled", isChecked).apply();
+            restart();
+        });
+
+        barWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.waveSpeed = 200 + progress * 100;
+            barWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.waveSpeed));
+            prefs().edit().putInt("batbar_wave_speed", BatteryBarConfig.waveSpeed).apply();
+            restart();
+        }));
+
+        barWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.waveAmplitude = 10 + progress;
+            barWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.waveAmplitude + "%");
+            prefs().edit().putInt("batbar_wave_amplitude", BatteryBarConfig.waveAmplitude).apply();
+            restart();
+        }));
+
+        barChargeWaveCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            BatteryBarConfig.chargeWaveEnabled = isChecked;
+            activity.applyCheckboxTint(barChargeWaveCheck, isChecked);
+            prefs().edit().putBoolean("batbar_charge_wave_enabled", isChecked).apply();
+            restart();
+        });
+
+        barChargeWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.chargeWaveSpeed = 200 + progress * 100;
+            barChargeWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.chargeWaveSpeed));
+            prefs().edit().putInt("batbar_charge_wave_speed", BatteryBarConfig.chargeWaveSpeed).apply();
+            restart();
+        }));
+
+        barChargeWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
+            BatteryBarConfig.chargeWaveAmplitude = 10 + progress;
+            barChargeWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.chargeWaveAmplitude + "%");
+            prefs().edit().putInt("batbar_charge_wave_amplitude", BatteryBarConfig.chargeWaveAmplitude).apply();
+            restart();
+        }));
 
         barSafeAreaCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.safeArea = isChecked;
@@ -280,6 +420,23 @@ public class BatteryBarPanelController {
             prefs().edit().putBoolean("batbar_safe_area", isChecked).apply();
             restart();
         });
+    }
+
+    private void setQuickMode(boolean quick) {
+        BatteryBarConfig.quickMode = quick;
+        prefs().edit().putBoolean("batbar_quick_mode", quick).apply();
+        updateModeSegment();
+        updateManualVisibility();
+        restart();
+    }
+
+    private void updateModeSegment() {
+        if (segmentQuick == null || segmentManual == null) return;
+        boolean quick = BatteryBarConfig.quickMode;
+        segmentQuick.setBackgroundResource(quick ? R.drawable.bg_segment_active : R.drawable.bg_segment_inactive);
+        segmentManual.setBackgroundResource(quick ? R.drawable.bg_segment_inactive : R.drawable.bg_segment_active);
+        segmentQuick.setTextColor(quick ? 0xFFFFFFFF : 0xFFCCCCCC);
+        segmentManual.setTextColor(quick ? 0xFFCCCCCC : 0xFFFFFFFF);
     }
 
     private void showSidePopup(View anchor) {
@@ -324,12 +481,73 @@ public class BatteryBarPanelController {
         sidePopup.showAsDropDown(anchor, 0, dp(2));
     }
 
+    private void showSchemePopup(View anchor) {
+        if (sidePopup != null && sidePopup.isShowing()) {
+            sidePopup.dismiss();
+            return;
+        }
+        int[] schemes = {BatteryBarConfig.SCHEME_NONE, BatteryBarConfig.SCHEME_CLASSIC, BatteryBarConfig.SCHEME_HUE};
+        LinearLayout content = new LinearLayout(activity);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+        for (int scheme : schemes) {
+            TextView item = new TextView(activity);
+            item.setText(schemeLabel(scheme));
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setTextColor(0xFF222222);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            if (scheme == BatteryBarConfig.colorScheme) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+            item.setOnClickListener(v -> {
+                BatteryBarConfig.colorScheme = scheme;
+                barSchemeSelector.setText(schemeLabel(scheme));
+                prefs().edit().putInt("batbar_color_scheme", scheme).apply();
+                updateLowColorEnabled();
+                restart();
+                if (sidePopup != null) sidePopup.dismiss();
+            });
+            content.addView(item);
+        }
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(content);
+        sidePopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT, dp(160), true);
+        sidePopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        sidePopup.setOutsideTouchable(true);
+        sidePopup.setElevation(dp(4));
+        sidePopup.showAsDropDown(anchor, 0, dp(2));
+    }
+
     private void updateManualVisibility() {
         boolean manual = !BatteryBarConfig.quickMode;
-        manualSection.setVisibility(manual ? View.VISIBLE : View.GONE);
+        quickSideRow.setVisibility(manual ? View.GONE : View.VISIBLE);
+        manualSection.setAlpha(manual ? 1f : 0.3f);
+        setManualSectionExpanded(manual);
         if (positionController != null) {
             positionController.setPositionControlsEnabled(manual);
         }
+        updateSafeAreaLock(manual);
+    }
+
+    private void updateSafeAreaLock(boolean manual) {
+        BatteryBarConfig.safeArea = true;
+        barSafeAreaCheck.setChecked(true);
+        barSafeAreaCheck.setEnabled(false);
+        barSafeAreaCheck.setAlpha(0.3f);
+        prefs().edit().putBoolean("batbar_safe_area", true).apply();
+    }
+
+    private void setManualSectionExpanded(boolean expanded) {
+        if (manualSectionHeader == null) return;
+        String clean = manualSectionHeader.getText().toString().replaceAll("^[▸▾]\\s*", "");
+        manualSectionHeader.setTag(expanded);
+        manualSection.setVisibility(expanded ? View.VISIBLE : View.GONE);
+        manualSectionHeader.setText((expanded ? "▾ " : "▸ ") + clean);
     }
 
     private SeekBar.OnSeekBarChangeListener simpleSeekBar(OnProgress handler) {
@@ -344,6 +562,14 @@ public class BatteryBarPanelController {
 
     private void restart() {
         FloatingService.restartModule(FloatingService.batteryBarModule());
+    }
+
+    private String schemeLabel(int scheme) {
+        switch (scheme) {
+            case BatteryBarConfig.SCHEME_CLASSIC: return "Klasik 3-warna";
+            case BatteryBarConfig.SCHEME_HUE: return "Hue Gradien";
+            default: return "Tanpa Skema";
+        }
     }
 
     private String sideLabel(String side) {

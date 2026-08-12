@@ -93,6 +93,8 @@ public class TextPanelController {
 
         TextConfig.text = editText.getText().toString().trim();
         if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit().putString("text_content", TextConfig.text).apply();
 
         if (FloatingService.instance != null) {
             FloatingService.createTextOverlayStatic();
@@ -160,6 +162,12 @@ public class TextPanelController {
     }
 
     private void loadConfig() {
+        String savedText = activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .getString("text_content", "FunText");
+        if (savedText.isEmpty()) savedText = "FunText";
+        TextConfig.text = savedText;
+        editText.setText(savedText);
+
         boolean overlayOn = activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                 .getBoolean("text_overlay_on", false);
         overlaySwitch.setChecked(overlayOn);
@@ -201,8 +209,11 @@ public class TextPanelController {
         editText.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                TextConfig.text = s.toString().trim();
-                if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
+                String value = s.toString().trim();
+                if (value.isEmpty()) value = "FunText";
+                TextConfig.text = value;
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putString("text_content", value).apply();
                 FloatingService.updateTextStatic();
             }
             @Override public void afterTextChanged(Editable s) {}
@@ -244,6 +255,8 @@ public class TextPanelController {
             if (isChecked) {
                 TextConfig.text = editText.getText().toString().trim();
                 if (TextConfig.text.isEmpty()) TextConfig.text = "FunText";
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putString("text_content", TextConfig.text).apply();
 
                 if (FloatingService.instance != null) {
                     FloatingService.createTextOverlayStatic();

@@ -456,24 +456,43 @@ public class MainActivity extends AppCompatActivity {
         BatteryBarConfig.quickMode = prefs.getBoolean("batbar_quick_mode", true);
         BatteryBarConfig.quickSide = prefs.getString("batbar_quick_side", "top");
         BatteryBarConfig.horizontal = prefs.getBoolean("batbar_horizontal", true);
+        BatteryBarConfig.invert = prefs.getBoolean("batbar_invert", false);
         BatteryBarConfig.length = prefs.getFloat("batbar_length", 0.5f);
         BatteryBarConfig.thickness = prefs.getInt("batbar_thickness", 8);
         BatteryBarConfig.color = prefs.getInt("batbar_color", Color.GREEN);
-        BatteryBarConfig.autoColor = prefs.getBoolean("batbar_auto_color", false);
+        if (prefs.contains("batbar_color_scheme")) {
+            BatteryBarConfig.colorScheme = prefs.getInt("batbar_color_scheme", BatteryBarConfig.SCHEME_NONE);
+        } else {
+            BatteryBarConfig.colorScheme = prefs.getBoolean("batbar_auto_color", false)
+                    ? BatteryBarConfig.SCHEME_CLASSIC : BatteryBarConfig.SCHEME_NONE;
+        }
         BatteryBarConfig.lowColor = prefs.getInt("batbar_low_color", Color.YELLOW);
         BatteryBarConfig.lowThreshold = prefs.getInt("batbar_low_threshold", 40);
         BatteryBarConfig.showEmptyStrip = prefs.getBoolean("batbar_show_empty_strip", true);
         BatteryBarConfig.emptyColor = prefs.getInt("batbar_empty_color", 0x66000000);
         BatteryBarConfig.radius = prefs.getInt("batbar_radius", 8);
-        BatteryBarConfig.fadeSpeed = prefs.getInt("batbar_fade_speed", 5);
+        BatteryBarConfig.fadeSpeed = prefs.getInt("batbar_fade_speed", 1800);
+        BatteryBarConfig.fadeEnabled = prefs.getBoolean("batbar_fade_enabled", false);
+        BatteryBarConfig.shineEnabled = prefs.getBoolean("batbar_shine_enabled", false);
+        BatteryBarConfig.shineSpeed = prefs.getInt("batbar_shine_speed", 1800);
+        BatteryBarConfig.shineWidth = prefs.getInt("batbar_shine_width", 25);
+        BatteryBarConfig.waveEnabled = prefs.getBoolean("batbar_wave_enabled", false);
+        BatteryBarConfig.waveSpeed = prefs.getInt("batbar_wave_speed", 1000);
+        BatteryBarConfig.waveAmplitude = prefs.getInt("batbar_wave_amplitude", 60);
+        BatteryBarConfig.chargeWaveEnabled = prefs.getBoolean("batbar_charge_wave_enabled", false);
+        BatteryBarConfig.chargeWaveSpeed = prefs.getInt("batbar_charge_wave_speed", 1000);
+        BatteryBarConfig.chargeWaveAmplitude = prefs.getInt("batbar_charge_wave_amplitude", 60);
         BatteryBarConfig.updateInterval = readFloatPref(prefs, "batbar_update_interval", 1f);
-        BatteryBarConfig.safeArea = prefs.getBoolean("batbar_safe_area", true);
         BatteryBarConfig.touchPassthrough = prefs.getBoolean("batbar_lock", true);
+        BatteryBarConfig.safeArea = true;
 
         TextConfig.patternEnabled = prefs.getBoolean("text_pattern_enabled", false);
         TextConfig.patternSpacingH = prefs.getFloat("text_pattern_spacing_h", 180f);
         TextConfig.patternSpacingV = prefs.getFloat("text_pattern_spacing_v", 220f);
         TextConfig.patternAngle = prefs.getFloat("text_pattern_angle", -30f);
+
+        String savedText = prefs.getString("text_content", "FunText");
+        if (!savedText.isEmpty()) TextConfig.text = savedText;
     }
 
     private float readFloatPref(SharedPreferences prefs, String key, float defaultVal) {
