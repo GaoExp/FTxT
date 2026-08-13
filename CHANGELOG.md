@@ -1,8 +1,12 @@
+# [4.85.4] - 2026-08-13 version code 181
+## 💡 Catatan
+- **Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama projec seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog**
+
+---
+
 # [4.85.3] - 2026-08-13 versionCode 180
 ### 🔧 Optimasi & Penyesuaian
 - **Fix rilis GitHub gagal karena override aapt2** — Property `android.aapt2FromMavenOverride=/usr/bin/aapt2` (ditambahkan di 4.85.1 untuk build lokal AndroidIDE aarch64) merujuk file yang **tidak ada di GitHub runner** (ubuntu x86_64), sehingga `assembleRelease` gagal dan release v4.85.2 tidak jadi terbit. Override kini hanya diterapkan saat sistem `aarch64` (via `app/build.gradle`); di CI AGP memakai aapt2 Maven default.
-## 💡 Catatan
-- **Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama projec seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog**
 
 ---
 
