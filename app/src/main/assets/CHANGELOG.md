@@ -1,4 +1,14 @@
-# [4.85.2] - 2026-08-11
+# [4.85.3] - 2026-08-13 versionCode 180
+### 🔧 Optimasi & Penyesuaian
+- **Fix rilis GitHub gagal karena override aapt2** — Property `android.aapt2FromMavenOverride=/usr/bin/aapt2` (ditambahkan di 4.85.1 untuk build lokal AndroidIDE aarch64) merujuk file yang **tidak ada di GitHub runner** (ubuntu x86_64), sehingga `assembleRelease` gagal dan release v4.85.2 tidak jadi terbit. Override kini hanya diterapkan saat sistem `aarch64` (via `app/build.gradle`); di CI AGP memakai aapt2 Maven default.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 180, versionName 4.85.3; set override aapt2 (`android.aapt2FromMavenOverride=/usr/bin/aapt2`) hanya saat `os.arch` berisi `aarch64` (AndroidIDE), CI x86_64 memakai aapt2 Maven default
+- `gradle.properties` — Hapus baris `android.aapt2FromMavenOverride=/usr/bin/aapt2` (menyebabkan rilis GitHub gagal)
+- `.github/workflows/release.yml` — Perbaiki regex judul entry CHANGELOG dari `^## [` menjadi `^# [` (CHANGELOG memakai satu `#`), sehingga release notes tidak lagi kosong
+
+---
+
+# [4.85.2] - 2026-08-11 versionCode 179
 ### ✨ Fitur Baru
 - **Kontrol animasi Shine Battery Bar** — Efek shine saat charging kini bisa disesuaikan dari section **Animasi Pengisian Daya**: **Checkbox "Animasi Shine"** untuk menyalakan/mematikan efek (default nonaktif — harus diaktifkan manual); **slider Kecepatan Shine** 0,2–2,0 detik (step 0,1 detik, default 1,8 detik, durasi satu sapuan band); **slider Lebar Band** 2–98% dari panjang bar (default 25%). Nilai tersimpan di prefs `batbar_shine_enabled`, `batbar_shine_speed`, `batbar_shine_width` dan ikut serta dalam preset (`shineEnabled`/`shineSpeed`/`shineWidth`).
 - **Animasi Wave (kedutan gelombang) saat baterai rendah** — Efek animasi baru di section **Animasi Baterai Rendah**: saat level baterai di bawah ambang low (dan tidak charging), warna isi bar digambar berlapis dengan pola gelombang sinus yang **menjalar** sepanjang bar (2 siklus), terlihat seperti denyut energi yang merambat. Dikontrol lewat **Checkbox "Animasi Wave"** (default nonaktif — harus diaktifkan manual), **slider Kecepatan Wave** 0,2–2,0 detik (step 0,1 detik, default 1,0 detik, durasi satu siklus gelombang), dan **slider Intensitas Wave** 10–100% (default 60%, menentukan kontras gelap-terang gelombang). Berjalan bersamaan dengan animasi fade low. Nilai tersimpan di prefs `batbar_wave_enabled`, `batbar_wave_speed`, `batbar_wave_amplitude` dan ikut serta dalam preset (`waveEnabled`/`waveSpeed`/`waveAmplitude`).
@@ -39,12 +49,10 @@
 - `app/src/main/java/exp/ftxt/MainActivity.java` — Muat `TextConfig.text` dari prefs `text_content` di `loadShadowConfigs()`; muat prefs `batbar_invert` ke `BatteryBarConfig.invert`; load `batbar_color_scheme` dengan migrasi otomatis dari `batbar_auto_color` lama; load prefs `batbar_shine_enabled`/`batbar_shine_speed`/`batbar_shine_width`; default `batbar_fade_speed` diubah ke 1800; load prefs `batbar_wave_enabled`/`batbar_wave_speed`/`batbar_wave_amplitude`; default load prefs animasi jadi `false`; `safeArea` selalu dipaksa `true`
 - `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Field `barInvert` + `barColorScheme` untuk preset Battery Bar + `shineEnabled`/`shineSpeed`/`shineWidth` + `waveEnabled`/`waveSpeed`/`waveAmplitude`
 - `app/src/main/res/layout/panel_battery_bar.xml` — Baris switch label dua sisi "Mode Cepat [switch] Manual" diganti **segment button** dua tombol, chevron Posisi dihapus, kontrol posisi dipindah ke bawah panjang bar, checkbox Kunci Posisi disabled + alpha 30% dengan label "(tidak tersedia)", CheckBox "Horizontal" diganti **RadioGroup Horizontal/Vertikal**, **Checkbox Invert** diletakkan sebaris di samping opsi Vertikal, header section **"Baterai Rendah" → "Efek dan Animasi"**, checkbox **Warna Level** diganti **label + tombol pemilih skema** (`batbarColorSchemeLabel` + `batbarSchemeSelector`); tambah kontrol **Animasi Shine** di section Efek dan Animasi (`batbarShineCheck`, `batbarShineSpeedLabel`+`batbarShineSpeedSeekBar` 0,2–2,0 dtk, `batbarShineWidthLabel`+`batbarShineWidthSeekBar` 2–98%); slider `batbarFadeSpeedSeekBar` & `batbarShineSpeedSeekBar` max 18 (0,2–2,0 detik step 0,1); tambah id `batbarLowColorLabel` untuk label Warna Low; checkbox `batbarSafeAreaCheck` dipindah dari section Mode Manual ke section Tampilan sebaris dengan `batbarShowEmptyStripCheck` (label "Area Aman"); tambah kontrol **Animasi Wave** di section **Animasi Baterai Rendah** (`batbarWaveCheck`, `batbarWaveSpeedLabel`+`batbarWaveSpeedSeekBar` 0,2–2,0 dtk, `batbarWaveAmplitudeLabel`+`batbarWaveAmplitudeSeekBar` 10–100%); tambah kontrol **Wave saat charging** di section **Animasi Pengisian Daya** (`batbarChargeWaveCheck`, `batbarChargeWaveSpeedLabel`+`batbarChargeWaveSpeedSeekBar` 0,2–2,0 dtk, `batbarChargeWaveAmplitudeLabel`+`batbarChargeWaveAmplitudeSeekBar` 10–100%) + checkbox **Animasi Fade** (`batbarFadeCheck`); section **"Efek dan Animasi"** dipecah jadi dua chevron: **"Animasi Pengisian Daya"** (`batbar_sectionChargeHeader`/`batbar_sectionCharge` — shine check + kecepatan + lebar band + charge wave) dan **"Animasi Baterai Rendah"** (`batbar_sectionLowAnimHeader`/`batbar_sectionLowAnim` — warna low, ambang low, fade, wave)
-### 🔢 Version
-`4.85.1` → `4.85.2`
 
 ---
 
-# [4.85.1] - 2026-08-11
+# [4.85.1] - 2026-08-11 versionCode 178
 ### ✨ Fitur Baru
 - **Modul Battery Bar** — Modul overlay baru `features/battery_bar` (BatteryBarConfig + BatteryBarView + BatteryBarModule) menampilkan bar baterai sebagai strip di layar. Dua mode: **Mode Cepat** (snap ke sisi atas/bawah/kiri/kanan dengan panjang penuh sisi, pilih sisi lewat popup) dan **Mode Manual** (panjang 0–100% + posisi bebas per orientasi `_port`/`_land`). Orientasi bar (horizontal/vertikal) otomatis mengikuti mode. Fitur panel: ketebalan, warna fill, strip kosong + warna, radius sudut, auto-color (hijau→kuning→merah mengikuti level), warna low + ambang low (fade berkedip saat rendah), kecepatan fade, animasi shine saat charging, shadow, kunci posisi (touch passthrough), area aman, dan preset khusus `moduleType "battery_bar"` dengan field bar tersendiri.
 ### ♻️ Perubahan Fitur
@@ -89,12 +97,10 @@
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Cek aktif & label "Bar"
 - `app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java` — Parameter `View` (sebelumnya `TextView`) agar cocok dengan BatteryBarView
 - `gradle.properties` — `android.aapt2FromMavenOverride=/usr/bin/aapt2` (aapt2 Maven AGP x86-64 tidak bisa jalan di sistem aarch64)
-### 🔢 Version
-`4.85.0` → `4.85.1`
 
 ---
 
-# [4.85.0] - 2026-08-04
+# [4.85.0] - 2026-08-04 versionCode 177
 ### ✨ Fitur Baru
 - **Battery Stats — suhu & persentase jadi satu kesatuan modul** — Modul `features/battery_stats` (BatteryStatsConfig + BatteryStatsModule) menggabungkan komponen suhu (°C) dan persentase (%) menjadi satu modul utuh, persis pola Battery Current yang menggabungkan tegangan/arus/daya. Satu overlay, satu panel, satu konfigurasi (warna, label, shadow, background, posisi, safe area, interval 0.2–10 detik), satu preset, satu key prefs (`battery_*`). Checkbox **°C** dan **%** di panel mengontrol komponen yang tampil; keduanya bisa tampil bersamaan dalam satu overlay.
 ### 🚮 Fitur Dihapus
@@ -149,12 +155,10 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java`
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryPercentagePanelFragment.java`
 - `app/src/main/res/layout/panel_battery_percentage.xml`
-### 🔢 Version
-`4.84.1` → `4.85.0`
 
 ---
 
-# [4.84.1] - 2026-08-04
+# [4.84.1] - 2026-08-04 versionCode 176
 ### 🔧 Optimasi & Penyesuaian
 - **Hapus dead code konstruktor lama `(Activity)`** — Semua PositionController & PanelController punya konstruktor lama yang sudah tidak dipakai setelah refactor ke fragment. Konstruktor lama berpotensi NPE karena `findViewById(android.R.id.content)` mengembalikan `null`. 15 konstruktor + 13 method `bindViews()` tanpa parameter dihapus dari 15 file controller.
 - **Hapus import `CheckBox` ganda** — Import duplikat dihapus dari `FpsPanelController.java` dan `BatteryPercentagePanelController.java`.
@@ -202,12 +206,10 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
 - `app/src/main/java/exp/ftxt/ui/BatteryPercentagePositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
 - `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Hapus konstruktor lama + method `bindViews()` tanpa parameter
-### 🔢 Version
-`4.84.0` → `4.84.1`
 
 ---
 
-# [4.84.0] - 2026-07-28
+# [4.84.0] - 2026-07-28 versionCode 175
 ### ✨ Fitur Baru
 - **Tanggal di Bawah Jam — Tampilan dua baris** — Clock module sekarang menampilkan tanggal di bawah jam dalam format dua baris (`HH:mm:ss` di atas, `MMM dd EE` di bawah). Diaktifkan secara default. Bisa di-toggle via panel jam (checkbox "Tanggal").
 ### ♻️ Perubahan Fitur
@@ -232,12 +234,10 @@
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryCurrentPanelFragment.java` — Isi lifecycle
 - `app/src/main/java/exp/ftxt/ui/fragment/NetworkPanelFragment.java` — Isi lifecycle
 - `app/src/main/java/exp/ftxt/ui/fragment/ColorPickerPanelFragment.java` — Isi lifecycle
-### 🔢 Version
-`4.83.2` → `4.84.0`
 
 ---
 
-# [4.83.2] - 2026-07-28
+# [4.83.2] - 2026-07-28 versionCode 174
 ### ✨ Fitur Baru
 - **Ikon Notifikasi Dinamis — nilai suhu baterai di status bar** — Ikon notifikasi foreground service sekarang menampilkan nilai suhu baterai aktual (misal `37°`) yang di-generate secara dinamis sebagai Bitmap. Update setiap 10 detik. Title notifikasi juga menampilkan suhu (misal `FTxT 37°C`).
 ### 🔧 Optimasi & Penyesuaian
@@ -254,8 +254,6 @@
 - `app/src/main/java/exp/ftxt/features/battery_percentage/BatteryPercentageModule.java` — Tambah `params = null` di `stop()`
 - `app/src/main/java/exp/ftxt/features/battery_current/BatteryCurrentModule.java` — Tambah `params = null` di `stop()`
 - `app/src/main/java/exp/ftxt/features/network_stats/NetworkModule.java` — Tambah `params = null` di `stop()`
-### 🔢 Version
-`4.83.1` → `4.83.2`
 
 ---
 

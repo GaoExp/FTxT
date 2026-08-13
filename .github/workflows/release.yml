@@ -89,8 +89,8 @@ jobs:
           VERSION="${VERSION#v}"
 
           NOTES=$(awk -v ver="$VERSION" '
-            $0 ~ "^## \\[" ver "\\]" { found=1; skip=0; next }
-            found && /^## \[/ { exit }
+            $0 ~ "^# \\[" ver "\\]" { found=1; skip=0; next }
+            found && /^# \[/ { exit }
             found && /^### / {
               if ($0 ~ /🗒️ File Added|✏️ File Changed|🔥 File Removed/) {
                 skip=1; next

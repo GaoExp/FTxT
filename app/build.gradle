@@ -1,3 +1,9 @@
+// Override aapt2 hanya diterapkan di sistem aarch64 (AndroidIDE).
+// Di CI (ubuntu x86_64) biarkan AGP memakai aapt2 dari Maven agar rilis GitHub tidak gagal.
+if (System.getProperty("os.arch", "").toLowerCase().contains("aarch64")) {
+    project.setProperty("android.aapt2FromMavenOverride", "/usr/bin/aapt2")
+}
+
 apply plugin: 'com.android.application'
 
 // Load keystore properties from the project root (optional; file may not exist on all machines/CI)
@@ -21,8 +27,8 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 179
-        versionName "4.85.2"
+        versionCode 180
+        versionName "4.85.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

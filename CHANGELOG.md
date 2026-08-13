@@ -1,3 +1,13 @@
+# [4.85.3] - 2026-08-13 versionCode 180
+### 🔧 Optimasi & Penyesuaian
+- **Fix rilis GitHub gagal karena override aapt2** — Property `android.aapt2FromMavenOverride=/usr/bin/aapt2` (ditambahkan di 4.85.1 untuk build lokal AndroidIDE aarch64) merujuk file yang **tidak ada di GitHub runner** (ubuntu x86_64), sehingga `assembleRelease` gagal dan release v4.85.2 tidak jadi terbit. Override kini hanya diterapkan saat sistem `aarch64` (via `app/build.gradle`); di CI AGP memakai aapt2 Maven default.
+### ✏️ File Changed
+- `app/build.gradle` — versionCode 180, versionName 4.85.3; set override aapt2 (`android.aapt2FromMavenOverride=/usr/bin/aapt2`) hanya saat `os.arch` berisi `aarch64` (AndroidIDE), CI x86_64 memakai aapt2 Maven default
+- `gradle.properties` — Hapus baris `android.aapt2FromMavenOverride=/usr/bin/aapt2` (menyebabkan rilis GitHub gagal)
+- `.github/workflows/release.yml` — Perbaiki regex judul entry CHANGELOG dari `^## [` menjadi `^# [` (CHANGELOG memakai satu `#`), sehingga release notes tidak lagi kosong
+
+---
+
 # [4.85.2] - 2026-08-11 versionCode 179
 ### ✨ Fitur Baru
 - **Kontrol animasi Shine Battery Bar** — Efek shine saat charging kini bisa disesuaikan dari section **Animasi Pengisian Daya**: **Checkbox "Animasi Shine"** untuk menyalakan/mematikan efek (default nonaktif — harus diaktifkan manual); **slider Kecepatan Shine** 0,2–2,0 detik (step 0,1 detik, default 1,8 detik, durasi satu sapuan band); **slider Lebar Band** 2–98% dari panjang bar (default 25%). Nilai tersimpan di prefs `batbar_shine_enabled`, `batbar_shine_speed`, `batbar_shine_width` dan ikut serta dalam preset (`shineEnabled`/`shineSpeed`/`shineWidth`).
