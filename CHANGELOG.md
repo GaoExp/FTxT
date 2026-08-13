@@ -1,10 +1,8 @@
 # [4.85.3] - 2026-08-13 versionCode 180
 ### 🔧 Optimasi & Penyesuaian
 - **Fix rilis GitHub gagal karena override aapt2** — Property `android.aapt2FromMavenOverride=/usr/bin/aapt2` (ditambahkan di 4.85.1 untuk build lokal AndroidIDE aarch64) merujuk file yang **tidak ada di GitHub runner** (ubuntu x86_64), sehingga `assembleRelease` gagal dan release v4.85.2 tidak jadi terbit. Override kini hanya diterapkan saat sistem `aarch64` (via `app/build.gradle`); di CI AGP memakai aapt2 Maven default.
-### ✏️ File Changed
-- `app/build.gradle` — versionCode 180, versionName 4.85.3; set override aapt2 (`android.aapt2FromMavenOverride=/usr/bin/aapt2`) hanya saat `os.arch` berisi `aarch64` (AndroidIDE), CI x86_64 memakai aapt2 Maven default
-- `gradle.properties` — Hapus baris `android.aapt2FromMavenOverride=/usr/bin/aapt2` (menyebabkan rilis GitHub gagal)
-- `.github/workflows/release.yml` — Perbaiki regex judul entry CHANGELOG dari `^## [` menjadi `^# [` (CHANGELOG memakai satu `#`), sehingga release notes tidak lagi kosong
+## 💡 Catatan
+- **Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama projec seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog**
 
 ---
 
@@ -38,7 +36,6 @@
 - `app/src/main/res/drawable/bg_segment_active.xml` — Background tombol segment aktif (rounded, `#4A90D9`)
 - `app/src/main/res/drawable/bg_segment_inactive.xml` — Background tombol segment non-aktif (transparan, rounded)
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 179, versionName 4.85.2
 - `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarConfig.java` — Field `invert` (arah pengisian dibalik); ganti `autoColor` → `colorScheme` (konstanta `SCHEME_NONE`/`SCHEME_CLASSIC`/`SCHEME_HUE`) + helper `isAutoColor()`; field `shineEnabled`/`shineSpeed`/`shineWidth` (kontrol animasi shine); `fadeSpeed` diubah makna jadi durasi ms (default 1800); tambah field `waveEnabled`/`waveSpeed`/`waveAmplitude`; default animasi (`fadeEnabled`/`shineEnabled`/`waveEnabled`/`chargeWaveEnabled`) jadi `false`, default `safeArea` tetap `true`
 - `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarView.java` — Method `setInvert()`; logika fill & band shine dibalik saat invert (horizontal isi kanan→kiri, vertikal isi atas→bawah, shine searah); band shine dipotong per segmen sesuai level: area terisi `PorterDuff.Mode.SCREEN` alpha 100%, area kosong alpha 40%; arah shine vertikal dibalik menyapu bawah → atas (searah pengisian); render warna skema **Klasik** (ambang 20/10) & **Hue Gradien** 3 segmen (0–20% hue 1° S70%; 21–50% hue 2°→100° S70%; 51–100% hue 102°→260° S71%→100%); method `setShineConfig()` + durasi shine dinamis (`shineSpeed`) + lebar band dinamis (`shineWidthPercent`); `setFadeSpeed()`/`startFade()` memakai durasi langsung ms (clamp 200–2000); tambah `setWaveConfig()`; animator wave (0–1, durasi `waveSpeed`, INFINITE); render fill berlapis saat low: dasar alpha `fillAlpha×(1-amp)` + overlay segmen gelombang sinus menjalar (`drawWaveFill()`, 2 siklus, alpha boost per segmen, arah mengikuti orientasi & invert); `stopWave()` di `onDetachedFromWindow()`; arah gelombang wave charging dibalik (offset negatif, menjalar searah pengisian)
 - `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarModule.java` — Teruskan `BatteryBarConfig.invert` & `colorScheme` ke view di `start()`/`applyAppearance()`/`reloadLayout()`; teruskan `shineEnabled`/`shineSpeed`/`shineWidth`; teruskan `setWaveConfig()` di `start()`/`applyAppearance()`; margin 8dp dihapus di Mode Cepat (margin 0, bar menempel penuh ke sisi)
@@ -74,7 +71,6 @@
 - `app/src/main/java/exp/ftxt/ui/fragment/BatteryBarPanelFragment.java` — Fragment panel
 - `app/src/main/res/layout/panel_battery_bar.xml` — Layout panel
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 178, versionName 4.85.1
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — `reloadAllPositions()` panggil `module.reloadPosition()`; field/getter/`ensureBatteryBarModule()`/start modul Battery Bar
 - `app/src/main/java/exp/ftxt/MainActivity.java` — Load prefs `batbar_*`, import `BatteryBarConfig`, item sidebar `navBatteryBar`, `panelIdToName` → `battery_bar`, judul toolbar, `isAnyModuleActive()` cek `BatteryBarConfig`, merge item default yang hilang ke sidebar tersimpan (`addMissingDefaultItems()`)
 - `app/src/main/java/exp/ftxt/shared/preset/OverlayPreset.java` — Tambah field `moduleType` + field preset Battery Bar (quickMode, quickSide, barHorizontal, barLength, barThickness, autoColor, lowColor, lowThreshold, showEmptyStrip, emptyColor, barRadius, fadeSpeed)
@@ -96,7 +92,6 @@
 - `app/src/main/java/exp/ftxt/core/BootReceiver.java` — Load `batbar_enabled` + cek aktif
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Cek aktif & label "Bar"
 - `app/src/main/java/exp/ftxt/shared/ui/OverlayShadow.java` — Parameter `View` (sebelumnya `TextView`) agar cocok dengan BatteryBarView
-- `gradle.properties` — `android.aapt2FromMavenOverride=/usr/bin/aapt2` (aapt2 Maven AGP x86-64 tidak bisa jalan di sistem aarch64)
 
 ---
 
@@ -118,7 +113,6 @@
 - `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Modul overlay satu kesatuan: tampilkan suhu °C dan/atau persen %, update per interval, dukungan safe area & drag
 - `app/src/debug/res/values/strings.xml` — Resource `app_name` "FTxTdebug" untuk build type debug
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 177, versionName 4.85.0
 - `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Format suhu dinamis: integer tanpa desimal saat nilai kelipatan 10, 1 desimal `%.1f°C` saat non-kelipatan-10
 - `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsConfig.java` — Tambah field `separatorColor` (default abu-abu)
 - `app/src/main/java/exp/ftxt/features/battery_stats/BatteryStatsModule.java` — Render pemisah `|` dengan warna `separatorColor` + method `updateSeparatorColor()`
@@ -176,7 +170,6 @@
 - `app/src/main/java/exp/ftxt/ui/fragment/LogoPanelFragment.java` — Fragment untuk panel Logo (placeholder)
 - `app/src/debug/res/mipmap-anydpi-v26/ic_launcher.xml` — Ikon launcher alternatif untuk build debug
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 176, versionName 4.84.1; tambah `applicationIdSuffix ".debug"` + `resValue "app_name"` di build type `debug`
 - `app/src/main/java/exp/ftxt/MainActivity.java` — `panelIdToName()` tambah `navCrosshair`→`crosshair`, `navLogo`→`logo`; fallback default ke panel text saat nilai tersimpan tidak dikenal; `updateActionBarTitle()` tambah judul untuk crosshair & logo; hapus `System.exit(0)` di `forceClose()` (mencegah data prefs hilang sebelum `.apply()` ter-flush)
 - `app/src/main/java/exp/ftxt/core/NotificationActionReceiver.java` — Hapus `System.exit(0)` di `handleKillService()` (mencegah data prefs hilang sebelum `.apply()` ter-flush)
 - `app/src/main/java/exp/ftxt/ui/PanelManager.java` — Guard null & validasi `panelMap` di `showPanel()`, `executePendingTransactions()` sebelum loop, `setReorderingAllowed(true)`, hide hanya fragment yang sedang tampil, `runOnCommit` untuk memanggil `onPanelShown()` setelah panel tampil
@@ -215,7 +208,6 @@
 ### ♻️ Perubahan Fitur
 - **Refactor Panel Navigation — Fragment-based** — Ubah sistem navigasi panel dari View visibility manual ke Fragment-based. Setiap panel (text, fps, clock, battery, battery_pct, battery_cur, network, color_picker) punya Fragment sendiri + PanelManager untuk mengelola show/hide. Semua PanelController & PositionController mendapat overload konstruktor dengan `(Activity, View rootView)` untuk binding di Fragment. bindViews() lama delegasi ke bindViews(rootView). MainActivity di-refactor: hapus semua field View panel, field controller, hideAllPanels(), dan if-else visibility — ganti dengan PanelManager.
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 175, versionName 4.84.0
 - `app/src/main/java/exp/ftxt/features/clock_module/ClockConfig.java` — Tambah field `showDate` (default `true`)
 - `app/src/main/java/exp/ftxt/features/clock_module/ClockModule.java` — Update `getCurrentTime()` untuk tampilkan tanggal via `\n` saat `showDate` aktif, tambah `setLineSpacing` & `setIncludeFontPadding(false)` untuk tampilan dua baris
 - `app/src/main/res/layout/panel_clock.xml` — Tambah checkbox "Tanggal" (`clockShowDateSwitch`)
@@ -243,7 +235,6 @@
 ### 🔧 Optimasi & Penyesuaian
 - **Optimasi Memori & Proses — Lazy Init, Conditional Resources** — Hemat memori dan baterai dengan 5 perubahan: (1) **Lazy Init Module** — 7 module overlay tidak lagi diinstansiasi semua di `onCreate()`. Module baru dibuat saat pertama diaktifkan. (2) **Cleanup Module saat Stop** — Null-kan `params` dan `choreographer` saat module di-stop agar bisa di-GC. (3) **Conditional WakeLock** — WakeLock hanya diambil jika ada module yang aktif. Saat semua overlay mati, CPU bisa tidur. (4) **Conditional BroadcastReceiver** — Receiver `CONFIG_CHANGED` hanya aktif saat ada overlay berjalan. (5) **Conditional Service Stop** — Service otomatis `stopSelf()` saat module terakhir di-stop.
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 174, versionName 4.83.2
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Tambah `generateIcon()` (Bitmap dinamis dari teks), `getBatteryTemp()` (baca suhu baterai), `buildNotificationDynamic()` (notifikasi dengan `Icon.createWithBitmap` + `DecoratedCustomViewStyle`), `startIconCycling()`/`stopIconCycling()` (update setiap 10 detik)
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Lazy init module (`ensure*Module()`), conditional WakeLock (`acquireWakeLockIfNeeded`/`releaseWakeLockIfEmpty`), conditional BroadcastReceiver (`registerConfigReceiver`/`unregisterConfigReceiver`), conditional service stop (`stopSelfIfEmpty`), panggil `NotificationHelper.startIconCycling()` di `onCreate()` dan `stopIconCycling()` di `onDestroy()`
 - `app/src/main/java/exp/ftxt/core/WakeLockManager.java` — Tambah method `isHeld()`
@@ -263,7 +254,6 @@
 ### 🗒️ File Added
 - `app/src/main/java/exp/ftxt/shared/ui/OverlayModule.java` — Interface untuk menyeragamkan method semua modul overlay
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 173, versionName 4.83.1
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Hapus ~430 baris static delegates, tambah method generik + static getters, pakai loop di onCreate/onDestroy
 - `app/src/main/java/exp/ftxt/features/floating_text/TextModule.java` — Implement OverlayModule: +start() +stop() +isRunning() +updateLabelColor() +@Override
 - `app/src/main/java/exp/ftxt/features/fps_display/FpsModule.java` — Implement OverlayModule: +init() overload +@Override
@@ -286,8 +276,6 @@
 - `app/src/main/java/exp/ftxt/ui/BatteryCurrentPositionController.java` — Ganti static delegates ke method generik
 - `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Ganti static delegates ke method generik
 - `app/src/main/java/exp/ftxt/ui/NetworkPositionController.java` — Ganti static delegates ke method generik
-### 🔢 Version
-`4.83.0` → `4.83.1`
 
 ---
 
@@ -306,7 +294,6 @@
 - `app/src/main/res/drawable/ic_notification_stop.xml` — Icon kill service untuk notifikasi
 - `app/src/main/res/drawable/ic_notification_open.xml` — Icon buka aplikasi untuk notifikasi
 ### ✏️ File Changed
-- `app/build.gradle` — versionCode 172, versionName 4.83.0
 - `app/src/main/AndroidManifest.xml` — Register NotificationActionReceiver
 - `app/src/main/java/exp/ftxt/core/FloatingService.java` — Tambah updateNotification() + stopAllModules() + hideAllOverlays() + showAllOverlays() + areAllOverlaysHidden()
 - `app/src/main/java/exp/ftxt/core/NotificationHelper.java` — Ganti ke custom RemoteViews layout + onClickPendingIntent + setImageViewResource + hapus addAction
@@ -321,9 +308,6 @@
 - `app/src/main/res/drawable/ic_notification_toggle_off.xml` — Hapus tint textColorPrimary
 - `app/src/main/res/drawable/ic_notification_stop.xml` — Hapus tint textColorPrimary
 - `app/src/main/res/drawable/ic_notification_open.xml` — Hapus tint textColorPrimary
-- `.gitignore` — Tambah `/_temp/`
-### 🔢 Version
-`4.82.4` → `4.83.0`
 
 ---
 
@@ -383,7 +367,6 @@
 ---
 
 # [3.11.3.78.0 – 3.9.3.74.2] - 2026-06-12–13
-Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Mode Tandai & aksi batch preset** — Tombol Tandai/Tandai Semua, aksi batch (Hapus/Favorit/Bagikan/Ekspor), opsi Gunakan Preset, drag reorder.
 - **Opsi Ganti Ikon Aplikasi** — Toggle Default/Alternatif di Konfigurasi.
@@ -402,7 +385,6 @@ Menggabungkan 5 release.
 ---
 
 # [3.9.3.74.1 – 3.9.3.72.0] - 2026-06-12
-Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Sembunyikan Label Battery Current** — Opsi value-only di panel Battery Current, voltase dalam V bukan mV.
 - **Sembunyikan Label Network Stats** — Opsi value-only di panel Network Stats.
@@ -425,7 +407,6 @@ Menggabungkan 5 release.
 ---
 
 # [3.9.3.71.0 – 3.9.3.69.6] - 2026-06-11–12
-Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Interval Update float 0.2–10s** — FPS, Network, Battery Current, Battery Temperature: step 0.2s, 0.5s, 0.75s, 1–10s.
 - **Kontrol Interval Battery Stats** — Tombol -/+ di panel Battery, interval 1–10 detik.
@@ -434,13 +415,12 @@ Menggabungkan 5 release.
 - **Centralized isAnyModuleActive()** — Ekstrak logic cek modul aktif ke method terpusat di MainActivity.
 ### 🐞 Bug Fixes
 - **Semua modul ikut nonaktif saat satu dimatikan** — `isAnyModuleActive()` cek semua 7 modul, bukan 1–2.
-- **CI signing path dobel app/app/** — storeFile `app/release.jks` → `release.jks`.
+- **CI signing path dobel app/app/ ** — storeFile `app/release.jks` → `release.jks`.
 - **APK release tidak signed** — Tambah step generate keystore.properties di workflow.
 
 ---
 
 # [3.9.3.69.5 – 3.9.3.69.1] - 2026-06-11
-Menggabungkan 5 release.
 ### ♻️ Perubahan Fitur
 - **Collapsible Section Grouping** — Semua 8 panel: section Tampilan, Posisi, Shadow, Background collapsible dengan SectionHelper.
 - **release.yml decode keystore** — Tambah step decode & mkdir untuk CI.
@@ -455,7 +435,6 @@ Menggabungkan 5 release.
 ---
 
 # [3.9.3.69.0 – 3.9.3.67.0] - 2026-06-01–02
-Menggabungkan 5 release.
 ### ✨ Fitur Baru
 - **Watermark Overlay** — Modul watermark teks kustom (ukuran 5–200sp, shadow, bg, posisi, touch passthrough, safe area).
 - **Watermark Seal Pattern** — Mode segel: teks diulang diagonal dengan kontrol spasi H/V dan sudut.
@@ -476,7 +455,6 @@ Menggabungkan 5 release.
 ---
 
 # [3.9.3.66.0 – 2.6.2.48.0] - 2026-05-16–06-01
-Menggabungkan 5 entry CHANGELOG (1 individual + 4 merger).
 ### ✨ Fitur Baru
 - **Preset System v2** — UUID-based index, metadata (tags, favorite, timestamps), thumbnail generation, version history (10), partial-apply API, search/filter, share intent, file picker import.
 - **Safe Area** — Checkbox "Gunakan Area Aman" di 6 panel overlay.
@@ -506,7 +484,6 @@ Menggabungkan 5 entry CHANGELOG (1 individual + 4 merger).
 ---
 
 # [2.6.1.42.0 – 2.3.1.15.0] - 2026-05-16–06-01
-Menggabungkan 5 entry CHANGELOG (masing-masing sudah merger 5 release = ~25 release).
 ### ✨ Fitur Baru
 - **Classic Color Wheel** — Full disk + crosshair, two-way sync dengan slider ARGB.
 - **Kontrol Posisi 3-in-1** — Slider X/Y, D-Pad, XY Pad dengan shared state float 0.0–1.0.
@@ -532,9 +509,9 @@ Menggabungkan 5 entry CHANGELOG (masing-masing sudah merger 5 release = ~25 rele
 - **Sistem Grup Sidebar** — Flat list.
 - **Hardcoded background** — Background dan shadow terpisah.
 - **Shadow Opacity** — Alpha via color picker.
-- **Module temp/** — Hapus folder deprecated.
+- **Module temp/ ** — Hapus folder deprecated.
 ### ♻️ Perubahan Fitur
-- **modules/ → features/** — Refactor package structure.
+- **modules/ → features/ ** — Refactor package structure.
 - **Popup settings di bawah ikon** — PopupMenu + Gravity.END.
 - **SettingsActivity → Konfigurasi** — Ringkas, hanya izin.
 - **Dokumentasi via popup** — Dipindah dari Settings.
