@@ -247,10 +247,10 @@ FTxT/
 | Menu XML | 2 |
 | Anim XML | 2 |
 | XML lainnya (Manifest) | 1 |
-| Assets (md) | 5 |
+| Assets (md) | 4 |
 | Root dokumen | 5 |
 | Root konfigurasi | 5 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~243** |
+| **Total file** | **~242** |
 | **Total direktori** | **~61** |

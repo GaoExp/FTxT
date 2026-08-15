@@ -89,6 +89,9 @@ public class BatteryBarView extends View {
         this.shineEnabled = enabled;
         this.shineSpeed = Math.max(200, speedMs);
         this.shineWidthPercent = Math.max(2, Math.min(98, widthPercent));
+        if (shineAnimator != null) {
+            stopShine();
+        }
         updateAnimators();
         invalidate();
     }
@@ -144,7 +147,7 @@ public class BatteryBarView extends View {
     private void startShine() {
         if (shineAnimator != null) return;
         shineAnimator = ValueAnimator.ofFloat(-0.5f, 1.5f);
-        shineAnimator.setDuration(shineSpeed);
+        shineAnimator.setDuration((long) (shineSpeed * WAVE_CYCLES * 2));
         shineAnimator.setRepeatCount(ValueAnimator.INFINITE);
         shineAnimator.setInterpolator(new LinearInterpolator());
         shineAnimator.addUpdateListener(a -> {
@@ -242,7 +245,7 @@ public class BatteryBarView extends View {
     private int fadeSpeed = 1800;
 
     public void setFadeSpeed(int speed) {
-        this.fadeSpeed = Math.max(200, Math.min(2000, speed));
+        this.fadeSpeed = Math.max(200, Math.min(5000, speed));
     }
 
     public void setFadeEnabled(boolean enabled) {

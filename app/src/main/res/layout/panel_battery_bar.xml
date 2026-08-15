@@ -46,45 +46,30 @@
 
             </LinearLayout>
 
-            <!-- Mode Cepat / Manual: segment button (satu pilihan aktif) -->
-            <LinearLayout
+            <!-- Mode Cepat / Manual: radio button (satu pilihan aktif) -->
+            <RadioGroup
+                android:id="@+id/batbar_modeGroup"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginTop="8dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_segment_container"
-                android:padding="3dp">
+                android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/batbar_segmentQuick"
+                <RadioButton
+                    android:id="@+id/batbar_modeQuick"
                     android:text="Mode Cepat"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:paddingVertical="8dp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="@drawable/bg_segment_active"/>
+                    android:checked="true"/>
 
-                <TextView
-                    android:id="@+id/batbar_segmentManual"
+                <RadioButton
+                    android:id="@+id/batbar_modeManual"
                     android:text="Manual"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:paddingVertical="8dp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="@drawable/bg_segment_inactive"/>
+                    android:layout_weight="1"/>
 
-            </LinearLayout>
+            </RadioGroup>
 
             <!-- Posisi Sisi (hanya tampil saat Mode Cepat) -->
             <LinearLayout
@@ -510,7 +495,7 @@
 
                 <SeekBar
                     android:id="@+id/batbarShineSpeedSeekBar"
-                    android:max="18"
+                    android:max="48"
                     android:progress="16"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -531,7 +516,7 @@
 
                 <CheckBox
                     android:id="@+id/batbarChargeWaveCheck"
-                    android:text="Animasi Wave (gelombang mengalir ke kanan)"
+                    android:text="Animasi Wave"
                     android:layout_marginTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -545,7 +530,7 @@
 
                 <SeekBar
                     android:id="@+id/batbarChargeWaveSpeedSeekBar"
-                    android:max="18"
+                    android:max="48"
                     android:progress="8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -656,14 +641,14 @@
 
                 <SeekBar
                     android:id="@+id/batbarFadeSpeedSeekBar"
-                    android:max="18"
+                    android:max="48"
                     android:progress="16"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
                 <CheckBox
                     android:id="@+id/batbarWaveCheck"
-                    android:text="Animasi Wave (kedutan gelombang)"
+                    android:text="Animasi Wave"
                     android:layout_marginTop="8dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
@@ -677,7 +662,7 @@
 
                 <SeekBar
                     android:id="@+id/batbarWaveSpeedSeekBar"
-                    android:max="18"
+                    android:max="48"
                     android:progress="8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>

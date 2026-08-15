@@ -19,6 +19,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class BatteryPanelController {
@@ -420,6 +421,25 @@ public class BatteryPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("battery_safe_area", isChecked).apply();
         });
+
+        batterySizeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", batterySizeSeekBar, 140, batterySizeLabel, "Ukuran Teks: "));
+        batteryBgPaddingLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", batteryBgPaddingSeekBar, 80, batteryBgPaddingLabel, "Ukuran Background: "));
+        batteryBgOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset X", batteryBgOffsetXSeekBar, batteryBgOffsetXLabel, "Offset X: "));
+        batteryBgOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset Y", batteryBgOffsetYSeekBar, batteryBgOffsetYLabel, "Offset Y: "));
+        batteryBgMarginLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Margin Background", batteryBgMarginSeekBar, 30, batteryBgMarginLabel, "Margin: "));
+        batteryBgRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Background", batteryBgRadiusSeekBar, 50, batteryBgRadiusLabel, "Radius: "));
+        batteryShadowBlurLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Blur Shadow", batteryShadowBlurSeekBar, 50, batteryShadowBlurLabel, "Blur Shadow: "));
+        batteryShadowOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow X", batteryShadowOffsetXSeekBar, batteryShadowOffsetXLabel, "Shadow X: "));
+        batteryShadowOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", batteryShadowOffsetYSeekBar, batteryShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
     }

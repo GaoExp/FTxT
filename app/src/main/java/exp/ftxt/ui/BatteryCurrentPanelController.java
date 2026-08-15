@@ -19,6 +19,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class BatteryCurrentPanelController {
@@ -439,6 +440,25 @@ public class BatteryCurrentPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("batcur_safe_area", isChecked).apply();
         });
+
+        batCurSizeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", batCurSizeSeekBar, 140, batCurSizeLabel, "Ukuran Teks: "));
+        batCurBgPaddingLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", batCurBgPaddingSeekBar, 80, batCurBgPaddingLabel, "Ukuran Background: "));
+        batCurBgOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset X", batCurBgOffsetXSeekBar, batCurBgOffsetXLabel, "Offset X: "));
+        batCurBgOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset Y", batCurBgOffsetYSeekBar, batCurBgOffsetYLabel, "Offset Y: "));
+        batCurBgMarginLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Margin Background", batCurBgMarginSeekBar, 30, batCurBgMarginLabel, "Margin: "));
+        batCurBgRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Background", batCurBgRadiusSeekBar, 50, batCurBgRadiusLabel, "Radius: "));
+        batCurShadowBlurLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Blur Shadow", batCurShadowBlurSeekBar, 50, batCurShadowBlurLabel, "Blur Shadow: "));
+        batCurShadowOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow X", batCurShadowOffsetXSeekBar, batCurShadowOffsetXLabel, "Shadow X: "));
+        batCurShadowOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", batCurShadowOffsetYSeekBar, batCurShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
     }

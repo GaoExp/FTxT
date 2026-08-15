@@ -20,6 +20,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class BatteryBarPanelController {
@@ -27,8 +28,9 @@ public class BatteryBarPanelController {
     private final MainActivity activity;
 
     private CheckBox barSwitch;
-    private TextView segmentQuick;
-    private TextView segmentManual;
+    private RadioGroup barModeGroup;
+    private RadioButton barModeQuick;
+    private RadioButton barModeManual;
     private View quickSideRow;
     private TextView barQuickSideValue;
     private RadioGroup barOrientationGroup;
@@ -107,8 +109,9 @@ public class BatteryBarPanelController {
 
     private void bindViews(View rootView) {
         barSwitch = rootView.findViewById(R.id.batbarSwitch);
-        segmentQuick = rootView.findViewById(R.id.batbar_segmentQuick);
-        segmentManual = rootView.findViewById(R.id.batbar_segmentManual);
+        barModeGroup = rootView.findViewById(R.id.batbar_modeGroup);
+        barModeQuick = rootView.findViewById(R.id.batbar_modeQuick);
+        barModeManual = rootView.findViewById(R.id.batbar_modeManual);
         quickSideRow = rootView.findViewById(R.id.batbar_quickSideRow);
         barQuickSideValue = rootView.findViewById(R.id.batbarQuickSideValue);
         barOrientationGroup = rootView.findViewById(R.id.batbar_orientationGroup);
@@ -165,7 +168,7 @@ public class BatteryBarPanelController {
     private void loadConfig() {
         barSwitch.setChecked(BatteryBarConfig.enabled);
         activity.applyCheckboxTint(barSwitch, BatteryBarConfig.enabled);
-        updateModeSegment();
+        updateModeGroup();
         barQuickSideValue.setText(sideLabel(BatteryBarConfig.quickSide));
         barOrientationH.setChecked(BatteryBarConfig.horizontal);
         barOrientationV.setChecked(!BatteryBarConfig.horizontal);
@@ -254,8 +257,8 @@ public class BatteryBarPanelController {
             }
         });
 
-        segmentQuick.setOnClickListener(v -> setQuickMode(true));
-        segmentManual.setOnClickListener(v -> setQuickMode(false));
+        barModeGroup.setOnCheckedChangeListener((group, checkedId) ->
+                setQuickMode(checkedId == R.id.batbar_modeQuick));
 
         barQuickSideValue.setOnClickListener(v -> showSidePopup(v));
 
@@ -273,19 +276,9 @@ public class BatteryBarPanelController {
             restart();
         });
 
-        barThicknessSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.thickness = progress;
-            barThicknessLabel.setText("Ketebalan: " + progress + "px");
-            prefs().edit().putInt("batbar_thickness", progress).apply();
-            restart();
-        }));
+        barThicknessSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyThickness));
 
-        barLengthSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.length = progress / 100f;
-            barLengthLabel.setText("Panjang: " + progress + "%");
-            prefs().edit().putFloat("batbar_length", BatteryBarConfig.length).apply();
-            restart();
-        }));
+        barLengthSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyLength));
 
         barColorPreview.setOnClickListener(v -> {
             ColorPickerDialog.show(activity, "Pilih Warna Bar", BatteryBarConfig.color, color -> {
@@ -307,12 +300,7 @@ public class BatteryBarPanelController {
             });
         });
 
-        barLowThresholdSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.lowThreshold = progress;
-            barLowThresholdLabel.setText("Ambang Low: " + progress + "%");
-            prefs().edit().putInt("batbar_low_threshold", progress).apply();
-            restart();
-        }));
+        barLowThresholdSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyLowThreshold));
 
         barShowEmptyStripCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.showEmptyStrip = isChecked;
@@ -330,19 +318,9 @@ public class BatteryBarPanelController {
             });
         });
 
-        barRadiusSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.radius = progress;
-            barRadiusLabel.setText("Radius Sudut: " + progress + "px");
-            prefs().edit().putInt("batbar_radius", progress).apply();
-            restart();
-        }));
+        barRadiusSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyRadius));
 
-        barFadeSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.fadeSpeed = 200 + progress * 100;
-            barFadeSpeedLabel.setText("Kecepatan Fade: " + formatSec(BatteryBarConfig.fadeSpeed));
-            prefs().edit().putInt("batbar_fade_speed", BatteryBarConfig.fadeSpeed).apply();
-            restart();
-        }));
+        barFadeSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyFadeSpeed));
 
         barFadeCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.fadeEnabled = isChecked;
@@ -358,19 +336,9 @@ public class BatteryBarPanelController {
             restart();
         });
 
-        barShineSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.shineSpeed = 200 + progress * 100;
-            barShineSpeedLabel.setText("Kecepatan Shine: " + formatSec(BatteryBarConfig.shineSpeed));
-            prefs().edit().putInt("batbar_shine_speed", BatteryBarConfig.shineSpeed).apply();
-            restart();
-        }));
+        barShineSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyShineSpeed));
 
-        barShineWidthSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.shineWidth = 2 + progress;
-            barShineWidthLabel.setText("Lebar Band: " + BatteryBarConfig.shineWidth + "%");
-            prefs().edit().putInt("batbar_shine_width", BatteryBarConfig.shineWidth).apply();
-            restart();
-        }));
+        barShineWidthSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyShineWidth));
 
         barWaveCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.waveEnabled = isChecked;
@@ -379,19 +347,9 @@ public class BatteryBarPanelController {
             restart();
         });
 
-        barWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.waveSpeed = 200 + progress * 100;
-            barWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.waveSpeed));
-            prefs().edit().putInt("batbar_wave_speed", BatteryBarConfig.waveSpeed).apply();
-            restart();
-        }));
+        barWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyWaveSpeed));
 
-        barWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.waveAmplitude = 10 + progress;
-            barWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.waveAmplitude + "%");
-            prefs().edit().putInt("batbar_wave_amplitude", BatteryBarConfig.waveAmplitude).apply();
-            restart();
-        }));
+        barWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyWaveAmplitude));
 
         barChargeWaveCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.chargeWaveEnabled = isChecked;
@@ -400,19 +358,9 @@ public class BatteryBarPanelController {
             restart();
         });
 
-        barChargeWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.chargeWaveSpeed = 200 + progress * 100;
-            barChargeWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.chargeWaveSpeed));
-            prefs().edit().putInt("batbar_charge_wave_speed", BatteryBarConfig.chargeWaveSpeed).apply();
-            restart();
-        }));
+        barChargeWaveSpeedSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyChargeWaveSpeed));
 
-        barChargeWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(progress -> {
-            BatteryBarConfig.chargeWaveAmplitude = 10 + progress;
-            barChargeWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.chargeWaveAmplitude + "%");
-            prefs().edit().putInt("batbar_charge_wave_amplitude", BatteryBarConfig.chargeWaveAmplitude).apply();
-            restart();
-        }));
+        barChargeWaveAmplitudeSeekBar.setOnSeekBarChangeListener(simpleSeekBar(this::applyChargeWaveAmplitude));
 
         barSafeAreaCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryBarConfig.safeArea = isChecked;
@@ -420,23 +368,44 @@ public class BatteryBarPanelController {
             prefs().edit().putBoolean("batbar_safe_area", isChecked).apply();
             restart();
         });
+
+        barThicknessLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ketebalan", barThicknessSeekBar, 0, 50, 0, barThicknessLabel, "Ketebalan: ", "px", this::applyThickness));
+        barLengthLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Panjang", barLengthSeekBar, 0, 100, 0, barLengthLabel, "Panjang: ", "%", this::applyLength));
+        barRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Sudut", barRadiusSeekBar, 0, 50, 0, barRadiusLabel, "Radius Sudut: ", "px", this::applyRadius));
+        barLowThresholdLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ambang Low", barLowThresholdSeekBar, 0, 100, 0, barLowThresholdLabel, "Ambang Low: ", "%", this::applyLowThreshold));
+        barShineWidthLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Lebar Band", barShineWidthSeekBar, 2, 98, 2, barShineWidthLabel, "Lebar Band: ", "%", this::applyShineWidth));
+        barWaveAmplitudeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Intensitas Wave", barWaveAmplitudeSeekBar, 10, 100, 10, barWaveAmplitudeLabel, "Intensitas Wave: ", "%", this::applyWaveAmplitude));
+        barChargeWaveAmplitudeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Intensitas Wave", barChargeWaveAmplitudeSeekBar, 10, 100, 10, barChargeWaveAmplitudeLabel, "Intensitas Wave: ", "%", this::applyChargeWaveAmplitude));
+        barShineSpeedLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSecEditor(activity, "Kecepatan Shine", barShineSpeedSeekBar, 0.2f, 5.0f, barShineSpeedLabel, "Kecepatan Shine: ", this::applyShineSpeed));
+        barFadeSpeedLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSecEditor(activity, "Kecepatan Fade", barFadeSpeedSeekBar, 0.2f, 5.0f, barFadeSpeedLabel, "Kecepatan Fade: ", this::applyFadeSpeed));
+        barWaveSpeedLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSecEditor(activity, "Kecepatan Wave", barWaveSpeedSeekBar, 0.2f, 5.0f, barWaveSpeedLabel, "Kecepatan Wave: ", this::applyWaveSpeed));
+        barChargeWaveSpeedLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSecEditor(activity, "Kecepatan Wave", barChargeWaveSpeedSeekBar, 0.2f, 5.0f, barChargeWaveSpeedLabel, "Kecepatan Wave: ", this::applyChargeWaveSpeed));
     }
 
     private void setQuickMode(boolean quick) {
         BatteryBarConfig.quickMode = quick;
         prefs().edit().putBoolean("batbar_quick_mode", quick).apply();
-        updateModeSegment();
+        updateModeGroup();
         updateManualVisibility();
         restart();
     }
 
-    private void updateModeSegment() {
-        if (segmentQuick == null || segmentManual == null) return;
+    private void updateModeGroup() {
+        if (barModeQuick == null || barModeManual == null) return;
         boolean quick = BatteryBarConfig.quickMode;
-        segmentQuick.setBackgroundResource(quick ? R.drawable.bg_segment_active : R.drawable.bg_segment_inactive);
-        segmentManual.setBackgroundResource(quick ? R.drawable.bg_segment_inactive : R.drawable.bg_segment_active);
-        segmentQuick.setTextColor(quick ? 0xFFFFFFFF : 0xFFCCCCCC);
-        segmentManual.setTextColor(quick ? 0xFFCCCCCC : 0xFFFFFFFF);
+        barModeQuick.setChecked(quick);
+        barModeManual.setChecked(!quick);
     }
 
     private void showSidePopup(View anchor) {
@@ -526,6 +495,7 @@ public class BatteryBarPanelController {
     private void updateManualVisibility() {
         boolean manual = !BatteryBarConfig.quickMode;
         quickSideRow.setVisibility(manual ? View.GONE : View.VISIBLE);
+        manualSectionHeader.setVisibility(manual ? View.VISIBLE : View.GONE);
         manualSection.setAlpha(manual ? 1f : 0.3f);
         setManualSectionExpanded(manual);
         if (positionController != null) {
@@ -562,6 +532,83 @@ public class BatteryBarPanelController {
 
     private void restart() {
         FloatingService.restartModule(FloatingService.batteryBarModule());
+    }
+
+    private void applyThickness(int progress) {
+        BatteryBarConfig.thickness = progress;
+        barThicknessLabel.setText("Ketebalan: " + progress + "px");
+        prefs().edit().putInt("batbar_thickness", progress).apply();
+        restart();
+    }
+
+    private void applyLength(int progress) {
+        BatteryBarConfig.length = progress / 100f;
+        barLengthLabel.setText("Panjang: " + progress + "%");
+        prefs().edit().putFloat("batbar_length", BatteryBarConfig.length).apply();
+        restart();
+    }
+
+    private void applyRadius(int progress) {
+        BatteryBarConfig.radius = progress;
+        barRadiusLabel.setText("Radius Sudut: " + progress + "px");
+        prefs().edit().putInt("batbar_radius", progress).apply();
+        restart();
+    }
+
+    private void applyLowThreshold(int progress) {
+        BatteryBarConfig.lowThreshold = progress;
+        barLowThresholdLabel.setText("Ambang Low: " + progress + "%");
+        prefs().edit().putInt("batbar_low_threshold", progress).apply();
+        restart();
+    }
+
+    private void applyShineWidth(int progress) {
+        BatteryBarConfig.shineWidth = 2 + progress;
+        barShineWidthLabel.setText("Lebar Band: " + BatteryBarConfig.shineWidth + "%");
+        prefs().edit().putInt("batbar_shine_width", BatteryBarConfig.shineWidth).apply();
+        restart();
+    }
+
+    private void applyWaveAmplitude(int progress) {
+        BatteryBarConfig.waveAmplitude = 10 + progress;
+        barWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.waveAmplitude + "%");
+        prefs().edit().putInt("batbar_wave_amplitude", BatteryBarConfig.waveAmplitude).apply();
+        restart();
+    }
+
+    private void applyChargeWaveAmplitude(int progress) {
+        BatteryBarConfig.chargeWaveAmplitude = 10 + progress;
+        barChargeWaveAmplitudeLabel.setText("Intensitas Wave: " + BatteryBarConfig.chargeWaveAmplitude + "%");
+        prefs().edit().putInt("batbar_charge_wave_amplitude", BatteryBarConfig.chargeWaveAmplitude).apply();
+        restart();
+    }
+
+    private void applyShineSpeed(int progress) {
+        BatteryBarConfig.shineSpeed = 200 + progress * 100;
+        barShineSpeedLabel.setText("Kecepatan Shine: " + formatSec(BatteryBarConfig.shineSpeed));
+        prefs().edit().putInt("batbar_shine_speed", BatteryBarConfig.shineSpeed).apply();
+        restart();
+    }
+
+    private void applyFadeSpeed(int progress) {
+        BatteryBarConfig.fadeSpeed = 200 + progress * 100;
+        barFadeSpeedLabel.setText("Kecepatan Fade: " + formatSec(BatteryBarConfig.fadeSpeed));
+        prefs().edit().putInt("batbar_fade_speed", BatteryBarConfig.fadeSpeed).apply();
+        restart();
+    }
+
+    private void applyWaveSpeed(int progress) {
+        BatteryBarConfig.waveSpeed = 200 + progress * 100;
+        barWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.waveSpeed));
+        prefs().edit().putInt("batbar_wave_speed", BatteryBarConfig.waveSpeed).apply();
+        restart();
+    }
+
+    private void applyChargeWaveSpeed(int progress) {
+        BatteryBarConfig.chargeWaveSpeed = 200 + progress * 100;
+        barChargeWaveSpeedLabel.setText("Kecepatan Wave: " + formatSec(BatteryBarConfig.chargeWaveSpeed));
+        prefs().edit().putInt("batbar_charge_wave_speed", BatteryBarConfig.chargeWaveSpeed).apply();
+        restart();
     }
 
     private String schemeLabel(int scheme) {

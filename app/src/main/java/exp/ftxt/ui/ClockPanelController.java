@@ -14,6 +14,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class ClockPanelController {
@@ -369,6 +370,25 @@ public class ClockPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("clock_safe_area", isChecked).apply();
         });
+
+        clockSizeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", clockSizeSeekBar, 200, clockSizeLabel, "Ukuran Teks: "));
+        clockBgPaddingLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", clockBgPaddingSeekBar, 80, clockBgPaddingLabel, "Ukuran Background: "));
+        clockBgOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset X", clockBgOffsetXSeekBar, clockBgOffsetXLabel, "Offset X: "));
+        clockBgOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset Y", clockBgOffsetYSeekBar, clockBgOffsetYLabel, "Offset Y: "));
+        clockBgMarginLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Margin Background", clockBgMarginSeekBar, 30, clockBgMarginLabel, "Margin: "));
+        clockBgRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Background", clockBgRadiusSeekBar, 50, clockBgRadiusLabel, "Radius: "));
+        clockShadowBlurLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Blur Shadow", clockShadowBlurSeekBar, 50, clockShadowBlurLabel, "Blur Shadow: "));
+        clockShadowOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow X", clockShadowOffsetXSeekBar, clockShadowOffsetXLabel, "Shadow X: "));
+        clockShadowOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", clockShadowOffsetYSeekBar, clockShadowOffsetYLabel, "Shadow Y: "));
     }
 
     private void saveClockShadowPrefs() {

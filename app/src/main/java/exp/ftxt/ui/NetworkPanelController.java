@@ -19,6 +19,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
+import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;
 
 public class NetworkPanelController {
@@ -396,6 +397,25 @@ public class NetworkPanelController {
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_safe_area", isChecked).apply();
         });
+
+        networkSizeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", networkSizeSeekBar, 100, networkSizeLabel, "Ukuran Teks: "));
+        networkBgPaddingLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", networkBgPaddingSeekBar, 80, networkBgPaddingLabel, "Ukuran Background: "));
+        networkBgOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset X", networkBgOffsetXSeekBar, networkBgOffsetXLabel, "Offset X: "));
+        networkBgOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Offset Y", networkBgOffsetYSeekBar, networkBgOffsetYLabel, "Offset Y: "));
+        networkBgMarginLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Margin Background", networkBgMarginSeekBar, 30, networkBgMarginLabel, "Margin: "));
+        networkBgRadiusLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Radius Background", networkBgRadiusSeekBar, 50, networkBgRadiusLabel, "Radius: "));
+        networkShadowBlurLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Blur Shadow", networkShadowBlurSeekBar, 50, networkShadowBlurLabel, "Blur Shadow: "));
+        networkShadowOffsetXLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow X", networkShadowOffsetXSeekBar, networkShadowOffsetXLabel, "Shadow X: "));
+        networkShadowOffsetYLabel.setOnClickListener(v ->
+                SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", networkShadowOffsetYSeekBar, networkShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
     }

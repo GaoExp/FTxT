@@ -1,3 +1,28 @@
+# [4.85.5] - 2026-08-15 versionCode 182
+### ✨ Fitur Baru
+- **Slider Label Edit untuk panel Jam Digital, Battery Stats, Battery Current, Network Speed, dan Battery Bar** — Klik label slider kini membuka dialog edit nilai manual, sama seperti Floating Text & FPS Display. Nilai offset (Offset X/Y, Shadow X/Y) mendukung angka negatif. Slider posisi (X/Y) tidak termasuk. Khusus Battery Bar: slider Kecepatan (Shine/Fade/Wave) bisa diedit dalam **desimal detik** (0,2–5,0), slider Panjang/Ambang Low/Lebar Band/Intensitas Wave memakai satuan %, serta Ketebalan/Radius Sudut memakai px. Untuk mendukung nilai desimal, `SliderLabelEditor` mendapat helper baru `showSliderEditor` (nilai dengan min/max/offset + suffix) dan `showSecEditor` (input desimal detik).
+### ♻️ Perubahan Fitur
+- **Kecepatan Shine disetarakan dengan kecepatan Wave** — Sebelumnya pada nilai slider yang sama, animasi shine bergerak **4× lebih cepat** dari wave karena animator shine berjalan `-0,5 → 1,5` (band menyapu 2× panjang bar per durasi) sedangkan wave hanya bergeser setengah panjang bar per siklus (`WAVE_CYCLES = 2`). Durasi animator shine kini dikalikan `2 × WAVE_CYCLES` (×4) sehingga band shine menyapu dengan kecepatan visual yang sama dengan gelombang wave saat nilai slider keduanya sama. Perubahan nilai slider Kecepatan Shine juga kini langsung diterapkan saat animator sedang berjalan (animator di-restart), tanpa perlu menunggu charging berhenti/mulai ulang.
+- **Rentang waktu animasi Battery Bar diperpanjang menjadi 5 detik** — Slider **Kecepatan Shine**, **Kecepatan Fade**, **Kecepatan Wave (baterai rendah)**, dan **Kecepatan Wave (saat charging)** kini bisa diatur **0,2–5,0 detik** (sebelumnya maks 2,0 detik), step tetap 0,1 detik (max seekbar `18` → `48`). Default tidak berubah: Shine/Fade 1,8 detik, Wave 1,0 detik. Clamp durasi fade di `BatteryBarView.setFadeSpeed()` ikut diperlonggar (maks 2000 → 5000 ms) agar nilai di atas 2 detik benar-benar diterapkan. Nilai tetap tersimpan di prefs `batbar_shine_speed`, `batbar_fade_speed`, `batbar_wave_speed`, `batbar_charge_wave_speed` dan ikut preset.
+- **Label deskriptif animasi Wave disederhanakan** — Teks checkbox "Animasi Wave (gelombang mengalir ke kanan)" di section **Animasi Pengisian Daya** dan "Animasi Wave (kedutan gelombang)" di section **Animasi Baterai Rendah** diubah menjadi **"Animasi Wave"** tanpa deskripsi perilaku di dalam kurung.
+- **Pemilih Mode Cepat/Manual jadi RadioButton** — Segment button (2 TextView custom dengan background `bg_segment_*`) diganti **RadioGroup** dua RadioButton ("Mode Cepat" / "Manual"), konsisten dengan pemilih orientasi Horizontal/Vertikal di panel yang sama. Perilaku sama: pilihan menentukan `BatteryBarConfig.quickMode` dan tersimpan di prefs `batbar_quick_mode`.
+- **Chevron Mode Manual disembunyikan sepenuhnya saat Mode Cepat aktif** — Saat mode cepat dipilih, **header "▾ Mode Manual" beserta seluruh isi section (panjang + kontrol posisi) hilang total** (GONE), bukan hanya tertutup/diburamkan seperti sebelumnya. Saat mode manual dipilih, header & section tampil kembali dalam keadaan terbuka (▾).
+### ✏️ File Changed
+- `app/src/main/java/exp/ftxt/shared/ui/SliderLabelEditor.java` — Helper baru `showSliderEditor` (nilai integer dengan min/max/offset + suffix label) dan `showSecEditor` (input desimal detik) untuk edit nilai slider Battery Bar
+- `app/src/main/java/exp/ftxt/ui/BatteryBarPanelController.java` — Refactor listener 11 slider ke method `applyX`; listener klik label slider (Ketebalan, Panjang, Radius Sudut, Ambang Low, Lebar Band, Intensitas Wave ×2, Kecepatan Shine/Fade/Wave ×2) untuk edit nilai manual via `SliderLabelEditor`; pemilih Mode Cepat/Manual diganti segment button (TextView) → **RadioGroup** (`updateModeGroup`, listener `batbar_modeGroup`); `updateManualVisibility()` kini menyembunyikan **header & isi section Mode Manual (GONE)** saat mode cepat aktif
+- `app/src/main/java/exp/ftxt/ui/ClockPanelController.java` — Listener klik label slider (ukuran, shadow, background) untuk edit nilai manual via `SliderLabelEditor`
+- `app/src/main/java/exp/ftxt/ui/BatteryPanelController.java` — Listener klik label slider (ukuran, shadow, background) untuk edit nilai manual via `SliderLabelEditor`
+- `app/src/main/java/exp/ftxt/ui/BatteryCurrentPanelController.java` — Listener klik label slider (ukuran, shadow, background) untuk edit nilai manual via `SliderLabelEditor`
+- `app/src/main/java/exp/ftxt/ui/NetworkPanelController.java` — Listener klik label slider (ukuran, shadow, background) untuk edit nilai manual via `SliderLabelEditor`
+- `app/src/main/java/exp/ftxt/features/battery_bar/BatteryBarView.java` — Clamp durasi fade di `setFadeSpeed()` diperlonggar (maks 2000 → 5000 ms) agar nilai 2–5 detik benar-benar diterapkan; durasi animator shine di `startShine()` dikalikan `2 × WAVE_CYCLES` (×4) agar kecepatan visual sama dengan wave; `setShineConfig()` me-restart animator shine saat berjalan agar perubahan kecepatan langsung diterapkan
+- `app/src/main/res/layout/panel_battery_bar.xml` — `android:max` seekbar Kecepatan Shine (`batbarShineSpeedSeekBar`), Kecepatan Fade (`batbarFadeSpeedSeekBar`), Kecepatan Wave low (`batbarWaveSpeedSeekBar`), dan Kecepatan Wave charging (`batbarChargeWaveSpeedSeekBar`) dinaikkan `18` → `48` (rentang 0,2–5,0 detik); teks checkbox `batbarChargeWaveCheck` dan `batbarWaveCheck` disederhanakan menjadi "Animasi Wave"; segment button (LinearLayout + 2 TextView `batbar_segmentQuick`/`batbar_segmentManual`) diganti **RadioGroup** (`batbar_modeGroup` + RadioButton `batbar_modeQuick`/`batbar_modeManual`)
+### 🔥 File Removed
+- `app/src/main/res/drawable/bg_segment_container.xml` — Background container segment button (tidak terpakai setelah diganti RadioGroup)
+- `app/src/main/res/drawable/bg_segment_active.xml` — Background tombol segment aktif (tidak terpakai)
+- `app/src/main/res/drawable/bg_segment_inactive.xml` — Background tombol segment non-aktif (tidak terpakai)
+
+---
+
 # [4.85.4] - 2026-08-13 version code 181
 ## 💡 Catatan
 - **Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama projec seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog**
@@ -419,7 +444,7 @@
 - **Centralized isAnyModuleActive()** — Ekstrak logic cek modul aktif ke method terpusat di MainActivity.
 ### 🐞 Bug Fixes
 - **Semua modul ikut nonaktif saat satu dimatikan** — `isAnyModuleActive()` cek semua 7 modul, bukan 1–2.
-- **CI signing path dobel app/app/ ** — storeFile `app/release.jks` → `release.jks`.
+- **CI signing path dobel app/app/** — storeFile `app/release.jks` → `release.jks`.
 - **APK release tidak signed** — Tambah step generate keystore.properties di workflow.
 
 ---
@@ -513,9 +538,9 @@
 - **Sistem Grup Sidebar** — Flat list.
 - **Hardcoded background** — Background dan shadow terpisah.
 - **Shadow Opacity** — Alpha via color picker.
-- **Module temp/ ** — Hapus folder deprecated.
+- **Module temp/** — Hapus folder deprecated.
 ### ♻️ Perubahan Fitur
-- **modules/ → features/ ** — Refactor package structure.
+- **modules/ → features/** — Refactor package structure.
 - **Popup settings di bawah ikon** — PopupMenu + Gravity.END.
 - **SettingsActivity → Konfigurasi** — Ringkas, hanya izin.
 - **Dokumentasi via popup** — Dipindah dari Settings.
