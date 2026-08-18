@@ -410,4 +410,17 @@ public class BatteryBarView extends View {
         stopWave();
         stopChargeWave();
     }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility == VISIBLE) {
+            updateAnimators();
+        } else {
+            stopFade();
+            stopShine();
+            stopWave();
+            stopChargeWave();
+        }
+    }
 }

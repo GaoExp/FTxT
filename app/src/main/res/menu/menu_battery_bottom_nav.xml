@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/batTabNavMonitor"
+        android:icon="@drawable/ic_monitor"
+        android:title="Monitor" />
+
+    <item
+        android:id="@+id/batTabNavOverlay"
+        android:icon="@drawable/ic_overlay"
+        android:title="Overlay" />
+
+    <item
+        android:id="@+id/batTabNavStrip"
+        android:icon="@drawable/ic_battery_strip"
+        android:title="Battery Strip" />
+
+</menu>

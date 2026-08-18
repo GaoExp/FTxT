@@ -8,31 +8,36 @@ import androidx.annotation.Nullable;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
-import exp.ftxt.ui.BatteryBarPanelController;
 import exp.ftxt.ui.BasePanelFragment;
+import exp.ftxt.ui.MemoryPanelController;
 
-public class BatteryBarPanelFragment extends BasePanelFragment {
-    private BatteryBarPanelController controller;
+public class MemoryPanelFragment extends BasePanelFragment {
+    private MemoryPanelController controller;
 
     @Override
     protected int getLayoutResId() {
-        return R.layout.panel_battery_bar;
+        return R.layout.panel_memory;
     }
 
     @Override
     protected String getPanelName() {
-        return "battery_bar";
+        return "memory";
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        controller = new BatteryBarPanelController((MainActivity) requireActivity(), view);
+        controller = new MemoryPanelController((MainActivity) requireActivity(), view);
     }
 
     @Override
     public void onPanelShown() {
         if (controller != null) controller.onPanelShown();
+    }
+
+    @Override
+    public void onPanelHidden() {
+        if (controller != null) controller.onPanelHidden();
     }
 
     @Override

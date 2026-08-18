@@ -17,7 +17,11 @@ public class BatteryStatsConfig {
     public static boolean safeArea = true;
     public static boolean showTemperature = true;
     public static boolean showPercentage = false;
+    public static boolean showVoltage = true;
+    public static boolean showCurrent = true;
+    public static boolean showPower = true;
     public static boolean showOnlyValue = false;
+    public static String itemOrder = "temp,pct,volt,cur,power";
     public static float posX = 0.05f;
     public static float posY = 0.8f;
     public static float updateInterval = 5f;

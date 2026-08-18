@@ -8,14 +8,14 @@ import androidx.fragment.app.FragmentTransaction;
 import java.util.HashMap;
 import java.util.Map;
 
-import exp.ftxt.ui.fragment.BatteryBarPanelFragment;
-import exp.ftxt.ui.fragment.BatteryCurrentPanelFragment;
 import exp.ftxt.ui.fragment.BatteryPanelFragment;
 import exp.ftxt.ui.fragment.ClockPanelFragment;
 import exp.ftxt.ui.fragment.ColorPickerPanelFragment;
 import exp.ftxt.ui.fragment.CrosshairPanelFragment;
 import exp.ftxt.ui.fragment.FpsPanelFragment;
 import exp.ftxt.ui.fragment.LogoPanelFragment;
+import exp.ftxt.ui.fragment.DebugingPanelFragment;
+import exp.ftxt.ui.fragment.MemoryPanelFragment;
 import exp.ftxt.ui.fragment.NetworkPanelFragment;
 import exp.ftxt.ui.fragment.TextPanelFragment;
 
@@ -34,12 +34,12 @@ public class PanelManager {
         panelMap.put("fps", FpsPanelFragment.class);
         panelMap.put("clock", ClockPanelFragment.class);
         panelMap.put("battery", BatteryPanelFragment.class);
-        panelMap.put("battery_cur", BatteryCurrentPanelFragment.class);
-        panelMap.put("battery_bar", BatteryBarPanelFragment.class);
         panelMap.put("network", NetworkPanelFragment.class);
         panelMap.put("color_picker", ColorPickerPanelFragment.class);
         panelMap.put("crosshair", CrosshairPanelFragment.class);
         panelMap.put("logo", LogoPanelFragment.class);
+        panelMap.put("memory", MemoryPanelFragment.class);
+        panelMap.put("debuging", DebugingPanelFragment.class);
     }
 
     public void showPanel(String name) {
@@ -53,6 +53,7 @@ public class PanelManager {
 
         for (Fragment f : fragmentManager.getFragments()) {
             if (f instanceof BasePanelFragment && f.isAdded() && !f.isHidden()) {
+                ((BasePanelFragment) f).onPanelHidden();
                 ft.hide(f);
             }
         }

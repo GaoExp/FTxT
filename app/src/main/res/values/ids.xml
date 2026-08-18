@@ -4,10 +4,10 @@
     <item name="navFps" type="id"/>
     <item name="navNetwork" type="id"/>
     <item name="navBattery" type="id"/>
-    <item name="navBatteryCurrent" type="id"/>
-    <item name="navBatteryBar" type="id"/>
     <item name="navClock" type="id"/>
     <item name="navCrosshair" type="id"/>
+    <item name="navMemory" type="id"/>
     <item name="navLogo" type="id"/>
     <item name="navColorPicker" type="id"/>
+    <item name="navDebuging" type="id"/>
 </resources>

@@ -1,3 +1,88 @@
+# [4.86.0] - 2026-08-19 03:20 WITA versionCode 183 ***PUSH***
+### ✨ Fitur Baru
+- **Panel Battery Bar digabung ke Battery Info dengan tabbed layout** — Panel Battery Bar tidak lagi berdiri sendiri di sidebar. Kini panel Battery Info memiliki 3 tab: **Monitor** (placeholder), **Overlay** (konfigurasi Battery Info + OrderZones), dan **Battery Strip** (seluruh konfigurasi Battery Bar dari panel terpisah sebelumnya). Pengguna beralih antar tab lewat navigasi bawah panel.
+- **OrderZones — urutan info baterai via drag-and-drop** — Di tab Overlay, checkbox °C/% diganti view chip drag dua zona (Aktif/Nonaktif) untuk mengatur urutan dan visibilitas info baterai: °C, %, V, mA, W. Chip bisa diseret antar zona untuk menampilkan/menyembunyikan info, dan diurutkan dalam satu zona.
+- **Battery Stats mendukung Voltage, Current, dan Power** — Overlay Battery Info kini bisa menampilkan **Voltase (V)**, **Arus (mA)**, dan **Daya (W)** selain °C dan %. Pembacaan dari BatteryManager dengan fallback sysfs.
+- **Panel Memory Stats — modul baru untuk monitoring memori** — Panel baru di sidebar dengan 2 tab: **Monitor** (info real-time 14 nilai: Java Heap, Native Heap, Graphics, Total, Gagal; Execution Time, Execution Time Average; Total Free RAM, Total RAM; Jumlah Proses, Proses Active, Proses Stopped, Proses Cached, Proses Minimum; bar RAM; Snapshot export/copy) dan **Overlay** (konfigurasi ukuran, warna, label, separator, shadow, background, posisi, orientasi, dan opsi tampilan). Mendukung background monitor yang tetap berjalan meski service overlay tidak aktif, serta export/copy snapshot ke clipboard.
+- **Crash Logger** — Saat force close, stack trace otomatis ditulis ke `FTxT_crash_*.txt` di folder Download (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb.
+
+### 🚮 Fitur Dihapus
+- **Modul Battery Current dihapus total** — Seluruh lapisan modul (config, module, controller, fragment, panel layout) dihapus. Sidebar item, module management, restore on boot, dan notifikasi cek aktif ikut dihapus. Preset lama dengan tipe "batcur" akan di-ignore oleh guard lintas modul.
+- **Sidebar item Battery Bar dihapus** — Entry "Battery Bar" di sidebar Navigation Drawer dihapus. Seluruh konfigurasi Battery Bar kini diakses dari tab Battery Strip di dalam panel Battery Info.
+
+### ♻️ Perubahan Fitur
+- **Branding panel Battery** — Label sidebar "Battery Stats" diubah jadi "Battery Info". Label checkbox modul diubah dari "Battery Stats" jadi "Battery Info". Nama preset diubah dari "Battery Bar" jadi "Battery Strip".
+
+### 🔧 Optimasi & Penyesuaian
+- **Battery Stats menggunakan urutan info yang bisa diatur** — Urutan info baterai (°C, %, V, mA, W) kini ditentukan oleh posisi chip di OrderZones, bukan urutan hardcode. Pembacaan data baterai dilakukan sekali per update lalu teks dibangun sesuai urutan yang dipilih.
+- **Perubahan konfigurasi langsung diterapkan** — Perubahan di panel Battery Info dan Battery Strip langsung diterapkan ke overlay tanpa me-restart modul.
+- **Memory Stats menggunakan urutan item yang bisa diatur** — Urutan item memori ditentukan oleh posisi chip di OrderZones, bukan hardcode. Pembacaan data memori dilakukan sekali per update lalu teks dibangun sesuai urutan yang dipilih.
+- **Background monitor Memory Stats** — Monitoring memori tetap berjalan meski service overlay tidak aktif (opsional), dengan interval polling yang bisa diatur.
+- **Panel callback onPanelHidden()** — BasePanelFragment menambah method `onPanelHidden()` yang dipanggil PanelManager saat panel di-hide, memungkinkan controller menghentikan polling atau resource saat panel tidak terlihat.
+- **WakeLock screen-off guard** — WakeLock hanya dipegang saat layar menyala (`pm.isInteractive()`); saat layar mati, WakeLock dilepas untuk menghemat baterai.
+- **NotificationHelper caching** — Bitmap ikon suhu di-cache (dibuat ulang hanya saat nilai berubah), RemoteViews + onClick PendingIntent dibuat sekali via `ensureCachedViews()`, update notifikasi di-skip bila suhu & ikon toggle tidak berubah.
+- **BatteryBarModule permanent receiver** — BroadcastReceiver baterai didaftarkan permanen di `start()` dan dilepas di `stop()`, dengan cache `batteryLevel`/`batteryScale`/`batteryStatus` sehingga tidak perlu `registerReceiver(null, ...)` berulang. Update display skip jika nilai tidak berubah.
+- **BatteryBarView lifecycle animasi** — Animasi (fade, shine, wave, chargeWave) otomatis dihentikan saat overlay invisible dan di-restart saat visible via `onVisibilityChanged()`, mencegah CPU waste saat overlay tidak terlihat.
+
+### 🐞 Bug Fixes
+- **CPU Monitor muncul di sidebar padahal belum diimplementasikan** — Menu "CPU Monitor" muncul di sidebar Navigation Drawer tanpa ada panel atau implementasi apapun. Saat diklik, tidak menampilkan apa-apa karena panel belum dibuat. Kini item sidebar dihapus.
+- **Tab Overlay di panel Memory terlihat aktif sebelum latar belakang diaktifkan** — Saat tab Overlay ditekan tapi background monitor belum aktif, dialog muncul namun tab Overlay tetap berubah warna biru (terlihat aktif) meskipun kontennya masih menampilkan tab Monitor. Kini tab tetap di posisi Monitor saat seleksi ditolak.
+
+### 🗒️ File Added
+- `BatteryOrderZonesView.java` — Custom view zona drag chip
+- `ic_monitor.xml`, `ic_overlay.xml`, `ic_battery_strip.xml` — Ikon tab
+- `bat_nav_item_color.xml` — Color selector navigasi bawah
+- `menu_battery_bottom_nav.xml` — Menu navigasi bawah
+- `MemoryConfig.java` — Konfigurasi modul Memory Stats
+- `MemoryModule.java` — Modul overlay Memory Stats (refreshDisplay, buildItemPart, readSysf)
+- `MemoryMonitor.java` — Background monitor polling memori
+- `MemoryPanelController.java` — Controller UI panel Memory Stats (tab Monitor + Overlay, OrderZones, export/copy snapshot)
+- `MemoryPositionController.java` — Controller posisi & preset untuk modul Memory
+- `MemoryPanelFragment.java` — Fragment panel Memory Stats
+- `panel_memory.xml` — Layout panel Memory Stats dengan BottomNavigationView
+- `menu_memory_bottom_nav.xml` — Menu navigasi bawah panel Memory
+- `mem_nav_item_color.xml` — Color selector navigasi bawah Memory
+- `mem_card_bg.xml`, `mem_badge_active_bg.xml`, `mem_badge_stopped_bg.xml` — Drawable panel Memory
+- `CrashLogger.java` — Crash logger otomatis saat force close ke folder Download
+- `DebugingPanelFragment.java` — Fragment panel Debuging (preview ikon rotasi)
+- `panel_debuging.xml` — Layout panel Debuging
+- `ic_rotation_variant_1.xml`–`ic_rotation_variant_5.xml` — Ikon varian rotasi untuk panel Debuging
+
+### ✏️ File Changed
+- `panel_battery.xml` — Diganti ke tabbed layout dengan BottomNavigationView
+- `BatteryPanelFragment.java` — Ditambah tab switching + dual controller
+- `BatteryPanelController.java` — Integrasi OrderZones, hapus checkbox °C/%
+- `BatteryStatsConfig.java` — Tambah field showVoltage, showCurrent, showPower, itemOrder
+- `BatteryStatsModule.java` — Tambah metode refreshDisplay(), pembacaan data v/c/p, urutan itemOrder
+- `BatteryBarPositionController.java` — Label diubah ke "Battery Strip", sync in-place
+- `PanelManager.java` — Hapus entry battery_bar, tambah panggilan `onPanelHidden()` saat panel di-hide
+- `MainActivity.java` — Hapus sidebar item battery_bar, ubah label "Battery Stats" → "Battery Info", tambah load prefs mem_* di loadShadowConfigs(), tambah cek MemoryConfig di isAnyModuleActive(), tambah panelIdToName/updateActionBarTitle/updateNavSelection untuk navMemory, init CrashLogger di onCreate
+- `FloatingService.java` — Tambah field memoryModule, ensureMemoryModule(), static memoryModule(), restore on onCreate, setBackgroundMonitorEnabled(), updateMemoryInPlace(), MemoryMonitor.stop() di stopAllModules & onDestroy, MemoryConfig.backgroundMonitor di isAnyModuleActive
+- `BootReceiver.java` — Tambah restore MemoryConfig.enabled & MemoryConfig.backgroundMonitor on boot
+- `NotificationHelper.java` — Tambah cek MemoryConfig di isAnyModuleActive & getActiveModulesText, caching bitmap icon & RemoteViews, skip update jika nilai tidak berubah
+- `OverlayPreset.java` — Tambah field itemOrder, showJavaHeap, showNativeHeap, showGraphics, showTotal
+- `BasePanelFragment.java` — Tambah method `onPanelHidden()` untuk callback saat panel disembunyikan
+- `WakeLockManager.java` — Tambah screen-off guard: skip acquire jika layar mati
+- `BatteryBarView.java` — Tambah `onVisibilityChanged()` untuk stop/start animasi saat overlay visible/invisible
+- `BatteryBarModule.java` — Permanent BroadcastReceiver dengan cache batteryLevel/Scale/Status, skip update jika nilai tidak berubah
+- `styles.xml` — Tambah style BatNavActiveIndicator dan BatNavTextAppearance, MemNavActiveIndicator dan MemNavTextAppearance
+- `colors.xml` — Tambah 12 color values untuk panel Memory
+- `strings.xml` — Ubah nav_battery → "Battery Info", hapus nav_cpu, nav_battery_current, nav_battery_bar, tambah nav_memory, nav_debuging
+- `drawer_menu.xml` — Hapus nav_cpu, nav_battery_current, nav_battery_bar, tambah nav_memory, nav_debuging
+- `ids.xml` — Hapus navBatteryCurrent, navBatteryBar, tambah navMemory, navDebuging
+
+### 🔥 File Removed
+- `panel_battery_bar.xml` — Tidak terpakai setelah digabung ke panel_battery.xml
+- `panel_battery_current.xml` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryBarPanelFragment.java` — Tidak terpakai setelah digabung ke BatteryPanelFragment
+- `BatteryCurrentPanelFragment.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentPanelController.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentPositionController.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentConfig.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentModule.java` — Tidak terpakai setelah modul Battery Current dihapus
+
+---
+
 # [4.85.5] - 2026-08-15 versionCode 182
 ### ✨ Fitur Baru
 - **Slider Label Edit untuk panel Jam Digital, Battery Stats, Battery Current, Network Speed, dan Battery Bar** — Klik label slider kini membuka dialog edit nilai manual, sama seperti Floating Text & FPS Display. Nilai offset (Offset X/Y, Shadow X/Y) mendukung angka negatif. Slider posisi (X/Y) tidak termasuk. Khusus Battery Bar: slider Kecepatan (Shine/Fade/Wave) bisa diedit dalam **desimal detik** (0,2–5,0), slider Panjang/Ambang Low/Lebar Band/Intensitas Wave memakai satuan %, serta Ketebalan/Radius Sudut memakai px. Untuk mendukung nilai desimal, `SliderLabelEditor` mendapat helper baru `showSliderEditor` (nilai dengan min/max/offset + suffix) dan `showSecEditor` (input desimal detik).

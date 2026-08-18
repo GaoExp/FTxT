@@ -16,8 +16,6 @@ import java.util.List;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_bar.BatteryBarModule;
-import exp.ftxt.features.battery_current.BatteryCurrentConfig;
-import exp.ftxt.features.battery_current.BatteryCurrentModule;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsModule;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -26,6 +24,9 @@ import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.fps_display.FpsModule;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.network_stats.NetworkModule;
+import exp.ftxt.features.memory_stats.MemoryConfig;
+import exp.ftxt.features.memory_stats.MemoryModule;
+import exp.ftxt.features.memory_stats.MemoryMonitor;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.ui.OverlayModule;
@@ -42,9 +43,9 @@ public class FloatingService extends Service {
     private FpsModule fpsModule;
     private ClockModule clockModule;
     private BatteryStatsModule batteryStatsModule;
-    private BatteryCurrentModule batteryCurrentModule;
     private NetworkModule networkModule;
     private BatteryBarModule batteryBarModule;
+    private MemoryModule memoryModule;
     private final List<OverlayModule> allModules = new ArrayList<>();
     private BroadcastReceiver configChangeReceiver;
 
@@ -52,7 +53,6 @@ public class FloatingService extends Service {
     public FpsModule getFpsModule() { return fpsModule; }
     public ClockModule getClockModule() { return clockModule; }
     public BatteryStatsModule getBatteryStatsModule() { return batteryStatsModule; }
-    public BatteryCurrentModule getBatteryCurrentModule() { return batteryCurrentModule; }
     public NetworkModule getNetworkModule() { return networkModule; }
     public BatteryBarModule getBatteryBarModule() { return batteryBarModule; }
 
@@ -72,10 +72,6 @@ public class FloatingService extends Service {
         if (instance != null) instance.ensureBatteryStatsModule();
         return instance != null ? instance.batteryStatsModule : null;
     }
-    public static BatteryCurrentModule batteryCurrentModule() {
-        if (instance != null) instance.ensureBatteryCurrentModule();
-        return instance != null ? instance.batteryCurrentModule : null;
-    }
     public static NetworkModule networkModule() {
         if (instance != null) instance.ensureNetworkModule();
         return instance != null ? instance.networkModule : null;
@@ -83,6 +79,10 @@ public class FloatingService extends Service {
     public static BatteryBarModule batteryBarModule() {
         if (instance != null) instance.ensureBatteryBarModule();
         return instance != null ? instance.batteryBarModule : null;
+    }
+    public static MemoryModule memoryModule() {
+        if (instance != null) instance.ensureMemoryModule();
+        return instance != null ? instance.memoryModule : null;
     }
 
     private void ensureTextModule() {
@@ -117,14 +117,6 @@ public class FloatingService extends Service {
         }
     }
 
-    private void ensureBatteryCurrentModule() {
-        if (batteryCurrentModule == null) {
-            batteryCurrentModule = new BatteryCurrentModule();
-            allModules.add(batteryCurrentModule);
-            batteryCurrentModule.init(windowManager, this, prefs);
-        }
-    }
-
     private void ensureNetworkModule() {
         if (networkModule == null) {
             networkModule = new NetworkModule();
@@ -141,11 +133,19 @@ public class FloatingService extends Service {
         }
     }
 
+    private void ensureMemoryModule() {
+        if (memoryModule == null) {
+            memoryModule = new MemoryModule();
+            allModules.add(memoryModule);
+            memoryModule.init(windowManager, this, prefs);
+        }
+    }
+
     private boolean isAnyModuleActive() {
         for (OverlayModule module : allModules) {
             if (module.isRunning()) return true;
         }
-        return false;
+        return MemoryConfig.backgroundMonitor;
     }
 
     private void registerConfigReceiver() {
@@ -214,10 +214,13 @@ public class FloatingService extends Service {
             }
             if (ClockConfig.enabled) { ensureClockModule(); clockModule.start(windowManager, this); }
             if (BatteryStatsConfig.enabled) { ensureBatteryStatsModule(); batteryStatsModule.start(windowManager, this); }
-            if (BatteryCurrentConfig.enabled) { ensureBatteryCurrentModule(); batteryCurrentModule.start(windowManager, this); }
             if (NetworkConfig.enabled) { ensureNetworkModule(); networkModule.start(windowManager, this); }
             if (FpsConfig.enabled) { ensureFpsModule(); fpsModule.start(windowManager, this); }
             if (BatteryBarConfig.enabled) { ensureBatteryBarModule(); batteryBarModule.start(windowManager, this); }
+            if (MemoryConfig.enabled) { ensureMemoryModule(); memoryModule.start(windowManager, this); }
+            if (MemoryConfig.backgroundMonitor) {
+                MemoryMonitor.start(this);
+            }
 
             acquireWakeLockIfNeeded();
             if (isAnyModuleActive()) registerConfigReceiver();
@@ -337,6 +340,39 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateBatteryBarInPlace() {
+        if (instance != null && instance.batteryBarModule != null && instance.batteryBarModule.isRunning()) {
+            instance.batteryBarModule.applyAppearance();
+            instance.batteryBarModule.reloadLayout();
+            instance.batteryBarModule.updatePosition();
+        }
+    }
+
+    public static void updateBatteryStatsInPlace() {
+        if (instance != null && instance.batteryStatsModule != null && instance.batteryStatsModule.isRunning()) {
+            instance.batteryStatsModule.refreshDisplay();
+        }
+    }
+
+    public static void setBackgroundMonitorEnabled(boolean enabled) {
+        if (enabled) {
+            if (instance != null) {
+                MemoryMonitor.start(instance);
+            }
+        } else {
+            MemoryMonitor.stop();
+            if (instance != null) {
+                instance.stopSelfIfEmpty();
+            }
+        }
+    }
+
+    public static void updateMemoryInPlace() {
+        if (instance != null && instance.memoryModule != null && instance.memoryModule.isRunning()) {
+            instance.memoryModule.refreshDisplay();
+        }
+    }
+
     private void reloadAllPositions() {
         for (OverlayModule module : allModules) {
             if (module.isRunning()) {
@@ -356,6 +392,7 @@ public class FloatingService extends Service {
         for (OverlayModule module : instance.allModules) {
             module.stop();
         }
+        MemoryMonitor.stop();
         instance.releaseWakeLockIfEmpty();
         instance.unregisterConfigReceiver();
         instance.stopSelfIfEmpty();
@@ -394,6 +431,7 @@ public class FloatingService extends Service {
 
         NotificationHelper.stopIconCycling();
         unregisterConfigReceiver();
+        MemoryMonitor.stop();
 
         for (OverlayModule module : allModules) {
             module.stop();

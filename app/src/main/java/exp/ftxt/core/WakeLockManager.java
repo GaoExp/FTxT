@@ -27,6 +27,8 @@ public class WakeLockManager {
     public void acquire(Context ctx) {
         if (wakeLock != null && wakeLock.isHeld()) return;
         this.context = ctx.getApplicationContext();
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (pm != null && !pm.isInteractive()) return;
         acquireInternal();
         handler.postDelayed(renewRunnable, RENEW_INTERVAL_MS);
     }

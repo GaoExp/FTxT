@@ -7,14 +7,13 @@
     <string name="nav_floating_text">Floating Text</string>
     <string name="nav_fps">FPS Display</string>
     <string name="nav_network">Network Speed</string>
-    <string name="nav_battery">Battery Stats</string>
+    <string name="nav_battery">Battery Info</string>
     <string name="nav_clock">Clock Display</string>
-    <string name="nav_cpu">CPU Monitor</string>
     <string name="nav_crosshair">Crosshair</string>
-    <string name="nav_battery_current">Battery Current</string>
-    <string name="nav_battery_bar">Battery Bar</string>
+    <string name="nav_memory">Info Memori</string>
     <string name="nav_logo">Logo Display</string>
     <string name="nav_color_picker">Color Picker</string>
+    <string name="nav_debuging">Debuging</string>
 
     <string name="back_press_toast">Tekan kembali lagi untuk keluar</string>
 

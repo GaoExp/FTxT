@@ -41,6 +41,13 @@ public class OverlayPreset {
     public Boolean showCurrent;
     public Boolean showPower;
 
+    public String itemOrder;
+
+    public Boolean showJavaHeap;
+    public Boolean showNativeHeap;
+    public Boolean showGraphics;
+    public Boolean showTotal;
+
     public Boolean quickMode;
     public String quickSide;
     public Boolean barHorizontal;

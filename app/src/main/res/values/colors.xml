@@ -9,5 +9,19 @@
     <color name="drawer_header_text">#000000</color>
 
     <color name="white">#FFFFFF</color>
+
+    <!-- Memory Monitor -->
+    <color name="mem_monitor_card">#F2F2F7</color>
+    <color name="mem_monitor_header">#0A6CFF</color>
+    <color name="mem_monitor_label">#8A8A8E</color>
+    <color name="mem_monitor_active">#34C759</color>
+    <color name="mem_monitor_stopped">#8E8E93</color>
+    <color name="mem_monitor_stop">#E53935</color>
+    <color name="mem_monitor_ram">#7C4DFF</color>
+    <color name="mem_monitor_runtime">#00A86B</color>
+    <color name="mem_monitor_bar_track">#338A8A8E</color>
+    <color name="mem_monitor_stroke">#1F8E8E93</color>
+    <color name="mem_badge_active_bg">#1A34C759</color>
+    <color name="mem_badge_stopped_bg">#1A8E8E93</color>
 </resources>
 

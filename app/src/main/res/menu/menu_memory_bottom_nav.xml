@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/memTabNavMonitor"
+        android:icon="@drawable/ic_monitor"
+        android:title="Monitor" />
+
+    <item
+        android:id="@+id/memTabNavOverlay"
+        android:icon="@drawable/ic_overlay"
+        android:title="Overlay" />
+
+</menu>

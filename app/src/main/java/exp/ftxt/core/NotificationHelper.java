@@ -26,11 +26,11 @@ import java.util.List;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
-import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
+import exp.ftxt.features.memory_stats.MemoryConfig;
 
 public class NotificationHelper {
 
@@ -40,7 +40,16 @@ public class NotificationHelper {
     private static Handler iconHandler;
     private static boolean iconCycling = false;
 
+    private static final IntentFilter BATTERY_FILTER = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    private static Bitmap cachedIconBitmap;
+    private static String cachedIconText;
+    private static RemoteViews cachedContentView;
+    private static String lastNotifiedKey;
+
     private static Bitmap generateIcon(String text) {
+        if (cachedIconBitmap != null && text.equals(cachedIconText)) {
+            return cachedIconBitmap;
+        }
         int size = 192;
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         bitmap.setDensity(android.util.DisplayMetrics.DENSITY_XXXHIGH);
@@ -55,13 +64,14 @@ public class NotificationHelper {
         float y = size / 2f - (fm.ascent + fm.descent) / 2f;
         canvas.drawText(text, size / 2f, y, textPaint);
 
+        cachedIconText = text;
+        cachedIconBitmap = bitmap;
         return bitmap;
     }
 
     private static String getBatteryTemp(Context context) {
         try {
-            Intent intent = context.registerReceiver(null,
-                    new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            Intent intent = context.registerReceiver(null, BATTERY_FILTER);
             if (intent == null) return "--";
             int temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0);
             return String.valueOf(Math.round(temp / 10f));
@@ -77,39 +87,48 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_custom);
-
-        Intent toggleIntent = new Intent(context, NotificationActionReceiver.class);
-        toggleIntent.setAction(NotificationActionReceiver.ACTION_TOGGLE_OVERLAY);
-        PendingIntent togglePending = PendingIntent.getBroadcast(context, 0, toggleIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        contentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
-        contentView.setOnClickPendingIntent(R.id.noti_toggle_btn, togglePending);
-
-        Intent killIntent = new Intent(context, NotificationActionReceiver.class);
-        killIntent.setAction(NotificationActionReceiver.ACTION_KILL_SERVICE);
-        PendingIntent killPending = PendingIntent.getBroadcast(context, 1, killIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        contentView.setImageViewResource(R.id.noti_close_btn, R.drawable.ic_close);
-        contentView.setOnClickPendingIntent(R.id.noti_close_btn, killPending);
-
-        Intent openIntent = new Intent(context, NotificationActionReceiver.class);
-        openIntent.setAction(NotificationActionReceiver.ACTION_OPEN_APP);
-        PendingIntent openPending = PendingIntent.getBroadcast(context, 2, openIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        contentView.setImageViewResource(R.id.noti_open_btn, R.drawable.ic_notification_open);
-        contentView.setOnClickPendingIntent(R.id.noti_open_btn, openPending);
+        ensureCachedViews(context);
+        cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
 
         android.graphics.drawable.Icon smallIcon = android.graphics.drawable.Icon.createWithBitmap(iconBitmap);
         return new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIcon)
                 .setContentTitle("FTxT " + tempValue + "\u00B0C")
                 .setContentText(getActiveModulesText(context))
-                .setCustomContentView(contentView)
-                .setCustomBigContentView(contentView)
+                .setCustomContentView(cachedContentView)
+                .setCustomBigContentView(cachedContentView)
                 .setStyle(new Notification.DecoratedCustomViewStyle())
                 .setOngoing(true)
                 .build();
+    }
+
+    private static void ensureCachedViews(Context context) {
+        if (cachedContentView != null) return;
+
+        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_custom);
+
+        contentView.setImageViewResource(R.id.noti_close_btn, R.drawable.ic_close);
+        contentView.setImageViewResource(R.id.noti_open_btn, R.drawable.ic_notification_open);
+
+        Intent toggleIntent = new Intent(context, NotificationActionReceiver.class);
+        toggleIntent.setAction(NotificationActionReceiver.ACTION_TOGGLE_OVERLAY);
+        contentView.setOnClickPendingIntent(R.id.noti_toggle_btn, PendingIntent.getBroadcast(
+                context, 0, toggleIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
+
+        Intent killIntent = new Intent(context, NotificationActionReceiver.class);
+        killIntent.setAction(NotificationActionReceiver.ACTION_KILL_SERVICE);
+        contentView.setOnClickPendingIntent(R.id.noti_close_btn, PendingIntent.getBroadcast(
+                context, 1, killIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
+
+        Intent openIntent = new Intent(context, NotificationActionReceiver.class);
+        openIntent.setAction(NotificationActionReceiver.ACTION_OPEN_APP);
+        contentView.setOnClickPendingIntent(R.id.noti_open_btn, PendingIntent.getBroadcast(
+                context, 2, openIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
+
+        cachedContentView = contentView;
     }
 
     public static void startIconCycling(Context context) {
@@ -124,8 +143,15 @@ public class NotificationHelper {
             @Override
             public void run() {
                 if (!iconCycling) return;
-                NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                nm2.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+                String tempValue = getBatteryTemp(context);
+                boolean allHidden = FloatingService.areAllOverlaysHidden();
+                int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
+                String key = tempValue + "|" + toggleIcon;
+                if (!key.equals(lastNotifiedKey)) {
+                    lastNotifiedKey = key;
+                    NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm2.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+                }
                 iconHandler.postDelayed(this, 10000);
             }
         }, 10000);
@@ -153,38 +179,12 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        RemoteViews contentView = new RemoteViews(context.getPackageName(), R.layout.notification_custom);
-
-        Intent toggleIntent = new Intent(context, NotificationActionReceiver.class);
-        toggleIntent.setAction(NotificationActionReceiver.ACTION_TOGGLE_OVERLAY);
-        PendingIntent togglePending = PendingIntent.getBroadcast(
-                context, 0, toggleIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        Intent killIntent = new Intent(context, NotificationActionReceiver.class);
-        killIntent.setAction(NotificationActionReceiver.ACTION_KILL_SERVICE);
-        PendingIntent killPending = PendingIntent.getBroadcast(
-                context, 1, killIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        Intent openIntent = new Intent(context, NotificationActionReceiver.class);
-        openIntent.setAction(NotificationActionReceiver.ACTION_OPEN_APP);
-        PendingIntent openPending = PendingIntent.getBroadcast(
-                context, 2, openIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        contentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
-        contentView.setOnClickPendingIntent(R.id.noti_toggle_btn, togglePending);
-
-        contentView.setImageViewResource(R.id.noti_close_btn, R.drawable.ic_close);
-        contentView.setOnClickPendingIntent(R.id.noti_close_btn, killPending);
-
-        contentView.setImageViewResource(R.id.noti_open_btn, R.drawable.ic_notification_open);
-        contentView.setOnClickPendingIntent(R.id.noti_open_btn, openPending);
+        ensureCachedViews(context);
+        cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_toggle)
-                .setCustomContentView(contentView)
+                .setCustomContentView(cachedContentView)
                 .setOngoing(true)
                 .build();
     }
@@ -206,9 +206,10 @@ public class NotificationHelper {
         if (FpsConfig.enabled) return true;
         if (ClockConfig.enabled) return true;
         if (BatteryStatsConfig.enabled) return true;
-        if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
         if (BatteryBarConfig.enabled) return true;
+        if (MemoryConfig.enabled) return true;
+        if (MemoryConfig.backgroundMonitor) return true;
 
         return false;
     }
@@ -221,9 +222,9 @@ public class NotificationHelper {
         if (FpsConfig.enabled) active.add("FPS");
         if (ClockConfig.enabled) active.add("Clock");
         if (BatteryStatsConfig.enabled) active.add("Battery");
-        if (BatteryCurrentConfig.enabled) active.add("Current");
         if (NetworkConfig.enabled) active.add("Network");
         if (BatteryBarConfig.enabled) active.add("Bar");
+        if (MemoryConfig.enabled || MemoryConfig.backgroundMonitor) active.add("Mem");
 
         if (active.isEmpty()) return "Tidak ada overlay aktif";
         return String.join(", ", active) + " aktif";

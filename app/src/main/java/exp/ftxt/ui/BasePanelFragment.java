@@ -26,5 +26,7 @@ public abstract class BasePanelFragment extends Fragment {
 
     public void onPanelShown() {}
 
+    public void onPanelHidden() {}
+
     public void showLoadPresetDialog() {}
 }

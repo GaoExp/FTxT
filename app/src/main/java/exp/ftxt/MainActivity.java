@@ -23,7 +23,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -36,11 +39,12 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import exp.ftxt.core.CrashLogger;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
-import exp.ftxt.features.battery_current.BatteryCurrentConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
@@ -60,14 +64,13 @@ public class MainActivity extends AppCompatActivity {
         "[{\"id\":\"navFloatingText\",\"l\":\"Floating Text\"}," +
         "{\"id\":\"navFps\",\"l\":\"FPS Display\"}," +
         "{\"id\":\"navNetwork\",\"l\":\"Network Stats\"}," +
-        "{\"id\":\"navBattery\",\"l\":\"Battery Stats\"}," +
-
-        "{\"id\":\"navBatteryCurrent\",\"l\":\"Battery Current\"}," +
-        "{\"id\":\"navBatteryBar\",\"l\":\"Battery Bar\"}," +
+        "{\"id\":\"navBattery\",\"l\":\"Battery Info\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
         "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
+        "{\"id\":\"navMemory\",\"l\":\"Info Memori\"}," +
         "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}," +
-        "{\"id\":\"navColorPicker\",\"l\":\"Color Picker\"}]";
+        "{\"id\":\"navColorPicker\",\"l\":\"Color Picker\"}," +
+        "{\"id\":\"navDebuging\",\"l\":\"Debuging\"}]";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
+        CrashLogger.init(this);
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -291,9 +295,10 @@ public class MainActivity extends AppCompatActivity {
         if (FpsConfig.enabled) return true;
         if (ClockConfig.enabled) return true;
         if (BatteryStatsConfig.enabled) return true;
-        if (BatteryCurrentConfig.enabled) return true;
         if (NetworkConfig.enabled) return true;
         if (BatteryBarConfig.enabled) return true;
+        if (MemoryConfig.enabled) return true;
+        if (MemoryConfig.backgroundMonitor) return true;
 
         return false;
     }
@@ -409,25 +414,6 @@ public class MainActivity extends AppCompatActivity {
         NetworkConfig.bg.padding = prefs.getInt("network_bg_padding", 8);
         NetworkConfig.updateInterval = readFloatPref(prefs, "network_update_interval", 1f);
 
-        BatteryCurrentConfig.enabled = prefs.getBoolean("batcur_enabled", false);
-        BatteryCurrentConfig.color = prefs.getInt("batcur_color", Color.GREEN);
-        BatteryCurrentConfig.labelColor = prefs.getInt("batcur_label_color", Color.CYAN);
-        BatteryCurrentConfig.separatorColor = prefs.getInt("batcur_separator_color", Color.GRAY);
-        BatteryCurrentConfig.shadow.enabled = prefs.getBoolean("batcur_shadow_enabled", false);
-        BatteryCurrentConfig.shadow.color = prefs.getInt("batcur_shadow_color", Color.BLACK);
-        BatteryCurrentConfig.shadow.blur = prefs.getFloat("batcur_shadow_blur", 5f);
-        BatteryCurrentConfig.shadow.offsetX = prefs.getFloat("batcur_shadow_offset_x", 3f);
-        BatteryCurrentConfig.shadow.offsetY = prefs.getFloat("batcur_shadow_offset_y", 3f);
-        BatteryCurrentConfig.safeArea = prefs.getBoolean("batcur_safe_area", true);
-        BatteryCurrentConfig.touchPassthrough = prefs.getBoolean("batcur_lock", true);
-        BatteryCurrentConfig.bg.enabled = prefs.getBoolean("batcur_bg_enabled", false);
-        BatteryCurrentConfig.bg.color = prefs.getInt("batcur_bg_color", 0xCC000000);
-        BatteryCurrentConfig.bg.padding = prefs.getInt("batcur_bg_padding", 8);
-        BatteryCurrentConfig.showVoltage = prefs.getBoolean("batcur_show_voltage", true);
-        BatteryCurrentConfig.showCurrent = prefs.getBoolean("batcur_show_current", true);
-        BatteryCurrentConfig.showPower = prefs.getBoolean("batcur_show_power", true);
-        BatteryCurrentConfig.updateInterval = readFloatPref(prefs, "batcur_update_interval", 1f);
-
         BatteryStatsConfig.enabled = prefs.getBoolean("battery_enabled", false);
         BatteryStatsConfig.size = prefs.getFloat("battery_size", 12f);
         BatteryStatsConfig.color = prefs.getInt("battery_color", Color.GREEN);
@@ -491,6 +477,36 @@ public class MainActivity extends AppCompatActivity {
         TextConfig.patternSpacingV = prefs.getFloat("text_pattern_spacing_v", 220f);
         TextConfig.patternAngle = prefs.getFloat("text_pattern_angle", -30f);
 
+        MemoryConfig.enabled = prefs.getBoolean("mem_enabled", false);
+        MemoryConfig.backgroundMonitor = prefs.getBoolean("mem_bg_monitor", false);
+        MemoryConfig.size = prefs.getFloat("mem_size", 12f);
+        MemoryConfig.color = prefs.getInt("mem_color", Color.WHITE);
+        MemoryConfig.labelColor = prefs.getInt("mem_label_color", Color.CYAN);
+        MemoryConfig.separatorColor = prefs.getInt("mem_separator_color", Color.GRAY);
+        MemoryConfig.shadow.enabled = prefs.getBoolean("mem_shadow_enabled", false);
+        MemoryConfig.shadow.color = prefs.getInt("mem_shadow_color", Color.BLACK);
+        MemoryConfig.shadow.blur = prefs.getFloat("mem_shadow_blur", 5f);
+        MemoryConfig.shadow.offsetX = prefs.getFloat("mem_shadow_offset_x", 3f);
+        MemoryConfig.shadow.offsetY = prefs.getFloat("mem_shadow_offset_y", 3f);
+        MemoryConfig.safeArea = prefs.getBoolean("mem_safe_area", true);
+        MemoryConfig.touchPassthrough = prefs.getBoolean("mem_lock", true);
+        MemoryConfig.showOnlyValue = prefs.getBoolean("mem_show_only_value", false);
+        MemoryConfig.showJavaHeap = prefs.getBoolean("mem_show_java", true);
+        MemoryConfig.showNativeHeap = prefs.getBoolean("mem_show_native", true);
+        MemoryConfig.showGraphics = prefs.getBoolean("mem_show_graphics", true);
+        MemoryConfig.showTotal = prefs.getBoolean("mem_show_total", true);
+        MemoryConfig.itemOrder = prefs.getString("mem_item_order", "java,native,graphics,total");
+        MemoryConfig.bg.enabled = prefs.getBoolean("mem_bg_enabled", false);
+        MemoryConfig.bg.color = prefs.getInt("mem_bg_color", 0xCC000000);
+        MemoryConfig.bg.padding = prefs.getInt("mem_bg_padding", 8);
+        MemoryConfig.bg.offsetX = prefs.getInt("mem_bg_offset_x", 0);
+        MemoryConfig.bg.offsetY = prefs.getInt("mem_bg_offset_y", 0);
+        MemoryConfig.bg.margin = prefs.getInt("mem_bg_margin", 0);
+        MemoryConfig.bg.radius = prefs.getInt("mem_bg_radius", 0);
+        MemoryConfig.updateInterval = readFloatPref(prefs, "mem_update_interval", 1f);
+        MemoryConfig.posX = prefs.getFloat("mem_pos_x_port", 0.05f);
+        MemoryConfig.posY = prefs.getFloat("mem_pos_y_port", 0.6f);
+
         String savedText = prefs.getString("text_content", "FunText");
         if (!savedText.isEmpty()) TextConfig.text = savedText;
     }
@@ -507,7 +523,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateNavSelection(int selectedId) {
         int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navBatteryCurrent, R.id.navBatteryBar, R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker};
+                R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker, R.id.navMemory,
+                R.id.navDebuging};
         for (int id : allIds) {
             View v = findViewById(id);
             if (v != null) {
@@ -577,6 +594,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e2) { }
         }
+        removeStaleItems(list);
         addMissingDefaultItems(list);
         return list;
     }
@@ -595,6 +613,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) { }
+    }
+
+    private void removeStaleItems(List<SidebarItem> list) {
+        Set<String> validIds = new HashSet<>();
+        try {
+            JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
+            for (int i = 0; i < def.length(); i++) {
+                String id = def.getJSONObject(i).optString("id", null);
+                if (id != null) validIds.add(id);
+            }
+        } catch (Exception e) { }
+        Iterator<SidebarItem> it = list.iterator();
+        while (it.hasNext()) {
+            SidebarItem item = it.next();
+            if (item.id == null || !validIds.contains(item.id)) {
+                it.remove();
+            }
+        }
     }
 
     private void rebuildSidebar() {
@@ -714,12 +750,12 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.navFps) return "fps";
         if (itemId == R.id.navClock) return "clock";
         if (itemId == R.id.navBattery) return "battery";
-        if (itemId == R.id.navBatteryCurrent) return "battery_cur";
-        if (itemId == R.id.navBatteryBar) return "battery_bar";
         if (itemId == R.id.navNetwork) return "network";
         if (itemId == R.id.navColorPicker) return "color_picker";
         if (itemId == R.id.navCrosshair) return "crosshair";
         if (itemId == R.id.navLogo) return "logo";
+        if (itemId == R.id.navMemory) return "memory";
+        if (itemId == R.id.navDebuging) return "debuging";
         return null;
     }
 
@@ -728,10 +764,6 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.nav_fps);
         } else if (itemId == R.id.navBattery) {
             getSupportActionBar().setTitle(R.string.nav_battery);
-        } else if (itemId == R.id.navBatteryCurrent) {
-            getSupportActionBar().setTitle(R.string.nav_battery_current);
-        } else if (itemId == R.id.navBatteryBar) {
-            getSupportActionBar().setTitle(R.string.nav_battery_bar);
         } else if (itemId == R.id.navClock) {
             getSupportActionBar().setTitle(R.string.nav_clock);
         } else if (itemId == R.id.navNetwork) {
@@ -742,6 +774,10 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.nav_crosshair);
         } else if (itemId == R.id.navLogo) {
             getSupportActionBar().setTitle(R.string.nav_logo);
+        } else if (itemId == R.id.navMemory) {
+            getSupportActionBar().setTitle(R.string.nav_memory);
+        } else if (itemId == R.id.navDebuging) {
+            getSupportActionBar().setTitle(R.string.nav_debuging);
         } else {
             getSupportActionBar().setTitle(R.string.nav_floating_text);
         }

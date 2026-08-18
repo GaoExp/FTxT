@@ -43,7 +43,7 @@ public class BatteryBarPositionController {
 
     private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
         @Override
-        public String moduleLabel() { return "Battery Bar"; }
+        public String moduleLabel() { return "Battery Strip"; }
         @Override
         public String moduleType() { return "battery_bar"; }
         @Override
@@ -204,10 +204,7 @@ public class BatteryBarPositionController {
 
         @Override
         public void syncToService() {
-            BatteryBarModule module = FloatingService.batteryBarModule();
-            if (module != null) {
-                FloatingService.restartModule(module);
-            }
+            FloatingService.updateBatteryBarInPlace();
         }
     };
 
@@ -249,7 +246,7 @@ public class BatteryBarPositionController {
         btnLeft = rootView.findViewById(R.id.batbar_btnLeft);
         btnRight = rootView.findViewById(R.id.batbar_btnRight);
         coordDisplay = rootView.findViewById(R.id.batbar_posCoordDisplay);
-        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
+        activePresetLabel = rootView.findViewById(R.id.active_preset_label_batbar);
     }
 
     private void setupListeners() {

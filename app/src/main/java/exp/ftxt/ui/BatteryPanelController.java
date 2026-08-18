@@ -5,7 +5,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -39,8 +38,7 @@ public class BatteryPanelController {
     private SeekBar batteryShadowOffsetYSeekBar;
     private CheckBox batteryLockSwitch;
     private CheckBox batteryValueOnlyCheck;
-    private CheckBox batteryShowTempCheck;
-    private CheckBox batteryShowPctCheck;
+    private BatteryOrderZonesView batteryOrderZones;
     private CheckBox batterySafeArea;
     private CheckBox batteryBgSwitch;
     private LinearLayout batteryBgConfigContainer;
@@ -66,9 +64,15 @@ public class BatteryPanelController {
     }
 
     public void onPanelShown() {
+        refreshOrderList();
         if (batteryPositionController != null) {
             batteryPositionController.refresh();
         }
+    }
+
+    private void refreshOrderList() {
+        if (batteryOrderZones == null) return;
+        batteryOrderZones.setOrder(BatteryStatsConfig.itemOrder);
     }
 
     public void showLoadPresetDialog() {
@@ -98,8 +102,7 @@ public class BatteryPanelController {
         batteryShadowOffsetYSeekBar = rootView.findViewById(R.id.batteryShadowOffsetYSeekBar);
         batteryLockSwitch = rootView.findViewById(R.id.batteryLockSwitch);
         batteryValueOnlyCheck = rootView.findViewById(R.id.batteryValueOnlyCheck);
-        batteryShowTempCheck = rootView.findViewById(R.id.batteryShowTempCheck);
-        batteryShowPctCheck = rootView.findViewById(R.id.batteryShowPctCheck);
+        batteryOrderZones = rootView.findViewById(R.id.batteryOrderZones);
         batterySafeArea = rootView.findViewById(R.id.batterySafeArea);
         batteryBgSwitch = rootView.findViewById(R.id.batteryBgSwitch);
         batteryBgConfigContainer = rootView.findViewById(R.id.bgConfigBattery);
@@ -120,10 +123,6 @@ public class BatteryPanelController {
         batteryShadowOffsetYLabel = rootView.findViewById(R.id.batteryShadowOffsetYLabel);
         batteryIntervalValue = rootView.findViewById(R.id.batteryIntervalValue);
 
-        View sectionDisplay = rootView.findViewById(R.id.battery_sectionDisplay);
-        TextView sectionDisplayHeader = rootView.findViewById(R.id.battery_sectionDisplayHeader);
-        SectionHelper.setupCollapsible(sectionDisplayHeader, sectionDisplay);
-
         View sectionPosition = rootView.findViewById(R.id.battery_sectionPosition);
         TextView sectionPositionHeader = rootView.findViewById(R.id.battery_sectionPositionHeader);
         SectionHelper.setupCollapsible(sectionPositionHeader, sectionPosition);
@@ -135,6 +134,10 @@ public class BatteryPanelController {
         View sectionBackground = rootView.findViewById(R.id.battery_sectionBackground);
         TextView sectionBackgroundHeader = rootView.findViewById(R.id.battery_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
+
+        View sectionOrder = rootView.findViewById(R.id.battery_sectionOrder);
+        TextView sectionOrderHeader = rootView.findViewById(R.id.battery_sectionOrderHeader);
+        SectionHelper.setupCollapsible(sectionOrderHeader, sectionOrder);
     }
 
     private void loadConfig() {
@@ -161,8 +164,6 @@ public class BatteryPanelController {
         batteryLockSwitch.setChecked(BatteryStatsConfig.touchPassthrough);
         activity.applyCheckboxTint(batteryLockSwitch, BatteryStatsConfig.touchPassthrough);
         batteryValueOnlyCheck.setChecked(BatteryStatsConfig.showOnlyValue);
-        batteryShowTempCheck.setChecked(BatteryStatsConfig.showTemperature);
-        batteryShowPctCheck.setChecked(BatteryStatsConfig.showPercentage);
         batterySafeArea.setChecked(BatteryStatsConfig.safeArea);
         batterySizeLabel.setText("Ukuran Teks: " + (int) BatteryStatsConfig.size);
         batteryBgPaddingLabel.setText("Ukuran Background: " + BatteryStatsConfig.bg.padding);
@@ -403,18 +404,6 @@ public class BatteryPanelController {
                     .edit().putBoolean("battery_show_only_value", isChecked).apply();
         });
 
-        batteryShowTempCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryStatsConfig.showTemperature = isChecked;
-            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                    .edit().putBoolean("battery_show_temperature", isChecked).apply();
-        });
-
-        batteryShowPctCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BatteryStatsConfig.showPercentage = isChecked;
-            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                    .edit().putBoolean("battery_show_percentage", isChecked).apply();
-        });
-
         batterySafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
             BatteryStatsConfig.safeArea = isChecked;
             activity.applyCheckboxTint(batterySafeArea, isChecked);
@@ -442,6 +431,7 @@ public class BatteryPanelController {
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", batteryShadowOffsetYSeekBar, batteryShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
+        setupOrderZones();
     }
 
     private void saveBatteryShadowPrefs() {
@@ -451,6 +441,30 @@ public class BatteryPanelController {
                 .putFloat("battery_shadow_offset_x", BatteryStatsConfig.shadow.offsetX)
                 .putFloat("battery_shadow_offset_y", BatteryStatsConfig.shadow.offsetY)
                 .apply();
+    }
+
+    private void setupOrderZones() {
+        batteryOrderZones.setListener(this::onOrderChanged);
+        batteryOrderZones.setOrder(BatteryStatsConfig.itemOrder);
+    }
+
+    private void onOrderChanged(String order, boolean temp, boolean pct, boolean volt, boolean cur, boolean power) {
+        BatteryStatsConfig.itemOrder = order;
+        BatteryStatsConfig.showTemperature = temp;
+        BatteryStatsConfig.showPercentage = pct;
+        BatteryStatsConfig.showVoltage = volt;
+        BatteryStatsConfig.showCurrent = cur;
+        BatteryStatsConfig.showPower = power;
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit()
+                .putString("battery_item_order", order)
+                .putBoolean("battery_show_temperature", temp)
+                .putBoolean("battery_show_percentage", pct)
+                .putBoolean("battery_show_voltage", volt)
+                .putBoolean("battery_show_current", cur)
+                .putBoolean("battery_show_power", power)
+                .apply();
+        FloatingService.updateBatteryStatsInPlace();
     }
 
     private static final float[] INTERVAL_STEPS = {0.2f, 0.5f, 0.75f, 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f};
@@ -496,7 +510,7 @@ public class BatteryPanelController {
             item.setOnClickListener(v -> {
                 BatteryStatsConfig.updateInterval = INTERVAL_STEPS[idx];
                 updateIntervalDisplay();
-                FloatingService.restartModule(FloatingService.batteryStatsModule());
+                FloatingService.updateBatteryStatsInPlace();
                 if (intervalPopup != null) intervalPopup.dismiss();
             });
             content.addView(item);

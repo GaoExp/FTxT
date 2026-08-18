@@ -12,10 +12,6 @@
             android:title="@string/nav_fps"/>
 
         <item
-            android:id="@+id/nav_network"
-            android:title="@string/nav_network"/>
-
-        <item
             android:id="@+id/nav_battery"
             android:title="@string/nav_battery"/>
 
@@ -24,24 +20,20 @@
             android:title="@string/nav_clock"/>
 
         <item
-            android:id="@+id/nav_cpu"
-            android:title="@string/nav_cpu"/>
-
-        <item
             android:id="@+id/nav_crosshair"
             android:title="@string/nav_crosshair"/>
 
         <item
-            android:id="@+id/nav_battery_current"
-            android:title="@string/nav_battery_current"/>
-
-        <item
-            android:id="@+id/nav_battery_bar"
-            android:title="@string/nav_battery_bar"/>
+            android:id="@+id/nav_memory"
+            android:title="@string/nav_memory"/>
 
         <item
             android:id="@+id/nav_logo"
             android:title="@string/nav_logo"/>
+
+        <item
+            android:id="@+id/nav_debuging"
+            android:title="@string/nav_debuging"/>
 
     </group>
 

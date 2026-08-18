@@ -3,4 +3,17 @@
     <color name="drawer_background">#1E1E1E</color>
     <color name="drawer_header_background">#121212</color>
     <color name="drawer_header_text">#FFFFFF</color>
+
+    <color name="mem_monitor_card">#232327</color>
+    <color name="mem_monitor_header">#4DA8FF</color>
+    <color name="mem_monitor_label">#9A9AA0</color>
+    <color name="mem_monitor_active">#30D158</color>
+    <color name="mem_monitor_stopped">#8E8E93</color>
+    <color name="mem_monitor_stop">#FF453A</color>
+    <color name="mem_monitor_ram">#B388FF</color>
+    <color name="mem_monitor_runtime">#4CD98A</color>
+    <color name="mem_monitor_bar_track">#339A9AA0</color>
+    <color name="mem_monitor_stroke">#26FFFFFF</color>
+    <color name="mem_badge_active_bg">#1A30D158</color>
+    <color name="mem_badge_stopped_bg">#1A8E8E93</color>
 </resources>

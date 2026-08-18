@@ -1,5 +1,6 @@
 package exp.ftxt.features.battery_bar;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -27,6 +28,24 @@ public class BatteryBarModule implements OverlayModule {
 
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
+
+    private static final IntentFilter BATTERY_FILTER = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+    private int lastPercent = -1;
+    private boolean lastCharging;
+    private boolean lastLow;
+
+    private int batteryLevel;
+    private int batteryScale = 100;
+    private int batteryStatus = BatteryManager.BATTERY_STATUS_UNKNOWN;
+
+    private final BroadcastReceiver batteryReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            batteryScale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+            batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
+        }
+    };
 
     @Override
     public void setOrientationSuffix(String suffix) {
@@ -74,6 +93,12 @@ public class BatteryBarModule implements OverlayModule {
         updateTouchFlags();
 
         try {
+            context.registerReceiver(batteryReceiver, BATTERY_FILTER);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
             wm.addView(view, params);
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,6 +106,7 @@ public class BatteryBarModule implements OverlayModule {
             return;
         }
 
+        lastPercent = -1;
         applyLayout();
         updateDisplay();
 
@@ -92,6 +118,11 @@ public class BatteryBarModule implements OverlayModule {
     public void stop() {
         running = false;
         handler.removeCallbacks(tickRunnable);
+        try {
+            context.unregisterReceiver(batteryReceiver);
+        } catch (Exception e) {
+            // ignore
+        }
         if (view != null && wm != null) {
             try {
                 wm.removeView(view);
@@ -275,36 +306,15 @@ public class BatteryBarModule implements OverlayModule {
 
     private void updateDisplay() {
         if (view == null) return;
-        int percent = getBatteryPercent();
-        boolean charging = isCharging();
+        int percent = (batteryScale > 0) ? (batteryLevel * 100) / batteryScale : 0;
+        boolean charging = batteryStatus == BatteryManager.BATTERY_STATUS_CHARGING
+                || batteryStatus == BatteryManager.BATTERY_STATUS_FULL;
         boolean low = percent < BatteryBarConfig.lowThreshold;
+        if (percent == lastPercent && charging == lastCharging && low == lastLow) return;
+        lastPercent = percent;
+        lastCharging = charging;
+        lastLow = low;
         view.updateStatus(percent, charging, low);
-    }
-
-    private int getBatteryPercent() {
-        try {
-            Intent intent = context.registerReceiver(null,
-                    new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-            if (intent == null) return 0;
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-            return (scale > 0) ? (level * 100) / scale : 0;
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private boolean isCharging() {
-        try {
-            Intent intent = context.registerReceiver(null,
-                    new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-            if (intent == null) return false;
-            int status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
-            return status == BatteryManager.BATTERY_STATUS_CHARGING
-                    || status == BatteryManager.BATTERY_STATUS_FULL;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private String posSuffix() {

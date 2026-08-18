@@ -44,13 +44,13 @@ Drawer terdiri dari menu berikut (urutan default; item panel bisa di-reorder den
 | Floating Text | Teks overlay kustom |
 | FPS Display | Counter FPS real-time |
 | Network Stats | Kecepatan internet real-time |
-| Battery Stats | Suhu (°C) dan persentase (%) baterai dalam satu modul |
-| Battery Current | Tegangan, arus, daya baterai |
-| Battery Bar | Bar baterai fleksibel (snap ke sisi atau manual) |
+| Battery Info | Info baterai (suhu, persentase, voltase, arus, daya) + Battery Strip |
 | Clock Module | Waktu real-time 24 jam (Jam Digital) |
 | Crosshair | Placeholder (coming soon) |
+| Info Memori | Monitoring memori real-time |
 | Logo Display | Placeholder (coming soon) |
 | Color Picker | Color picker wheel + slider H/S/V/RGB |
+| Debuging | Panel debugging |
 | Kill Service | Hentikan semua layanan overlay + tutup app |
 | Keluar | Tutup UI aplikasi, overlay tetap berjalan |
 
@@ -101,37 +101,52 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Ukuran default 48sp, bisa diatur warna, shadow, background
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
-### Battery Stats
-- Menampilkan suhu baterai dalam °C dan/atau persentase dalam satu modul kesatuan
-- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan °C/% terpisah dari nilai angka
-- **Warna Pemisah** — Saat suhu & persentase tampil bersamaan, keduanya dipisahkan tanda `|` (misal `37.4°C | 87%`) yang warnanya bisa diatur sendiri
-- Opsi toggle tampilkan suhu, persentase (bisa keduanya sekaligus), atau hanya nilai
+### Battery Info
+Panel Battery Info memiliki **3 tab** di bagian bawah: **Monitor**, **Overlay**, dan **Battery Strip**.
+
+**Tab Monitor** — Placeholder untuk monitoring baterai (coming soon).
+
+**Tab Overlay** — Konfigurasi info baterai:
+- Menampilkan **suhu (°C)**, **persentase (%)**, **voltase (V)**, **arus (mA)**, dan **daya (W)** dalam satu overlay
+- **OrderZones** — Atur urutan dan visibilitas info baterai via drag-and-drop chip. Chip bisa diseret antar zona Aktif/Nonaktif untuk menampilkan/menyembunyikan info, dan diurutkan dalam satu zona
+- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan terpisah dari nilai angka
+- **Warna Pemisah** — Komponen dipisahkan tanda `|` (misal `37.4°C | 87% | 4.1V`) yang warnanya bisa diatur sendiri
+- Opsi toggle tampilkan komponen tertentu, atau hanya nilai tanpa label
 - Konfigurasi ukuran, warna, shadow, background, kontrol posisi
 - Interval update bisa diatur 0.2–10 detik (default 5d)
 
-### Battery Current
-- Menampilkan tegangan (mV), arus (mA), dan daya (W) baterai
-- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna satuan mV/mA/W terpisah dari nilai angka
-- **Warna Pemisah** — Komponen dipisahkan tanda `|` (misal `4.1V | +120mA | 0.5W`) yang warnanya bisa diatur sendiri
-- Opsi tampilkan mV, mA, W (toggle)
-- Interval update bisa diatur 0.2–10 detik (default 1d)
-
-### Battery Bar
+**Tab Battery Strip** — Konfigurasi bar baterai (sebelumnya panel Battery Bar terpisah):
 - Menampilkan bar baterai sebagai strip di layar (level mengikuti persentase baterai)
 - **Mode Cepat** — Bar menempel penuh di salah satu sisi layar (Atas/Bawah/Kiri/Kanan). Posisi & panjang otomatis mengikuti sisi yang dipilih. Kontrol posisi manual nonaktif dalam mode ini. Bar menempel penuh di tepi tanpa jarak — **margin 8dp dihilangkan** sehingga tidak ada gap antara bar dan sisi layar, namun **Area Aman tetap terkunci aktif** (checkbox tercentang, disabled).
 - **Mode Manual** — Matikan "Mode Cepat" untuk mengatur panjang bar (0–100%) dan posisi bebas (slider X/Y, D-Pad) per orientasi layar. **Area Aman otomatis terkunci aktif** dalam mode ini — bar tidak bisa masuk area notch/cutout dan posisi selalu di-clamp dalam batas layar. Checkbox Area Aman **selalu terkunci aktif** (tercentang, disabled) di kedua mode.
 - **Warna Level** — Pemilih skema warna otomatis berdasarkan level baterai: **Tanpa Skema** (warna tetap pilihan user), **Klasik 3-warna** (hijau >20%, kuning ≤20%, merah ≤10%), **Hue Gradien** (warna bergradasi per segmen: 0–20% hue `1°` S70%, 21–50% hue `2°→100°` S70%, 51–100% hue `102°→260°` dengan saturasi naik `71%→100%`). Saat skema dipilih, langsung aktif.
-- **Baterai Rendah** — Atur ambang low (default 40%); saat level di bawah ambang bar berubah ke warna Low dan berkedip (kecepatan fade bisa diatur 0,2–5,0 detik). **Warna Low hanya berfungsi saat skema Tanpa Skema** — jika skema Klasik 3-warna atau Hue Gradien aktif, pemilih Warna Low diburamkan & nonaktif karena skema sudah memetakan warna di level rendah.
-- **Strip Kosong** — Tampilkan sisa strip di belakang bar dengan warna terpisah.
-- **Charging** — Bar menampilkan animasi shine saat perangkat di-charge. Efek ini bisa disesuaikan di section **Animasi Pengisian Daya**: **Animasi Shine** (on/off, default nonaktif), **Kecepatan Shine** (0,2–5,0 detik per sapuan, step 0,1 detik, default 1,8 detik), dan **Lebar Band** (2–98% dari panjang bar, default 25%). Section ini juga berisi **Animasi Wave saat charging** (gelombang mengalir sepanjang bar): **Animasi Wave** (on/off, default nonaktif), **Kecepatan Wave** (0,2–5,0 detik per siklus, step 0,1 detik, default 1,0 detik), dan **Intensitas Wave** (10–100%, default 60%).
-- **Baterai Rendah** — Saat level di bawah ambang low, bar menampilkan **animasi Wave** (kedutan gelombang): pola gelombang sinus yang menjalar sepanjang bar, berjalan bersamaan dengan animasi fade. Sesuaikan di section **Animasi Baterai Rendah**: **Animasi Wave** (on/off, default nonaktif), **Kecepatan Wave** (0,2–5,0 detik per siklus, step 0,1 detik, default 1,0 detik), dan **Intensitas Wave** (10–100%, default 60% — menentukan kontras gelap-terang gelombang). Section ini juga berisi Warna Low, Ambang Low, **Animasi Fade** (on/off, default nonaktif), dan Kecepatan Fade.
-- Pengaturan lain: ketebalan, radius sudut, shadow, kunci posisi, area aman.
+- **Animasi Pengisian Daya** — Efek saat charging: **Animasi Shine** (on/off, default nonaktif), **Kecepatan Shine** (0,2–5,0 detik per sapuan, step 0,1 detik, default 1,8 detik), **Lebar Band** (2–98% dari panjang bar, default 25%), dan **Animasi Wave saat charging** (gelombang mengalir sepanjang bar): on/off, kecepatan (0,2–5,0 detik), intensitas (10–100%, default 60%).
+- **Animasi Baterai Rendah** — Saat level di bawah ambang low, bar menampilkan **animasi Wave** (kedutan gelombang) yang berjalan bersamaan dengan animasi fade: on/off, kecepatan (0,2–5,0 detik), intensitas (10–100%, default 60%). Section ini juga berisi Warna Low, Ambang Low, **Animasi Fade** (on/off, default nonaktif), dan Kecepatan Fade.
+- **Warna Low hanya berfungsi saat skema Tanpa Skema** — jika skema Klasik 3-warna atau Hue Gradien aktif, pemilih Warna Low diburamkan & nonaktif karena skema sudah memetakan warna di level rendah.
+- Pengaturan lain: ketebalan, radius sudut, strip kosong, shadow, kunci posisi, area aman.
 
 ### Network Speed
 - Kecepatan internet real-time format `↓128KB/s ↑128KB/s`
 - **Warna Label Terpisah** — Tombol "Warna Label" untuk warna indikator ↓↑ dan satuan KB/MB/s terpisah dari nilai angka
 - Otomatis berubah ke MB/s saat >1024 KB/s
 - Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
+
+### Memory Stats
+Panel Memory Stats memiliki **2 tab**: **Monitor** dan **Overlay**.
+
+**Tab Monitor** — Info memori real-time 14 nilai:
+- Java Heap, Native Heap, Graphics, Total, Gagal (MB)
+- Execution Time, Execution Time Average (ms)
+- Total Free RAM, Total RAM (MB)
+- Jumlah Proses, Proses Active, Proses Stopped, Proses Cached, Proses Minimum
+- Bar visualisasi RAM
+- Tombol **Export** dan **Copy** untuk snapshot
+
+**Tab Overlay** — Konfigurasi overlay Memory:
+- OrderZones untuk mengatur urutan item via drag-and-drop
+- Toggle visibilitas tiap item (Java Heap, Native Heap, dll)
+- Konfigurasi ukuran, warna, label, separator, shadow, background, posisi, orientasi
+- Opsi **Background Monitor** — Monitoring memori tetap berjalan meski service overlay tidak aktif (opsional), dengan interval polling yang bisa diatur
 
 ### Color Picker
 Color Wheel dan Hue/Saturation/Value/Alpha slider tampil bersamaan dalam satu panel:
@@ -179,6 +194,7 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 
 - **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon
+- **Crash Logger** — Saat force close, stack trace otomatis ditulis ke `FTxT_crash_*.txt` di folder Download (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
 
 ---
 
