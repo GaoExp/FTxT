@@ -13,7 +13,7 @@
     <string name="nav_memory">Info Memori</string>
     <string name="nav_logo">Logo Display</string>
     <string name="nav_color_picker">Color Picker</string>
-    <string name="nav_debuging">Debuging</string>
+    <string name="nav_debuging">Debugging</string>
 
     <string name="back_press_toast">Tekan kembali lagi untuk keluar</string>
 

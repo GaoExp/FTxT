@@ -40,9 +40,11 @@ FTxT/
     │   ├── java/exp/ftxt/
     │   │   ├── core/
     │   │   │   ├── FloatingService.java     — Foreground service: kelola semua overlay via WindowManager
-    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews + ikon dinamis Bitmap suhu)
+    │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews + ikon dinamis Bitmap suhu, caching)
     │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
-    │   │   │   └── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
+    │   │   │   ├── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
+    │   │   │   ├── BootReceiver.java        — Restore overlay aktif saat boot
+    │   │   │   └── CrashLogger.java         — Crash logger otomatis: stack trace ke folder Download saat force close
     │   │   │
     │   │   ├── features/
     │   │   │   ├── floating_text/
@@ -55,23 +57,21 @@ FTxT/
     │   │   │   │   ├── ClockConfig.java     — Konfigurasi statis Clock overlay
     │   │   │   │   └── ClockModule.java     — Jam real-time HH:mm:ss, update tiap 1 detik
     │   │   │   ├── battery_stats/
-    │   │   │   │   ├── BatteryStatsConfig.java   — Konfigurasi statis Battery Stats overlay
-    │   │   │   │   └── BatteryStatsModule.java   — Suhu °C + persen %, baca dari sticky broadcast
-    │   │   │   ├── battery_current/
-    │   │   │   │   ├── BatteryCurrentConfig.java     — Konfigurasi Battery Current overlay
-    │   │   │   │   └── BatteryCurrentModule.java     — Tegangan/arus/daya dari 3 sumber (broadcast, API 28+, sysfs)
+    │   │   │   │   ├── BatteryStatsConfig.java   — Konfigurasi Battery Stats overlay (suhu, %, voltase, arus, daya, urutan item)
+    │   │   │   │   └── BatteryStatsModule.java   — Info baterai gabungan: °C + % + V + mA + W, baca dari BatteryManager
     │   │   │   ├── battery_bar/
     │   │   │   │   ├── BatteryBarConfig.java         — Konfigurasi Battery Bar overlay
-    │   │   │   │   ├── BatteryBarView.java           — Custom View bar baterai H/V (empty strip, fade, shine)
+    │   │   │   │   ├── BatteryBarView.java           — Custom View bar baterai H/V (empty strip, fade, shine, wave)
     │   │   │   │   └── BatteryBarModule.java         — Bar baterai: mode cepat (snap sisi) & manual, update interval
+    │   │   │   ├── memory_stats/
+    │   │   │   │   ├── MemoryConfig.java      — Konfigurasi modul Memory Stats
+    │   │   │   │   ├── MemoryModule.java      — Modul overlay Memory Stats (refreshDisplay, buildItemPart, readSysfs)
+    │   │   │   │   └── MemoryMonitor.java     — Background monitor polling memori
     │   │   │   ├── network_stats/
     │   │   │   │   ├── NetworkConfig.java  — Konfigurasi statis Network overlay
     │   │   │   │   └── NetworkModule.java  — Kecepatan internet ↓↑ via TrafficStats, 1 detik
-    │   │   │   ├── color_picker/
-    │   │   │   │   └── TriangleColorPickerView.java — Custom View segitiga HSV untuk Color Picker
-    │   │   │   ├── crosshair/      (placeholder — coming soon)
-    │   │   │   ├── cpu_monitor/    (placeholder — coming soon)
-    │   │   │   └── logo_display/   (placeholder — coming soon)
+    │   │   │   └── color_picker/
+    │   │   │       └── TriangleColorPickerView.java — Custom View segitiga HSV untuk Color Picker
     │   │   │
     │   │   ├── shared/
     │   │   │   ├── color/
@@ -105,28 +105,29 @@ FTxT/
     │   │   │   ├── FpsPositionController.java          — Kontrol posisi FPS dengan preset
     │   │   │   ├── ClockPanelController.java           — UI panel Clock: switch, size, color, shadow, bg
     │   │   │   ├── ClockPositionController.java        — Kontrol posisi Clock dengan preset
-    │   │   │   ├── BatteryPanelController.java         — UI panel Battery: °C/% toggle, size, color
-    │   │   │   ├── BatteryPositionController.java      — Kontrol posisi Battery Stats dengan preset
-    │   │   │   ├── BatteryCurrentPanelController.java      — UI panel Battery Current: volt, current, power toggle
-    │   │   │   ├── BatteryCurrentPositionController.java   — Kontrol posisi Battery Current
-    │   │   │   ├── BatteryBarPanelController.java          — UI panel Battery Bar: quick/manual mode, warna, shadow
-    │   │   │   ├── BatteryBarPositionController.java       — Kontrol posisi Battery Bar + preset
-    │   │   │   ├── NetworkPanelController.java             — UI panel Network: switch, size, color, shadow
-    │   │   │   ├── NetworkPositionController.java          — Kontrol posisi Network
-    │   │   │   ├── ColorPickerPanelController.java         — UI panel Color Picker: wheel, sliders, saved colors
-    │   │   │   ├── BasePanelFragment.java                  — Abstract base Fragment untuk semua panel
-    │   │   │   ├── PanelManager.java                       — Kelola show/hide Fragment panel
+    │   │   │   ├── BatteryPanelController.java         — UI panel Battery Info (tab Overlay): OrderZones, toggle °C/%/V/mA/W, warna
+    │   │   │   ├── BatteryPositionController.java      — Kontrol posisi Battery Info + preset
+    │   │   │   ├── BatteryBarPanelController.java      — UI panel Battery Strip (tab Battery Strip): quick/manual mode, warna, animasi
+    │   │   │   ├── BatteryBarPositionController.java   — Kontrol posisi Battery Strip + preset
+    │   │   │   ├── BatteryOrderZonesView.java          — Custom view zona drag chip untuk urutan info baterai
+    │   │   │   ├── MemoryPanelController.java          — UI panel Memory Stats (tab Monitor + Overlay): OrderZones, export/copy
+    │   │   │   ├── MemoryPositionController.java       — Kontrol posisi Memory Stats + preset
+    │   │   │   ├── NetworkPanelController.java         — UI panel Network: switch, size, color, shadow
+    │   │   │   ├── NetworkPositionController.java      — Kontrol posisi Network
+    │   │   │   ├── ColorPickerPanelController.java     — UI panel Color Picker: wheel, sliders, saved colors
+    │   │   │   ├── BasePanelFragment.java              — Abstract base Fragment untuk semua panel
+    │   │   │   ├── PanelManager.java                   — Kelola show/hide Fragment panel + onPanelHidden callback
     │   │   │   ├── fragment/
     │   │   │   │   ├── TextPanelFragment.java              — Fragment Floating Text
     │   │   │   │   ├── FpsPanelFragment.java               — Fragment FPS Display
     │   │   │   │   ├── ClockPanelFragment.java             — Fragment Jam Digital
-    │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Battery Stats
-    │   │   │   │   ├── BatteryCurrentPanelFragment.java    — Fragment Battery Current
-    │   │   │   │   ├── BatteryBarPanelFragment.java        — Fragment Battery Bar
+    │   │   │   │   ├── BatteryPanelFragment.java           — Fragment Battery Info (tabbed: Monitor/Overlay/Battery Strip)
+    │   │   │   │   ├── MemoryPanelFragment.java            — Fragment Memory Stats (tabbed: Monitor/Overlay)
     │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
     │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
     │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair (placeholder)
-    │   │   │   │   └── LogoPanelFragment.java              — Fragment Logo Display (placeholder)
+    │   │   │   │   ├── LogoPanelFragment.java              — Fragment Logo Display (placeholder)
+    │   │   │   │   └── DebugingPanelFragment.java          — Fragment panel Debuging (preview ikon rotasi)
     │   │   │   │
     │   │   ├── utils/
     │   │   │   └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
@@ -144,6 +145,7 @@ FTxT/
     │       │   ├── ic_arrow_left.xml        — Ikon panah kiri untuk D-Pad
     │       │   ├── ic_arrow_right.xml       — Ikon panah kanan untuk D-Pad
     │       │   ├── ic_arrow_up.xml          — Ikon panah atas untuk D-Pad
+    │       │   ├── ic_battery_strip.xml     — Ikon tab Battery Strip
     │       │   ├── ic_close.xml             — Ikon close/X untuk Kill Service
     │       │   ├── ic_dots_vertical.xml     — Ikon tiga titik vertikal (overflow menu)
     │       │   ├── ic_edit.xml              — Ikon pensil untuk edit HEX/nilai
@@ -152,12 +154,19 @@ FTxT/
     │       │   ├── ic_launcher_foreground.png   — Foreground launcher adaptive icon
     │       │   ├── ic_launcher_bg.png       — Background ikon aplikasi
     │       │   ├── ic_launcher_foreground_alt.png — Foreground ikon alternatif
+    │       │   ├── ic_monitor.xml           — Ikon tab Monitor
     │       │   ├── ic_notification_invisible.xml — Ikon mata tertutup untuk toggle hide
     │       │   ├── ic_notification_open.xml — Ikon buka aplikasi untuk notifikasi
     │       │   ├── ic_notification_stop.xml — Ikon kill service untuk notifikasi
     │       │   ├── ic_notification_toggle.xml — Ikon toggle untuk notifikasi
     │       │   ├── ic_notification_toggle_off.xml — Ikon toggle off untuk notifikasi
     │       │   ├── ic_notification_visible.xml — Ikon mata terbuka untuk toggle show
+    │       │   ├── ic_overlay.xml           — Ikon tab Overlay
+    │       │   ├── ic_rotation_variant_1.xml — Ikon varian rotasi 1 (panel Debuging)
+    │       │   ├── ic_rotation_variant_2.xml — Ikon varian rotasi 2
+    │       │   ├── ic_rotation_variant_3.xml — Ikon varian rotasi 3
+    │       │   ├── ic_rotation_variant_4.xml — Ikon varian rotasi 4
+    │       │   ├── ic_rotation_variant_5.xml — Ikon varian rotasi 5
     │       │   ├── ic_screen_rotation.xml   — Ikon orientasi layar (toolbar)
     │       │   ├── ic_settings.xml          — Ikon gear untuk settings
     │       │   ├── ic_star_filled.xml       — Ikon bintang solid (favorit)
@@ -165,6 +174,9 @@ FTxT/
     │       │   ├── ic_sun.xml               — Ikon matahari untuk tema terang
     │       │   ├── ic_swap.xml              — Ikon swap untuk tukar mode color picker
     │       │   ├── ic_theme.xml             — Ikon tema gelap/terang
+    │       │   ├── mem_badge_active_bg.xml  — Background badge proses aktif (panel Memory)
+    │       │   ├── mem_badge_stopped_bg.xml — Background badge proses stopped (panel Memory)
+    │       │   ├── mem_card_bg.xml          — Background card panel Memory
     │       │   ├── seekbar_thumb.xml        — Thumb slider lingkaran 12×12dp
     │       │   ├── splash_screen.xml        — Splash screen drawable
 │       │       ├── bg_alt_light.png         — Background drawer tema terang (varian 1)
@@ -200,22 +212,27 @@ FTxT/
     │   │   ├── panel_text.xml               — Panel konfigurasi Floating Text
     │   │   ├── panel_fps.xml                — Panel konfigurasi FPS Display
     │   │   ├── panel_clock.xml              — Panel konfigurasi Jam Digital
-    │   │   ├── panel_battery.xml            — Panel konfigurasi Battery Stats
-    │   │   ├── panel_battery_current.xml    — Panel konfigurasi Battery Current
-    │   │   ├── panel_battery_bar.xml        — Panel konfigurasi Battery Bar
+    │   │   ├── panel_battery.xml            — Panel konfigurasi Battery Info (tabbed: Monitor/Overlay/Battery Strip)
+    │   │   ├── panel_memory.xml             — Panel konfigurasi Memory Stats (tabbed: Monitor/Overlay)
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
     │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
     │   │   ├── panel_logo.xml               — Placeholder Logo Display (coming soon)
+    │   │   ├── panel_debuging.xml           — Panel konfigurasi Debuging (preview ikon rotasi)
     │   │   ├── panel_color_picker.xml       — Panel konfigurasi Color Picker
     │   │   ├── preset_browser_item.xml      — Item layout untuk daftar preset
     │   │   ├── preset_list_item.xml         — Item layout alternate untuk preset
     │   │   └── toolbar_zoom.xml             — Kontrol zoom − [+] di toolbar dokumentasi
     │       ├── menu/
-    │       │   ├── drawer_menu.xml   — Menu navigation drawer: daftar panel
-    │       │   └── main_menu.xml     — Menu toolbar: settings, theme, exit
+    │       │   ├── drawer_menu.xml           — Menu navigation drawer: daftar panel
+    │       │   ├── main_menu.xml             — Menu toolbar: settings, theme, exit
+    │       │   ├── menu_battery_bottom_nav.xml — Navigasi bawah panel Battery Info (Monitor/Overlay/Battery Strip)
+    │       │   └── menu_memory_bottom_nav.xml  — Navigasi bawah panel Memory Stats (Monitor/Overlay)
     │       ├── mipmap-anydpi-v26/
-    │       │   ├── ic_launcher.xml   — Adaptive icon launcher (default)
-    │       │   └── ic_launcher_alt.xml   — Adaptive icon launcher (alternatif)
+    │       │   ├── ic_launcher.xml           — Adaptive icon launcher (default)
+    │       │   └── ic_launcher_alt.xml       — Adaptive icon launcher (alternatif)
+    │       ├── color/
+    │       │   ├── bat_nav_item_color.xml    — Color selector navigasi bawah Battery Info
+    │       │   └── mem_nav_item_color.xml    — Color selector navigasi bawah Memory Stats
     │       ├── values/
     │       │   ├── colors.xml        — Warna: primary, accent, drawer, bg
     │       │   ├── strings.xml       — Semua string UI Bahasa Indonesia
@@ -238,13 +255,14 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 72 |
+| Java source | 75 |
 | Layout XML | 21 |
-| Drawable XML | 34 |
+| Drawable XML | 45 |
 | Drawable PNG | 13 |
+| Color XML | 2 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
-| Menu XML | 2 |
+| Menu XML | 4 |
 | Anim XML | 2 |
 | XML lainnya (Manifest) | 1 |
 | Assets (md) | 4 |
@@ -252,5 +270,5 @@ FTxT/
 | Root konfigurasi | 5 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~242** |
-| **Total direktori** | **~61** |
+| **Total file** | **~263** |
+| **Total direktori** | **~66** |

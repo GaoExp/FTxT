@@ -1,7 +1,7 @@
 # FTxT (FunText) — Floating Text Overlay
 
->**Current Release:** `4.85.5` **Beta** 
-**Last Updated:** `2026-08-15`
+>**Current Release:** `4.86.0` **Beta** 
+**Last Updated:** `2026-08-18`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -12,10 +12,11 @@
 - **Floating Text Overlay** — Teks custom di atas semua aplikasi, real-time update, dengan Mode Segel (pola teks diulang diagonal, kontrol spasi H/V, sudut -180° hingga 180°)
 - **FPS Display Overlay** — FPS counter draggable dengan warna nilai & label terpisah
 - **Jam Digital Overlay** — Waktu real-time 24 jam `HH:mm:ss`, update tiap 1 detik
-- **Battery Stats Overlay** — Suhu baterai (°C) dan persentase (%) dalam satu modul utuh dengan warna nilai & label terpisah, interval update bisa diatur
-- **Battery Current Overlay** — Tegangan (mV), arus (mA), dan daya (W) dengan warna nilai & satuan terpisah
-- **Battery Bar Overlay** — Bar baterai fleksibel di layar: Mode Cepat (snap ke sisi atas/bawah/kiri/kanan) atau Mode Manual (panjang & posisi bebas), warna fill + strip kosong, skema warna level (Klasik 3-warna / Hue Gradien), animasi fade + wave (kedutan gelombang) saat low & shine saat charging (kecepatan, lebar band, intensitas bisa diatur)
+- **Battery Info Overlay** — Info baterai (suhu °C, persentase %, voltase V, arus mA, daya W) dengan warna nilai & label terpisah, urutan info via drag-and-drop (OrderZones), interval update bisa diatur
+- **Battery Strip Overlay** — Bar baterai fleksibel di dalam panel Battery Info (tab Battery Strip): Mode Cepat (snap ke sisi atas/bawah/kiri/kanan) atau Mode Manual (panjang & posisi bebas), warna fill + strip kosong, skema warna level (Klasik 3-warna / Hue Gradien), animasi fade + wave (kedutan gelombang) saat low & shine saat charging (kecepatan, lebar band, intensitas bisa diatur)
 - **Network Speed Meter Overlay** — Kecepatan internet real-time (↓ ↑) dengan warna nilai & label terpisah
+- **Memory Stats Overlay** — Monitoring memori real-time 14 nilai (Java Heap, Native Heap, Graphics, Total, Gagal, Execution Time, Free RAM, Total RAM, jumlah proses, dll) dengan urutan item via OrderZones, background monitor yang tetap berjalan meski service tidak aktif, export/copy snapshot
+- **Crash Logger** — Saat force close, stack trace otomatis ditulis ke folder Download (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
 - **Color Wheel & Hue Slider** — Dua mode color picker: Classic Color Wheel dengan crosshair + ARGB slider, atau Hue/Saturation/Brightness/Alpha slider. Two-way sync, color name auto-detection, HEX edit manual, saved colors
 - **Safe Area** — Batasi posisi overlay agar tidak masuk area notch/cutout
 - **Touch Passthrough** — Kunci posisi agar sentuhan tembus ke aplikasi belakang (default ON)

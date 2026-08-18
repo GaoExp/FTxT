@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         "{\"id\":\"navMemory\",\"l\":\"Info Memori\"}," +
         "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}," +
         "{\"id\":\"navColorPicker\",\"l\":\"Color Picker\"}," +
-        "{\"id\":\"navDebuging\",\"l\":\"Debuging\"}]";
+        "{\"id\":\"navDebuging\",\"l\":\"Debugging\"}]";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        rebuildSidebar();
         if (panelManager != null) {
             panelManager.onPanelShown();
         }
@@ -581,16 +582,28 @@ public class MainActivity extends AppCompatActivity {
                     arr = flat;
                 }
             }
+            SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+            boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject item = arr.getJSONObject(i);
-                list.add(new SidebarItem(item.getString("l"), item.optString("id", null)));
+                String id = item.optString("id", null);
+                if ("navDebuging".equals(id) && !showDebugging) {
+                    continue;
+                }
+                list.add(new SidebarItem(item.getString("l"), id));
             }
         } catch (Exception e) {
             try {
                 JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
+                SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+                boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
                 for (int i = 0; i < def.length(); i++) {
                     JSONObject item = def.getJSONObject(i);
-                    list.add(new SidebarItem(item.getString("l"), item.optString("id", null)));
+                    String id = item.optString("id", null);
+                    if ("navDebuging".equals(id) && !showDebugging) {
+                        continue;
+                    }
+                    list.add(new SidebarItem(item.getString("l"), id));
                 }
             } catch (Exception e2) { }
         }
@@ -602,12 +615,17 @@ public class MainActivity extends AppCompatActivity {
     private void addMissingDefaultItems(List<SidebarItem> list) {
         List<String> existing = new ArrayList<>();
         for (SidebarItem i : list) existing.add(i.id);
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
         try {
             JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
             for (int i = 0; i < def.length(); i++) {
                 JSONObject o = def.getJSONObject(i);
                 String id = o.optString("id", null);
                 if (id != null && !existing.contains(id)) {
+                    if ("navDebuging".equals(id) && !showDebugging) {
+                        continue;
+                    }
                     list.add(new SidebarItem(o.getString("l"), id));
                     existing.add(id);
                 }
@@ -633,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void rebuildSidebar() {
+    public void rebuildSidebar() {
         List<SidebarItem> items = parseSidebarJson();
 
         navItemContainer.setLayoutManager(new LinearLayoutManager(this));
@@ -755,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.navCrosshair) return "crosshair";
         if (itemId == R.id.navLogo) return "logo";
         if (itemId == R.id.navMemory) return "memory";
-        if (itemId == R.id.navDebuging) return "debuging";
+        if (itemId == R.id.navDebuging) return "debugging";
         return null;
     }
 

@@ -39,7 +39,7 @@ public class PanelManager {
         panelMap.put("crosshair", CrosshairPanelFragment.class);
         panelMap.put("logo", LogoPanelFragment.class);
         panelMap.put("memory", MemoryPanelFragment.class);
-        panelMap.put("debuging", DebugingPanelFragment.class);
+        panelMap.put("debugging", DebugingPanelFragment.class);
     }
 
     public void showPanel(String name) {

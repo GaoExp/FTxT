@@ -19,7 +19,7 @@ public class DebugingPanelFragment extends BasePanelFragment {
 
     @Override
     protected String getPanelName() {
-        return "debuging";
+        return "debugging";
     }
 
     @Override
@@ -27,7 +27,10 @@ public class DebugingPanelFragment extends BasePanelFragment {
         super.onViewCreated(view, savedInstanceState);
         view.setVisibility(View.VISIBLE);
 
-        // Setup click listeners untuk preview ikon
+        setupIconClicks(view);
+    }
+
+    private void setupIconClicks(View view) {
         setupIconClick(view.findViewById(R.id.icon_variant_1), "Variant 1: Material Default");
         setupIconClick(view.findViewById(R.id.icon_variant_2), "Variant 2: Ponsel + Panah");
         setupIconClick(view.findViewById(R.id.icon_variant_3), "Variant 3: Tablet + Panah");

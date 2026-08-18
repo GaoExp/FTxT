@@ -1,4 +1,4 @@
-# [4.86.0] - 2026-08-18 17:17 WITA versionCode 183 ***ONGOING***
+# [4.86.0] - 2026-08-19 03:20 WITA versionCode 183 ***PUSH***
 ### ✨ Fitur Baru
 - **Panel Battery Bar digabung ke Battery Info dengan tabbed layout** — Panel Battery Bar tidak lagi berdiri sendiri di sidebar. Kini panel Battery Info memiliki 3 tab: **Monitor** (placeholder), **Overlay** (konfigurasi Battery Info + OrderZones), dan **Battery Strip** (seluruh konfigurasi Battery Bar dari panel terpisah sebelumnya). Pengguna beralih antar tab lewat navigasi bawah panel.
 - **OrderZones — urutan info baterai via drag-and-drop** — Di tab Overlay, checkbox °C/% diganti view chip drag dua zona (Aktif/Nonaktif) untuk mengatur urutan dan visibilitas info baterai: °C, %, V, mA, W. Chip bisa diseret antar zona untuk menampilkan/menyembunyikan info, dan diurutkan dalam satu zona.
@@ -43,8 +43,10 @@
 - `menu_memory_bottom_nav.xml` — Menu navigasi bawah panel Memory
 - `mem_nav_item_color.xml` — Color selector navigasi bawah Memory
 - `mem_card_bg.xml`, `mem_badge_active_bg.xml`, `mem_badge_stopped_bg.xml` — Drawable panel Memory
-- `ic_monitor.xml`, `ic_overlay.xml` — Ikon tab Memory (sekali pakai, nama sama dengan Battery tapi di direktori memory)
 - `CrashLogger.java` — Crash logger otomatis saat force close ke folder Download
+- `DebugingPanelFragment.java` — Fragment panel Debuging (preview ikon rotasi)
+- `panel_debuging.xml` — Layout panel Debuging
+- `ic_rotation_variant_1.xml`–`ic_rotation_variant_5.xml` — Ikon varian rotasi untuk panel Debuging
 
 ### ✏️ File Changed
 - `panel_battery.xml` — Diganti ke tabbed layout dengan BottomNavigationView
@@ -65,12 +67,19 @@
 - `BatteryBarModule.java` — Permanent BroadcastReceiver dengan cache batteryLevel/Scale/Status, skip update jika nilai tidak berubah
 - `styles.xml` — Tambah style BatNavActiveIndicator dan BatNavTextAppearance, MemNavActiveIndicator dan MemNavTextAppearance
 - `colors.xml` — Tambah 12 color values untuk panel Memory
-- `strings.xml` — Tambah nav_memory, ubah nav_battery → "Battery Info", hapus nav_battery_bar
-- `drawer_menu.xml` — Hapus nav_battery_bar, tambah nav_memory
-- `ids.xml` — Hapus navBatteryBar, tambah navMemory
+- `strings.xml` — Ubah nav_battery → "Battery Info", hapus nav_cpu, nav_battery_current, nav_battery_bar, tambah nav_memory, nav_debuging
+- `drawer_menu.xml` — Hapus nav_cpu, nav_battery_current, nav_battery_bar, tambah nav_memory, nav_debuging
+- `ids.xml` — Hapus navBatteryCurrent, navBatteryBar, tambah navMemory, navDebuging
 
 ### 🔥 File Removed
 - `panel_battery_bar.xml` — Tidak terpakai setelah digabung ke panel_battery.xml
+- `panel_battery_current.xml` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryBarPanelFragment.java` — Tidak terpakai setelah digabung ke BatteryPanelFragment
+- `BatteryCurrentPanelFragment.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentPanelController.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentPositionController.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentConfig.java` — Tidak terpakai setelah modul Battery Current dihapus
+- `BatteryCurrentModule.java` — Tidak terpakai setelah modul Battery Current dihapus
 
 ---
 

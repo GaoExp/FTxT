@@ -1,3 +1,21 @@
+# [4.87.0] - 2026-08-19 06:57 WITA versionCode 184 ***ONGOING***
+### ✨ Fitur Baru
+- **Toggle "Tampilkan panel Debugging" di halaman Konfigurasi** — Switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dari sidebar Navigation Drawer. Saat switch OFF, panel Debugging tidak muncul di daftar modul. Setting tersimpan otomatis dan berlaku persisten.
+
+### 🔧 Optimasi & Penyesuaian
+- **Perbaikan typo label "Debuging" → "Debugging"** — Seluruh label navigasi, judul panel, dan string resource diperbaiki dari "Debuging" menjadi "Debugging".
+
+### ✏️ File Changed
+- 2026-08-19 06:45 — `strings.xml` — Ubah label "Debuging" → "Debugging"
+- 2026-08-19 06:45 — `panel_debuging.xml` — Ubah id & judul panel ke "Debugging"
+- 2026-08-19 06:45 — `PanelManager.java` — Ubah key map "debuging" → "debugging"
+- 2026-08-19 06:45 — `DebugingPanelFragment.java` — Ubah return panelName ke "debugging"
+- 2026-08-19 06:45 — `MainActivity.java` — Ubah label & key "Debuging"/"debugging", `rebuildSidebar()` jadi public, filter sidebar berdasarkan setting toggle, `rebuildSidebar()` dipanggil di `onResume()`
+- 2026-08-19 06:56 — `activity_settings.xml` — Tambah section "Modul" dengan switch "Tampilkan panel Debugging"
+- 2026-08-19 06:56 — `SettingsActivity.java` — Tambah `debuggingSidebarSwitch` dengan load/save prefs
+
+---
+
 # [4.86.0] - 2026-08-19 03:20 WITA versionCode 183 ***PUSH***
 ### ✨ Fitur Baru
 - **Panel Battery Bar digabung ke Battery Info dengan tabbed layout** — Panel Battery Bar tidak lagi berdiri sendiri di sidebar. Kini panel Battery Info memiliki 3 tab: **Monitor** (placeholder), **Overlay** (konfigurasi Battery Info + OrderZones), dan **Battery Strip** (seluruh konfigurasi Battery Bar dari panel terpisah sebelumnya). Pengguna beralih antar tab lewat navigasi bawah panel.

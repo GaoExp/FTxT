@@ -27,6 +27,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch notificationSwitch;
     private Switch batterySwitch;
     private Switch iconSwitch;
+    private Switch debuggingSidebarSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,16 @@ public class SettingsActivity extends AppCompatActivity {
             applySwitchTint(iconSwitch, isChecked);
             prefs.edit().putBoolean("alt_icon", isChecked).apply();
             setIcon(isChecked);
+        });
+
+        debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
+        boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
+        debuggingSidebarSwitch.setChecked(showDebugging);
+        applySwitchTint(debuggingSidebarSwitch, showDebugging);
+
+        debuggingSidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(debuggingSidebarSwitch, isChecked);
+            prefs.edit().putBoolean("debugging_show_in_sidebar", isChecked).apply();
         });
 
     }

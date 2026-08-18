@@ -67,6 +67,7 @@ TZ=Asia/Makassar date +"%Y-%m-%d %H:%M WITA"
 - **Jangan catat detail internal.** Detail teknis implementasi (nama helper, cara polling, key prefs, dll) tidak ditulis kecuali berpengaruh ke perilaku user.
 - **Cek konsistensi sebelum selesai:** tidak boleh ada poin dalam satu entry yang saling bertentangan atau menduplikasi.
 - **Saat merapikan entry lama, jangan mengubah fakta** — hanya menggabungkan poin yang saling menimpa atau menghapus jejak iterasi yang sudah obsolete.
+- **Section 🗒️ File Added, ✏️ File Changed, 🔥 File Removed wajib disertakan waktu perubahan** — Format: `- yyyy-mm-dd hh:mm — \`filename\` — deskripsi perubahan`. Waktu dicatat berdasarkan urutan agent mengerjakan perubahan tersebut.
 
 ---
 
