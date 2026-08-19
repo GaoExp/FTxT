@@ -9,6 +9,7 @@ import android.graphics.PixelFormat;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -31,7 +32,10 @@ public class BatteryStatsModule implements OverlayModule {
     private SharedPreferences prefs;
     private boolean running;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private HandlerThread bgThread;
+    private Handler bgHandler;
     private String lastRenderedText;
+    private volatile boolean bgBusy;
 
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
@@ -92,6 +96,9 @@ public class BatteryStatsModule implements OverlayModule {
 
         view.post(this::updatePosition);
         running = true;
+        bgThread = new HandlerThread("bat-read");
+        bgThread.start();
+        bgHandler = new Handler(bgThread.getLooper());
         handler.post(tickRunnable);
     }
 
@@ -99,6 +106,11 @@ public class BatteryStatsModule implements OverlayModule {
     public void stop() {
         running = false;
         handler.removeCallbacks(tickRunnable);
+        if (bgThread != null) {
+            bgThread.quitSafely();
+            bgThread = null;
+            bgHandler = null;
+        }
         if (view != null && wm != null) {
             try {
                 wm.removeView(view);
@@ -275,35 +287,17 @@ public class BatteryStatsModule implements OverlayModule {
 
     private void updateDisplay() {
         if (view == null) return;
-        BatterySnapshot snap = readBatterySnapshot();
-        StringBuilder sb = new StringBuilder();
-        String[] order = BatteryStatsConfig.itemOrder.split(",");
-        for (String id : order) {
-            String part = buildItemPart(id, snap);
-            if (part == null) continue;
-            if (sb.length() > 0) sb.append(" | ");
-            sb.append(part);
+        if (bgHandler != null) {
+            bgHandler.post(() -> {
+                BatterySnapshot snap = readBatterySnapshot();
+                String text = buildDisplayText(snap);
+                handler.post(() -> applyDisplay(text));
+            });
+        } else {
+            BatterySnapshot snap = readBatterySnapshot();
+            String text = buildDisplayText(snap);
+            applyDisplay(text);
         }
-        String text = sb.length() > 0 ? sb.toString() : "N/A";
-        if (text.equals(lastRenderedText)) return;
-        lastRenderedText = text;
-        view.setTextColor(BatteryStatsConfig.color);
-        if (BatteryStatsConfig.showOnlyValue) {
-            view.setText(text);
-            return;
-        }
-        SpannableString spannable = new SpannableString(text);
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (c == '°' || c == 'C' || c == '%' || c == 'm' || c == 'V' || c == 'A' || c == 'W') {
-                spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.labelColor),
-                        i, i + 1, 0);
-            } else if (c == '|') {
-                spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.separatorColor),
-                        i, i + 1, 0);
-            }
-        }
-        view.setText(spannable);
     }
 
     private static class BatterySnapshot {
@@ -420,8 +414,62 @@ public class BatteryStatsModule implements OverlayModule {
         @Override
         public void run() {
             if (!running) return;
-            updateDisplay();
-            handler.postDelayed(this, (long)(BatteryStatsConfig.updateInterval * 1000));
+            if (!bgBusy) {
+                bgBusy = true;
+                final Runnable self = this;
+                bgHandler.post(() -> {
+                    try {
+                        BatterySnapshot snap = readBatterySnapshot();
+                        String text = buildDisplayText(snap);
+                        handler.post(() -> {
+                            bgBusy = false;
+                            if (!running) return;
+                            applyDisplay(text);
+                            handler.postDelayed(self, (long) (BatteryStatsConfig.updateInterval * 1000));
+                        });
+                    } catch (Exception e) {
+                        bgBusy = false;
+                        handler.postDelayed(self, (long) (BatteryStatsConfig.updateInterval * 1000));
+                    }
+                });
+            } else {
+                handler.postDelayed(this, (long) (BatteryStatsConfig.updateInterval * 1000));
+            }
         }
     };
+
+    private String buildDisplayText(BatterySnapshot snap) {
+        StringBuilder sb = new StringBuilder();
+        String[] order = BatteryStatsConfig.itemOrder.split(",");
+        for (String id : order) {
+            String part = buildItemPart(id, snap);
+            if (part == null) continue;
+            if (sb.length() > 0) sb.append(" | ");
+            sb.append(part);
+        }
+        return sb.length() > 0 ? sb.toString() : "N/A";
+    }
+
+    private void applyDisplay(String text) {
+        if (view == null) return;
+        if (text.equals(lastRenderedText)) return;
+        lastRenderedText = text;
+        view.setTextColor(BatteryStatsConfig.color);
+        if (BatteryStatsConfig.showOnlyValue) {
+            view.setText(text);
+            return;
+        }
+        SpannableString spannable = new SpannableString(text);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\u00B0' || c == 'C' || c == '%' || c == 'm' || c == 'V' || c == 'A' || c == 'W') {
+                spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.labelColor),
+                        i, i + 1, 0);
+            } else if (c == '|') {
+                spannable.setSpan(new ForegroundColorSpan(BatteryStatsConfig.separatorColor),
+                        i, i + 1, 0);
+            }
+        }
+        view.setText(spannable);
+    }
 }

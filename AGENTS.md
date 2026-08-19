@@ -9,7 +9,7 @@
 - **Tindakan destruktif (hapus/revert/ubah besar) WAJIB konfirmasi eksplisit.**
 - **JANGAN build; JANGAN menulis laporan section/bullet list di chat.**
 - **Gunakan bahasa Indonesia untuk thinking dan respons.**
-
+- **Tidak perlu sinkronisasi dokumen di assets, Sinkronisasi Gradle akan menanganinya secara otomatis saat build.**
 ---
 
 ## 1. Versioning (`app/build.gradle`)
@@ -100,15 +100,16 @@ TZ=Asia/Makassar date +"%Y-%m-%d %H:%M WITA"
 
 ### Rilis (hanya jika diperintah)
 1. `git add -A && git commit -m "vX.X.X deskripsi"`
-2. setelah commit: ubah status judul entry → `***PUSH***` (commit tanpa tag) atau `***RELEASE***` (commit + tag), perbarui tanggal & jam WITA saat itu
-3. `git tag vX.X.X` bila versi akan di-tag (status menjadi `***RELEASE***`)
+2. **JANGAN ubah status CHANGELOG** — status tetap `***ONGOING***` sampai user bilang push
+3. `git tag vX.X.X` bila versi akan di-tag
 4. **JANGAN push** — user yang push menyusul setelah commit
 
 ### Setelah Push (langsung buat judul entry versi baru)
 1. versionCode +1
 2. versionName akan disesuaikan setelah ada perubahan (major.minor.patch)
-3. buat entry CHANGELOG baru (paling atas dengan label `***ONGOING***`) — dibuat saat sesi kerja berikutnya dimulai setelah commit (push menyusul oleh user)
-4. kembali ke Edit Biasa
+3. ubah status judul entry → `***PUSH***` (commit tanpa tag) atau `***RELEASE***` (commit + tag), perbarui tanggal & jam WITA saat itu
+4. buat entry CHANGELOG baru (paling atas dengan label `***ONGOING***`) — dibuat saat sesi kerja berikutnya dimulai setelah commit (push menyusul oleh user)
+5. kembali ke Edit Biasa
 
 ---
 
