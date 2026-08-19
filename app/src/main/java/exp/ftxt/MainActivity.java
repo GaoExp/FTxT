@@ -583,11 +583,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-            boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
+            boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", false);
+            boolean showMemory = prefs.getBoolean("memory_show_in_sidebar", false);
             for (int i = 0; i < arr.length(); i++) {
                 JSONObject item = arr.getJSONObject(i);
                 String id = item.optString("id", null);
                 if ("navDebuging".equals(id) && !showDebugging) {
+                    continue;
+                }
+                if ("navMemory".equals(id) && !showMemory) {
                     continue;
                 }
                 list.add(new SidebarItem(item.getString("l"), id));
@@ -596,11 +600,15 @@ public class MainActivity extends AppCompatActivity {
             try {
                 JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
                 SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-                boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
+                boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", false);
+                boolean showMemory = prefs.getBoolean("memory_show_in_sidebar", false);
                 for (int i = 0; i < def.length(); i++) {
                     JSONObject item = def.getJSONObject(i);
                     String id = item.optString("id", null);
                     if ("navDebuging".equals(id) && !showDebugging) {
+                        continue;
+                    }
+                    if ("navMemory".equals(id) && !showMemory) {
                         continue;
                     }
                     list.add(new SidebarItem(item.getString("l"), id));
@@ -616,7 +624,8 @@ public class MainActivity extends AppCompatActivity {
         List<String> existing = new ArrayList<>();
         for (SidebarItem i : list) existing.add(i.id);
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
-        boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", true);
+        boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", false);
+        boolean showMemory = prefs.getBoolean("memory_show_in_sidebar", false);
         try {
             JSONArray def = new JSONArray(DEFAULT_SIDEBAR_JSON);
             for (int i = 0; i < def.length(); i++) {
@@ -624,6 +633,9 @@ public class MainActivity extends AppCompatActivity {
                 String id = o.optString("id", null);
                 if (id != null && !existing.contains(id)) {
                     if ("navDebuging".equals(id) && !showDebugging) {
+                        continue;
+                    }
+                    if ("navMemory".equals(id) && !showMemory) {
                         continue;
                     }
                     list.add(new SidebarItem(o.getString("l"), id));

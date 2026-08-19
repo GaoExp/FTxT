@@ -1,9 +1,12 @@
-# [4.87.0] - 2026-08-19 06:57 WITA versionCode 184 ***ONGOING***
+# [4.87.0] - 2026-08-19 08:32 WITA versionCode 184 ***ONGOING***
 ### ✨ Fitur Baru
-- **Toggle "Tampilkan panel Debugging" di halaman Konfigurasi** — Switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dari sidebar Navigation Drawer. Saat switch OFF, panel Debugging tidak muncul di daftar modul. Setting tersimpan otomatis dan berlaku persisten.
+- **Toggle "Tampilkan panel Debugging" & "Tampilkan panel Info Memori" di halaman Konfigurasi** — Dua switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dan Info Memori dari sidebar Navigation Drawer. Kedua switch default OFF (sembunyi). Setting tersimpan otomatis dan berlaku persisten.
 
 ### 🔧 Optimasi & Penyesuaian
 - **Perbaikan typo label "Debuging" → "Debugging"** — Seluruh label navigasi, judul panel, dan string resource diperbaiki dari "Debuging" menjadi "Debugging".
+
+### 🐞 Bug Fixes
+- **Battery Stats overlay berkedip (flickering)** — Pembacaan data baterai (`registerReceiver` + `readSysfs`) dilakukan di main thread yang memblok UI thread dan menyebabkan micro-stutter/flicker. Kini pembacaan dipindah ke background thread terpisah, dan UI hanya diupdate dari main thread saat data baru tersedia.
 
 ### ✏️ File Changed
 - 2026-08-19 06:45 — `strings.xml` — Ubah label "Debuging" → "Debugging"
@@ -13,6 +16,10 @@
 - 2026-08-19 06:45 — `MainActivity.java` — Ubah label & key "Debuging"/"debugging", `rebuildSidebar()` jadi public, filter sidebar berdasarkan setting toggle, `rebuildSidebar()` dipanggil di `onResume()`
 - 2026-08-19 06:56 — `activity_settings.xml` — Tambah section "Modul" dengan switch "Tampilkan panel Debugging"
 - 2026-08-19 06:56 — `SettingsActivity.java` — Tambah `debuggingSidebarSwitch` dengan load/save prefs
+- 2026-08-19 08:13 — `BatteryStatsModule.java` — Pindahkan `readBatterySnapshot()` ke background thread (`HandlerThread`), pisah `buildDisplayText()` & `applyDisplay()`, `tickRunnable` baca data async
+- 2026-08-19 08:32 — `activity_settings.xml` — Tambah switch "Tampilkan panel Info Memori" di section Modul
+- 2026-08-19 08:32 — `SettingsActivity.java` — Tambah `memorySidebarSwitch` dengan load/save prefs `memory_show_in_sidebar`, ubah default `debugging_show_in_sidebar` ke `false`
+- 2026-08-19 08:32 — `MainActivity.java` — Filter sidebar `navMemory` berdasarkan pref `memory_show_in_sidebar`, ubah default `debugging_show_in_sidebar` ke `false`
 
 ---
 
