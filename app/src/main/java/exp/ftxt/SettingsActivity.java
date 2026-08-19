@@ -10,8 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -28,7 +30,14 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch batterySwitch;
     private Switch iconSwitch;
     private Switch debuggingSidebarSwitch;
+    private EditText debuggingPasswordInput;
+    private TextView debuggingPasswordStatus;
+    private TextView debuggingUnlockBtn;
+    private TextView debuggingRelockBtn;
     private Switch memorySidebarSwitch;
+
+    private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
+    private static final String PREF_DEBUGGING_UNLOCKED = "debugging_unlocked";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +100,58 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
+        debuggingPasswordInput = findViewById(R.id.debuggingPasswordInput);
+        debuggingPasswordStatus = findViewById(R.id.debuggingPasswordStatus);
+        debuggingUnlockBtn = findViewById(R.id.debuggingUnlockBtn);
+        debuggingRelockBtn = findViewById(R.id.debuggingRelockBtn);
+
+        boolean debuggingUnlocked = prefs.getBoolean(PREF_DEBUGGING_UNLOCKED, false);
         boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", false);
+
+        if (debuggingUnlocked) {
+            debuggingSidebarSwitch.setEnabled(true);
+            debuggingPasswordInput.setVisibility(android.view.View.GONE);
+            debuggingUnlockBtn.setVisibility(android.view.View.GONE);
+            debuggingRelockBtn.setVisibility(android.view.View.VISIBLE);
+            debuggingPasswordStatus.setText("Terbuka");
+            debuggingPasswordStatus.setTextColor(Color.parseColor("#4CAF50"));
+        }
+
         debuggingSidebarSwitch.setChecked(showDebugging);
         applySwitchTint(debuggingSidebarSwitch, showDebugging);
 
         debuggingSidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             applySwitchTint(debuggingSidebarSwitch, isChecked);
             prefs.edit().putBoolean("debugging_show_in_sidebar", isChecked).apply();
+        });
+
+        debuggingUnlockBtn.setOnClickListener(v -> {
+            String input = debuggingPasswordInput.getText().toString();
+            if (input.equals(DEBUGGING_PASSWORD)) {
+                debuggingSidebarSwitch.setEnabled(true);
+                debuggingPasswordInput.setText("");
+                debuggingPasswordInput.setVisibility(android.view.View.GONE);
+                debuggingUnlockBtn.setVisibility(android.view.View.GONE);
+                debuggingRelockBtn.setVisibility(android.view.View.VISIBLE);
+                debuggingPasswordStatus.setText("Terbuka");
+                debuggingPasswordStatus.setTextColor(Color.parseColor("#4CAF50"));
+                prefs.edit().putBoolean(PREF_DEBUGGING_UNLOCKED, true).apply();
+            } else {
+                debuggingPasswordStatus.setText("Kunci salah");
+                debuggingPasswordStatus.setTextColor(Color.parseColor("#E53935"));
+            }
+        });
+
+        debuggingRelockBtn.setOnClickListener(v -> {
+            debuggingSidebarSwitch.setChecked(false);
+            applySwitchTint(debuggingSidebarSwitch, false);
+            prefs.edit().putBoolean("debugging_show_in_sidebar", false).apply();
+            debuggingSidebarSwitch.setEnabled(false);
+            debuggingRelockBtn.setVisibility(android.view.View.GONE);
+            debuggingPasswordInput.setVisibility(android.view.View.VISIBLE);
+            debuggingUnlockBtn.setVisibility(android.view.View.VISIBLE);
+            debuggingPasswordStatus.setText("");
+            prefs.edit().putBoolean(PREF_DEBUGGING_UNLOCKED, false).apply();
         });
 
         memorySidebarSwitch = findViewById(R.id.memorySidebarSwitch);
