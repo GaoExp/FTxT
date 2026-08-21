@@ -1,4 +1,4 @@
-# [4.87.0] - 2026-08-21 20:13 WITA versionCode 184 ***ONGOING***
+# [4.87.0] - 2026-08-21 20:28 WITA versionCode 184 ***RELEASE***
 ### ✨ Fitur Baru
 - **Toggle "Tampilkan panel Debugging" & "Tampilkan panel Info Memori" di halaman Konfigurasi** — Dua switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dan Info Memori dari sidebar Navigation Drawer. Kedua switch default OFF (sembunyi). Setting tersimpan otomatis dan berlaku persisten.
 - **Proteksi password panel Debugging** — Switch panel Debugging terkunci (disabled) dan membutuhkan kunci password untuk membukanya. Kolom input password + tombol Unlock muncul di bawah switch. Setelah password benar dimasukkan dan tombol diklik, switch terbuka dan tombol Relock muncul di sebelah switch untuk mengunci ulang. Status unlock tersimpan persisten.
