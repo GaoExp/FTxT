@@ -110,6 +110,7 @@ FTxT/
     │   │   │   ├── BatteryBarPanelController.java      — UI panel Battery Strip (tab Battery Strip): quick/manual mode, warna, animasi
     │   │   │   ├── BatteryBarPositionController.java   — Kontrol posisi Battery Strip + preset
     │   │   │   ├── BatteryOrderZonesView.java          — Custom view zona drag chip untuk urutan info baterai
+    │   │   │   ├── MemoryOrderZonesView.java           — Custom view zona drag chip dua zona untuk urutan item Memory Stats
     │   │   │   ├── MemoryPanelController.java          — UI panel Memory Stats (tab Monitor + Overlay): OrderZones, export/copy
     │   │   │   ├── MemoryPositionController.java       — Kontrol posisi Memory Stats + preset
     │   │   │   ├── NetworkPanelController.java         — UI panel Network: switch, size, color, shadow
@@ -127,7 +128,7 @@ FTxT/
     │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
     │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair (placeholder)
     │   │   │   │   ├── LogoPanelFragment.java              — Fragment Logo Display (placeholder)
-    │   │   │   │   └── DebugingPanelFragment.java          — Fragment panel Debuging (preview ikon rotasi)
+    │   │   │   │   └── DebugingPanelFragment.java          — Fragment panel Debugging (preview ikon rotasi)
     │   │   │   │
     │   │   ├── utils/
     │   │   │   └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
@@ -162,7 +163,7 @@ FTxT/
     │       │   ├── ic_notification_toggle_off.xml — Ikon toggle off untuk notifikasi
     │       │   ├── ic_notification_visible.xml — Ikon mata terbuka untuk toggle show
     │       │   ├── ic_overlay.xml           — Ikon tab Overlay
-    │       │   ├── ic_rotation_variant_1.xml — Ikon varian rotasi 1 (panel Debuging)
+    │       │   ├── ic_rotation_variant_1.xml — Ikon varian rotasi 1 (panel Debugging)
     │       │   ├── ic_rotation_variant_2.xml — Ikon varian rotasi 2
     │       │   ├── ic_rotation_variant_3.xml — Ikon varian rotasi 3
     │       │   ├── ic_rotation_variant_4.xml — Ikon varian rotasi 4
@@ -217,7 +218,7 @@ FTxT/
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
     │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
     │   │   ├── panel_logo.xml               — Placeholder Logo Display (coming soon)
-    │   │   ├── panel_debuging.xml           — Panel konfigurasi Debuging (preview ikon rotasi)
+    │   │   ├── panel_debuging.xml           — Panel konfigurasi Debugging (preview ikon rotasi)
     │   │   ├── panel_color_picker.xml       — Panel konfigurasi Color Picker
     │   │   ├── preset_browser_item.xml      — Item layout untuk daftar preset
     │   │   ├── preset_list_item.xml         — Item layout alternate untuk preset
@@ -255,7 +256,7 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 75 |
+| Java source | 76 |
 | Layout XML | 21 |
 | Drawable XML | 45 |
 | Drawable PNG | 13 |

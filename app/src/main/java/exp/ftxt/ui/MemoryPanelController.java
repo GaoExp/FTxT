@@ -59,10 +59,7 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
     private final MainActivity activity;
 
     private CheckBox memSwitch;
-    private CheckBox memItemJava;
-    private CheckBox memItemNative;
-    private CheckBox memItemGraphics;
-    private CheckBox memItemTotal;
+    private MemoryOrderZonesView memoryOrderZones;
     private CheckBox memValueOnlyCheck;
     private CheckBox memLockSwitch;
     private CheckBox memSafeArea;
@@ -149,6 +146,9 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
         if (memoryPositionController != null) {
             memoryPositionController.refresh();
         }
+        if (memoryOrderZones != null) {
+            memoryOrderZones.setOrder(MemoryConfig.itemOrder);
+        }
         resumeMonitorPolling();
     }
 
@@ -175,10 +175,7 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
 
     private void bindViews(View rootView) {
         memSwitch = rootView.findViewById(R.id.memSwitch);
-        memItemJava = rootView.findViewById(R.id.memItemJava);
-        memItemNative = rootView.findViewById(R.id.memItemNative);
-        memItemGraphics = rootView.findViewById(R.id.memItemGraphics);
-        memItemTotal = rootView.findViewById(R.id.memItemTotal);
+        memoryOrderZones = rootView.findViewById(R.id.memoryOrderZones);
         memValueOnlyCheck = rootView.findViewById(R.id.memValueOnlyCheck);
         memLockSwitch = rootView.findViewById(R.id.memLockSwitch);
         memSafeArea = rootView.findViewById(R.id.memSafeArea);
@@ -249,14 +246,7 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
     private void loadConfig() {
         memSwitch.setChecked(MemoryConfig.enabled);
         activity.applyCheckboxTint(memSwitch, MemoryConfig.enabled);
-        memItemJava.setChecked(MemoryConfig.showJavaHeap);
-        activity.applyCheckboxTint(memItemJava, MemoryConfig.showJavaHeap);
-        memItemNative.setChecked(MemoryConfig.showNativeHeap);
-        activity.applyCheckboxTint(memItemNative, MemoryConfig.showNativeHeap);
-        memItemGraphics.setChecked(MemoryConfig.showGraphics);
-        activity.applyCheckboxTint(memItemGraphics, MemoryConfig.showGraphics);
-        memItemTotal.setChecked(MemoryConfig.showTotal);
-        activity.applyCheckboxTint(memItemTotal, MemoryConfig.showTotal);
+        memoryOrderZones.setOrder(MemoryConfig.itemOrder);
         memSizeSeekBar.setProgress((int) MemoryConfig.size);
         memColorPreview.setBackgroundColor(MemoryConfig.color);
         memLabelColorPreview.setBackgroundColor(MemoryConfig.labelColor);
@@ -323,34 +313,6 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
                     activity.stopService(new Intent(activity, FloatingService.class));
                 }
             }
-        });
-
-        memItemJava.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            MemoryConfig.showJavaHeap = isChecked;
-            activity.applyCheckboxTint(memItemJava, isChecked);
-            saveItemPrefs();
-            FloatingService.updateMemoryInPlace();
-        });
-
-        memItemNative.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            MemoryConfig.showNativeHeap = isChecked;
-            activity.applyCheckboxTint(memItemNative, isChecked);
-            saveItemPrefs();
-            FloatingService.updateMemoryInPlace();
-        });
-
-        memItemGraphics.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            MemoryConfig.showGraphics = isChecked;
-            activity.applyCheckboxTint(memItemGraphics, isChecked);
-            saveItemPrefs();
-            FloatingService.updateMemoryInPlace();
-        });
-
-        memItemTotal.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            MemoryConfig.showTotal = isChecked;
-            activity.applyCheckboxTint(memItemTotal, isChecked);
-            saveItemPrefs();
-            FloatingService.updateMemoryInPlace();
         });
 
         memValueOnlyCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -577,6 +539,7 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", memShadowOffsetYSeekBar, memShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
+        setupOrderZones();
         setupMonitorTab();
     }
 
@@ -888,13 +851,26 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
         }
     }
 
-    private void saveItemPrefs() {
-        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE).edit()
-                .putBoolean("mem_show_java", MemoryConfig.showJavaHeap)
-                .putBoolean("mem_show_native", MemoryConfig.showNativeHeap)
-                .putBoolean("mem_show_graphics", MemoryConfig.showGraphics)
-                .putBoolean("mem_show_total", MemoryConfig.showTotal)
+    private void setupOrderZones() {
+        memoryOrderZones.setListener(this::onOrderChanged);
+        memoryOrderZones.setOrder(MemoryConfig.itemOrder);
+    }
+
+    private void onOrderChanged(String order, boolean java, boolean nativeHeap, boolean graphics, boolean total) {
+        MemoryConfig.itemOrder = order;
+        MemoryConfig.showJavaHeap = java;
+        MemoryConfig.showNativeHeap = nativeHeap;
+        MemoryConfig.showGraphics = graphics;
+        MemoryConfig.showTotal = total;
+        activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                .edit()
+                .putString("mem_item_order", order)
+                .putBoolean("mem_show_java", java)
+                .putBoolean("mem_show_native", nativeHeap)
+                .putBoolean("mem_show_graphics", graphics)
+                .putBoolean("mem_show_total", total)
                 .apply();
+        FloatingService.updateMemoryInPlace();
     }
 
     private void saveMemShadowPrefs() {

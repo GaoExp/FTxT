@@ -1,4 +1,4 @@
-# [4.87.0] - 2026-08-19 16:22 WITA versionCode 184 ***ONGOING***
+# [4.87.0] - 2026-08-21 20:13 WITA versionCode 184 ***ONGOING***
 ### ✨ Fitur Baru
 - **Toggle "Tampilkan panel Debugging" & "Tampilkan panel Info Memori" di halaman Konfigurasi** — Dua switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dan Info Memori dari sidebar Navigation Drawer. Kedua switch default OFF (sembunyi). Setting tersimpan otomatis dan berlaku persisten.
 - **Proteksi password panel Debugging** — Switch panel Debugging terkunci (disabled) dan membutuhkan kunci password untuk membukanya. Kolom input password + tombol Unlock muncul di bawah switch. Setelah password benar dimasukkan dan tombol diklik, switch terbuka dan tombol Relock muncul di sebelah switch untuk mengunci ulang. Status unlock tersimpan persisten.
@@ -8,8 +8,17 @@
 - **Tombol Relock panel Debugging diperkecil** — Tombol Relock di halaman Konfigurasi diubah dari `Button` menjadi `TextView` (11sp, warna merah) agar tidak mencolok dan konsisten dengan toggle switch di sebelahnya.
 - **Urutan section halaman Konfigurasi ditata ulang** — "Ikon Aplikasi" dipindah ke posisi paling atas, "Akses Izin" di bawahnya. Di section Modul: "Info Memori" di atas "Debugging".
 
+### ♻️ Perubahan Fitur
+- **Urutan item Memory Stats via OrderZones drag-and-drop** — Pemilihan item Memory Stats (Heap, Native, Graphics, Total) diubah dari 4 checkbox individual menjadi `MemoryOrderZonesView` drag-and-drop dua zona (Aktif/Nonaktif), konsisten dengan panel Battery Info. Pengguna bisa menyeret chip antar zona untuk menampilkan/menyembunyikan item dan mengurutkannya dalam satu zona.
+
 ### 🐞 Bug Fixes
+- **Sidebar drag-and-drop tidak stabil (item tumpuk, ruang kosong, tidak berubah)** — `rebuildSidebar()` dipanggil di `onCreate()` DAN `onResume()`, menyebabkan DividerItemDecoration bertambah terus (ruang kosong), seluruh infrastruktur RecyclerView di-rebuild setiap kali (animasi aneh, drag state hilang), dan `getAdapterPosition()` deprecated yang bisa gagal diam-diam. Kini dipisah: `initSidebar()` (sekali di `onCreate()`) untuk setup LayoutManager + DividerItemDecoration + ItemTouchHelper, dan `refreshSidebar()` (di `onResume()`) hanya update data adapter. `getAdapterPosition()` diganti `getBindingAdapterPosition()`.
 - **Battery Stats overlay berkedip (flickering)** — Pembacaan data baterai (`registerReceiver` + `readSysfs`) dilakukan di main thread yang memblok UI thread dan menyebabkan micro-stutter/flicker. Kini pembacaan dipindah ke background thread terpisah, dan UI hanya diupdate dari main thread saat data baru tersedia.
+- **Switch "Tampilkan panel Info Memori" di Settings tidak menghentikan overlay & background monitor** — Saat switch dimatikan, panel tersembunyi dari sidebar namun overlay Memory dan background monitor tetap berjalan. Kini saat switch OFF, overlay dihentikan via `FloatingService.stopModule()`, `MemoryConfig.enabled` diset `false`, dan `MemoryMonitor.stop()` dipanggil jika background monitor aktif.
+- **Panel Memory/Debugging masih terlihat & bisa diakses saat switch panel dimatikan** — Saat switch "Tampilkan panel" di Settings dimatikan, panel Memory atau Debugging yang sedang aktif tetap terlihat di UI dan masih bisa diakses bahkan setelah menutup & membuka ulang aplikasi. Kini saat switch OFF, panel aktif otomatis dialihkan ke Floating Text, dan `onResume()` mengecek apakah panel aktif masih valid sebelum menampilkannya.
+
+### 🗒️ File Added
+- 2026-08-19 17:59 — `MemoryOrderZonesView.java` — Custom view zona drag chip dua zona (Aktif/Nonaktif) untuk urutan & visibilitas item Memory Stats
 
 ### ✏️ File Changed
 - 2026-08-19 06:45 — `strings.xml` — Ubah label "Debuging" → "Debugging"
@@ -22,6 +31,11 @@
 - 2026-08-19 08:13 — `BatteryStatsModule.java` — Pindahkan `readBatterySnapshot()` ke background thread (`HandlerThread`), pisah `buildDisplayText()` & `applyDisplay()`, `tickRunnable` baca data async
 - 2026-08-19 16:22 — `activity_settings.xml` — Tombol Relock diubah dari Button ke TextView (11sp, warna merah); urutan section ditata ulang: Ikon Aplikasi di atas Akses Izin, Info Memori di atas Debugging di section Modul
 - 2026-08-19 16:22 — `SettingsActivity.java` — Field `debuggingRelockBtn` diubah dari Button ke TextView
+- 2026-08-19 18:18 — `MemoryPanelController.java` — Ganti 4 CheckBox (Heap, Native, Graphics, Total) dengan `MemoryOrderZonesView`, hapus listener individual, tambah `setupOrderZones()` + `onOrderChanged()` callback
+- 2026-08-19 18:18 — `panel_memory.xml` — Ganti 4 CheckBox dalam 2 LinearLayout dengan `MemoryOrderZonesView` (`memoryOrderZones`)
+- 2026-08-19 18:35 — `MainActivity.java` — Pisahkan `rebuildSidebar()` jadi `initSidebar()` (setup infrastruktur sekali) + `refreshSidebar()` (update data di `onResume()`); tambah `setItems()` di SidebarAdapter; ganti `getAdapterPosition()` → `getBindingAdapterPosition()`
+- 2026-08-19 20:13 — `SettingsActivity.java` — Tambah broadcast `ACTION_PANEL_VISIBILITY_CHANGED` saat switch Debugging/Memory di-off, termasuk tombol Relock
+- 2026-08-19 20:13 — `MainActivity.java` — Daftarkan `panelVisibilityReceiver` untuk alihkan panel aktif ke "text" saat panel disembunyikan; tambah pengecekan di `onResume()` agar panel tidak valid otomatis dialihkan
 
 ---
 

@@ -1,6 +1,9 @@
 package exp.ftxt;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private SidebarAdapter sidebarAdapter;
     private ItemTouchHelper sidebarTouchHelper;
     private static final String PREFS_SIDEBAR_STATE = "sidebar_state";
+
+    private BroadcastReceiver panelVisibilityReceiver;
 
     private static final String DEFAULT_SIDEBAR_JSON =
         "[{\"id\":\"navFloatingText\",\"l\":\"Floating Text\"}," +
@@ -119,12 +124,33 @@ public class MainActivity extends AppCompatActivity {
 
         navItemContainer = findViewById(R.id.navItemContainer);
 
-        rebuildSidebar();
+        initSidebar();
 
         findViewById(R.id.navTutupAplikasi).setOnClickListener(v -> forceClose());
         findViewById(R.id.navKeluar).setOnClickListener(v -> finishAffinity());
 
         loadShadowConfigs();
+
+        panelVisibilityReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (SettingsActivity.ACTION_PANEL_VISIBILITY_CHANGED.equals(intent.getAction())) {
+                    String panelId = intent.getStringExtra(SettingsActivity.EXTRA_PANEL_ID);
+                    if (panelId != null && panelManager != null) {
+                        String currentPanel = panelManager.getCurrentPanel();
+                        if (panelId.equals(currentPanel)) {
+                            panelManager.showPanel("text");
+                            getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                                    .edit().putInt("nav_selected_item", R.id.navFloatingText).apply();
+                            updateNavSelection(R.id.navFloatingText);
+                            updateActionBarTitle(R.id.navFloatingText);
+                        }
+                    }
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter(SettingsActivity.ACTION_PANEL_VISIBILITY_CHANGED);
+        registerReceiver(panelVisibilityReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         requestAllPermissionsOnFirstLaunch();
     }
@@ -154,9 +180,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        rebuildSidebar();
+        refreshSidebar();
         if (panelManager != null) {
             panelManager.onPanelShown();
+            String currentPanel = panelManager.getCurrentPanel();
+            if (currentPanel != null) {
+                SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+                boolean isDebuggingPanel = "debugging".equals(currentPanel);
+                boolean isMemoryPanel = "memory".equals(currentPanel);
+                boolean debuggingAllowed = prefs.getBoolean("debugging_show_in_sidebar", false);
+                boolean memoryAllowed = prefs.getBoolean("memory_show_in_sidebar", false);
+                if ((isDebuggingPanel && !debuggingAllowed) || (isMemoryPanel && !memoryAllowed)) {
+                    panelManager.showPanel("text");
+                    prefs.edit().putInt("nav_selected_item", R.id.navFloatingText).apply();
+                    updateNavSelection(R.id.navFloatingText);
+                    updateActionBarTitle(R.id.navFloatingText);
+                }
+            }
         }
         autoRequestAndStart();
         requestRemainingPermissions();
@@ -347,6 +387,15 @@ public class MainActivity extends AppCompatActivity {
     private void forceClose() {
         killService();
         finishAffinity();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (panelVisibilityReceiver != null) {
+            unregisterReceiver(panelVisibilityReceiver);
+            panelVisibilityReceiver = null;
+        }
+        super.onDestroy();
     }
 
     private void loadShadowConfigs() {
@@ -663,20 +712,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void rebuildSidebar() {
-        List<SidebarItem> items = parseSidebarJson();
-
+    private void initSidebar() {
         navItemContainer.setLayoutManager(new LinearLayoutManager(this));
-        navItemContainer.addItemDecoration(new androidx.recyclerview.widget.DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        sidebarAdapter = new SidebarAdapter(items);
+        navItemContainer.addItemDecoration(
+                new androidx.recyclerview.widget.DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+
+        sidebarAdapter = new SidebarAdapter(parseSidebarJson());
         navItemContainer.setAdapter(sidebarAdapter);
 
         ItemTouchHelper.SimpleCallback cb = new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
             public boolean onMove(RecyclerView rv, RecyclerView.ViewHolder vh, RecyclerView.ViewHolder target) {
-                int from = vh.getAdapterPosition();
-                int to = target.getAdapterPosition();
+                int from = vh.getBindingAdapterPosition();
+                int to = target.getBindingAdapterPosition();
                 if (from < 0 || to < 0 || from == to) return false;
                 sidebarAdapter.moveItem(from, to);
                 return true;
@@ -691,9 +740,12 @@ public class MainActivity extends AppCompatActivity {
                 saveSidebarState();
             }
         };
-        ItemTouchHelper ith = new ItemTouchHelper(cb);
-        ith.attachToRecyclerView(navItemContainer);
-        sidebarTouchHelper = ith;
+        sidebarTouchHelper = new ItemTouchHelper(cb);
+        sidebarTouchHelper.attachToRecyclerView(navItemContainer);
+    }
+
+    private void refreshSidebar() {
+        sidebarAdapter.setItems(parseSidebarJson());
     }
 
     private static class SidebarItem {
@@ -714,6 +766,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         List<SidebarItem> getItems() { return items; }
+
+        void setItems(List<SidebarItem> newItems) {
+            items.clear();
+            items.addAll(newItems);
+            notifyDataSetChanged();
+        }
 
         void moveItem(int from, int to) {
             SidebarItem item = items.remove(from);

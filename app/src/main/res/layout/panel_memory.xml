@@ -443,47 +443,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <LinearLayout
-                        android:orientation="horizontal"
+                    <exp.ftxt.ui.MemoryOrderZonesView
+                        android:id="@+id/memoryOrderZones"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <CheckBox
-                            android:id="@+id/memItemJava"
-                            android:text="Heap"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"/>
-
-                        <CheckBox
-                            android:id="@+id/memItemNative"
-                            android:text="Native"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"/>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <CheckBox
-                            android:id="@+id/memItemGraphics"
-                            android:text="Graphics"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"/>
-
-                        <CheckBox
-                            android:id="@+id/memItemTotal"
-                            android:text="Total"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"/>
-
-                    </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"/>
 
                 <LinearLayout
                     android:orientation="horizontal"

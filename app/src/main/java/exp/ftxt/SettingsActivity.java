@@ -23,6 +23,11 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 
+import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.memory_stats.MemoryConfig;
+import exp.ftxt.features.memory_stats.MemoryMonitor;
+import exp.ftxt.features.memory_stats.MemoryModule;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private Switch overlaySwitch;
@@ -38,6 +43,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
     private static final String PREF_DEBUGGING_UNLOCKED = "debugging_unlocked";
+
+    public static final String ACTION_PANEL_VISIBILITY_CHANGED = "exp.ftxt.PANEL_VISIBILITY_CHANGED";
+    public static final String EXTRA_PANEL_ID = "panel_id";
+    public static final String EXTRA_PANEL_VISIBLE = "panel_visible";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +132,12 @@ public class SettingsActivity extends AppCompatActivity {
         debuggingSidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             applySwitchTint(debuggingSidebarSwitch, isChecked);
             prefs.edit().putBoolean("debugging_show_in_sidebar", isChecked).apply();
+            if (!isChecked) {
+                Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
+                intent.putExtra(EXTRA_PANEL_ID, "debugging");
+                intent.putExtra(EXTRA_PANEL_VISIBLE, false);
+                sendBroadcast(intent);
+            }
         });
 
         debuggingUnlockBtn.setOnClickListener(v -> {
@@ -152,6 +167,10 @@ public class SettingsActivity extends AppCompatActivity {
             debuggingUnlockBtn.setVisibility(android.view.View.VISIBLE);
             debuggingPasswordStatus.setText("");
             prefs.edit().putBoolean(PREF_DEBUGGING_UNLOCKED, false).apply();
+            Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
+            intent.putExtra(EXTRA_PANEL_ID, "debugging");
+            intent.putExtra(EXTRA_PANEL_VISIBLE, false);
+            sendBroadcast(intent);
         });
 
         memorySidebarSwitch = findViewById(R.id.memorySidebarSwitch);
@@ -162,6 +181,27 @@ public class SettingsActivity extends AppCompatActivity {
         memorySidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             applySwitchTint(memorySidebarSwitch, isChecked);
             prefs.edit().putBoolean("memory_show_in_sidebar", isChecked).apply();
+            if (!isChecked) {
+                if (MemoryConfig.enabled) {
+                    MemoryConfig.enabled = false;
+                    prefs.edit().putBoolean("mem_enabled", false).apply();
+                    if (FloatingService.instance != null) {
+                        MemoryModule memoryModule = FloatingService.memoryModule();
+                        if (memoryModule != null && memoryModule.isRunning()) {
+                            FloatingService.stopModule(memoryModule);
+                        }
+                    }
+                }
+                if (MemoryConfig.backgroundMonitor) {
+                    MemoryConfig.backgroundMonitor = false;
+                    prefs.edit().putBoolean("mem_bg_monitor", false).apply();
+                    MemoryMonitor.stop();
+                }
+                Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
+                intent.putExtra(EXTRA_PANEL_ID, "memory");
+                intent.putExtra(EXTRA_PANEL_VISIBLE, false);
+                sendBroadcast(intent);
+            }
         });
 
     }

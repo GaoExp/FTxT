@@ -47,14 +47,16 @@ Drawer terdiri dari menu berikut (urutan default; item panel bisa di-reorder den
 | Battery Info | Info baterai (suhu, persentase, voltase, arus, daya) + Battery Strip |
 | Clock Module | Waktu real-time 24 jam (Jam Digital) |
 | Crosshair | Placeholder (coming soon) |
-| Info Memori | Monitoring memori real-time |
+| Info Memori | Monitoring memori real-time (default tersembunyi) |
 | Logo Display | Placeholder (coming soon) |
 | Color Picker | Color picker wheel + slider H/S/V/RGB |
-| Debuging | Panel debugging |
+| Debugging | Panel debugging (default tersembunyi & terkunci password) |
 | Kill Service | Hentikan semua layanan overlay + tutup app |
 | Keluar | Tutup UI aplikasi, overlay tetap berjalan |
 
 Pengaturan & izin aplikasi diakses melalui ikon gear (⚙️) di toolbar, bukan dari drawer.
+
+Panel **Info Memori** dan **Debugging** tidak tampil di drawer secara default. Keduanya bisa ditampilkan lewat **Pengaturan > Konfigurasi** (lihat section Pengaturan).
 
 ---
 
@@ -193,6 +195,10 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 ## Pengaturan
 
 - **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
+- **Konfigurasi** — Pengaturan tampilan aplikasi:
+  - **Ikon Aplikasi** — Ganti ikon launcher (varian default/alternatif)
+  - **Tampilkan panel Info Memori** — Toggle untuk menampilkan/menyembunyikan panel Info Memori dari Navigation Drawer (default OFF)
+  - **Tampilkan panel Debugging** — Toggle untuk menampilkan/menyembunyikan panel Debugging dari Navigation Drawer (default OFF). Switch terkunci password: masukkan password lalu tap Unlock untuk membuka, tombol Relock untuk mengunci ulang. Status unlock tersimpan persisten.
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon
 - **Crash Logger** — Saat force close, stack trace otomatis ditulis ke `FTxT_crash_*.txt` di folder Download (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
 
