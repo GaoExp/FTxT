@@ -33,7 +33,6 @@
     <color name="bat_monitor_stop">#E53935</color>
     <color name="bat_monitor_hot">#E53935</color>
     <color name="bat_monitor_cold">#1E88E5</color>
-    <color name="bat_monitor_bar_track">#338A8A8E</color>
     <color name="bat_monitor_stroke">#1F8E8E93</color>
     <color name="bat_badge_stopped_bg">#1A8E8E93</color>
 

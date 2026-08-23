@@ -58,71 +58,6 @@
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <View
-                                    android:layout_width="3dp"
-                                    android:layout_height="15dp"
-                                    android:background="@color/bat_monitor_level"/>
-
-                                <TextView
-                                    android:text="Level Baterai"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/bat_monitor_level"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"/>
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1"/>
-
-                                <TextView
-                                    android:id="@+id/batMonitorPercentText"
-                                    android:text="0%"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/bat_monitor_level"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                            </LinearLayout>
-
-                            <ProgressBar
-                                android:id="@+id/batMonitorLevelBar"
-                                style="?android:attr/progressBarStyleHorizontal"
-                                android:max="100"
-                                android:progress="0"
-                                android:progressTint="@color/bat_monitor_level"
-                                android:progressBackgroundTint="@color/bat_monitor_bar_track"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"/>
-
-                            <TextView
-                                android:id="@+id/batMonitorChargeText"
-                                android:textSize="12sp"
-                                android:typeface="monospace"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"/>
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:background="@drawable/bat_card_bg"
-                            android:padding="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
-
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="6dp">
 
@@ -146,9 +81,13 @@
                                     android:layout_weight="1"/>
 
                                 <TextView
-                                    android:text="6 nilai"
-                                    android:textSize="10sp"
-                                    android:textColor="@color/bat_monitor_label"
+                                    android:id="@+id/batMonitorConditionBadge"
+                                    android:text="● Normal"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:background="@drawable/bat_badge_stopped_bg"
+                                    android:paddingHorizontal="10dp"
+                                    android:paddingVertical="5dp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
 
@@ -180,62 +119,14 @@
 
                             </LinearLayout>
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:background="@drawable/bat_card_bg"
-                            android:padding="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
-
-                            <LinearLayout
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="6dp">
-
-                                <View
-                                    android:layout_width="3dp"
-                                    android:layout_height="15dp"
-                                    android:background="@color/bat_monitor_header"/>
-
-                                <TextView
-                                    android:text="Status Pengisian"
-                                    android:textSize="13sp"
-                                    android:textStyle="bold"
-                                    android:textColor="@color/bat_monitor_header"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"/>
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1"/>
-
-                                <TextView
-                                    android:id="@+id/batMonitorConditionBadge"
-                                    android:text="● Normal"
-                                    android:textSize="11sp"
-                                    android:textStyle="bold"
-                                    android:background="@drawable/bat_badge_stopped_bg"
-                                    android:paddingHorizontal="10dp"
-                                    android:paddingVertical="5dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                            </LinearLayout>
-
                             <TextView
                                 android:id="@+id/batMonitorStatusText"
                                 android:textSize="12sp"
                                 android:typeface="monospace"
                                 android:lineSpacingExtra="2dp"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content"/>
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"/>
 
                         </LinearLayout>
 
@@ -332,35 +223,26 @@
 
                             </RadioGroup>
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:background="@drawable/bat_card_bg"
-                            android:padding="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
-
                             <LinearLayout
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
 
                                 <View
                                     android:layout_width="3dp"
-                                    android:layout_height="15dp"
+                                    android:layout_height="12dp"
                                     android:background="@color/bat_chart_temp"/>
 
                                 <TextView
                                     android:text="Suhu"
-                                    android:textSize="13sp"
+                                    android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/bat_chart_temp"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"/>
+                                    android:layout_marginStart="6dp"/>
 
                             </LinearLayout>
 
@@ -368,17 +250,13 @@
                                 android:id="@+id/batChartTempView"
                                 android:layout_width="match_parent"
                                 android:layout_height="140dp"
-                                android:layout_marginTop="6dp"/>
+                                android:layout_marginTop="4dp"/>
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:background="@drawable/bat_card_bg"
-                            android:padding="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/bat_monitor_stroke"/>
 
                             <LinearLayout
                                 android:orientation="horizontal"
@@ -388,17 +266,17 @@
 
                                 <View
                                     android:layout_width="3dp"
-                                    android:layout_height="15dp"
+                                    android:layout_height="12dp"
                                     android:background="@color/bat_chart_percent"/>
 
                                 <TextView
                                     android:text="Persentase"
-                                    android:textSize="13sp"
+                                    android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/bat_chart_percent"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"/>
+                                    android:layout_marginStart="6dp"/>
 
                             </LinearLayout>
 
@@ -406,17 +284,13 @@
                                 android:id="@+id/batChartPercentView"
                                 android:layout_width="match_parent"
                                 android:layout_height="140dp"
-                                android:layout_marginTop="6dp"/>
+                                android:layout_marginTop="4dp"/>
 
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:orientation="vertical"
-                            android:background="@drawable/bat_card_bg"
-                            android:padding="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/bat_monitor_stroke"/>
 
                             <LinearLayout
                                 android:orientation="horizontal"
@@ -426,17 +300,17 @@
 
                                 <View
                                     android:layout_width="3dp"
-                                    android:layout_height="15dp"
+                                    android:layout_height="12dp"
                                     android:background="@color/bat_chart_power"/>
 
                                 <TextView
                                     android:text="Daya"
-                                    android:textSize="13sp"
+                                    android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:textColor="@color/bat_chart_power"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"/>
+                                    android:layout_marginStart="6dp"/>
 
                             </LinearLayout>
 
@@ -444,7 +318,7 @@
                                 android:id="@+id/batChartPowerView"
                                 android:layout_width="match_parent"
                                 android:layout_height="140dp"
-                                android:layout_marginTop="6dp"/>
+                                android:layout_marginTop="4dp"/>
 
                         </LinearLayout>
 

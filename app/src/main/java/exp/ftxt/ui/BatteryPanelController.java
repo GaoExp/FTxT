@@ -24,7 +24,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
@@ -92,9 +91,6 @@ public class BatteryPanelController {
     private PopupWindow intervalPopup;
 
     private View batTabMonitorView;
-    private TextView batMonitorPercentText;
-    private ProgressBar batMonitorLevelBar;
-    private TextView batMonitorChargeText;
     private TextView batMonitorMetricsText1;
     private TextView batMonitorMetricsText2;
     private TextView batMonitorStatusText;
@@ -206,9 +202,6 @@ public class BatteryPanelController {
         batteryIntervalValue = rootView.findViewById(R.id.batteryIntervalValue);
 
         batTabMonitorView = rootView.findViewById(R.id.batTabMonitor);
-        batMonitorPercentText = rootView.findViewById(R.id.batMonitorPercentText);
-        batMonitorLevelBar = rootView.findViewById(R.id.batMonitorLevelBar);
-        batMonitorChargeText = rootView.findViewById(R.id.batMonitorChargeText);
         batMonitorMetricsText1 = rootView.findViewById(R.id.batMonitorMetricsText1);
         batMonitorMetricsText2 = rootView.findViewById(R.id.batMonitorMetricsText2);
         batMonitorStatusText = rootView.findViewById(R.id.batMonitorStatusText);
@@ -618,18 +611,11 @@ public class BatteryPanelController {
     }
 
     private void updateMonitorInfo() {
-        if (batMonitorPercentText == null) return;
+        if (batMonitorMetricsText1 == null) return;
         BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
 
-        batMonitorPercentText.setText(s.percent + "%");
-        batMonitorLevelBar.setProgress(s.percent);
-
-        SpannableStringBuilder charge = new SpannableStringBuilder();
-        appendLine(charge, "Kapasitas Tersisa",
-                s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—");
-        batMonitorChargeText.setText(charge);
-
         SpannableStringBuilder col1 = new SpannableStringBuilder();
+        appendLine(col1, "% Level", s.percent + "%");
         appendLine(col1, "Suhu", String.format(Locale.US, "%.1f°C", s.tempC));
         appendLine(col1, "Voltase", String.format(Locale.US, "%.3fV", s.voltageV));
         appendLine(col1, "Arus", s.currentMa != 0
@@ -765,9 +751,7 @@ public class BatteryPanelController {
     private void copyToClipboard() {
         if (batMonitorMetricsText1 == null) return;
         StringBuilder sb = new StringBuilder();
-        sb.append("Baterai Perangkat\n");
-        sb.append(batMonitorPercentText.getText()).append("\n\n");
-        sb.append(batMonitorChargeText.getText().toString().trim()).append("\n\n");
+        sb.append("Baterai Perangkat\n\n");
         sb.append("Metrik Real-Time\n").append(combineMetricColumns());
         sb.append("\n\nStatus Pengisian\n").append(batMonitorStatusText.getText());
         ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
