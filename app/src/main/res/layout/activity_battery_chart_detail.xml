@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground">
+
+    <LinearLayout
+        android:id="@+id/chartDetailHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/bat_monitor_card"
+        android:elevation="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <TextView
+            android:id="@+id/chartDetailBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:textSize="22sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="6dp">
+
+            <TextView
+                android:id="@+id/chartDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/chartDetailSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/bat_monitor_label"
+                android:layout_marginTop="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <exp.ftxt.shared.ui.BatteryChartView
+        android:id="@+id/chartDetailView"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginTop="8dp"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp">
+
+        <LinearLayout
+            android:id="@+id/chartRangeLabelRow"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="2m"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="5m"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="10m"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="15m"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="30m"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="1j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="3j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="6j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="12j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="24j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/chartDetailRangeSeek"
+            android:max="9"
+            android:progress="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:progressTint="@android:color/transparent"
+            android:progressBackgroundTint="@android:color/transparent"
+            android:secondaryProgressTint="@android:color/transparent"
+            android:thumbTint="@android:color/transparent"
+            android:splitTrack="false"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bat_card_bg"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="10dp"
+        android:padding="14dp">
+
+        <TextView
+            android:id="@+id/chartStatsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Statistik Periode"
+            android:textSize="13sp"
+            android:textStyle="bold"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Min"
+                    android:textSize="11sp"
+                    android:textColor="@color/bat_monitor_label"/>
+
+                <TextView
+                    android:id="@+id/chartStatMinValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Max"
+                    android:textSize="11sp"
+                    android:textColor="@color/bat_monitor_label"/>
+
+                <TextView
+                    android:id="@+id/chartStatMaxValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rata²"
+                    android:textSize="11sp"
+                    android:textColor="@color/bat_monitor_label"/>
+
+                <TextView
+                    android:id="@+id/chartStatAvgValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Δ"
+                    android:textSize="11sp"
+                    android:textColor="@color/bat_monitor_label"/>
+
+                <TextView
+                    android:id="@+id/chartStatDeltaValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

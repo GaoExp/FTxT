@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.floating_text.TextConfig;
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class PresetExampleActivity {
 

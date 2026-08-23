@@ -2,8 +2,8 @@ package exp.ftxt.features.floating_text;
 
 import android.graphics.Color;
 
-import exp.ftxt.shared.ui.BackgroundConfig;
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.BackgroundConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class TextConfig {
     public static String text = "FunText";

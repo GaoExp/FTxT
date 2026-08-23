@@ -1,4 +1,4 @@
-package exp.ftxt.shared.ui;
+package exp.ftxt.shared.config;
 
 public class BackgroundConfig {
     public boolean enabled = false;

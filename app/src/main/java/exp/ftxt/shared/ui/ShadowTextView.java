@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.widget.TextView;
 
+import exp.ftxt.shared.config.ShadowConfig;
+
 public class ShadowTextView extends TextView {
 
     private ShadowConfig shadowConfig;

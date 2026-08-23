@@ -2,8 +2,8 @@ package exp.ftxt.features.clock_module;
 
 import android.graphics.Color;
 
-import exp.ftxt.shared.ui.BackgroundConfig;
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.BackgroundConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class ClockConfig {
     public static boolean enabled = false;

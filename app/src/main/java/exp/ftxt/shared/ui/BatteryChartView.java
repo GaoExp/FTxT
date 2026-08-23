@@ -2,9 +2,11 @@ package exp.ftxt.shared.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
@@ -53,6 +55,27 @@ public class BatteryChartView extends View {
     private final SimpleDateFormat timeMediumFormat = new SimpleDateFormat("HH:mm", Locale.US);
     private final SimpleDateFormat timeLongFormat = new SimpleDateFormat("dd/MM HH:mm", Locale.US);
 
+    /** Callback saat titik data terpilih berubah lewat sentuhan (crosshair). */
+    public interface OnScrubListener {
+        void onScrub(int index, BatteryReading.Snapshot snapshot);
+    }
+
+    private boolean interactive = false;
+    private boolean scrubbing = false;
+    private int selectedIndex = -1;
+    private OnScrubListener scrubListener;
+
+    // Geometri render terakhir — dipakai memetakan posisi sentuhan ke titik data.
+    private float lastPadLeft, lastPlotW, lastPadTop, lastPlotH;
+    private long lastBaseT;
+    private float lastSpanMs = 1f;
+    private int lastFirst, lastCount, lastN;
+    private float lastMin, lastVRange = 1f;
+
+    private final Paint crosshairPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint crosshairTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
     public BatteryChartView(Context context) {
         this(context, null);
     }
@@ -80,6 +103,16 @@ public class BatteryChartView extends View {
         emptyPaint.setTextSize(sp(12));
         emptyPaint.setTextAlign(Paint.Align.CENTER);
 
+        crosshairPaint.setStyle(Paint.Style.STROKE);
+        crosshairPaint.setStrokeWidth(dp(1));
+        crosshairPaint.setColor(0x668A8A8E);
+
+        bubblePaint.setStyle(Paint.Style.FILL);
+
+        crosshairTextPaint.setColor(Color.WHITE);
+        crosshairTextPaint.setTextSize(sp(10));
+        crosshairTextPaint.setTextAlign(Paint.Align.CENTER);
+
         applySeriesStyle();
     }
 
@@ -99,16 +132,78 @@ public class BatteryChartView extends View {
         invalidate();
     }
 
-    private void applySeriesStyle() {
-        int colorRes;
-        switch (seriesType) {
-            case SERIES_TEMP: colorRes = R.color.bat_chart_temp; break;
-            case SERIES_PERCENT: colorRes = R.color.bat_chart_percent; break;
-            case SERIES_VOLTAGE: colorRes = R.color.bat_chart_voltage; break;
-            case SERIES_CURRENT: colorRes = R.color.bat_chart_current; break;
-            default: colorRes = R.color.bat_chart_power; break;
+    /** Aktifkan interaksi sentuhan (crosshair) pada grafik ini — default mati. */
+    public void setInteractive(boolean interactive) {
+        this.interactive = interactive;
+        if (!interactive) {
+            selectedIndex = -1;
+            scrubbing = false;
         }
-        linePaint.setColor(getResources().getColor(colorRes));
+        invalidate();
+    }
+
+    /** True saat jari sedang menekan grafik (pembaruan data sebaiknya ditunda). */
+    public boolean isScrubbing() {
+        return scrubbing;
+    }
+
+    /** True bila crosshair sedang menampilkan titik data terpilih. */
+    public boolean hasSelection() {
+        return interactive && selectedIndex >= 0;
+    }
+
+    public void setOnScrubListener(OnScrubListener listener) {
+        this.scrubListener = listener;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!interactive || lastCount < 2 || lastPlotW <= 0f) return super.onTouchEvent(event);
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                scrubbing = true;
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
+                selectNearest(event.getX());
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                selectNearest(event.getX());
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                scrubbing = false;
+                return true;
+            default:
+                return super.onTouchEvent(event);
+        }
+    }
+
+    private void selectNearest(float touchX) {
+        float x = Math.max(lastPadLeft, Math.min(lastPadLeft + lastPlotW, touchX));
+        long target = lastBaseT + (long) ((x - lastPadLeft) / lastPlotW * lastSpanMs);
+        int best = -1;
+        long bestDiff = Long.MAX_VALUE;
+        for (int i = lastFirst; i < lastFirst + lastCount && i < lastN; i++) {
+            long diff = Math.abs(samples[i].time - target);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                best = i;
+            }
+        }
+        if (best >= 0 && best != selectedIndex) {
+            selectedIndex = best;
+            invalidate();
+            notifyScrub();
+        }
+    }
+
+    private void notifyScrub() {
+        if (scrubListener == null) return;
+        scrubListener.onScrub(selectedIndex,
+                selectedIndex >= 0 && selectedIndex < samples.length ? samples[selectedIndex] : null);
+    }
+
+    private void applySeriesStyle() {
+        linePaint.setColor(getResources().getColor(seriesColorRes(seriesType)));
     }
 
     @Override
@@ -132,6 +227,7 @@ public class BatteryChartView extends View {
         int n = samples.length;
         long endT = n > 0 ? samples[n - 1].time : System.currentTimeMillis();
         if (n == 0) {
+            lastCount = 0;
             drawTimeLabels(canvas, padLeft, plotW, h, padBottom, endT - windowMs, endT);
             canvas.drawText("Belum ada data grafik", padLeft + plotW / 2f, h / 2f, emptyPaint);
             return;
@@ -144,6 +240,7 @@ public class BatteryChartView extends View {
         drawTimeLabels(canvas, padLeft, plotW, h, padBottom,
                 count >= 2 ? samples[first].time : startT, endT);
         if (count < 2) {
+            lastCount = 0;
             canvas.drawText("Belum ada data grafik", padLeft + plotW / 2f, h / 2f, emptyPaint);
             return;
         }
@@ -162,7 +259,7 @@ public class BatteryChartView extends View {
         } else {
             float range = max - min;
             if (seriesType == SERIES_TEMP) {
-                if (max < 50f) max = 50f;
+                if (max < 45f) max = 45f;
                 if (min >= max) min = max - 1f;
             } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);
@@ -184,6 +281,23 @@ public class BatteryChartView extends View {
 
         float spanMs = Math.max(1f, endT - samples[first].time);
         long baseT = samples[first].time;
+
+        lastPadLeft = padLeft;
+        lastPlotW = plotW;
+        lastPadTop = padTop;
+        lastPlotH = plotH;
+        lastBaseT = baseT;
+        lastSpanMs = spanMs;
+        lastFirst = first;
+        lastCount = count;
+        lastN = n;
+        lastMin = min;
+        lastVRange = vRange;
+        if (interactive) {
+            if (selectedIndex < first) selectedIndex = first;
+            else if (selectedIndex >= first + count) selectedIndex = first + count - 1;
+        }
+
         path.rewind();
         boolean started = false;
         float lastX = 0f;
@@ -214,21 +328,29 @@ public class BatteryChartView extends View {
         float ty = (lastY - dp(16) < padTop) ? lastY + dp(15) : lastY - dp(7);
         valueLabelPaint.setColor(labelPaint.getColor());
         canvas.drawText(txt, Math.max(lastX, padLeft + plotW) - dp(5), ty, valueLabelPaint);
+
+        if (interactive && selectedIndex >= 0) drawCrosshair(canvas);
     }
 
     private final Paint valueLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private float valueAt(int idx) {
+    /** Nilai numerik mentah satu snapshot sesuai jenis seri — dipakai juga halaman detail. */
+    public static float valueOf(int seriesType, BatteryReading.Snapshot s) {
         switch (seriesType) {
-            case SERIES_TEMP: return samples[idx].tempC;
-            case SERIES_PERCENT: return samples[idx].percent;
-            case SERIES_VOLTAGE: return samples[idx].voltageV;
-            case SERIES_CURRENT: return samples[idx].currentMa;
-            default: return (float) samples[idx].powerW;
+            case SERIES_TEMP: return s.tempC;
+            case SERIES_PERCENT: return s.percent;
+            case SERIES_VOLTAGE: return s.voltageV;
+            case SERIES_CURRENT: return s.currentMa;
+            default: return (float) s.powerW;
         }
     }
 
-    private String fmt(float v) {
+    private float valueAt(int idx) {
+        return valueOf(seriesType, samples[idx]);
+    }
+
+    /** Format nilai sesuai jenis seri — dipakai juga halaman detail. */
+    public static String formatValue(int seriesType, float v) {
         switch (seriesType) {
             case SERIES_TEMP: return String.format(Locale.US, "%.1f°", v);
             case SERIES_PERCENT: return String.format(Locale.US, "%.0f%%", v);
@@ -238,6 +360,55 @@ public class BatteryChartView extends View {
                     : String.format(Locale.US, "%.0fmA", v);
             default: return String.format(Locale.US, v < 10f ? "%.2fW" : "%.1fW", v);
         }
+    }
+
+    private String fmt(float v) {
+        return formatValue(seriesType, v);
+    }
+
+    /** Resource warna aksen per jenis seri — dipakai juga halaman detail. */
+    public static int seriesColorRes(int seriesType) {
+        switch (seriesType) {
+            case SERIES_TEMP: return R.color.bat_chart_temp;
+            case SERIES_PERCENT: return R.color.bat_chart_percent;
+            case SERIES_VOLTAGE: return R.color.bat_chart_voltage;
+            case SERIES_CURRENT: return R.color.bat_chart_current;
+            default: return R.color.bat_chart_power;
+        }
+    }
+
+    private void drawCrosshair(Canvas canvas) {
+        int idx = selectedIndex;
+        if (idx < lastFirst || idx >= lastFirst + lastCount || idx >= samples.length) return;
+        float x = lastPadLeft + lastPlotW * ((samples[idx].time - lastBaseT) / lastSpanMs);
+        float norm = (valueAt(idx) - lastMin) / lastVRange;
+        norm = Math.max(0f, Math.min(1f, norm));
+        float y = lastPadTop + lastPlotH * (1f - norm);
+
+        canvas.drawLine(x, lastPadTop, x, lastPadTop + lastPlotH, crosshairPaint);
+
+        dotPaint.setColor(linePaint.getColor());
+        canvas.drawCircle(x, y, dp(4), dotPaint);
+
+        String txt = fmt(valueAt(idx)) + " · " + activeTimeFormat().format(new Date(samples[idx].time));
+        float tw = crosshairTextPaint.measureText(txt);
+        float bw = tw + dp(14);
+        float bh = dp(20);
+        float bx = x - bw / 2f;
+        if (bx < 0) bx = 0;
+        if (bx + bw > getWidth()) bx = getWidth() - bw;
+        float by = y - bh - dp(10);
+        if (by < lastPadTop) by = y + dp(12);
+        canvas.drawRoundRect(bx, by, bx + bw, by + bh, dp(9), dp(9), bubblePaint);
+        Paint.FontMetrics fm = crosshairTextPaint.getFontMetrics();
+        canvas.drawText(txt, bx + bw / 2f,
+                by + bh / 2f - (fm.ascent + fm.descent) / 2f, crosshairTextPaint);
+    }
+
+    private SimpleDateFormat activeTimeFormat() {
+        if (windowMs >= WINDOW_6H) return timeLongFormat;
+        if (windowMs >= WINDOW_1H) return timeMediumFormat;
+        return timeShortFormat;
     }
 
     private void drawTimeLabels(Canvas canvas, float padLeft, float plotW, float h,

@@ -1,6 +1,6 @@
 package exp.ftxt.shared.preset;
 
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class OverlayPreset {
 

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class PresetHandler {
 

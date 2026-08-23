@@ -174,240 +174,114 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp">
 
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
+
                                 <LinearLayout
                                     android:orientation="horizontal"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content">
 
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick0"
+                                        android:text="2m"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick0"
-                                            android:text="2m"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick1"
+                                        android:text="5m"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick1"
-                                            android:text="5m"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick2"
+                                        android:text="10m"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick2"
-                                            android:text="10m"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick3"
+                                        android:text="15m"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick3"
-                                            android:text="15m"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick4"
+                                        android:text="30m"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick4"
-                                            android:text="30m"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick5"
+                                        android:text="1j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick5"
-                                            android:text="1j"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick6"
+                                        android:text="3j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick6"
-                                            android:text="3j"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick7"
+                                        android:text="6j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick7"
-                                            android:text="6j"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick8"
+                                        android:text="12j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
+                                        android:layout_height="wrap_content"/>
 
-                                        <TextView
-                                            android:id="@+id/batChartTick8"
-                                            android:text="12j"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
-
-                                    <LinearLayout
-                                        android:orientation="vertical"
-                                        android:gravity="center_horizontal"
+                                    <TextView
+                                        android:id="@+id/batChartTick9"
+                                        android:text="24j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
                                         android:layout_width="0dp"
                                         android:layout_weight="1"
-                                        android:layout_height="wrap_content">
-
-                                        <TextView
-                                            android:id="@+id/batChartTick9"
-                                            android:text="24j"
-                                            android:textSize="10sp"
-                                            android:textColor="@color/bat_monitor_label"
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"/>
-
-                                        <View
-                                            android:layout_width="1dp"
-                                            android:layout_height="8dp"
-                                            android:layout_marginTop="2dp"
-                                            android:background="@color/bat_chart_grid"/>
-
-                                    </LinearLayout>
+                                        android:layout_height="wrap_content"/>
 
                                 </LinearLayout>
 
@@ -416,8 +290,15 @@
                                     android:max="9"
                                     android:progress="1"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"/>
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:progressTint="@android:color/transparent"
+                                    android:progressBackgroundTint="@android:color/transparent"
+                                    android:secondaryProgressTint="@android:color/transparent"
+                                    android:thumbTint="@android:color/transparent"
+                                    android:splitTrack="false"/>
+
+                                </FrameLayout>
 
                             </LinearLayout>
 

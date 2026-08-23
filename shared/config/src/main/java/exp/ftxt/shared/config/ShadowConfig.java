@@ -1,4 +1,4 @@
-package exp.ftxt.shared.ui;
+package exp.ftxt.shared.config;
 
 import android.graphics.Color;
 

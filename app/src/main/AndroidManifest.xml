@@ -60,6 +60,10 @@
             android:name=".DocumentationActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".ui.BatteryChartDetailActivity"
+            android:exported="false"/>
+
         <service
             android:name=".core.FloatingService"
             android:enabled="true"

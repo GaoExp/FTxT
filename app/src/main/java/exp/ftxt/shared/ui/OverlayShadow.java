@@ -4,6 +4,8 @@ import android.os.Build;
 import android.view.View;
 import android.view.WindowManager;
 
+import exp.ftxt.shared.config.ShadowConfig;
+
 public class OverlayShadow {
 
     public static void apply(View view, WindowManager.LayoutParams params, WindowManager wm,

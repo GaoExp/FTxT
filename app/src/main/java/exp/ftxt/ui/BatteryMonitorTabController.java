@@ -18,6 +18,7 @@ import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.features.battery_stats.BatteryRingView;
+import exp.ftxt.shared.ui.BatteryChartView;
 
 public class BatteryMonitorTabController {
 
@@ -54,6 +55,9 @@ public class BatteryMonitorTabController {
         BatteryCapacityEstimator.init(activity);
         batMonitorExportButton.setOnClickListener(v -> snapshotExporter.exportBatterySnapshot());
         batMonitorCopyButton.setOnClickListener(v -> snapshotExporter.copyToClipboard());
+        rootView.findViewById(R.id.batChartPercentView).setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity,
+                        BatteryChartView.SERIES_PERCENT, charts.getCurrentWindowMs()));
     }
 
     private void bindViews(View rootView) {

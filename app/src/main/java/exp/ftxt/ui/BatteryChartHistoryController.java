@@ -30,7 +30,7 @@ public class BatteryChartHistoryController {
     private final TextView[] rangeTicks = new TextView[10];
     private long chartWindowMs = BatteryChartView.WINDOW_5M;
 
-    private static final long[] CHART_WINDOWS = {
+    static final long[] CHART_WINDOWS = {
             BatteryChartView.WINDOW_2M, BatteryChartView.WINDOW_5M,
             BatteryChartView.WINDOW_10M, BatteryChartView.WINDOW_15M,
             BatteryChartView.WINDOW_30M, BatteryChartView.WINDOW_1H,
@@ -81,6 +81,15 @@ public class BatteryChartHistoryController {
         batChartRangeSeek.setProgress(CHART_WINDOW_DEFAULT);
         batChartRangeLabel.setText(CHART_WINDOW_LABELS[CHART_WINDOW_DEFAULT] + " Terakhir");
         highlightRangeTick(CHART_WINDOW_DEFAULT);
+        // Slider transparan menimpa baris label: padding 5% lebar membuat setiap
+        // langkah jatuh tepat di tengah labelnya (10 label = lebar 10% per sel).
+        batChartRangeSeek.addOnLayoutChangeListener((v, left, top, right, bottom,
+                oldLeft, oldTop, oldRight, oldBottom) -> {
+            int pad = (right - left) / 20;
+            if (pad > 0 && batChartRangeSeek.getPaddingLeft() != pad) {
+                batChartRangeSeek.setPadding(pad, 0, pad, 0);
+            }
+        });
         batChartRangeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -108,6 +117,10 @@ public class BatteryChartHistoryController {
                     active ? R.color.bat_monitor_header : R.color.bat_monitor_label));
             rangeTicks[i].setTypeface(active ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
         }
+    }
+
+    public long getCurrentWindowMs() {
+        return chartWindowMs;
     }
 
     private void applyChartWindow(int index) {

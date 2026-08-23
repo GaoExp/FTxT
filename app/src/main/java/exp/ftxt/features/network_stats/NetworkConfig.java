@@ -2,8 +2,8 @@ package exp.ftxt.features.network_stats;
 
 import android.graphics.Color;
 
-import exp.ftxt.shared.ui.BackgroundConfig;
-import exp.ftxt.shared.ui.ShadowConfig;
+import exp.ftxt.shared.config.BackgroundConfig;
+import exp.ftxt.shared.config.ShadowConfig;
 
 public class NetworkConfig {
     public static boolean enabled = false;

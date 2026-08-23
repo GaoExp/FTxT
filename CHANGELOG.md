@@ -1,29 +1,37 @@
-# [4.88.1] - 2026-08-24 02:17 WITA versionCode 186 ***ONGOING***
+# [4.88.1] - 2026-08-24 06:19 WITA versionCode 186 ***ONGOING***
+### ✨ Fitur Baru
+- **Ketuk grafik Persentase membuka halaman detail fullscreen** — Grafik Persentase di kartu Metrik Real-Time kini bisa diketuk membuka halaman detail ala aplikasi pemantau baterai: grafik besar interaktif dengan crosshair yang mengikuti jari (garis vertikal + titik penebal + gelembung nilai & jam titik terpilih) dan tetap menempel setelah jari dilepas, baris label rentang waktu 2m–24j yang bisa diketuk maupun digeser lewat slider transparan (independen dari slider panel monitor; rentang awal mengikuti rentang aktif panel), serta kartu statistik Min / Max / Rata-rata / Δ dari data periode yang tampil. Header halaman beraksen warna metrik dengan subjudul nilai terkini; data disegarkan tiap 5 detik dan ditunda saat jari sedang menelusuri grafik.
 ### ♻️ Perubahan Fitur
 - **Kunci password jadi "Fitur Developer" yang mengatur panel Info Memori, Debugging, dan Salin/Simpan Snapshot** — Proteksi password yang sebelumnya hanya menempel pada switch panel Debugging kini menjadi satu saklar "Fitur Developer" di halaman Konfigurasi: label statusnya berganti "Fitur Developer • Terkunci" (merah) / "• Terbuka" (hijau), dengan kolom kunci + tombol Unlock/Kunci Ulang tepat di bawahnya. Saat Terkunci, switch "Tampilkan panel Info Memori" & "Tampilkan panel Debugging" tidak bisa dinyalakan; tombol Kunci Ulang mematikan kedua panel sekaligus (overlay Memory yang berjalan ikut berhenti, panel aktif dialihkan, keduanya hilang dari sidebar). Tombol Salin & Simpan Snapshot di tab Monitor Battery Info juga terkunci — tampak buram dan tidak bisa ditekan sampai Fitur Developer dibuka, dicek ulang setiap tab Monitor ditampilkan. Section "Modul" di halaman Konfigurasi diganti nama jadi "Developer".
 - **Grafik riwayat Suhu/Daya/Tegangan/Arus tersusun grid 2×2** — Empat grafik di kartu Grafik Riwayat yang sebelumnya tampil utuh empat baris ke bawah kini disusun seperti tabel dua kolom: baris atas Suhu & Daya, baris bawah Tegangan & Arus. Tiap sel tetap punya sub-header aksen warna sendiri dan menggambar elemen yang sama persis dengan grafik level baterai (label sumbu Y max/tengah/min, label waktu awal–akhir, nilai terkini di ujung garis); tinggi tiap grafik 140→130dp. Divider pemisah antar grafik diganti jarak antar sel grid. Chevron pelipat kartu dihapus — isi kartu kini selalu tampil karena grid tidak lagi memakan ruang layar.
 ### 🔧 Optimasi & Penyesuaian
-- **Pemilih rentang waktu grafik diganti slider** — Baris lima radio button (5 Menit/15 Menit/1 Jam/6 Jam/24 Jam) diganti satu slider dengan pilihan tetap: 2 Menit, 5 Menit, 10 Menit, 15 Menit, 30 Menit, 1 Jam, 3 Jam, 6 Jam, 12 Jam, 24 Jam (default 5 Menit). Slider memanjang penuh tanpa label statis; di atasnya ada deretan pembatas berlabel singkat (2m/5m/10m/15m/30m/1j/3j/6j/12j/24j) dan langkah aktif disorot tebal. Label rentang aktif tetap tampil di header kartu; saat slider digeser pratinjau ikut berubah, data grafik baru di-query saat jari dilepas.
+- **Pemilih rentang waktu grafik jadi baris label yang bisa diketuk & digeser** — Baris lima radio button (5 Menit/15 Menit/1 Jam/6 Jam/24 Jam) diganti deretan label singkat 2m/5m/10m/15m/30m/1j/3j/6j/12j/24j yang berperilaku layaknya tombol: slider transparan menimpa baris label sehingga ketuk sebuah label langsung memilih interval itu dan menggeser jari pindah antar interval, tiap langkah slider jatuh tepat di tengah labelnya. Garis pembatas kecil di bawah label dihapus; label aktif disorot tebal berwarna sebagai indikator posisi. Label rentang aktif tetap tampil di header kartu; saat label diketuk/digeser pratinjau ikut berubah, data grafik baru di-query saat jari dilepas (default 5 Menit).
 - **Kode tab Monitor Battery Info dipecah menjadi beberapa file** — BatteryPanelController yang menampung seluruh panel (1.020 baris) kini hanya mengurus tab Overlay (±560 baris); isi tab Monitor dipindah utuh ke empat controller terpisah: BatteryMonitorTabController (ring gauge, metrik real-time, polling 1 detik & tombol Salin/Simpan Snapshot), BatteryChartHistoryController (kartu Grafik Riwayat lengkap dengan slider rentang), BatteryHealthCardController (kartu Kesehatan Baterai + dialog kapasitas desain), dan BatterySnapshotExporter (pembuat teks salinan/berkas ekspor). Perilaku fitur tidak berubah.
 ### 🐞 Bug Fixes
-- **Rilis GitHub gagal build (v4.87.0)** — CI GitHub Actions gagal di step Build Release APK karena `gradle.properties` membawa `org.gradle.java.home` yang menunjuk path JDK 21 khusus device (path tidak ada di runner GitHub, sehingga Gradle menolak start: "Java home supplied is invalid"). Properti itu dihapus dari repo — pemilihan JDK kini mengikuti lingkungan masing-masing (JDK 17 di CI sudah memadai untuk AGP 8.12); kebutuhan JDK khusus untuk build lokal sebaiknya diset di gradle.properties global (`~/.gradle/`) yang tidak ikut ter-commit.
-- **Skala grafik Suhu kini maksimal tetap 50°C** — Sebelumnya skala Y Suhu otomatis simetris ±2°C dari nilai tengah data sehingga bentuk garis nyaris tidak terbaca saat suhu stabil. Kini batas atas skala selalu 50°C (melebar otomatis hanya bila suhu melebihi 50° agar garis tidak hilang) dan batas bawah otomatis mengikuti data terkecil.
+- **Skala grafik Suhu kini maksimal tetap 45°C** — Sebelumnya skala Y Suhu otomatis simetris ±2°C dari nilai tengah data sehingga bentuk garis nyaris tidak terbaca saat suhu stabil. Kini batas atas skala selalu 45°C (melebar otomatis hanya bila suhu melebihi 45° agar garis tidak hilang) dan batas bawah otomatis mengikuti data terkecil.
 
 ### 🗒️ File Added
-- 2026-08-24 01:37 — `BatteryChartHistoryController.java` — Controller kartu Grafik Riwayat tab Monitor: binding 5 chart + slider rentang dengan pembatas berlabel & sorot langkah aktif (pratinjau saat digeser, query saat lepas jari), query database via executor latar
+- 2026-08-24 05:12 — `BatteryChartView.java` — Mode interaktif crosshair (garis vertikal + titik + gelembung nilai & jam) dengan flag default mati agar grafik panel tak berubah perilaku
+- 2026-08-24 05:41 — `BatteryChartDetailActivity.java` — Halaman detail satu grafik: chart besar interaktif, baris label rentang independen 2m–24j dikontrol seekbar transparan, kartu statistik Min/Max/Rata-rata/Δ, refresh 5 detik yang ditunda saat crosshair aktif
+- 2026-08-24 06:19 — `activity_battery_chart_detail.xml` — Layout halaman detail: header aksen metrik + subjudul nilai terkini, chart 220dp, baris label rentang dengan seekbar transparan overlay (tinggi menyesuaikan label), kartu statistik 4 kolom
+- 2026-08-24 01:37 — `BatteryChartHistoryController.java` — Controller kartu Grafik Riwayat tab Monitor: binding 5 chart + pemilih rentang berbasis label & slider transparan (pratinjau saat digeser, query saat lepas jari), query database via executor latar
 - 2026-08-24 00:32 — `BatteryHealthCardController.java` — Controller kartu Kesehatan Baterai tab Monitor: estimasi kapasitas, skor kesehatan berwarna, keyakinan, status pengumpulan, dialog kapasitas desain
 - 2026-08-24 00:38 — `BatterySnapshotExporter.java` — Pembuat teks salinan clipboard & ekspor 20 snapshot terakhir ke folder Download (MediaStore/API lama), menyertakan catatan kesehatan baterai
 - 2026-08-24 00:42 — `BatteryMonitorTabController.java` — Controller orkestrasi tab Monitor: ring gauge, dua kolom metrik real-time, badge kondisi suhu, polling 1 detik hanya saat tab tampil, memegang tiga controller di atas
 
 ### ✏️ File Changed
+- 2026-08-24 06:19 — `panel_battery.xml` — Pemilih rentang Grafik Riwayat: garis pembatas di bawah label dihapus, slider jadi transparan dan diposkan menimpa baris label agar label bisa diketuk/digeser layaknya tombol, tinggi area menyesuaikan baris label (tanpa ruang sisa), label interval diperbesar
+- 2026-08-24 06:04 — `BatteryChartHistoryController.java` — Padding dinamis 5% lebar pada slider transparan supaya tiap langkah jatuh tepat di tengah labelnya
+- 2026-08-24 05:30 — `AndroidManifest.xml` — Daftarkan halaman detail grafik ke manifest
+- 2026-08-24 05:28 — `BatteryMonitorTabController.java` — Ketuk grafik Persentase membuka halaman detail dengan rentang awal mengikuti slider panel
+- 2026-08-24 05:26 — `BatteryChartHistoryController.java` — Buka akses daftar pilihan rentang & getter rentang aktif untuk halaman detail
+- 2026-08-24 04:49 — `BatteryChartView.java` — Batas atas tetap skala Y grafik Suhu diturunkan 50°C → 45°C; skala tetap melebar otomatis bila suhu melebihi 45°
 - 2026-08-24 02:17 — `activity_settings.xml` — Section "Modul" jadi "Developer": label status "Fitur Developer • Terkunci/Terbuka" + kolom kunci & tombol Unlock/Kunci Ulang dipindah ke atas, switch Info Memori ikut disabled default
 - 2026-08-24 02:17 — `SettingsActivity.java` — Logika Fitur Developer: satu pref kunci untuk kedua switch panel, Kunci Ulang mematikan Memory overlay/monitor + broadcast pengalihan panel, status unlock pindah ke label berwarna (pesan kunci salah via Toast)
 - 2026-08-24 02:17 — `BatteryMonitorTabController.java` — Tombol Salin & Simpan Snapshot disabled + buram saat Fitur Developer terkunci, dicek ulang tiap tab Monitor ditampilkan
-- 2026-08-24 01:30 — `gradle.properties` — Hapus `org.gradle.java.home` (path JDK khusus device yang membuat build CI GitHub gagal)
 - 2026-08-24 01:07 — `panel_battery.xml` — Kartu Grafik Riwayat: RadioGroup 5 pilihan diganti slider full width tanpa label statis + deretan pembatas berlabel singkat 2m–24j di atasnya; chevron pelipat kartu dihapus (isi selalu tampil); empat grafik disusun grid 2×2 (baris 1: Suhu/Daya, baris 2: Tegangan/Arus) dengan sub-header aksen per sel, tinggi chart 130dp, divider antar chart dihapus
 - 2026-08-24 01:07 — `BatteryChartView.java` — Konstanta window baru WINDOW_2M, WINDOW_10M, WINDOW_30M, WINDOW_3H, WINDOW_12H; skala Y Suhu maksimal tetap 50°C dengan batas bawah otomatis mengikuti data
 - 2026-08-24 00:46 — `BatteryPanelController.java` — Seluruh isi tab Monitor dipindah ke controller terpisah; kini hanya mengurus tab Overlay (1.020 → ±560 baris), membuat BatteryMonitorTabController di konstruktor dan mendelegasikan onPanelShown/onPanelHidden/cleanup/refresh awal
-- 2026-08-24 00:09 — `app/build.gradle` — versionCode 186, versionName 4.88.1
 
 ---
 
@@ -60,7 +68,6 @@
 - 2026-08-21 20:58 — `MainActivity.java` — Load pref bat_bg_monitor, cek BatteryStatsConfig.backgroundMonitor di isAnyModuleActive()
 - 2026-08-21 20:58 — `NotificationHelper.java` — Cek backgroundMonitor di isAnyModuleActive, tambah label "BatMon" di teks modul aktif notifikasi
 - 2026-08-21 20:58 — `BootReceiver.java` — Restore pref bat_bg_monitor saat boot
-- 2026-08-21 20:58 — `app/build.gradle` — versionCode 185, versionName 4.88.0
 - 2026-08-22 18:35 — `BatteryMonitor.java` — Tambah buffer grafik ±1 jam (3600 titik, auto-trim, terpisah dari riwayat snapshot export, bertahan lintas start/stop pemantauan) + akses data & reset grafik
 - 2026-08-22 20:41 — `panel_battery.xml` — Kartu Grafik Riwayat dipecah: kartu kontrol (rentang/Jeda/Reset) + tiga kartu chart terpisah untuk Suhu, Persentase, dan Daya; checkbox seri dihapus
 - 2026-08-22 18:35 — `colors.xml` — Tambah 4 color values untuk grafik (garis suhu/persen/daya + grid)
@@ -261,12 +268,6 @@
 # [4.85.4] - 2026-08-13 version code 181
 ## 💡 Catatan
 - **Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama projec seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog**
-
----
-
-# [4.85.3] - 2026-08-13 versionCode 180
-### 🔧 Optimasi & Penyesuaian
-- **Fix rilis GitHub gagal karena override aapt2** — Property `android.aapt2FromMavenOverride=/usr/bin/aapt2` (ditambahkan di 4.85.1 untuk build lokal AndroidIDE aarch64) merujuk file yang **tidak ada di GitHub runner** (ubuntu x86_64), sehingga `assembleRelease` gagal dan release v4.85.2 tidak jadi terbit. Override kini hanya diterapkan saat sistem `aarch64` (via `app/build.gradle`); di CI AGP memakai aapt2 Maven default.
 
 ---
 
@@ -618,13 +619,8 @@
 - **Tombol switch mode color picker** — Tombol ⇄ di title bar untuk menukar mode.
 - **Thumb slider jadi lingkaran** — Dari rectangle 2×10dp ke oval 12×12dp.
 - **Saved Colors drag-reorder + animasi** — Long-press swap, animasi geser 300ms.
-### 🔧 Optimasi & Penyesuaian
-- **Release notes GitHub strip section file** — Workflow `release.yml` menyaring section file dari deskripsi release.
-- **Sync dokumen .md root → assets saat build** — Gradle task `syncDocs` otomatis menyalin dokumen.
-- **Lint `MissingDefaultResource` dinonaktifkan** — Agar `lintVitalRelease` tidak gagal karena drawable malam.
 ### 🐞 Bug Fixes
 - **Slider mode color picker crash (NPE)** — Custom slider tanpa cek null. Diperbaiki dengan null check.
-- **Build gagal: cannot find symbol Animator** — Import `android.animation.Animator` ditambahkan.
 - **Edit HEX di Hue Slider mode force close (NPE)** — Null check di `setThumbPos()`.
 - **Posisi overlay antar orientasi saling menimpa** — Reset `orientationSuffix` di `cleanup()` semua PositionController.
 
@@ -679,22 +675,17 @@
 - **Centralized isAnyModuleActive()** — Ekstrak logic cek modul aktif ke method terpusat di MainActivity.
 ### 🐞 Bug Fixes
 - **Semua modul ikut nonaktif saat satu dimatikan** — `isAnyModuleActive()` cek semua 7 modul, bukan 1–2.
-- **CI signing path dobel app/app/** — storeFile `app/release.jks` → `release.jks`.
-- **APK release tidak signed** — Tambah step generate keystore.properties di workflow.
 
 ---
 
 # [3.9.3.69.5 – 3.9.3.69.1] - 2026-06-11
 ### ♻️ Perubahan Fitur
 - **Collapsible Section Grouping** — Semua 8 panel: section Tampilan, Posisi, Shadow, Background collapsible dengan SectionHelper.
-- **release.yml decode keystore** — Tambah step decode & mkdir untuk CI.
 ### 🔧 Optimasi & Penyesuaian
 - **Refactor layout ekstrak panel** — Pisahkan 8 panel dari `activity_main.xml` ke file `<include>` terpisah.
-### 🐞 Bug Fixes
-- **release.yml restore** — Kembalikan workflow ke versi kerja (Java 17, secret names benar).
 ### 🗒️ File Added
 - `panel_text.xml`, `panel_fps.xml`, `panel_clock.xml`, `panel_battery_current.xml`, `panel_network.xml`, `panel_crosshair.xml`, `panel_watermark.xml`, `panel_logo.xml`
-- `SectionHelper.java`, `key/.gitkeep`
+- `SectionHelper.java`
 
 ---
 
@@ -708,12 +699,9 @@
 - **Tombol E/I dihapus** dari 7 panel — fungsi ekspor/impor sudah ada di PresetBrowserDialog.
 - **Tampilan FPS diseragamkan** — Hapus gaya neumorphism, ganti ke inline style default.
 ### 🔧 Optimasi & Penyesuaian
-- **Java 8 → Java 17** — sourceCompatibility/targetCompatibility dinaikkan.
 - **Ekstrak PresetHandler** — ~800 baris kode duplikat dari 7 PositionController ke shared class.
-- **GitHub Actions Workflow** — CI/CD build & release APT otomatis.
 - **Bersihkan styles & colors** — Hapus 6 style + 5 color neumorphism tidak terpakai.
 ### 🐞 Bug Fixes
-- **CI build gagal** — SDK license, platform 35, AAPT2, local.properties.
 - **Import FC PresetBrowserDialog** — `registerForActivityResult` pindah ke `onCreate`.
 
 ---

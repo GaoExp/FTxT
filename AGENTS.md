@@ -70,6 +70,13 @@ TZ=Asia/Makassar date +"%Y-%m-%d %H:%M WITA"
 - **Saat merapikan entry lama, jangan mengubah fakta** — hanya menggabungkan poin yang saling menimpa atau menghapus jejak iterasi yang sudah obsolete.
 - **Section 🗒️ File Added, ✏️ File Changed, 🔥 File Removed wajib disertakan waktu perubahan** — Format: `- yyyy-mm-dd hh:mm — \`filename\` — deskripsi perubahan`. Waktu dicatat berdasarkan urutan agent mengerjakan perubahan tersebut.
 
+**File yang DILARANG dicatat di changelog** — perubahan pada file-file berikut tidak boleh muncul di entry manapun, baik sebagai baris File Added/Changed/Removed maupun sebagai poin deskripsi perubahan di section ✨ Fitur Baru / 🚮 Fitur Dihapus / ♻️ Perubahan Fitur / 🔧 Optimasi & Penyesuaian / 🐞 Bug Fixes:
+- **Build system:** `build.gradle` (root, `app/`, maupun module seperti `shared/*/build.gradle`), `settings.gradle`, `gradle.properties`, `gradle/wrapper/`, `gradlew`, `gradlew.bat`, `proguard-rules.pro`, folder output `build/`
+- **CI/CD & signing release:** `.github/workflows/`, `keystore.properties`, folder `key/` (`.jks`, `.gitkeep`)
+- **Dokumen root & kerja internal:** `AGENTS.md`, `README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md` (versi assets ikut tersinkron otomatis via Gradle), `_schedule/`, `_temp/`, `local.properties`
+
+Konsekuensinya, topik-topik yang lahir dari file-file tersebut juga tidak diumbar: mekanisme build/CI/signing/rilis (CI gagal, override aapt2, decode keystore, dsb), bump versionCode/versionName di build.gradle, serta restrukturisasi internal seperti pemindahan file antar package/module Gradle dan ganti import.
+
 ---
 
 ## 3. Aturan Kerja Universal
