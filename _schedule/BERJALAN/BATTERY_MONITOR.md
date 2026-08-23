@@ -1,13 +1,15 @@
-# Battery Monitor v4.88.0 — Kondisi Terkini
+# Battery Monitor — Kondisi Terkini
 
-> **Diperbarui:** 2026-08-23 21:19 WITA
-> **Versi Target:** v4.88.0 (entry CHANGELOG berjalan, versionCode 185)
-> **Status:** seluruh rencana TEREALISASI di kode (belum commit) — dokumen pindah ke
-> `SELESAI` setelah v4.88.0 rilis & push
+> **Diperbarui:** 2026-08-24 01:07 WITA
+> **Versi Target:** entry CHANGELOG berjalan `[4.88.1]` (versionCode 186) — pekerjaan
+> lanjutan monitor baterai masuk ke sini sampai di-commit & push
+> **Status:** DOKUMEN TETAP DI `BERJALAN` sampai fitur Battery Monitor dirilis dan
+> dinyatakan selesai. v4.88.0 (fondasi monitoring) sudah PUSH (commit `fade934`);
+> iterasi berjalan (v4.88.1): slider rentang, grid 2×2 grafik, dan pemecahan controller.
 
 ---
 
-## 1. Kondisi Terkini (v4.88.0)
+## 1. Kondisi Terkini (v4.88.1)
 
 - Pemantauan baterai **selalu aktif** via `core/BatteryMonitorService` (foreground,
   notifikasi minimal prioritas rendah): auto-start saat app dibuka dan saat boot.
@@ -29,8 +31,16 @@
 - Grafik riwayat digambar dari query DB per rentang di background thread
   (`BatteryChartView`, custom Canvas tanpa library). Hasil query di-resample ke grid
   waktu seragam (`BatteryHistoryDb.resampleUniform`, interpolasi linear) agar kepadatan
-  garis konsisten lintas rezim sampling; skala Y Suhu punya rentang minimum ±2°C dari
-  nilai tengah.
+  nilai tengah; skala Y Suhu kini MAKSIMAL TETAP 50°C (melebar otomatis hanya bila
+  suhu data melebihi 50°) dengan batas bawah otomatis mengikuti data.
+- **Struktur kode tab Monitor sudah dipecah** (v4.88.1) — `ui/BatteryPanelController`
+  hanya mengurus tab Overlay (±560 baris); isi tab Monitor pindah utuh ke:
+  - `ui/BatteryMonitorTabController` — ring gauge, metrik real-time, badge kondisi,
+    polling 1 detik (hanya saat tab tampil), tombol Salin/Simpan Snapshot;
+  - `ui/BatteryChartHistoryController` — kartu Grafik Riwayat + slider rentang;
+  - `ui/BatteryHealthCardController` — kartu Kesehatan Baterai + dialog kapasitas desain;
+  - `ui/BatterySnapshotExporter` — teks salinan clipboard & ekspor Download.
+  `BatteryPanelFragment` tidak berubah (masih fasad ke `BatteryPanelController`).
 
 ### Batasan Android yang Mengikat
 
@@ -53,10 +63,13 @@
    Suhu | Voltase / Arus | Daya / Cycle Count | Teknologi
 
 [Kartu Grafik Riwayat]
- header: judul ... label rentang aktif [chevron ▾/▸ collapse]
- RadioGroup rentang: 5 Menit–24 Jam
- chart Suhu / Daya / Tegangan / Arus @140dp, sub-header beraksen warna,
- dipisah divider; state collapse RUNTIME SAJA
+ header: judul ... label rentang aktif (tanpa chevron — konten SELALU tampil)
+ baris slider full width:
+   deretan pembatas + label singkat di ATAS slider: 2m 5m 10m 15m 30m 1j 3j 6j 12j 24j
+   langkah aktif disorot (tebal + warna header)
+ chart grid 2×2 @130dp tanpa divider:
+   baris 1: Suhu | Daya   —   baris 2: Tegangan | Arus
+   tiap sel punya sub-header aksen warna sendiri
 
 [Kartu Kesehatan Baterai]
  teks hasil estimasi/skor/sesi/keyakinan/status pengumpulan;
@@ -71,7 +84,16 @@
   - Simpan Snapshot = file teks di Download berisi catatan kesehatan +
     20 sampel terakhir dari database (waktu + semua metrik per baris).
 - Grafik Persentase tinggal SATU instance dan berada di kartu Metrik Real-Time
-  (ID tetap `batChartPercentView`, ikut RadioGroup rentang global).
+  (ID tetap `batChartPercentView`, ikut rentang global).
+- **Pemilih rentang = slider** (v4.88.1): 10 langkah tetap — 2 Menit, 5 Menit,
+  10 Menit, 15 Menit, 30 Menit, 1 Jam, 3 Jam, 6 Jam, 12 Jam, 24 Jam (default
+  5 Menit). Tanpa label statis "Rentang" — slider memanjang penuh; di atasnya
+  ada deretan pembatas berlabel singkat (2m/5m/10m/…/24j) dan langkah aktif
+  disorot. Geser = pratinjau label header + sorot langkah; query DB + render
+  baru jalan saat jari dilepas.
+- **Chevron pelipat kartu Grafik Riwayat DIHAPUS** (v4.88.1) — grid 2×2 tidak
+  lagi memakan ruang, isi kartu selalu tampil; ID `batChartHeader`,
+  `batChartCollapseToggle`, `batChartContent` sudah hilang permanen.
 - Warna chart: suhu merah, persentase hijau, daya amber, tegangan indigo
   (`bat_chart_voltage`), arus teal (`bat_chart_current`) — lengkap varian night.
 
@@ -85,15 +107,24 @@
 - Monitor full-aktif tanpa kontrol manual; grafik bersumber DB bukan buffer memori.
 - Rumus tidak boleh duplikasi (preseden bug ×1000); helper hue tunggal di
   `shared/color/BatteryColors`.
+- Rentang grafik pakai slider opsi diskrit tetap (bukan slider kontinu/non-linear)
+  dengan pembatas berlabel di atasnya; query dieksekusi saat lepas jari agar tidak
+  menumpuk puluhan query DB per gesekan.
+- Skala Y grafik Suhu: atas tetap 50°C (ambang panas baterai), bawah otomatis.
+- Satu panel = banyak file kecil, bukan satu file ribuan baris: controller per
+  kartu/tab dipisah; fragment tetap fasad tunggal.
 
 ---
 
 ## 4. Versioning
 
-- Seluruh pekerjaan monitor baterai masuk **satu entry v4.88.0** (versionCode 185)
-  sampai entry tersebut di-commit & push; setelah push barulah entry versi baru dibuat
-  sesuai alur AGENTS.md.
-- Setelah push: dokumen ini pindah ke `_schedule/SELESAI/`.
+- Fondasi monitoring masuk **entry v4.88.0** (versionCode 185) — sudah commit & tag
+  `v4.88.0` (commit `fade934`, status PUSH).
+- Iterasi berjalan masuk **entry `[4.88.1]`** (versionCode 186, status ONGOING):
+  slider rentang, grid 2×2 grafik, pemecahan controller. Entry ini yang akan
+  di-commit/push berikutnya sesuai alur AGENTS.md.
+- Dokumen ini **tetap di `_schedule/BERJALAN/`** sampai fitur Battery Monitor rilis
+  dan dinyatakan selesai — baru pindah ke `_schedule/SELESAI/`.
 
 ---
 
@@ -104,6 +135,9 @@
 - Overlay vs tab Monitor harus menampilkan angka identik persis (sumber tunggal).
 - Arus device-dependent (kernel): grafik Arus bisa datar/kosong — perilaku diketahui,
   bukan bug.
-- Regresi binding: ID grid/badge/chart dipertahankan; yang sudah hilang permanen:
+- Regresi binding: ID grid/badge/chart dipertahankan lintas refactor pemecahan file
+  (semua ID lama masih ada di layout); yang sudah hilang permanen:
   `batMonitorPercentText`, `batMonitorLevelBar`, `batMonitorChargeText`,
   `batMonitorStatusText`.
+- Label waktu sumbu-X rentang ≥6 jam masih format panjang `dd/MM HH:mm` — berpotensi
+  sempit di sel grid 2×2; pantau saat review di aplikasi.

@@ -22,10 +22,15 @@ import exp.ftxt.features.battery_stats.BatteryReading;
  */
 public class BatteryChartView extends View {
 
+    public static final long WINDOW_2M = 2L * 60_000L;
     public static final long WINDOW_5M = 5L * 60_000L;
+    public static final long WINDOW_10M = 10L * 60_000L;
     public static final long WINDOW_15M = 15L * 60_000L;
+    public static final long WINDOW_30M = 30L * 60_000L;
     public static final long WINDOW_1H = 60L * 60_000L;
+    public static final long WINDOW_3H = 3L * 60L * 60_000L;
     public static final long WINDOW_6H = 6L * 60L * 60_000L;
+    public static final long WINDOW_12H = 12L * 60L * 60_000L;
     public static final long WINDOW_24H = 24L * 60L * 60_000L;
 
     public static final int SERIES_TEMP = 0;
@@ -156,10 +161,9 @@ public class BatteryChartView extends View {
             max = 100f;
         } else {
             float range = max - min;
-            if (seriesType == SERIES_TEMP && range < 4f) {
-                float mid = (min + max) / 2f;
-                min = mid - 2f;
-                max = mid + 2f;
+            if (seriesType == SERIES_TEMP) {
+                if (max < 50f) max = 50f;
+                if (min >= max) min = max - 1f;
             } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);
                 max += Math.max(1f, Math.abs(max) * 0.1f);

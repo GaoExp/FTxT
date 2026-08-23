@@ -10,6 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -36,13 +39,13 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch iconSwitch;
     private Switch debuggingSidebarSwitch;
     private EditText debuggingPasswordInput;
-    private TextView debuggingPasswordStatus;
+    private TextView developerStatusLabel;
     private TextView debuggingUnlockBtn;
     private TextView debuggingRelockBtn;
     private Switch memorySidebarSwitch;
 
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
-    private static final String PREF_DEBUGGING_UNLOCKED = "debugging_unlocked";
+    public static final String PREF_DEVELOPER_UNLOCKED = "developer_unlocked";
 
     public static final String ACTION_PANEL_VISIBILITY_CHANGED = "exp.ftxt.PANEL_VISIBILITY_CHANGED";
     public static final String EXTRA_PANEL_ID = "panel_id";
@@ -110,21 +113,23 @@ public class SettingsActivity extends AppCompatActivity {
 
         debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
         debuggingPasswordInput = findViewById(R.id.debuggingPasswordInput);
-        debuggingPasswordStatus = findViewById(R.id.debuggingPasswordStatus);
+        developerStatusLabel = findViewById(R.id.developerStatusLabel);
         debuggingUnlockBtn = findViewById(R.id.debuggingUnlockBtn);
         debuggingRelockBtn = findViewById(R.id.debuggingRelockBtn);
+        memorySidebarSwitch = findViewById(R.id.memorySidebarSwitch);
 
-        boolean debuggingUnlocked = prefs.getBoolean(PREF_DEBUGGING_UNLOCKED, false);
-        boolean showDebugging = prefs.getBoolean("debugging_show_in_sidebar", false);
+        boolean developerUnlocked = prefs.getBoolean(PREF_DEVELOPER_UNLOCKED, false);
+        boolean showDebugging = developerUnlocked && prefs.getBoolean("debugging_show_in_sidebar", false);
+        boolean showMemory = developerUnlocked && prefs.getBoolean("memory_show_in_sidebar", false);
 
-        if (debuggingUnlocked) {
-            debuggingSidebarSwitch.setEnabled(true);
-            debuggingPasswordInput.setVisibility(android.view.View.GONE);
-            debuggingUnlockBtn.setVisibility(android.view.View.GONE);
-            debuggingRelockBtn.setVisibility(android.view.View.VISIBLE);
-            debuggingPasswordStatus.setText("Terbuka");
-            debuggingPasswordStatus.setTextColor(Color.parseColor("#4CAF50"));
-        }
+        memorySidebarSwitch.setChecked(showMemory);
+        applySwitchTint(memorySidebarSwitch, showMemory);
+
+        memorySidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(memorySidebarSwitch, isChecked);
+            prefs.edit().putBoolean("memory_show_in_sidebar", isChecked).apply();
+            if (!isChecked) turnOffMemoryPanel(prefs);
+        });
 
         debuggingSidebarSwitch.setChecked(showDebugging);
         applySwitchTint(debuggingSidebarSwitch, showDebugging);
@@ -132,77 +137,32 @@ public class SettingsActivity extends AppCompatActivity {
         debuggingSidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             applySwitchTint(debuggingSidebarSwitch, isChecked);
             prefs.edit().putBoolean("debugging_show_in_sidebar", isChecked).apply();
-            if (!isChecked) {
-                Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
-                intent.putExtra(EXTRA_PANEL_ID, "debugging");
-                intent.putExtra(EXTRA_PANEL_VISIBLE, false);
-                sendBroadcast(intent);
-            }
+            if (!isChecked) sendPanelHiddenBroadcast("debugging");
         });
 
         debuggingUnlockBtn.setOnClickListener(v -> {
             String input = debuggingPasswordInput.getText().toString();
             if (input.equals(DEBUGGING_PASSWORD)) {
-                debuggingSidebarSwitch.setEnabled(true);
                 debuggingPasswordInput.setText("");
-                debuggingPasswordInput.setVisibility(android.view.View.GONE);
-                debuggingUnlockBtn.setVisibility(android.view.View.GONE);
-                debuggingRelockBtn.setVisibility(android.view.View.VISIBLE);
-                debuggingPasswordStatus.setText("Terbuka");
-                debuggingPasswordStatus.setTextColor(Color.parseColor("#4CAF50"));
-                prefs.edit().putBoolean(PREF_DEBUGGING_UNLOCKED, true).apply();
+                prefs.edit().putBoolean(PREF_DEVELOPER_UNLOCKED, true).apply();
+                applyDeveloperState(true);
             } else {
-                debuggingPasswordStatus.setText("Kunci salah");
-                debuggingPasswordStatus.setTextColor(Color.parseColor("#E53935"));
+                Toast.makeText(this, "Kunci salah", Toast.LENGTH_SHORT).show();
             }
         });
 
         debuggingRelockBtn.setOnClickListener(v -> {
+            memorySidebarSwitch.setChecked(false);
             debuggingSidebarSwitch.setChecked(false);
-            applySwitchTint(debuggingSidebarSwitch, false);
-            prefs.edit().putBoolean("debugging_show_in_sidebar", false).apply();
-            debuggingSidebarSwitch.setEnabled(false);
-            debuggingRelockBtn.setVisibility(android.view.View.GONE);
-            debuggingPasswordInput.setVisibility(android.view.View.VISIBLE);
-            debuggingUnlockBtn.setVisibility(android.view.View.VISIBLE);
-            debuggingPasswordStatus.setText("");
-            prefs.edit().putBoolean(PREF_DEBUGGING_UNLOCKED, false).apply();
-            Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
-            intent.putExtra(EXTRA_PANEL_ID, "debugging");
-            intent.putExtra(EXTRA_PANEL_VISIBLE, false);
-            sendBroadcast(intent);
+            prefs.edit()
+                    .putBoolean(PREF_DEVELOPER_UNLOCKED, false)
+                    .putBoolean("memory_show_in_sidebar", false)
+                    .putBoolean("debugging_show_in_sidebar", false)
+                    .apply();
+            applyDeveloperState(false);
         });
 
-        memorySidebarSwitch = findViewById(R.id.memorySidebarSwitch);
-        boolean showMemory = prefs.getBoolean("memory_show_in_sidebar", false);
-        memorySidebarSwitch.setChecked(showMemory);
-        applySwitchTint(memorySidebarSwitch, showMemory);
-
-        memorySidebarSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            applySwitchTint(memorySidebarSwitch, isChecked);
-            prefs.edit().putBoolean("memory_show_in_sidebar", isChecked).apply();
-            if (!isChecked) {
-                if (MemoryConfig.enabled) {
-                    MemoryConfig.enabled = false;
-                    prefs.edit().putBoolean("mem_enabled", false).apply();
-                    if (FloatingService.instance != null) {
-                        MemoryModule memoryModule = FloatingService.memoryModule();
-                        if (memoryModule != null && memoryModule.isRunning()) {
-                            FloatingService.stopModule(memoryModule);
-                        }
-                    }
-                }
-                if (MemoryConfig.backgroundMonitor) {
-                    MemoryConfig.backgroundMonitor = false;
-                    prefs.edit().putBoolean("mem_bg_monitor", false).apply();
-                    MemoryMonitor.stop();
-                }
-                Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
-                intent.putExtra(EXTRA_PANEL_ID, "memory");
-                intent.putExtra(EXTRA_PANEL_VISIBLE, false);
-                sendBroadcast(intent);
-            }
-        });
+        applyDeveloperState(developerUnlocked);
 
     }
 
@@ -220,6 +180,46 @@ public class SettingsActivity extends AppCompatActivity {
             sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
             sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
+    }
+
+    private void applyDeveloperState(boolean unlocked) {
+        String status = unlocked ? "Terbuka" : "Terkunci";
+        int color = Color.parseColor(unlocked ? "#4CAF50" : "#E53935");
+        SpannableString label = new SpannableString("Fitur Developer • " + status);
+        label.setSpan(new ForegroundColorSpan(color),
+                18, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        developerStatusLabel.setText(label);
+        debuggingPasswordInput.setVisibility(unlocked ? android.view.View.GONE : android.view.View.VISIBLE);
+        debuggingUnlockBtn.setVisibility(unlocked ? android.view.View.GONE : android.view.View.VISIBLE);
+        debuggingRelockBtn.setVisibility(unlocked ? android.view.View.VISIBLE : android.view.View.GONE);
+        memorySidebarSwitch.setEnabled(unlocked);
+        debuggingSidebarSwitch.setEnabled(unlocked);
+    }
+
+    private void turnOffMemoryPanel(SharedPreferences prefs) {
+        if (MemoryConfig.enabled) {
+            MemoryConfig.enabled = false;
+            prefs.edit().putBoolean("mem_enabled", false).apply();
+            if (FloatingService.instance != null) {
+                MemoryModule memoryModule = FloatingService.memoryModule();
+                if (memoryModule != null && memoryModule.isRunning()) {
+                    FloatingService.stopModule(memoryModule);
+                }
+            }
+        }
+        if (MemoryConfig.backgroundMonitor) {
+            MemoryConfig.backgroundMonitor = false;
+            prefs.edit().putBoolean("mem_bg_monitor", false).apply();
+            MemoryMonitor.stop();
+        }
+        sendPanelHiddenBroadcast("memory");
+    }
+
+    private void sendPanelHiddenBroadcast(String panelId) {
+        Intent intent = new Intent(ACTION_PANEL_VISIBILITY_CHANGED);
+        intent.putExtra(EXTRA_PANEL_ID, panelId);
+        intent.putExtra(EXTRA_PANEL_VISIBLE, false);
+        sendBroadcast(intent);
     }
 
     private void setIcon(boolean useAlt) {

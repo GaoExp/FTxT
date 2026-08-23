@@ -44,6 +44,7 @@ FTxT/
     │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
     │   │   │   ├── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
     │   │   │   ├── BootReceiver.java        — Restore overlay aktif saat boot
+    │   │   │   ├── BatteryMonitorService.java — Foreground service ringan monitor baterai full-aktif (notifikasi minimal prioritas rendah, auto-start app & boot)
     │   │   │   └── CrashLogger.java         — Crash logger otomatis: stack trace ke folder Download saat force close
     │   │   │
     │   │   ├── features/
@@ -58,7 +59,12 @@ FTxT/
     │   │   │   │   └── ClockModule.java     — Jam real-time HH:mm:ss, update tiap 1 detik
     │   │   │   ├── battery_stats/
     │   │   │   │   ├── BatteryStatsConfig.java   — Konfigurasi Battery Stats overlay (suhu, %, voltase, arus, daya, urutan item)
-    │   │   │   │   └── BatteryStatsModule.java   — Info baterai gabungan: °C + % + V + mA + W, baca dari BatteryManager
+    │   │   │   │   ├── BatteryStatsModule.java   — Info baterai gabungan: °C + % + V + mA + W, baca via BatteryReading
+    │   │   │   │   ├── BatteryMonitor.java       — Polling & pencatatan metrik baterai ke database (sampling dinamis: charging/layar nyala/layar mati)
+    │   │   │   │   ├── BatteryReading.java       — Util pembaca metrik baterai tunggal (battery intent + property + sysfs fallback) untuk overlay & tab Monitor
+    │   │   │   │   ├── BatteryHistoryDb.java     — Database SQLite riwayat baterai (sampel time-series + sesi pengisian, query per rentang dengan resample seragam)
+    │   │   │   │   ├── BatteryCapacityEstimator.java — Estimasi kapasitas & skor kesehatan baterai dari segmen pengisian daya (agregasi median lintas sesi)
+    │   │   │   │   └── BatteryRingView.java      — Custom view ring gauge baterai melingkar (arc gradien hue, teks level/kapasitas/status di dalam lingkaran)
     │   │   │   ├── battery_bar/
     │   │   │   │   ├── BatteryBarConfig.java         — Konfigurasi Battery Bar overlay
     │   │   │   │   ├── BatteryBarView.java           — Custom View bar baterai H/V (empty strip, fade, shine, wave)
@@ -77,6 +83,7 @@ FTxT/
     │   │   │   ├── color/
     │   │   │   │   ├── ColorMath.java         — Operasi matematika HSV: gradient, angle, selector posisi
     │   │   │   │   ├── ColorNameResolver.java — Deteksi nama warna dari RGB
+    │   │   │   │   ├── BatteryColors.java     — Helper warna bersama: rumus gradien hue baterai untuk Battery Strip & ring gauge
     │   │   │   │   └── HSVColorPickerView.java— Custom View: color wheel HSV + crosshair
     │   │   │   ├── preset/
     │   │   │   │   ├── OverlayPreset.java     — Model data preset dengan UUID, metadata, history
@@ -88,6 +95,7 @@ FTxT/
     │   │   │       ├── BackgroundConfig.java      — Model data background (enable, color, padding, offset, margin, radius)
     │   │   │       ├── ShadowConfig.java          — Model data shadow (enable, color, blur, offset)
     │   │   │       ├── ShadowTextView.java        — Custom TextView dengan shadow + background di onDraw()
+    │   │   │       ├── BatteryChartView.java      — Custom View line chart Canvas riwayat metrik baterai (sumbu Y otomatis, label waktu adaptif)
     │   │   │       ├── OverlayDragHandler.java    — Touch listener untuk drag overlay
     │   │   │       ├── OverlayModule.java         — Interface untuk menyeragamkan method semua modul overlay
     │   │   │       ├── OverlayShadow.java         — Apply elevation-based shadow ke overlay
@@ -180,12 +188,7 @@ FTxT/
     │       │   ├── mem_card_bg.xml          — Background card panel Memory
     │       │   ├── seekbar_thumb.xml        — Thumb slider lingkaran 12×12dp
     │       │   ├── splash_screen.xml        — Splash screen drawable
-│       │       ├── bg_alt_light.png         — Background drawer tema terang (varian 1)
-│       │       ├── bg_alt_light2.png        — Background drawer tema terang (varian 2)
-│       │       ├── bg_main_light.png        — Background layar utama tema terang (varian 1)
-│       │       ├── bg_main_light2.png       — Background layar utama tema terang (varian 2)
-│       │       ├── appbar_light.png         — Background toolbar tema terang
-│       │       ├── drawbar_light.png        — Background header drawer tema terang
+    │       │   ├── bat_card_bg.xml          — Background card tab Monitor Battery Info
     │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg terang
     │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer terang
     │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg terang
@@ -193,10 +196,6 @@ FTxT/
     │       │   ├── divider_horizontal.xml   — Divider horizontal untuk daftar dokumen
     │       │   └── main_bg.xml              — Drawable wrapper main bg terang
     │       ├── drawable-night/
-    │       │   ├── bg_alt.png               — Background drawer tema gelap
-    │       │   ├── bg_main_dark.png         — Background layar utama tema gelap
-    │       │   ├── appbar_dark.png          — Background toolbar tema gelap
-    │       │   ├── drawbar_dark.png         — Background header drawer tema gelap
     │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg gelap (flip 180°)
     │       │   ├── drawer_header_bg.xml     — Drawable wrapper header drawer gelap
     │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg gelap
@@ -256,10 +255,10 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 76 |
+| Java source | 84 |
 | Layout XML | 21 |
-| Drawable XML | 45 |
-| Drawable PNG | 13 |
+| Drawable XML | 47 |
+| Drawable PNG | 3 |
 | Color XML | 2 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -271,5 +270,5 @@ FTxT/
 | Root konfigurasi | 5 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~263** |
-| **Total direktori** | **~66** |
+| **Total file** | **~261** |
+| **Total direktori** | **~59** |
