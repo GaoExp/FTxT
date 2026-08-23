@@ -29,6 +29,11 @@ public class BootReceiver extends BroadcastReceiver {
         MemoryConfig.enabled = prefs.getBoolean("mem_enabled", false);
         MemoryConfig.backgroundMonitor = prefs.getBoolean("mem_bg_monitor", false);
 
+        // Monitor baterai full-aktif: selalu direstart saat boot.
+        try {
+            context.startForegroundService(new Intent(context, BatteryMonitorService.class));
+        } catch (Exception ignored) {}
+
         boolean anyActive = textOn || FpsConfig.enabled || ClockConfig.enabled
                 || BatteryStatsConfig.enabled || NetworkConfig.enabled
                 || BatteryBarConfig.enabled

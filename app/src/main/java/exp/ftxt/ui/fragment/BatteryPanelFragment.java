@@ -56,6 +56,7 @@ public class BatteryPanelFragment extends BasePanelFragment {
             if (id == R.id.batTabNavMonitor) {
                 showTab(tabMonitor);
                 currentTabId = id;
+                if (batteryPanelController != null) batteryPanelController.onPanelShown();
             } else if (id == R.id.batTabNavOverlay) {
                 showTab(tabOverlay);
                 currentTabId = id;
@@ -80,6 +81,11 @@ public class BatteryPanelFragment extends BasePanelFragment {
     public void onPanelShown() {
         if (batteryPanelController != null) batteryPanelController.onPanelShown();
         if (batteryBarPanelController != null) batteryBarPanelController.onPanelShown();
+    }
+
+    @Override
+    public void onPanelHidden() {
+        if (batteryPanelController != null) batteryPanelController.onPanelHidden();
     }
 
     @Override

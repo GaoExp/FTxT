@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import exp.ftxt.core.BatteryMonitorService;
 import exp.ftxt.core.CrashLogger;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
@@ -131,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
 
         loadShadowConfigs();
 
+        startBatteryMonitorService();
+
         panelVisibilityReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -153,6 +156,14 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(panelVisibilityReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         requestAllPermissionsOnFirstLaunch();
+    }
+
+    private void startBatteryMonitorService() {
+        try {
+            startForegroundService(new Intent(this, BatteryMonitorService.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void requestAllPermissionsOnFirstLaunch() {

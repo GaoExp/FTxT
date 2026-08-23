@@ -1,13 +1,9 @@
 package exp.ftxt.features.battery_stats;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
-import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
@@ -15,8 +11,6 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.WindowManager;
-
-import java.lang.reflect.Field;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
@@ -39,8 +33,6 @@ public class BatteryStatsModule implements OverlayModule {
 
     public static Runnable onPositionUpdate;
     private String orientationSuffix;
-
-    private static final IntentFilter BATTERY_FILTER = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
     @Override
     public void setOrientationSuffix(String suffix) {
@@ -289,125 +281,53 @@ public class BatteryStatsModule implements OverlayModule {
         if (view == null) return;
         if (bgHandler != null) {
             bgHandler.post(() -> {
-                BatterySnapshot snap = readBatterySnapshot();
+                BatteryReading.Snapshot snap = BatteryReading.read(context);
                 String text = buildDisplayText(snap);
                 handler.post(() -> applyDisplay(text));
             });
         } else {
-            BatterySnapshot snap = readBatterySnapshot();
+            BatteryReading.Snapshot snap = BatteryReading.read(context);
             String text = buildDisplayText(snap);
             applyDisplay(text);
         }
     }
 
-    private static class BatterySnapshot {
-        String tempText;
-        String pctText;
-        String voltText;
-        String curText;
-        String powerText;
-    }
-
-    private String buildItemPart(String id, BatterySnapshot s) {
-        if ("temp".equals(id) && BatteryStatsConfig.showTemperature && s.tempText != null) return s.tempText;
-        if ("pct".equals(id) && BatteryStatsConfig.showPercentage && s.pctText != null) return s.pctText;
-        if ("volt".equals(id) && BatteryStatsConfig.showVoltage && s.voltText != null) return s.voltText;
-        if ("cur".equals(id) && BatteryStatsConfig.showCurrent && s.curText != null) return s.curText;
-        if ("power".equals(id) && BatteryStatsConfig.showPower && s.powerText != null) return s.powerText;
+    private String buildItemPart(String id, BatteryReading.Snapshot s) {
+        if ("temp".equals(id) && BatteryStatsConfig.showTemperature && s.tempC != 0f) {
+            String tempText = (s.tempC == Math.floor(s.tempC))
+                    ? String.valueOf((int) s.tempC)
+                    : String.format("%.1f", s.tempC);
+            return BatteryStatsConfig.showOnlyValue ? tempText : tempText + "°C";
+        }
+        if ("pct".equals(id) && BatteryStatsConfig.showPercentage && s.percent > 0) {
+            return BatteryStatsConfig.showOnlyValue
+                    ? String.valueOf(s.percent)
+                    : String.format("%d%%", s.percent);
+        }
+        if ("volt".equals(id) && BatteryStatsConfig.showVoltage && s.voltageV > 0) {
+            return BatteryStatsConfig.showOnlyValue
+                    ? String.format("%.1f", s.voltageV)
+                    : String.format("%.1fV", s.voltageV);
+        }
+        if ("cur".equals(id) && BatteryStatsConfig.showCurrent && s.currentMa != 0) {
+            int ma = s.currentMa;
+            String sign = "";
+            if (ma > 0) {
+                sign = "+";
+            } else if (ma < 0) {
+                sign = "-";
+                ma = -ma;
+            }
+            return BatteryStatsConfig.showOnlyValue
+                    ? String.format("%s%d", sign, ma)
+                    : String.format("%s%dmA", sign, ma);
+        }
+        if ("power".equals(id) && BatteryStatsConfig.showPower && s.powerW > 0) {
+            return BatteryStatsConfig.showOnlyValue
+                    ? String.format("%.1f", s.powerW)
+                    : String.format("%.1fW", s.powerW);
+        }
         return null;
-    }
-
-    private BatterySnapshot readBatterySnapshot() {
-        BatterySnapshot s = new BatterySnapshot();
-        int temp = 0, level = 0, scale = 100, voltage = 0, current = 0;
-
-        try {
-            Intent batteryIntent = context.registerReceiver(null, BATTERY_FILTER);
-            if (batteryIntent != null) {
-                temp = batteryIntent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0);
-                level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-                scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-                voltage = batteryIntent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
-                try {
-                    Field field = BatteryManager.class.getField("EXTRA_CURRENT_NOW");
-                    String extra = (String) field.get(null);
-                    current = batteryIntent.getIntExtra(extra, 0);
-                } catch (Exception ignored) {}
-            }
-        } catch (Exception ignored) {}
-
-        if (current == 0 && Build.VERSION.SDK_INT >= 28) {
-            try {
-                BatteryManager bm = (BatteryManager) context.getSystemService(Context.BATTERY_SERVICE);
-                long c = bm.getLongProperty(2);
-                if (c != 0) current = (int) (c / 1000);
-            } catch (Exception ignored) {}
-        }
-
-        if (voltage == 0) voltage = readSysfs("voltage_now", 1000);
-        if (current == 0) current = readSysfs("current_now", 1000);
-
-        if (temp != 0) {
-            String tempText = (temp % 10 == 0)
-                    ? String.valueOf(temp / 10)
-                    : String.format("%.1f", temp / 10f);
-            s.tempText = BatteryStatsConfig.showOnlyValue ? tempText : tempText + "°C";
-        }
-
-        if (level > 0 && scale > 0) {
-            int percent = (level * 100) / scale;
-            s.pctText = BatteryStatsConfig.showOnlyValue
-                    ? String.valueOf(percent)
-                    : String.format("%d%%", percent);
-        }
-
-        String sign = "";
-        int mA = current;
-        if (current > 0) {
-            sign = "+";
-        } else if (current < 0) {
-            sign = "-";
-            mA = -current;
-        }
-
-        if (voltage > 0) {
-            s.voltText = BatteryStatsConfig.showOnlyValue
-                    ? String.format("%.1f", voltage / 1000.0)
-                    : String.format("%.1fV", voltage / 1000.0);
-        }
-
-        if (current != 0) {
-            s.curText = BatteryStatsConfig.showOnlyValue
-                    ? String.format("%s%d", sign, mA)
-                    : String.format("%s%dmA", sign, mA);
-        }
-
-        if (voltage > 0 && mA > 0) {
-            double powerW = (voltage / 1000.0) * (mA / 1000.0);
-            s.powerText = BatteryStatsConfig.showOnlyValue
-                    ? String.format("%.1f", powerW)
-                    : String.format("%.1fW", powerW);
-        }
-
-        return s;
-    }
-
-    private int readSysfs(String file, int divisor) {
-        try {
-            java.io.File dir = new java.io.File("/sys/class/power_supply");
-            java.io.File[] entries = dir.listFiles();
-            if (entries == null) return 0;
-            for (java.io.File entry : entries) {
-                java.io.File f = new java.io.File(entry, file);
-                if (!f.exists()) continue;
-                java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f));
-                String line = r.readLine();
-                r.close();
-                if (line == null) continue;
-                return Integer.parseInt(line.trim()) / divisor;
-            }
-        } catch (Exception ignored) {}
-        return 0;
     }
 
     private final Runnable tickRunnable = new Runnable() {
@@ -419,7 +339,7 @@ public class BatteryStatsModule implements OverlayModule {
                 final Runnable self = this;
                 bgHandler.post(() -> {
                     try {
-                        BatterySnapshot snap = readBatterySnapshot();
+                        BatteryReading.Snapshot snap = BatteryReading.read(context);
                         String text = buildDisplayText(snap);
                         handler.post(() -> {
                             bgBusy = false;
@@ -438,7 +358,7 @@ public class BatteryStatsModule implements OverlayModule {
         }
     };
 
-    private String buildDisplayText(BatterySnapshot snap) {
+    private String buildDisplayText(BatteryReading.Snapshot snap) {
         StringBuilder sb = new StringBuilder();
         String[] order = BatteryStatsConfig.itemOrder.split(",");
         for (String id : order) {

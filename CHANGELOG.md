@@ -1,3 +1,66 @@
+# [4.88.0] - 2026-08-23 12:51 WITA versionCode 185 ***ONGOING***
+### ✨ Fitur Baru
+- **Tab Monitor di panel Battery Info — monitoring real-time baterai perangkat** — Tab Monitor (sebelumnya placeholder) kini berisi pemantauan baterai ala aplikasi Battery Guru/AccuBattery: kartu Level Baterai (persentase besar + bar + kapasitas tersisa mAh), kartu Metrik Real-Time 6 nilai (suhu, voltase, arus, daya, kapasitas, cycle count), dan kartu Status Pengisian (status penuh/mengisi AC/USB/Wireless/tidak mengisi, sumber daya, teknologi baterai) dengan badge kondisi suhu (Normal/Panas/Dingin), plus tombol Salin & Simpan Snapshot. Cycle count hanya tampil jika device melaporkan (API 34+/vendor tertentu).
+- **Grafik Riwayat di tab Monitor panel Battery Info — kartu terpisah per metrik ala Battery Guru** — Riwayat pemantauan digambar sebagai line chart via Canvas (tanpa library eksternal) dalam tiga kartu terpisah yang masing-masing menampilkan satu metrik: Suhu, Persentase, dan Daya. Tiap kartu punya sumbu Y sendiri dengan label nilai max/tengah/min di kiri (Persentase selalu 0–100%, Suhu & Daya skala otomatis mengikuti data) dan angka nilai terkini di ujung garis. Rentang tampil bisa dipilih: 5 Menit / 15 Menit / 1 Jam / 6 Jam / 24 Jam (berlaku untuk ketiga kartu); label sumbu waktu menyesuaikan rentang panjang (detik/menit/jam-tanggal). Data grafik bersumber dari database sehingga riwayat lama tetap terlihat walau aplikasi sempat ditutup.
+- **Estimasi Kapasitas & Kesehatan Baterai di tab Monitor panel Battery Info** — Fitur ala AccuBattery: saat perangkat mengisi daya, aplikasi mencatat segmen pengisian (Δkapasitas mAh vs Δpersen) lalu menghitung estimasi kapasitas penuh per sesi. Estimasi lintas sesi diagregasi dengan median (tahan outlier) dan tersimpan persisten di database. Sesi dengan mayoritas waktu layar mati diberi prioritas dalam perhitungan median (hasil lebih akurat, butuh minimal 3 sesi layar-mati; jika belum ada, semua sesi dipakai). Kartu Kesehatan Baterai menampilkan: estimasi kapasitas, skor kesehatan (estimasi ÷ kapasitas desain × 100%, berwarna hijau ≥80% / oranye ≥50% / merah <50%), jumlah sesi tercatat, indikator keyakinan (jumlah sampel), dan status pengumpulan data real-time. Kapasitas desain (mAh) diinput manual via dialog ketuk — skor kesehatan baru muncul jika terisi. Segmen dengan Δpersen <5% atau durasi <1 menit otomatis dibuang agar estimasi tidak noise.
+- **Pemantauan baterai full-aktif — merekam otomatis tanpa henti** — Monitor baterai kini selalu aktif tanpa tombol mulai/hentikan: overlay dipakai atau tidak, panel dibuka atau tidak, aplikasi ditutup sekalipun, pencatatan tetap berjalan lewat foreground service ringan tersendiri dengan notifikasi minimal prioritas rendah. Otomatis nyala saat aplikasi dibuka dan direstart otomatis saat boot. Sampling dinamis hemat baterai: rapat (±1 detik) hanya saat mengisi daya (presisi estimator), ±10 detik saat layar nyala idle, ±60 detik saat layar mati.
+- **Database riwayat baterai lokal (SQLite)** — Riwayat metrik (time-series) dan sesi pengisian kini disimpan di database SQLite bawaan framework (tanpa Room/kapt/KSP): buffer memori grafik ±1 jam dan persistensi JSON dihapus. Kartu grafik, export/copy snapshot, dan estimasi kesehatan semuanya membaca dari database; tanpa auto-trim pembuang riwayat (ukuran per baris sangat kecil). Data JSON estimasi versi lama dimigrasikan otomatis sekali ke database lalu filenya dihapus.
+
+### 🔧 Optimasi & Penyesuaian
+- **Pembacaan data baterai disatukan ke satu sumber** — Overlay Battery Info dan tab Monitor kini membaca metrik dari util pembaca tunggal (`BatteryReading`), bukan masing-masing punya logika sendiri. Menghilangkan duplikasi rumus yang pernah membuat angka Daya overlay dan tab Monitor berbeda (8W vs 0,008W) karena salah faktor konversi.
+
+### 🗒️ File Added
+- 2026-08-21 20:45 — `BatteryMonitor.java` — Background monitor polling data baterai (snapshot metrik lengkap, riwayat 20 snapshot, helper status/kondisi)
+- 2026-08-21 20:48 — `bat_card_bg.xml` — Drawable card tab Monitor Battery
+- 2026-08-21 20:48 — `bat_badge_active_bg.xml`, `bat_badge_stopped_bg.xml` — Drawable badge status monitor
+- 2026-08-22 20:41 — `BatteryChartView.java` — Custom view line chart Canvas satu metrik per instance (Suhu/Persen/Daya), label sumbu Y max/tengah/min di kiri, angka nilai terkini di ujung garis, rentang waktu 5 menit–1 jam, tanpa library eksternal
+- 2026-08-22 18:58 — `BatteryCapacityEstimator.java` — Akumulasi estimasi kapasitas dari segmen pengisian daya + persistensi JSON internal storage
+- 2026-08-23 12:16 — `BatteryReading.java` — Util pembaca metrik baterai tunggal (battery intent + property + sysfs fallback, konversi satuan, helper status/kondisi) untuk overlay & tab Monitor
+- 2026-08-23 12:51 — `BatteryHistoryDb.java` — Database SQLite riwayat baterai (tabel sampel metrik time-series + sesi pengisian + meta, query per rentang dengan downsampling otomatis)
+- 2026-08-23 12:51 — `BatteryMonitorService.java` — Foreground service ringan monitor baterai full-aktif (notifikasi minimal prioritas rendah, auto-start app & boot)
+
+### ✏️ File Changed
+- 2026-08-21 20:50 — `BatteryStatsConfig.java` — Tambah field backgroundMonitor
+- 2026-08-21 20:52 — `panel_battery.xml` — Ganti placeholder tab Monitor dengan UI monitoring lengkap (kartu level, metrik, status pengisian, toggle, switch latar belakang, salin/simpan snapshot)
+- 2026-08-21 20:55 — `colors.xml` — Tambah 13 color values untuk tab Monitor Battery
+- 2026-08-21 20:56 — `BatteryPanelController.java` — Tambah logika tab Monitor: polling update UI, toggle manual, switch latar belakang, badge status/kondisi, export/copy snapshot
+- 2026-08-21 20:57 — `BatteryPanelFragment.java` — Panggil onPanelShown() controller di semua tab + onPanelHidden() saat panel disembunyikan
+- 2026-08-21 20:58 — `FloatingService.java` — Start/stop BatteryMonitor sesuai backgroundMonitor di onCreate/stopAllModules/onDestroy, tambah setBackgroundBatteryMonitorEnabled(), cek backgroundMonitor di isAnyModuleActive()
+- 2026-08-21 20:58 — `MainActivity.java` — Load pref bat_bg_monitor, cek BatteryStatsConfig.backgroundMonitor di isAnyModuleActive()
+- 2026-08-21 20:58 — `NotificationHelper.java` — Cek backgroundMonitor di isAnyModuleActive, tambah label "BatMon" di teks modul aktif notifikasi
+- 2026-08-21 20:58 — `BootReceiver.java` — Restore pref bat_bg_monitor saat boot
+- 2026-08-21 20:58 — `app/build.gradle` — versionCode 185, versionName 4.88.0
+- 2026-08-22 18:35 — `BatteryMonitor.java` — Tambah buffer grafik ±1 jam (3600 titik, auto-trim, terpisah dari riwayat snapshot export, bertahan lintas start/stop pemantauan) + akses data & reset grafik
+- 2026-08-22 20:41 — `panel_battery.xml` — Kartu Grafik Riwayat dipecah: kartu kontrol (rentang/Jeda/Reset) + tiga kartu chart terpisah untuk Suhu, Persentase, dan Daya; checkbox seri dihapus
+- 2026-08-22 18:35 — `colors.xml` — Tambah 4 color values untuk grafik (garis suhu/persen/daya + grid)
+- 2026-08-22 20:41 — `BatteryPanelController.java` — Binding & kontrol tiga kartu chart terpisah: pilih rentang (berlaku global), jeda/lanjut (sampling tetap jalan), reset dengan dialog konfirmasi; chart ikut diperbarui loop polling 1 detik
+- 2026-08-22 18:58 — `BatteryMonitor.java` — Hook estimasi kapasitas: init estimator saat start, kirim sampel tiap polling, finalize segmen & simpan saat stop
+- 2026-08-22 18:58 — `panel_battery.xml` — Tambah kartu Kesehatan Baterai di tab Monitor (teks hasil monospace, input kapasitas desain via ketuk, badge jumlah sesi, tombol Reset Data Estimasi)
+- 2026-08-22 18:58 — `BatteryPanelController.java` — Kartu Kesehatan: refresh real-time (estimasi, skor berwarna, keyakinan, status), dialog input kapasitas desain (validasi 500–30000 mAh), reset data dengan konfirmasi
+- 2026-08-22 19:26 — `values-night/colors.xml` — Varian gelap 17 warna tab Monitor Battery (kartu, badge, level bar, grafik) agar kartu tidak putih di mode gelap
+- 2026-08-23 12:16 — `BatteryMonitor.java` — Logika pembacaan snapshot dipindah ke `BatteryReading`; helper status/kondisi jadi method pada Snapshot
+- 2026-08-23 12:16 — `BatteryStatsModule.java` — Blok baca mandiri (battery intent + sysfs) diganti panggilan `BatteryReading.read()`, format teks overlay tidak berubah
+- 2026-08-23 12:16 — `BatteryChartView.java` — Tipe data seri grafik mengikuti model `BatteryReading.Snapshot`
+- 2026-08-23 12:16 — `BatteryCapacityEstimator.java` — Sumber sampel & cek status charging via `BatteryReading.Snapshot`
+- 2026-08-23 12:16 — `BatteryPanelController.java` — Referensi tipe snapshot & pemanggilan helper status/kondisi menyesuaikan model baru
+- 2026-08-23 12:51 — `BatteryMonitor.java` — Buffer memori riwayat 20 snapshot & grafik 3600 titik dihapus; sampel polling langsung masuk database; interval sampling dinamis (1 dtk charging / 10 dtk layar nyala / 60 dtk layar mati)
+- 2026-08-23 12:51 — `BatteryCapacityEstimator.java` — Persistensi JSON diganti tabel sesi di database (migrasi file JSON lama sekali otomatis lalu dihapus); durasi segmen memakai delta waktu aktual; trim maksimum 60 sesi dibuang
+- 2026-08-23 12:51 — `MainActivity.java` — Auto-start BatteryMonitorService saat aplikasi dibuka; jejak pref bat_bg_monitor dibersihkan
+- 2026-08-23 12:51 — `BootReceiver.java` — BatteryMonitorService selalu direstart saat boot; pref bat_bg_monitor dibersihkan dari syarat restore overlay
+- 2026-08-23 12:51 — `FloatingService.java` — Lifecycle monitor baterai dilepas dari service overlay (start/stop, setBackgroundBatteryMonitorEnabled, cek isAnyModuleActive)
+- 2026-08-23 12:51 — `NotificationHelper.java` — Cek backgroundMonitor & label "BatMon" pada notifikasi dibuang
+- 2026-08-23 12:51 — `BatteryStatsConfig.java` — Field backgroundMonitor dihapus
+- 2026-08-23 12:51 — `panel_battery.xml` — Kontrol manual tab Monitor dihapus (tombol Mulai/Hentikan, switch Latar Belakang, badge status, tombol Jeda/Reset Grafik, tombol Reset Data Estimasi); pilihan rentang grafik diperluas 6 Jam & 24 Jam
+- 2026-08-23 12:51 — `BatteryPanelController.java` — Seluruh listener kontrol manual dihapus; grafik digambar dari query database per rentang secara background thread; export snapshot membaca 20 sampel terakhir dari database
+- 2026-08-23 12:51 — `BatteryChartView.java` — Konstanta rentang 6 Jam & 24 Jam; format label sumbu waktu adaptif (HH:mm:ss / HH:mm / dd/MM HH:mm)
+- 2026-08-23 12:51 — `AndroidManifest.xml` — Deklarasi BatteryMonitorService (foregroundServiceType specialUse)
+- 2026-08-23 12:51 — `colors.xml`, `values-night/colors.xml` — Warna badge status monitor yang tak terpakai dibersihkan
+
+### 🔥 File Removed
+- 2026-08-23 12:51 — `bat_badge_active_bg.xml` — Drawable badge status monitor tak terpakai setelah kontrol manual dihapus
+
+---
+
 # [4.87.0] - 2026-08-21 20:28 WITA versionCode 184 ***RELEASE***
 ### ✨ Fitur Baru
 - **Toggle "Tampilkan panel Debugging" & "Tampilkan panel Info Memori" di halaman Konfigurasi** — Dua switch baru di halaman Pengaturan > Konfigurasi, section Modul, untuk menampilkan/menyembunyikan panel Debugging dan Info Memori dari sidebar Navigation Drawer. Kedua switch default OFF (sembunyi). Setting tersimpan otomatis dan berlaku persisten.

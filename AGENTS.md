@@ -7,7 +7,8 @@
 - **JANGAN refactor / ubah file di luar scope.**
 - **Tanya dulu saat ragu — jangan asal improvisasi.**
 - **Tindakan destruktif (hapus/revert/ubah besar) WAJIB konfirmasi eksplisit.**
-- **JANGAN build; JANGAN menulis laporan section/bullet list di chat.**
+- **JANGAN build.**
+- **JANGAN menulis laporan section/bullet list/Anchored Summar di chat.**
 - **Gunakan bahasa Indonesia untuk thinking dan respons.**
 - **Tidak perlu sinkronisasi dokumen di assets, Sinkronisasi Gradle akan menanganinya secara otomatis saat build.**
 ---

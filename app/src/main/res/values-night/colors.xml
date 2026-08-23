@@ -16,4 +16,21 @@
     <color name="mem_monitor_stroke">#26FFFFFF</color>
     <color name="mem_badge_active_bg">#1A30D158</color>
     <color name="mem_badge_stopped_bg">#1A8E8E93</color>
+
+    <color name="bat_monitor_card">#232327</color>
+    <color name="bat_monitor_header">#FFB74D</color>
+    <color name="bat_monitor_label">#9A9AA0</color>
+    <color name="bat_monitor_level">#66BB6A</color>
+    <color name="bat_monitor_active">#30D158</color>
+    <color name="bat_monitor_stop">#FF453A</color>
+    <color name="bat_monitor_hot">#FF453A</color>
+    <color name="bat_monitor_cold">#64B5F6</color>
+    <color name="bat_monitor_bar_track">#339A9AA0</color>
+    <color name="bat_monitor_stroke">#26FFFFFF</color>
+    <color name="bat_badge_stopped_bg">#1A8E8E93</color>
+
+    <color name="bat_chart_temp">#FF453A</color>
+    <color name="bat_chart_percent">#66BB6A</color>
+    <color name="bat_chart_power">#FFD54F</color>
+    <color name="bat_chart_grid">#26FFFFFF</color>
 </resources>

@@ -1,21 +1,57 @@
 package exp.ftxt.ui;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.BatteryManager;
+import android.os.Build;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.MediaStore;
+import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
+import exp.ftxt.features.battery_stats.BatteryHistoryDb;
+import exp.ftxt.features.battery_stats.BatteryMonitor;
+import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
+import exp.ftxt.shared.ui.BatteryChartView;
 import exp.ftxt.shared.ui.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.shared.ui.SliderLabelEditor;
@@ -55,6 +91,45 @@ public class BatteryPanelController {
     private TextView batteryIntervalValue;
     private PopupWindow intervalPopup;
 
+    private View batTabMonitorView;
+    private TextView batMonitorPercentText;
+    private ProgressBar batMonitorLevelBar;
+    private TextView batMonitorChargeText;
+    private TextView batMonitorMetricsText1;
+    private TextView batMonitorMetricsText2;
+    private TextView batMonitorStatusText;
+    private TextView batMonitorConditionBadge;
+    private Button batMonitorExportButton;
+    private Button batMonitorCopyButton;
+    private int monitorLabelColor;
+
+    private BatteryChartView batChartTempView;
+    private BatteryChartView batChartPercentView;
+    private BatteryChartView batChartPowerView;
+    private RadioGroup batChartRangeGroup;
+    private RadioButton batChartRange5m;
+    private RadioButton batChartRange15m;
+    private RadioButton batChartRange1h;
+    private RadioButton batChartRange6h;
+    private RadioButton batChartRange24h;
+    private TextView batChartRangeLabel;
+    private long chartWindowMs = BatteryChartView.WINDOW_5M;
+
+    private TextView batHealthText;
+    private TextView batHealthDesignText;
+    private TextView batHealthSessionBadge;
+
+    private final Handler monitorHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService chartExecutor = Executors.newSingleThreadExecutor();
+    private boolean chartQueryInFlight = false;
+    private final Runnable monitorRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateMonitorInfo();
+            monitorHandler.postDelayed(this, 1000);
+        }
+    };
+
     public BatteryPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
@@ -68,6 +143,11 @@ public class BatteryPanelController {
         if (batteryPositionController != null) {
             batteryPositionController.refresh();
         }
+        resumeMonitorPolling();
+    }
+
+    public void onPanelHidden() {
+        stopMonitorPolling();
     }
 
     private void refreshOrderList() {
@@ -82,6 +162,8 @@ public class BatteryPanelController {
     }
 
     public void cleanup() {
+        stopMonitorPolling();
+        chartExecutor.shutdown();
         if (batteryPositionController != null) {
             batteryPositionController.cleanup();
             batteryPositionController = null;
@@ -122,6 +204,33 @@ public class BatteryPanelController {
         batteryShadowOffsetXLabel = rootView.findViewById(R.id.batteryShadowOffsetXLabel);
         batteryShadowOffsetYLabel = rootView.findViewById(R.id.batteryShadowOffsetYLabel);
         batteryIntervalValue = rootView.findViewById(R.id.batteryIntervalValue);
+
+        batTabMonitorView = rootView.findViewById(R.id.batTabMonitor);
+        batMonitorPercentText = rootView.findViewById(R.id.batMonitorPercentText);
+        batMonitorLevelBar = rootView.findViewById(R.id.batMonitorLevelBar);
+        batMonitorChargeText = rootView.findViewById(R.id.batMonitorChargeText);
+        batMonitorMetricsText1 = rootView.findViewById(R.id.batMonitorMetricsText1);
+        batMonitorMetricsText2 = rootView.findViewById(R.id.batMonitorMetricsText2);
+        batMonitorStatusText = rootView.findViewById(R.id.batMonitorStatusText);
+        batMonitorConditionBadge = rootView.findViewById(R.id.batMonitorConditionBadge);
+        batMonitorExportButton = rootView.findViewById(R.id.batMonitorExportButton);
+        batMonitorCopyButton = rootView.findViewById(R.id.batMonitorCopyButton);
+        monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
+
+        batChartTempView = rootView.findViewById(R.id.batChartTempView);
+        batChartPercentView = rootView.findViewById(R.id.batChartPercentView);
+        batChartPowerView = rootView.findViewById(R.id.batChartPowerView);
+        batChartRangeGroup = rootView.findViewById(R.id.batChartRangeGroup);
+        batChartRange5m = rootView.findViewById(R.id.batChartRange5m);
+        batChartRange15m = rootView.findViewById(R.id.batChartRange15m);
+        batChartRange1h = rootView.findViewById(R.id.batChartRange1h);
+        batChartRange6h = rootView.findViewById(R.id.batChartRange6h);
+        batChartRange24h = rootView.findViewById(R.id.batChartRange24h);
+        batChartRangeLabel = rootView.findViewById(R.id.batChartRangeLabel);
+
+        batHealthText = rootView.findViewById(R.id.batHealthText);
+        batHealthDesignText = rootView.findViewById(R.id.batHealthDesignText);
+        batHealthSessionBadge = rootView.findViewById(R.id.batHealthSessionBadge);
 
         View sectionPosition = rootView.findViewById(R.id.battery_sectionPosition);
         TextView sectionPositionHeader = rootView.findViewById(R.id.battery_sectionPositionHeader);
@@ -177,6 +286,7 @@ public class BatteryPanelController {
         batteryShadowOffsetYLabel.setText("Shadow Y: " + (int) BatteryStatsConfig.shadow.offsetY);
         batteryShadowColorPreview.setBackgroundColor(BatteryStatsConfig.shadow.color);
         batteryIntervalValue.setText(formatIntervalValue(BatteryStatsConfig.updateInterval));
+        updateMonitorInfo();
     }
 
     private void setupListeners() {
@@ -432,6 +542,315 @@ public class BatteryPanelController {
 
         setupIntervalListeners();
         setupOrderZones();
+        setupMonitorTab();
+    }
+
+    private void setupMonitorTab() {
+        BatteryCapacityEstimator.init(activity);
+        batMonitorExportButton.setOnClickListener(v -> exportBatterySnapshot());
+        batMonitorCopyButton.setOnClickListener(v -> copyToClipboard());
+        batHealthDesignText.setOnClickListener(v -> showDesignCapacityDialog());
+        setupChartControls();
+    }
+
+    private void setupChartControls() {
+        batChartTempView.setSeriesType(BatteryChartView.SERIES_TEMP);
+        batChartPercentView.setSeriesType(BatteryChartView.SERIES_PERCENT);
+        batChartPowerView.setSeriesType(BatteryChartView.SERIES_POWER);
+
+        batChartRangeGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            long window;
+            String label;
+            if (checkedId == R.id.batChartRange15m) {
+                window = BatteryChartView.WINDOW_15M;
+                label = "15 Menit Terakhir";
+            } else if (checkedId == R.id.batChartRange1h) {
+                window = BatteryChartView.WINDOW_1H;
+                label = "1 Jam Terakhir";
+            } else if (checkedId == R.id.batChartRange6h) {
+                window = BatteryChartView.WINDOW_6H;
+                label = "6 Jam Terakhir";
+            } else if (checkedId == R.id.batChartRange24h) {
+                window = BatteryChartView.WINDOW_24H;
+                label = "24 Jam Terakhir";
+            } else {
+                window = BatteryChartView.WINDOW_5M;
+                label = "5 Menit Terakhir";
+            }
+            chartWindowMs = window;
+            batChartRangeLabel.setText(label);
+            batChartTempView.setWindowMs(window);
+            batChartPercentView.setWindowMs(window);
+            batChartPowerView.setWindowMs(window);
+            refreshChart();
+        });
+    }
+
+    private void refreshChart() {
+        if (batChartTempView == null || chartQueryInFlight) return;
+        final long now = System.currentTimeMillis();
+        final long from = now - chartWindowMs;
+        chartQueryInFlight = true;
+        chartExecutor.execute(() -> {
+            BatteryReading.Snapshot[] data =
+                    BatteryHistoryDb.get(activity).queryChart(from, now, 600);
+            monitorHandler.post(() -> {
+                chartQueryInFlight = false;
+                if (batChartTempView == null) return;
+                batChartTempView.setData(data);
+                batChartPercentView.setData(data);
+                batChartPowerView.setData(data);
+            });
+        });
+    }
+
+    private void resumeMonitorPolling() {
+        if (batTabMonitorView == null || batTabMonitorView.getVisibility() != View.VISIBLE) {
+            stopMonitorPolling();
+            return;
+        }
+        monitorHandler.removeCallbacks(monitorRunnable);
+        monitorHandler.post(monitorRunnable);
+    }
+
+    private void stopMonitorPolling() {
+        monitorHandler.removeCallbacks(monitorRunnable);
+    }
+
+    private void updateMonitorInfo() {
+        if (batMonitorPercentText == null) return;
+        BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
+
+        batMonitorPercentText.setText(s.percent + "%");
+        batMonitorLevelBar.setProgress(s.percent);
+
+        SpannableStringBuilder charge = new SpannableStringBuilder();
+        appendLine(charge, "Kapasitas Tersisa",
+                s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—");
+        batMonitorChargeText.setText(charge);
+
+        SpannableStringBuilder col1 = new SpannableStringBuilder();
+        appendLine(col1, "Suhu", String.format(Locale.US, "%.1f°C", s.tempC));
+        appendLine(col1, "Voltase", String.format(Locale.US, "%.3fV", s.voltageV));
+        appendLine(col1, "Arus", s.currentMa != 0
+                ? String.format(Locale.US, "%+d mA", s.currentMa) : "—");
+        appendLine(col1, "Daya", s.powerW > 0
+                ? String.format(Locale.US, "%.2fW", s.powerW) : "—");
+        batMonitorMetricsText1.setText(col1);
+
+        SpannableStringBuilder col2 = new SpannableStringBuilder();
+        appendLine(col2, "Kapasitas", s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—");
+        appendLine(col2, "Cycle Count", s.cycleCount >= 0 ? String.valueOf(s.cycleCount) : "—");
+        appendLine(col2, "Teknologi", s.technology != null ? s.technology : "—");
+        batMonitorMetricsText2.setText(col2);
+
+        SpannableStringBuilder status = new SpannableStringBuilder();
+        appendLine(status, "Status", s.chargingText());
+        switch (s.pluggedInt) {
+            case BatteryManager.BATTERY_PLUGGED_AC: appendLine(status, "Sumber Daya", "AC"); break;
+            case BatteryManager.BATTERY_PLUGGED_USB: appendLine(status, "Sumber Daya", "USB"); break;
+            case BatteryManager.BATTERY_PLUGGED_WIRELESS: appendLine(status, "Sumber Daya", "Wireless"); break;
+            default: appendLine(status, "Sumber Daya", "Baterai"); break;
+        }
+        batMonitorStatusText.setText(status);
+
+        int condLevel = s.conditionLevel();
+        batMonitorConditionBadge.setText("● " + s.conditionText());
+        int condColor = activity.getColor(condLevel > 0 ? R.color.bat_monitor_hot
+                : condLevel < 0 ? R.color.bat_monitor_cold : R.color.bat_monitor_active);
+        batMonitorConditionBadge.setTextColor(condColor);
+
+        refreshHealthCard();
+        refreshChart();
+    }
+
+    private void refreshHealthCard() {
+        if (batHealthText == null) return;
+        BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
+
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        appendLine(sb, "Estimasi Kapasitas",
+                r.medianMah > 0 ? String.format(Locale.US, "%.0f mAh", r.medianMah) : "—");
+
+        int scoreColor;
+        String score;
+        if (r.designMah <= 0) {
+            score = "Isi kapasitas desain";
+            scoreColor = monitorLabelColor;
+        } else if (r.medianMah <= 0) {
+            score = "Belum ada data";
+            scoreColor = monitorLabelColor;
+        } else {
+            float pctScore = r.medianMah / r.designMah * 100f;
+            score = String.format(Locale.US, "%.1f%%", pctScore);
+            scoreColor = activity.getColor(pctScore >= 80f ? R.color.bat_monitor_active
+                    : pctScore >= 50f ? R.color.bat_monitor_header : R.color.bat_monitor_stop);
+        }
+        appendLineColored(sb, "Skor Kesehatan", score, scoreColor);
+
+        appendLine(sb, "Sesi Tercatat", String.valueOf(r.sessionCount));
+        String confidence = r.totalSamples > 0
+                ? (r.fromScreenOffSessions
+                        ? r.totalSamples + " sampel (layar mati)"
+                        : r.totalSamples + " sampel")
+                : "—";
+        appendLineColored(sb, "Keyakinan", confidence,
+                r.totalSamples <= 0 ? monitorLabelColor : null);
+
+        boolean collecting = BatteryCapacityEstimator.isSegmentActive();
+        String status = collecting
+                ? "Mengumpulkan saat mengisi…"
+                : "Menunggu pengisian daya";
+        appendLineColored(sb, "Status", status,
+                collecting ? activity.getColor(R.color.bat_monitor_active) : monitorLabelColor);
+
+        batHealthText.setText(sb);
+        batHealthSessionBadge.setText(r.sessionCount + " sesi");
+        batHealthDesignText.setText(r.designMah > 0
+                ? "Kapasitas Desain: " + r.designMah + " mAh · Ketuk untuk mengatur"
+                : "Kapasitas Desain: Belum diatur · Ketuk untuk mengatur");
+    }
+
+    private void appendLineColored(SpannableStringBuilder sb, String label, String value, Integer valueColor) {
+        String padded = String.format(Locale.US, "%-17s", label);
+        int start = sb.length();
+        sb.append(padded).append(value).append("\n");
+        sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
+                start, start + padded.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (valueColor != null) {
+            sb.setSpan(new ForegroundColorSpan(valueColor),
+                    start + padded.length(), sb.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }
+
+    private void showDesignCapacityDialog() {
+        final EditText input = new EditText(activity);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        int current = BatteryCapacityEstimator.getResult().designMah;
+        input.setText(current > 0 ? String.valueOf(current) : "");
+        input.setHint("mis. 5000");
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Kapasitas Desain")
+                .setMessage("Masukkan kapasitas desain baterai (mAh) sesuai spesifikasi pabrik. "
+                        + "Skor kesehatan hanya dihitung jika kolom ini terisi. Kosongkan untuk menghapus.")
+                .setView(input)
+                .setPositiveButton("Simpan", (dialog, which) -> {
+                    String txt = input.getText().toString().trim();
+                    int value = 0;
+                    if (!txt.isEmpty()) {
+                        try {
+                            value = Integer.parseInt(txt);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                    if (value != 0 && (value < 500 || value > 30000)) {
+                        Toast.makeText(activity, "Kapasitas harus 500–30000 mAh", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    BatteryCapacityEstimator.setDesignCapacity(value);
+                    refreshHealthCard();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void appendLine(SpannableStringBuilder sb, String label, String value) {
+        String padded = String.format(Locale.US, "%-17s", label);
+        int start = sb.length();
+        sb.append(padded).append(value).append("\n");
+        sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
+                start, start + padded.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    private void copyToClipboard() {
+        if (batMonitorMetricsText1 == null) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Baterai Perangkat\n");
+        sb.append(batMonitorPercentText.getText()).append("\n\n");
+        sb.append(batMonitorChargeText.getText().toString().trim()).append("\n\n");
+        sb.append("Metrik Real-Time\n").append(combineMetricColumns());
+        sb.append("\n\nStatus Pengisian\n").append(batMonitorStatusText.getText());
+        ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+        if (cm == null) return;
+        cm.setPrimaryClip(ClipData.newPlainText("FTxT Monitor Baterai", sb.toString()));
+        Toast.makeText(activity, "Disalin ke clipboard", Toast.LENGTH_SHORT).show();
+    }
+
+    private String combineMetricColumns() {
+        String left = batMonitorMetricsText1.getText().toString().trim();
+        String right = batMonitorMetricsText2.getText().toString().trim();
+        if (left.isEmpty()) return right;
+        if (right.isEmpty()) return left;
+        return left + "\n" + right;
+    }
+
+    private void exportBatterySnapshot() {
+        String exportTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+                .format(new Date());
+        BatteryReading.Snapshot[] history =
+                BatteryHistoryDb.get(activity).queryLastSamples(20);
+        StringBuilder sb = new StringBuilder();
+        sb.append("FTxT - Monitor Baterai (Riwayat 20 Snapshot Terakhir)\n");
+        sb.append("Ekspor: ").append(exportTime).append("\n");
+        sb.append("Jumlah snapshot: ").append(history.length).append("\n\n");
+        int index = 1;
+        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        for (BatteryReading.Snapshot snap : history) {
+            String time = timeFormat.format(new Date(snap.time));
+            sb.append("--- Snapshot ").append(index++)
+                    .append("/").append(history.length)
+                    .append(" (").append(time).append(") ---\n");
+            sb.append("Persentase       : ").append(snap.percent).append("%\n");
+            sb.append("Suhu             : ").append(String.format(Locale.US, "%.1f°C", snap.tempC)).append("\n");
+            sb.append("Voltase          : ").append(String.format(Locale.US, "%.3fV", snap.voltageV)).append("\n");
+            sb.append("Arus             : ").append(snap.currentMa != 0
+                    ? String.format(Locale.US, "%+d mA", snap.currentMa) : "—").append("\n");
+            sb.append("Daya             : ").append(snap.powerW > 0
+                    ? String.format(Locale.US, "%.2fW", snap.powerW) : "—").append("\n");
+            sb.append("Kapasitas Tersisa: ").append(snap.chargeMah >= 0 ? snap.chargeMah + " mAh" : "—").append("\n");
+            sb.append("Cycle Count      : ").append(snap.cycleCount >= 0 ? String.valueOf(snap.cycleCount) : "—").append("\n");
+            sb.append("Status           : ").append(snap.chargingText()).append("\n");
+            sb.append("Teknologi        : ").append(snap.technology != null ? snap.technology : "—").append("\n");
+            sb.append("Kondisi          : ").append(snap.conditionText()).append("\n\n");
+        }
+
+        String fileName = "FTxT_baterai_" + System.currentTimeMillis() + ".txt";
+        try {
+            if (writeSnapshotToDownload(sb.toString(), fileName)) {
+                Toast.makeText(activity, "Tersimpan: Download/" + fileName +
+                        " (" + history.length + " snapshot)", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(activity, "Gagal menyimpan snapshot", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(activity, "Gagal menyimpan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private boolean writeSnapshotToDownload(String content, String fileName) throws Exception {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+            values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            Uri uri = activity.getContentResolver().insert(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+            if (uri == null) return false;
+            try (OutputStream os = activity.getContentResolver().openOutputStream(uri)) {
+                if (os == null) return false;
+                os.write(content.getBytes("UTF-8"));
+            }
+            return true;
+        } else {
+            File dir = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS);
+            if (!dir.exists()) dir.mkdirs();
+            File file = new File(dir, fileName);
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(content.getBytes("UTF-8"));
+            }
+            return true;
+        }
     }
 
     private void saveBatteryShadowPrefs() {
