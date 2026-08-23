@@ -17,22 +17,6 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:text="Pemantauan real-time baterai perangkat"
-                        android:textSize="11sp"
-                        android:textColor="@color/bat_monitor_label"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"/>
-
-                </LinearLayout>
-
                 <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -98,6 +82,26 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
+                                <exp.ftxt.features.battery_stats.BatteryRingView
+                                    android:id="@+id/batMonitorRing"
+                                    android:layout_width="130dp"
+                                    android:layout_height="130dp"/>
+
+                                <exp.ftxt.shared.ui.BatteryChartView
+                                    android:id="@+id/batChartPercentView"
+                                    android:layout_width="0dp"
+                                    android:layout_height="130dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginStart="10dp"/>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
+
                                 <TextView
                                     android:id="@+id/batMonitorMetricsText1"
                                     android:textSize="12sp"
@@ -119,15 +123,6 @@
 
                             </LinearLayout>
 
-                            <TextView
-                                android:id="@+id/batMonitorStatusText"
-                                android:textSize="12sp"
-                                android:typeface="monospace"
-                                android:lineSpacingExtra="2dp"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"/>
-
                         </LinearLayout>
 
                         <LinearLayout
@@ -139,8 +134,11 @@
                             android:layout_marginBottom="10dp">
 
                             <LinearLayout
+                                android:id="@+id/batChartHeader"
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
+                                android:clickable="true"
+                                android:focusable="true"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
@@ -171,7 +169,23 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"/>
 
+                                <TextView
+                                    android:id="@+id/batChartCollapseToggle"
+                                    android:text="▾"
+                                    android:textSize="14sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/bat_monitor_label"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"/>
+
                             </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/batChartContent"
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
 
                             <RadioGroup
                                 android:id="@+id/batChartRangeGroup"
@@ -267,13 +281,13 @@
                                 <View
                                     android:layout_width="3dp"
                                     android:layout_height="12dp"
-                                    android:background="@color/bat_chart_percent"/>
+                                    android:background="@color/bat_chart_power"/>
 
                                 <TextView
-                                    android:text="Persentase"
+                                    android:text="Daya"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
-                                    android:textColor="@color/bat_chart_percent"
+                                    android:textColor="@color/bat_chart_power"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"/>
@@ -281,7 +295,7 @@
                             </LinearLayout>
 
                             <exp.ftxt.shared.ui.BatteryChartView
-                                android:id="@+id/batChartPercentView"
+                                android:id="@+id/batChartPowerView"
                                 android:layout_width="match_parent"
                                 android:layout_height="140dp"
                                 android:layout_marginTop="4dp"/>
@@ -301,13 +315,13 @@
                                 <View
                                     android:layout_width="3dp"
                                     android:layout_height="12dp"
-                                    android:background="@color/bat_chart_power"/>
+                                    android:background="@color/bat_chart_voltage"/>
 
                                 <TextView
-                                    android:text="Daya"
+                                    android:text="Tegangan"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
-                                    android:textColor="@color/bat_chart_power"
+                                    android:textColor="@color/bat_chart_voltage"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="6dp"/>
@@ -315,10 +329,46 @@
                             </LinearLayout>
 
                             <exp.ftxt.shared.ui.BatteryChartView
-                                android:id="@+id/batChartPowerView"
+                                android:id="@+id/batChartVoltageView"
                                 android:layout_width="match_parent"
                                 android:layout_height="140dp"
                                 android:layout_marginTop="4dp"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@color/bat_monitor_stroke"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+
+                                <View
+                                    android:layout_width="3dp"
+                                    android:layout_height="12dp"
+                                    android:background="@color/bat_chart_current"/>
+
+                                <TextView
+                                    android:text="Arus"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/bat_chart_current"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"/>
+
+                            </LinearLayout>
+
+                            <exp.ftxt.shared.ui.BatteryChartView
+                                android:id="@+id/batChartCurrentView"
+                                android:layout_width="match_parent"
+                                android:layout_height="140dp"
+                                android:layout_marginTop="4dp"/>
+
+                            </LinearLayout>
 
                         </LinearLayout>
 
@@ -384,48 +434,48 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"/>
 
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp">
+
+                                <Button
+                                    android:id="@+id/batMonitorCopyButton"
+                                    android:text="Salin"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="8dp"
+                                    android:textSize="12sp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:paddingTop="10dp"
+                                    android:paddingBottom="10dp"/>
+
+                                <Button
+                                    android:id="@+id/batMonitorExportButton"
+                                    android:text="Simpan Snapshot"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:textSize="12sp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:paddingTop="10dp"
+                                    android:paddingBottom="10dp"/>
+
+                            </LinearLayout>
+
                         </LinearLayout>
 
                     </LinearLayout>
 
                 </androidx.core.widget.NestedScrollView>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
-
-                    <Button
-                        android:id="@+id/batMonitorCopyButton"
-                        android:text="Salin"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:textSize="12sp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"/>
-
-                    <Button
-                        android:id="@+id/batMonitorExportButton"
-                        android:text="Simpan Snapshot"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="12sp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"/>
-
-                </LinearLayout>
 
             </LinearLayout>
 

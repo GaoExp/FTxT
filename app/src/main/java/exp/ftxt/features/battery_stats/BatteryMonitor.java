@@ -10,8 +10,8 @@ public class BatteryMonitor {
 
     /** Interval sampling dinamis hemat baterai (§2.6 rencana rework). */
     private static final long POLL_CHARGING_MS = 1000;
-    private static final long POLL_SCREEN_ON_MS = 10_000;
-    private static final long POLL_SCREEN_OFF_MS = 60_000;
+    private static final long POLL_SCREEN_ON_MS = 5_000;
+    private static final long POLL_SCREEN_OFF_MS = 30_000;
 
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static boolean running = false;

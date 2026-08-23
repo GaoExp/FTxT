@@ -12,6 +12,8 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import exp.ftxt.shared.color.BatteryColors;
+
 public class BatteryBarView extends View {
 
     private static final float WAVE_CYCLES = 2f;
@@ -272,20 +274,7 @@ public class BatteryBarView extends View {
 
         int barColor = fillColor;
         if (colorScheme == BatteryBarConfig.SCHEME_HUE) {
-            float hue, sat;
-            if (percent <= 20f) {
-                hue = 1f;
-                sat = 0.7f;
-            } else if (percent <= 50f) {
-                float t = (percent - 21f) / 29f;
-                hue = 2f + 98f * t;
-                sat = 0.7f;
-            } else {
-                float t = (percent - 51f) / 49f;
-                hue = 102f + 158f * t;
-                sat = 0.71f + 0.29f * t;
-            }
-            barColor = Color.HSVToColor(255, new float[]{hue, sat, 1f});
+            barColor = BatteryColors.hueColor(percent);
         } else if (colorScheme == BatteryBarConfig.SCHEME_CLASSIC) {
             if (percent <= 10f) barColor = Color.RED;
             else if (percent <= 20f) barColor = Color.YELLOW;

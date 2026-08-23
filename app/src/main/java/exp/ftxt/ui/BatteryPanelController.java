@@ -49,6 +49,7 @@ import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;
+import exp.ftxt.features.battery_stats.BatteryRingView;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.shared.ui.BatteryChartView;
 import exp.ftxt.shared.ui.ColorPickerDialog;
@@ -91,9 +92,9 @@ public class BatteryPanelController {
     private PopupWindow intervalPopup;
 
     private View batTabMonitorView;
+    private BatteryRingView batMonitorRing;
     private TextView batMonitorMetricsText1;
     private TextView batMonitorMetricsText2;
-    private TextView batMonitorStatusText;
     private TextView batMonitorConditionBadge;
     private Button batMonitorExportButton;
     private Button batMonitorCopyButton;
@@ -102,6 +103,8 @@ public class BatteryPanelController {
     private BatteryChartView batChartTempView;
     private BatteryChartView batChartPercentView;
     private BatteryChartView batChartPowerView;
+    private BatteryChartView batChartVoltageView;
+    private BatteryChartView batChartCurrentView;
     private RadioGroup batChartRangeGroup;
     private RadioButton batChartRange5m;
     private RadioButton batChartRange15m;
@@ -109,6 +112,9 @@ public class BatteryPanelController {
     private RadioButton batChartRange6h;
     private RadioButton batChartRange24h;
     private TextView batChartRangeLabel;
+    private View batChartHeader;
+    private TextView batChartCollapseToggle;
+    private View batChartContent;
     private long chartWindowMs = BatteryChartView.WINDOW_5M;
 
     private TextView batHealthText;
@@ -202,9 +208,9 @@ public class BatteryPanelController {
         batteryIntervalValue = rootView.findViewById(R.id.batteryIntervalValue);
 
         batTabMonitorView = rootView.findViewById(R.id.batTabMonitor);
+        batMonitorRing = rootView.findViewById(R.id.batMonitorRing);
         batMonitorMetricsText1 = rootView.findViewById(R.id.batMonitorMetricsText1);
         batMonitorMetricsText2 = rootView.findViewById(R.id.batMonitorMetricsText2);
-        batMonitorStatusText = rootView.findViewById(R.id.batMonitorStatusText);
         batMonitorConditionBadge = rootView.findViewById(R.id.batMonitorConditionBadge);
         batMonitorExportButton = rootView.findViewById(R.id.batMonitorExportButton);
         batMonitorCopyButton = rootView.findViewById(R.id.batMonitorCopyButton);
@@ -213,6 +219,8 @@ public class BatteryPanelController {
         batChartTempView = rootView.findViewById(R.id.batChartTempView);
         batChartPercentView = rootView.findViewById(R.id.batChartPercentView);
         batChartPowerView = rootView.findViewById(R.id.batChartPowerView);
+        batChartVoltageView = rootView.findViewById(R.id.batChartVoltageView);
+        batChartCurrentView = rootView.findViewById(R.id.batChartCurrentView);
         batChartRangeGroup = rootView.findViewById(R.id.batChartRangeGroup);
         batChartRange5m = rootView.findViewById(R.id.batChartRange5m);
         batChartRange15m = rootView.findViewById(R.id.batChartRange15m);
@@ -220,6 +228,9 @@ public class BatteryPanelController {
         batChartRange6h = rootView.findViewById(R.id.batChartRange6h);
         batChartRange24h = rootView.findViewById(R.id.batChartRange24h);
         batChartRangeLabel = rootView.findViewById(R.id.batChartRangeLabel);
+        batChartHeader = rootView.findViewById(R.id.batChartHeader);
+        batChartCollapseToggle = rootView.findViewById(R.id.batChartCollapseToggle);
+        batChartContent = rootView.findViewById(R.id.batChartContent);
 
         batHealthText = rootView.findViewById(R.id.batHealthText);
         batHealthDesignText = rootView.findViewById(R.id.batHealthDesignText);
@@ -550,6 +561,16 @@ public class BatteryPanelController {
         batChartTempView.setSeriesType(BatteryChartView.SERIES_TEMP);
         batChartPercentView.setSeriesType(BatteryChartView.SERIES_PERCENT);
         batChartPowerView.setSeriesType(BatteryChartView.SERIES_POWER);
+        batChartVoltageView.setSeriesType(BatteryChartView.SERIES_VOLTAGE);
+        batChartCurrentView.setSeriesType(BatteryChartView.SERIES_CURRENT);
+
+        View.OnClickListener collapseToggle = v -> {
+            boolean expanded = batChartContent.getVisibility() == View.VISIBLE;
+            batChartContent.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            batChartCollapseToggle.setText(expanded ? "▸" : "▾");
+        };
+        batChartHeader.setOnClickListener(collapseToggle);
+        batChartCollapseToggle.setOnClickListener(collapseToggle);
 
         batChartRangeGroup.setOnCheckedChangeListener((group, checkedId) -> {
             long window;
@@ -575,6 +596,8 @@ public class BatteryPanelController {
             batChartTempView.setWindowMs(window);
             batChartPercentView.setWindowMs(window);
             batChartPowerView.setWindowMs(window);
+            batChartVoltageView.setWindowMs(window);
+            batChartCurrentView.setWindowMs(window);
             refreshChart();
         });
     }
@@ -593,6 +616,8 @@ public class BatteryPanelController {
                 batChartTempView.setData(data);
                 batChartPercentView.setData(data);
                 batChartPowerView.setData(data);
+                batChartVoltageView.setData(data);
+                batChartCurrentView.setData(data);
             });
         });
     }
@@ -615,30 +640,22 @@ public class BatteryPanelController {
         BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
 
         SpannableStringBuilder col1 = new SpannableStringBuilder();
-        appendLine(col1, "% Level", s.percent + "%");
         appendLine(col1, "Suhu", String.format(Locale.US, "%.1f°C", s.tempC));
         appendLine(col1, "Voltase", String.format(Locale.US, "%.3fV", s.voltageV));
         appendLine(col1, "Arus", s.currentMa != 0
                 ? String.format(Locale.US, "%+d mA", s.currentMa) : "—");
-        appendLine(col1, "Daya", s.powerW > 0
-                ? String.format(Locale.US, "%.2fW", s.powerW) : "—");
         batMonitorMetricsText1.setText(col1);
 
         SpannableStringBuilder col2 = new SpannableStringBuilder();
-        appendLine(col2, "Kapasitas", s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—");
+        appendLine(col2, "Daya", s.powerW > 0
+                ? String.format(Locale.US, "%.2fW", s.powerW) : "—");
         appendLine(col2, "Cycle Count", s.cycleCount >= 0 ? String.valueOf(s.cycleCount) : "—");
         appendLine(col2, "Teknologi", s.technology != null ? s.technology : "—");
         batMonitorMetricsText2.setText(col2);
 
-        SpannableStringBuilder status = new SpannableStringBuilder();
-        appendLine(status, "Status", s.chargingText());
-        switch (s.pluggedInt) {
-            case BatteryManager.BATTERY_PLUGGED_AC: appendLine(status, "Sumber Daya", "AC"); break;
-            case BatteryManager.BATTERY_PLUGGED_USB: appendLine(status, "Sumber Daya", "USB"); break;
-            case BatteryManager.BATTERY_PLUGGED_WIRELESS: appendLine(status, "Sumber Daya", "Wireless"); break;
-            default: appendLine(status, "Sumber Daya", "Baterai"); break;
-        }
-        batMonitorStatusText.setText(status);
+        batMonitorRing.setBatteryData(s.percent,
+                s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—",
+                shortChargingStatus(s));
 
         int condLevel = s.conditionLevel();
         batMonitorConditionBadge.setText("● " + s.conditionText());
@@ -648,6 +665,19 @@ public class BatteryPanelController {
 
         refreshHealthCard();
         refreshChart();
+    }
+
+    private String shortChargingStatus(BatteryReading.Snapshot s) {
+        if (s.statusInt == BatteryManager.BATTERY_STATUS_FULL) return "Full";
+        if (s.statusInt == BatteryManager.BATTERY_STATUS_CHARGING) {
+            switch (s.pluggedInt) {
+                case BatteryManager.BATTERY_PLUGGED_AC: return "Charging•AC";
+                case BatteryManager.BATTERY_PLUGGED_USB: return "Charging•USB";
+                case BatteryManager.BATTERY_PLUGGED_WIRELESS: return "Charging•Wireless";
+                default: return "Charging";
+            }
+        }
+        return "Discharging";
     }
 
     private void refreshHealthCard() {
@@ -750,14 +780,40 @@ public class BatteryPanelController {
 
     private void copyToClipboard() {
         if (batMonitorMetricsText1 == null) return;
+        BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
+        BatteryCapacityEstimator.HealthResult h = BatteryCapacityEstimator.getResult();
         StringBuilder sb = new StringBuilder();
         sb.append("Baterai Perangkat\n\n");
+        sb.append("Level           : ").append(s.percent).append("%\n");
+        sb.append("Kapasitas       : ").append(s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—").append("\n");
+        sb.append("Status          : ").append(shortChargingStatus(s)).append("\n\n");
         sb.append("Metrik Real-Time\n").append(combineMetricColumns());
-        sb.append("\n\nStatus Pengisian\n").append(batMonitorStatusText.getText());
+        sb.append("\n\nKesehatan Baterai\n");
+        sb.append("Estimasi Kapasitas : ").append(healthMedianText(h)).append("\n");
+        sb.append("Skor Kesehatan     : ").append(healthScoreText(h)).append("\n");
+        sb.append("Sesi Tercatat      : ").append(h.sessionCount).append("\n");
+        sb.append("Keyakinan          : ").append(healthConfidenceText(h)).append("\n");
         ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
         if (cm == null) return;
         cm.setPrimaryClip(ClipData.newPlainText("FTxT Monitor Baterai", sb.toString()));
         Toast.makeText(activity, "Disalin ke clipboard", Toast.LENGTH_SHORT).show();
+    }
+
+    private String healthMedianText(BatteryCapacityEstimator.HealthResult r) {
+        return r.medianMah > 0 ? String.format(Locale.US, "%.0f mAh", r.medianMah) : "—";
+    }
+
+    private String healthScoreText(BatteryCapacityEstimator.HealthResult r) {
+        if (r.designMah <= 0) return "Isi kapasitas desain";
+        if (r.medianMah <= 0) return "Belum ada data";
+        return String.format(Locale.US, "%.1f%%", r.medianMah / r.designMah * 100f);
+    }
+
+    private String healthConfidenceText(BatteryCapacityEstimator.HealthResult r) {
+        if (r.totalSamples <= 0) return "—";
+        return r.fromScreenOffSessions
+                ? r.totalSamples + " sampel (layar mati)"
+                : r.totalSamples + " sampel";
     }
 
     private String combineMetricColumns() {
@@ -773,10 +829,20 @@ public class BatteryPanelController {
                 .format(new Date());
         BatteryReading.Snapshot[] history =
                 BatteryHistoryDb.get(activity).queryLastSamples(20);
+        BatteryCapacityEstimator.HealthResult health = BatteryCapacityEstimator.getResult();
         StringBuilder sb = new StringBuilder();
         sb.append("FTxT - Monitor Baterai (Riwayat 20 Snapshot Terakhir)\n");
         sb.append("Ekspor: ").append(exportTime).append("\n");
         sb.append("Jumlah snapshot: ").append(history.length).append("\n\n");
+        sb.append("=== Kesehatan Baterai ===\n");
+        sb.append("Estimasi Kapasitas : ").append(healthMedianText(health)).append("\n");
+        String scoreText = healthScoreText(health);
+        if (health.designMah > 0 && health.medianMah > 0) {
+            scoreText += " (kapasitas desain " + health.designMah + " mAh)";
+        }
+        sb.append("Skor Kesehatan     : ").append(scoreText).append("\n");
+        sb.append("Sesi Tercatat      : ").append(health.sessionCount).append("\n");
+        sb.append("Keyakinan          : ").append(healthConfidenceText(health)).append("\n\n");
         int index = 1;
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         for (BatteryReading.Snapshot snap : history) {

@@ -120,8 +120,16 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
     /**
      * Sampel untuk grafik pada rentang [fromMs, toMs]. Bila jumlah baris melebihi
      * targetPoints, baris dirata-rata per bucket waktu agar hasil ringan digambar.
+     * Hasil akhirnya di-resample ke grid waktu SERAGAM (step tetap) sehingga
+     * kepadatan titik grafik konsisten — pola garis tidak berubah mengikuti
+     * interval sampling yang sedang aktif saat data direkam (charging 1 dtk vs idle).
      */
     public BatteryReading.Snapshot[] queryChart(long fromMs, long toMs, int targetPoints) {
+        BatteryReading.Snapshot[] raw = queryChartRaw(fromMs, toMs, targetPoints);
+        return resampleUniform(raw, fromMs, toMs, targetPoints);
+    }
+
+    private BatteryReading.Snapshot[] queryChartRaw(long fromMs, long toMs, int targetPoints) {
         SQLiteDatabase db = getReadableDatabase();
         long count = 0;
         Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + T_SAMPLES
@@ -155,6 +163,40 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         } finally {
             cur.close();
         }
+        return out.toArray(new BatteryReading.Snapshot[0]);
+    }
+
+    /** Interpolasi linear ke titik-titik berjarak waktu sama (maks. targetPoints). */
+    private static BatteryReading.Snapshot[] resampleUniform(
+            BatteryReading.Snapshot[] raw, long fromMs, long toMs, int targetPoints) {
+        int n = raw.length;
+        if (n < 2) return raw;
+        long start = Math.max(fromMs, raw[0].time);
+        long end = Math.min(toMs, raw[n - 1].time);
+        long step = Math.max(1000L, (end - start) / targetPoints);
+        ArrayList<BatteryReading.Snapshot> out = new ArrayList<>();
+        int j = 0;
+        for (long t = start; t <= end && out.size() < targetPoints; t += step) {
+            while (j + 1 < n && raw[j + 1].time <= t) j++;
+            BatteryReading.Snapshot a = raw[j];
+            int k = Math.min(j + 1, n - 1);
+            BatteryReading.Snapshot b = raw[k];
+            if (b.time <= a.time) {
+                out.add(a);
+                continue;
+            }
+            float frac = (t - a.time) / (float) (b.time - a.time);
+            out.add(new BatteryReading.Snapshot(
+                    t,
+                    a.tempC + (b.tempC - a.tempC) * frac,
+                    Math.round(a.percent + (b.percent - a.percent) * frac),
+                    a.voltageV + (b.voltageV - a.voltageV) * frac,
+                    Math.round(a.currentMa + (b.currentMa - a.currentMa) * frac),
+                    a.powerW + (b.powerW - a.powerW) * frac,
+                    Math.round(a.chargeMah + (b.chargeMah - a.chargeMah) * frac),
+                    a.cycleCount, a.statusInt, a.pluggedInt, a.technology));
+        }
+        if (out.isEmpty()) return raw;
         return out.toArray(new BatteryReading.Snapshot[0]);
     }
 

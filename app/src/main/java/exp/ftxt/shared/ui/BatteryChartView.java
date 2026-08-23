@@ -31,6 +31,8 @@ public class BatteryChartView extends View {
     public static final int SERIES_TEMP = 0;
     public static final int SERIES_PERCENT = 1;
     public static final int SERIES_POWER = 2;
+    public static final int SERIES_VOLTAGE = 3;
+    public static final int SERIES_CURRENT = 4;
 
     private BatteryReading.Snapshot[] samples = new BatteryReading.Snapshot[0];
     private long windowMs = WINDOW_5M;
@@ -93,9 +95,14 @@ public class BatteryChartView extends View {
     }
 
     private void applySeriesStyle() {
-        int colorRes = seriesType == SERIES_TEMP ? R.color.bat_chart_temp
-                : seriesType == SERIES_PERCENT ? R.color.bat_chart_percent
-                : R.color.bat_chart_power;
+        int colorRes;
+        switch (seriesType) {
+            case SERIES_TEMP: colorRes = R.color.bat_chart_temp; break;
+            case SERIES_PERCENT: colorRes = R.color.bat_chart_percent; break;
+            case SERIES_VOLTAGE: colorRes = R.color.bat_chart_voltage; break;
+            case SERIES_CURRENT: colorRes = R.color.bat_chart_current; break;
+            default: colorRes = R.color.bat_chart_power; break;
+        }
         linePaint.setColor(getResources().getColor(colorRes));
     }
 
@@ -149,7 +156,11 @@ public class BatteryChartView extends View {
             max = 100f;
         } else {
             float range = max - min;
-            if (range < 1e-3f) {
+            if (seriesType == SERIES_TEMP && range < 4f) {
+                float mid = (min + max) / 2f;
+                min = mid - 2f;
+                max = mid + 2f;
+            } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);
                 max += Math.max(1f, Math.abs(max) * 0.1f);
             } else {
@@ -207,6 +218,8 @@ public class BatteryChartView extends View {
         switch (seriesType) {
             case SERIES_TEMP: return samples[idx].tempC;
             case SERIES_PERCENT: return samples[idx].percent;
+            case SERIES_VOLTAGE: return samples[idx].voltageV;
+            case SERIES_CURRENT: return samples[idx].currentMa;
             default: return (float) samples[idx].powerW;
         }
     }
@@ -215,6 +228,10 @@ public class BatteryChartView extends View {
         switch (seriesType) {
             case SERIES_TEMP: return String.format(Locale.US, "%.1f°", v);
             case SERIES_PERCENT: return String.format(Locale.US, "%.0f%%", v);
+            case SERIES_VOLTAGE: return String.format(Locale.US, "%.2fV", v);
+            case SERIES_CURRENT: return Math.abs(v) >= 1000f
+                    ? String.format(Locale.US, "%.2fA", v / 1000f)
+                    : String.format(Locale.US, "%.0fmA", v);
             default: return String.format(Locale.US, v < 10f ? "%.2fW" : "%.1fW", v);
         }
     }

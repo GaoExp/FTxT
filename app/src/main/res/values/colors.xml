@@ -40,6 +40,8 @@
     <color name="bat_chart_temp">#E53935</color>
     <color name="bat_chart_percent">#43A047</color>
     <color name="bat_chart_power">#FFB300</color>
+    <color name="bat_chart_voltage">#5C6BC0</color>
+    <color name="bat_chart_current">#00897B</color>
     <color name="bat_chart_grid">#228A8A8E</color>
 </resources>
 

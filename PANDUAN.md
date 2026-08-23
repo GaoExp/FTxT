@@ -106,7 +106,11 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 ### Battery Info
 Panel Battery Info memiliki **3 tab** di bagian bawah: **Monitor**, **Overlay**, dan **Battery Strip**.
 
-**Tab Monitor** — Placeholder untuk monitoring baterai (coming soon).
+**Tab Monitor** — Pemantauan baterai perangkat real-time dalam 3 kartu:
+- **Metrik Real-Time** — Ring gauge melingkar di kiri: arc berwarna gradien hue mengikuti level baterai (skema warna yang sama dengan Battery Strip), di dalam lingkaran tampil level %, kapasitas tersisa (mAh), dan status pengisian singkat (Charging•AC/USB/Wireless / Full / Discharging). Grafik riwayat Persentase berada di sebelah kanan ring, dan grid metrik monospace berjajar di bawahnya: suhu, voltase, arus, daya, cycle count, teknologi baterai (cycle count hanya tampil jika perangkat melaporkan). Badge kondisi suhu (Normal/Panas/Dingin) tampil di header kartu.
+- **Grafik Riwayat** — Empat chart Suhu, Daya, Tegangan, dan Arus dengan pemilih rentang 5 Menit / 15 Menit / 1 Jam / 6 Jam / 24 Jam (berlaku global untuk semua chart). Tiap chart punya sumbu Y sendiri (skala otomatis mengikuti data) dan angka nilai terkini di ujung garis. Chevron di header kartu untuk melipat/membuka seluruh isi grafik. Data bersumber dari database sehingga riwayat lama tetap terlihat walau aplikasi sempat ditutup.
+- **Kesehatan Baterai** — Estimasi kapasitas penuh ala AccuBattery: saat perangkat mengisi daya, segmen pengisian dicatat lalu estimasi diagregasi dengan median lintas sesi (sesi mayoritas waktu layar mati diprioritaskan agar lebih akurat). Tampil: estimasi kapasitas, skor kesehatan (hijau ≥80% / oranye ≥50% / merah <50%), jumlah sesi tercatat, indikator keyakinan, dan status pengumpulan data. Ketuk kartu untuk input kapasitas desain (mAh) — skor kesehatan baru muncul jika kapasitas desain terisi. Tombol **Salin** & **Simpan Snapshot** ada di dalam kartu ini; hasilnya menyertakan catatan kesehatan baterai.
+- Pemantauan berjalan **otomatis full-aktif**: tanpa tombol mulai/hentikan — pencatatan tetap jalan meski overlay mati, panel tertutup, atau aplikasi ditutup, lewat foreground service ringan dengan notifikasi minimal prioritas rendah. Nyala otomatis saat aplikasi dibuka dan direstart otomatis saat boot. Sampling dinamis hemat baterai: rapat ±1 detik saat mengisi daya, ±5 detik saat layar nyala idle, ±30 detik saat layar mati.
 
 **Tab Overlay** — Konfigurasi info baterai:
 - Menampilkan **suhu (°C)**, **persentase (%)**, **voltase (V)**, **arus (mA)**, dan **daya (W)** dalam satu overlay
