@@ -29,7 +29,10 @@
     <color name="bat_badge_stopped_bg">#1A8E8E93</color>
 
     <color name="bat_chart_temp">#FF453A</color>
+    <color name="bat_chart_temp_ice">#33F1FF</color>
     <color name="bat_chart_percent">#66BB6A</color>
+    <color name="bat_chart_percent_charging">#66BB6A</color>
+    <color name="bat_chart_percent_discharging">#FF453A</color>
     <color name="bat_chart_power">#FFD54F</color>
     <color name="bat_chart_voltage">#7986CB</color>
     <color name="bat_chart_current">#4DB6AC</color>

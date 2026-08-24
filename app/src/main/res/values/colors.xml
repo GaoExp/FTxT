@@ -38,7 +38,10 @@
 
     <!-- Battery Chart -->
     <color name="bat_chart_temp">#E53935</color>
+    <color name="bat_chart_temp_ice">#33F1FF</color>
     <color name="bat_chart_percent">#43A047</color>
+    <color name="bat_chart_percent_charging">#43A047</color>
+    <color name="bat_chart_percent_discharging">#E53935</color>
     <color name="bat_chart_power">#FFB300</color>
     <color name="bat_chart_voltage">#5C6BC0</color>
     <color name="bat_chart_current">#00897B</color>

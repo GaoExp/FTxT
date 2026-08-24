@@ -77,6 +77,15 @@ public class BatteryChartHistoryController {
         batChartVoltageView.setSeriesType(BatteryChartView.SERIES_VOLTAGE);
         batChartCurrentView.setSeriesType(BatteryChartView.SERIES_CURRENT);
 
+        batChartTempView.setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_TEMP, chartWindowMs));
+        batChartPowerView.setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_POWER, chartWindowMs));
+        batChartVoltageView.setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_VOLTAGE, chartWindowMs));
+        batChartCurrentView.setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_CURRENT, chartWindowMs));
+
         batChartRangeSeek.setMax(CHART_WINDOWS.length - 1);
         batChartRangeSeek.setProgress(CHART_WINDOW_DEFAULT);
         batChartRangeLabel.setText(CHART_WINDOW_LABELS[CHART_WINDOW_DEFAULT] + " Terakhir");

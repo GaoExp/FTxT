@@ -14,7 +14,8 @@ keystore.properties
 talkhere.txt
 /_planning/
 /_temp/
-# key/ — folder untuk keystore CI, file sensitif diabaikan
-/key/*.jks
-/key/alias-key
+shared/config/build/
 opencode.jsonc
+# key/ — folder untuk keystore CI, file sensitif diabaikan
+/key/alias-key
+/key/*.jks

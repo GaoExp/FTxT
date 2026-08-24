@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.core.graphics.ColorUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -298,24 +300,66 @@ public class BatteryChartView extends View {
             else if (selectedIndex >= first + count) selectedIndex = first + count - 1;
         }
 
-        path.rewind();
-        boolean started = false;
         float lastX = 0f;
         float lastY = 0f;
-        for (int k = 0; k < count; k++) {
-            int idx = first + k;
-            float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
-            float norm = (valueAt(idx) - min) / vRange;
-            norm = Math.max(0f, Math.min(1f, norm));
-            float y = padTop + plotH * (1f - norm);
-            if (!started) {
-                path.moveTo(x, y);
-                started = true;
-            } else {
-                path.lineTo(x, y);
+        if (seriesType == SERIES_TEMP) {
+            // Garis Suhu: warna tiap segmen mengikuti nilai suhu titik datanya
+            // (putih dingin ekstrem → ice blue → hijau → oranye → merah panas).
+            path.rewind();
+            float prevX = padLeft + plotW * ((samples[first].time - baseT) / spanMs);
+            float prevY = pointY(first, min, vRange, padTop, plotH);
+            for (int k = 1; k < count; k++) {
+                int idx = first + k;
+                float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
+                float y = pointY(idx, min, vRange, padTop, plotH);
+                linePaint.setColor(tempColor(valueAt(idx - 1)));
+                canvas.drawLine(prevX, prevY, x, y, linePaint);
+                prevX = x;
+                prevY = y;
+                lastX = x;
+                lastY = y;
             }
-            lastX = x;
-            lastY = y;
+            linePaint.setColor(tempColor(valueAt(first + count - 1)));
+        } else if (isStatusColored()) {
+            // Garis Persentase/Tegangan/Arus diwarnai per segmen sesuai status baterai
+            // titik data: hijau saat mengisi, merah saat tidak. Segmen transisi ikut run sebelumnya.
+            boolean charging = samples[first].isCharging();
+            linePaint.setColor(lineColor(charging));
+            path.rewind();
+            path.moveTo(padLeft + plotW * ((samples[first].time - baseT) / spanMs),
+                    pointY(first, min, vRange, padTop, plotH));
+            for (int k = 1; k < count; k++) {
+                int idx = first + k;
+                float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
+                float y = pointY(idx, min, vRange, padTop, plotH);
+                path.lineTo(x, y);
+                lastX = x;
+                lastY = y;
+                boolean c = samples[idx].isCharging();
+                if (c != charging) {
+                    canvas.drawPath(path, linePaint);
+                    path.rewind();
+                    path.moveTo(x, y);
+                    charging = c;
+                    linePaint.setColor(lineColor(charging));
+                }
+            }
+        } else {
+            path.rewind();
+            boolean started = false;
+            for (int k = 0; k < count; k++) {
+                int idx = first + k;
+                float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
+                float y = pointY(idx, min, vRange, padTop, plotH);
+                if (!started) {
+                    path.moveTo(x, y);
+                    started = true;
+                } else {
+                    path.lineTo(x, y);
+                }
+                lastX = x;
+                lastY = y;
+            }
         }
         canvas.drawPath(path, linePaint);
 
@@ -325,14 +369,22 @@ public class BatteryChartView extends View {
         valueLabelPaint.setTextAlign(Paint.Align.RIGHT);
         valueLabelPaint.setTextSize(sp(10));
         String txt = fmt(valueAt(first + count - 1));
-        float ty = (lastY - dp(16) < padTop) ? lastY + dp(15) : lastY - dp(7);
-        valueLabelPaint.setColor(labelPaint.getColor());
-        canvas.drawText(txt, Math.max(lastX, padLeft + plotW) - dp(5), ty, valueLabelPaint);
+        float tx = Math.max(lastX, padLeft + plotW) - dp(5);
+        float ty = (lastY - dp(28) < padTop) ? lastY + dp(17) : lastY - dp(12);
+        // Chip latar gelap semi-opaque agar angka tetap terbaca saat ditumpuk garis.
+        float tw = valueLabelPaint.measureText(txt);
+        Paint.FontMetrics fm = valueLabelPaint.getFontMetrics();
+        valueTagBgPaint.setColor(0x66202124);
+        canvas.drawRoundRect(tx - tw - dp(4), ty + fm.ascent - dp(2),
+                tx + dp(4), ty + fm.descent + dp(2), dp(4), dp(4), valueTagBgPaint);
+        valueLabelPaint.setColor(Color.WHITE);
+        canvas.drawText(txt, tx, ty, valueLabelPaint);
 
         if (interactive && selectedIndex >= 0) drawCrosshair(canvas);
     }
 
     private final Paint valueLabelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint valueTagBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     /** Nilai numerik mentah satu snapshot sesuai jenis seri — dipakai juga halaman detail. */
     public static float valueOf(int seriesType, BatteryReading.Snapshot s) {
@@ -347,6 +399,56 @@ public class BatteryChartView extends View {
 
     private float valueAt(int idx) {
         return valueOf(seriesType, samples[idx]);
+    }
+
+    private float pointY(int idx, float min, float vRange, float padTop, float plotH) {
+        float norm = (valueAt(idx) - min) / vRange;
+        norm = Math.max(0f, Math.min(1f, norm));
+        return padTop + plotH * (1f - norm);
+    }
+
+    /** Seri yang garisnya diwarnai sesuai status pengisian titik data. */
+    private boolean isStatusColored() {
+        return seriesType == SERIES_PERCENT || seriesType == SERIES_VOLTAGE
+                || seriesType == SERIES_CURRENT;
+    }
+
+    private int[] tempAnchors;
+
+    /** Anchor warna gradien Suhu: ice blue → hijau → oranye → merah. */
+    private int[] tempAnchors() {
+        if (tempAnchors == null) {
+            tempAnchors = new int[] {
+                    getResources().getColor(R.color.bat_chart_temp_ice),
+                    getResources().getColor(R.color.bat_chart_percent),
+                    getResources().getColor(R.color.bat_chart_power),
+                    getResources().getColor(R.color.bat_chart_temp)};
+        }
+        return tempAnchors;
+    }
+
+    /**
+     * Warna garis Suhu per nilai (°C): ≤5° putih, 5–24° putih→ice blue,
+     * 25–34° ice blue→hijau, 35–39° hijau→oranye, 40–45°+ oranye→merah.
+     */
+    private int tempColor(float c) {
+        int[] a = tempAnchors();
+        if (c <= 5f) return Color.WHITE;
+        if (c < 24f) return ColorUtils.blendARGB(Color.WHITE, a[0], (c - 5f) / 19f);
+        if (c < 25f) return a[0];
+        if (c < 34f) return ColorUtils.blendARGB(a[0], a[1], (c - 25f) / 9f);
+        if (c < 35f) return a[1];
+        if (c < 39f) return ColorUtils.blendARGB(a[1], a[2], (c - 35f) / 4f);
+        if (c < 40f) return a[2];
+        if (c < 45f) return ColorUtils.blendARGB(a[2], a[3], (c - 40f) / 5f);
+        return a[3];
+    }
+
+    /** Warna garis sesuai status pengisian titik data (hijau isi, merah tidak). */
+    private int lineColor(boolean charging) {
+        return getResources().getColor(charging
+                ? R.color.bat_chart_percent_charging
+                : R.color.bat_chart_percent_discharging);
     }
 
     /** Format nilai sesuai jenis seri — dipakai juga halaman detail. */
@@ -387,7 +489,13 @@ public class BatteryChartView extends View {
 
         canvas.drawLine(x, lastPadTop, x, lastPadTop + lastPlotH, crosshairPaint);
 
-        dotPaint.setColor(linePaint.getColor());
+        if (isStatusColored()) {
+            dotPaint.setColor(lineColor(samples[idx].isCharging()));
+        } else if (seriesType == SERIES_TEMP) {
+            dotPaint.setColor(tempColor(valueAt(idx)));
+        } else {
+            dotPaint.setColor(linePaint.getColor());
+        }
         canvas.drawCircle(x, y, dp(4), dotPaint);
 
         String txt = fmt(valueAt(idx)) + " · " + activeTimeFormat().format(new Date(samples[idx].time));
