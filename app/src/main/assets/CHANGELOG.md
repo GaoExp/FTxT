@@ -1,13 +1,37 @@
-# [4.88.1] - 2026-08-24 08:11 WITA versionCode 186 ***ONGOING***
+# [4.89.0] - 2026-08-24 11:38 WITA versionCode 187 ***ONGOING***
+### ✨ Fitur Baru
+- **Modul Crosshair: overlay bidikan untuk game** — Panel Crosshair yang semula placeholder kini berisi modul overlay sungguhan dengan 44 gaya bidikan siap pilih dari galeri thumbnail (pilihan tersorot garis aksen cyan). Ukuran bisa diatur 24–160dp lewat slider atau ketuk labelnya untuk mengetik angka persis, opasitas 10–100% agar bidikan bisa dibuat transparan, dan posisi diatur bebas tiga cara: geser langsung bidikannya di layar, slider X/Y, atau tombol panah D-Pad untuk geser halus perlahan. Posisi yang terpasang mengacu ke titik tengah bidikan (bukan pojok gambarnya), tersimpan otomatis terpisah untuk mode tegak & mendatar, dan muncul kembali sendiri saat HP direstart bila dibiarkan aktif. Opsi "Kunci Posisi" membuat sentuhan menembus ke game (bidikan tak ikut tergeser), opsi "Area Aman" menjaga bidikan tidak melolos keluar tepi layar. Status modul aktif ikut tampil di notifikasi layar mengambang.
+
+### 🗒️ File Added
+- 2026-08-24 10:58 — `crosshair_1.png` … `crosshair_44.png` — 44 aset gambar gaya bidikan (sumber `_schedule/drawable-nodpi-v4/chr_1..44.png`)
+- 2026-08-24 11:00 — `CrosshairConfig.java` — Konfigurasi statis modul Crosshair
+- 2026-08-24 11:01 — `CrosshairModule.java` — Modul overlay ImageView: posisi titik tengah, drag + safe area, apply style/opacity
+- 2026-08-24 11:03 — `CrosshairPanelController.java` — UI panel Crosshair: grid 44 gaya, size/opacity, switch Material
+- 2026-08-24 11:03 — `CrosshairPositionController.java` — Kontrol posisi Crosshair: slider X/Y + D-Pad + koordinat
+- 2026-08-24 11:04 — `bg_style_item.xml`, `bg_style_item_selected.xml` — Sel grid gaya bidikan default & terpilih
+
+### ✏️ File Changed
+- 2026-08-24 11:38 — `panel_crosshair.xml` — Placeholder "coming soon" diganti panel lengkap mengikuti pola panel overlay lain (switch + Kunci Posisi, section Tampilan & Posisi collapsible)
+- 2026-08-24 11:06 — `CrosshairPanelFragment.java` — Memasang controller panel & siklus hidup seperti panel lain
+- 2026-08-24 11:07 — `FloatingService.java` — Registrasi CrosshairModule: field, accessor statis, ensure, start saat layanan hidup
+- 2026-08-24 11:07 — `BootReceiver.java` — Pulihkan status aktif Crosshair saat boot & ikutkan dalam cek modul aktif
+- 2026-08-24 11:08 — `NotificationHelper.java` — Crosshair ikut menandai notifikasi ada modul aktif ("Xhair")
+- 2026-08-24 11:08 — `MainActivity.java` — Muat konfigurasi Crosshair dari preferensi, ikutkan dalam cek modul aktif, label sidebar "(coming soon)" dihapus
+- 2026-08-24 11:38 — `CrosshairPanelController.java` — Switch Material diganti CheckBox, section Gaya Bidikan jadi Tampilan; kontrol Kunci Posisi pindah ke atas bersama switch, Area Aman pindah ke section Posisi
+- 2026-08-24 11:38 — `colors.xml`, `values-night/colors.xml` — Warna latar sel galeri gaya bidikan & aksen Crosshair (#26C6DA) untuk tema terang & gelap
+
+# [4.88.1] - 2026-08-24 08:48 WITA versionCode 186 ***ONGOING***
 ### ✨ Fitur Baru
 - **Ketuk grafik baterai membuka halaman detail fullscreen** — Kelima grafik tab Monitor kini bisa diketuk membuka halaman detail ala aplikasi pemantau baterai: Persentase di kartu Metrik Real-Time serta Suhu, Daya, Tegangan & Arus di kartu Grafik Riwayat. Tiap halaman berisi grafik besar interaktif dengan crosshair yang mengikuti jari (garis vertikal + titik penebal + gelembung nilai & jam titik terpilih) dan tetap menempel setelah jari dilepas, baris label rentang waktu 2m–24j yang bisa diketuk maupun digeser lewat slider transparan (independen dari slider panel monitor; rentang awal mengikuti rentang aktif panel), serta kartu statistik Min / Max / Rata-rata / Δ dari data periode yang tampil. Header halaman beraksen warna metrik dengan subjudul nilai terkini; data disegarkan tiap 5 detik dan ditunda saat jari sedang menelusuri grafik.
+### 🚮 Fitur Dihapus
+- **Preview pilihan ikon orientasi dihapus dari panel Debugging** — Panel Debugging yang semula menampilkan judul beserta grid 5 varian ikon orientasi layar untuk dipilih (Material Default, Ponsel + Panah, Tablet + Panah, Panah Sederhana, Lingkaran + P) kini kosong dan hanya menampilkan placeholder "Konsep overlay sedang dalam tahap pengerjaan / Penerapan akan segera diluncurkan." ala panel Logo Display. Kelima drawable ikon varian rotasi yang tak terpakai ikut dihapus.
 ### ♻️ Perubahan Fitur
 - **Garis grafik Suhu berwarna gradien mengikuti nilai suhu** — Pada grafik Suhu (kartu Grafik Riwayat maupun halaman detail), warna tiap segmen garis kini mengikuti suhu titik datanya sebagai gradien mulus: 5°C ke bawah putih, 5–24° memutih memudar ke ice blue (makin dingin makin putih), 25–34° ice blue → hijau, 35–39° hijau → oranye, 40–45°+ oranye → merah. Titik crosshair di halaman detail ikut mewarisi warna suhu titik yang dipilih.
 - **Garis grafik Persentase/Tegangan/Arus berwarna sesuai status pengisian baterai** — Pada ketiga grafik itu (kartu Metrik Real-Time maupun halaman detail), garis kini digambar dua warna dalam satu garis nyambung: segmen saat baterai sedang mengisi digambar hijau, segmen saat tidak mengisi digambar merah; warna berganti tepat di titik data tempat status baterai berubah. Titik crosshair di halaman detail ikut mewarisi warna status titik yang dipilih. Grafik Daya tidak berubah.
 - **Kunci password jadi "Fitur Developer" yang mengatur panel Info Memori, Debugging, dan Salin/Simpan Snapshot** — Proteksi password yang sebelumnya hanya menempel pada switch panel Debugging kini menjadi satu saklar "Fitur Developer" di halaman Konfigurasi: label statusnya berganti "Fitur Developer • Terkunci" (merah) / "• Terbuka" (hijau), dengan kolom kunci + tombol Unlock/Kunci Ulang tepat di bawahnya. Saat Terkunci, switch "Tampilkan panel Info Memori" & "Tampilkan panel Debugging" tidak bisa dinyalakan; tombol Kunci Ulang mematikan kedua panel sekaligus (overlay Memory yang berjalan ikut berhenti, panel aktif dialihkan, keduanya hilang dari sidebar). Tombol Salin & Simpan Snapshot di tab Monitor Battery Info juga terkunci — tampak buram dan tidak bisa ditekan sampai Fitur Developer dibuka, dicek ulang setiap tab Monitor ditampilkan. Section "Modul" di halaman Konfigurasi diganti nama jadi "Developer".
 - **Grafik riwayat Suhu/Daya/Tegangan/Arus tersusun grid 2×2** — Empat grafik di kartu Grafik Riwayat yang sebelumnya tampil utuh empat baris ke bawah kini disusun seperti tabel dua kolom: baris atas Suhu & Daya, baris bawah Tegangan & Arus. Tiap sel tetap punya sub-header aksen warna sendiri dan menggambar elemen yang sama persis dengan grafik level baterai (label sumbu Y max/tengah/min, label waktu awal–akhir, nilai terkini di ujung garis); tinggi tiap grafik 140→130dp. Divider pemisah antar grafik diganti jarak antar sel grid. Chevron pelipat kartu dihapus — isi kartu kini selalu tampil karena grid tidak lagi memakan ruang layar.
 ### 🔧 Optimasi & Penyesuaian
-- **Angka nilai di ujung garis grafik diberi chip latar agar tetap terbaca** — Teks nilai terkini di ujung garis pada kelima grafik baterai (panel maupun halaman detail) kini berada di atas chip kecil gelap semi-opaque dengan angka putih, sehingga tetap kontras dan mudah dibaca saat garis-garis grafik menumpuk di bawahnya; sebelumnya teks abu polos yang mudah tertimpa garis. Posisi chip otomatis membalik ke bawah titik saat grafik mepet batas atas.
+- **Angka nilai di ujung garis grafik diberi chip latar agar tetap terbaca** — Teks nilai terkini di ujung garis pada kelima grafik baterai (panel maupun halaman detail) kini berada di atas chip kecil gelap transparan dengan angka putih, sehingga tetap terbaca saat garis-garis grafik menumpuk tanpa menutupi bentuk grafik di bawahnya; sebelumnya teks abu polos yang mudah tertimpa garis. Posisi chip otomatis membalik ke bawah titik saat grafik mepet batas atas.
 - **Pemilih rentang waktu grafik jadi baris label yang bisa diketuk & digeser** — Baris lima radio button (5 Menit/15 Menit/1 Jam/6 Jam/24 Jam) diganti deretan label singkat 2m/5m/10m/15m/30m/1j/3j/6j/12j/24j yang berperilaku layaknya tombol: slider transparan menimpa baris label sehingga ketuk sebuah label langsung memilih interval itu dan menggeser jari pindah antar interval, tiap langkah slider jatuh tepat di tengah labelnya. Garis pembatas kecil di bawah label dihapus; label aktif disorot tebal berwarna sebagai indikator posisi. Label rentang aktif tetap tampil di header kartu; saat label diketuk/digeser pratinjau ikut berubah, data grafik baru di-query saat jari dilepas (default 5 Menit).
 - **Kode tab Monitor Battery Info dipecah menjadi beberapa file** — BatteryPanelController yang menampung seluruh panel (1.020 baris) kini hanya mengurus tab Overlay (±560 baris); isi tab Monitor dipindah utuh ke empat controller terpisah: BatteryMonitorTabController (ring gauge, metrik real-time, polling 1 detik & tombol Salin/Simpan Snapshot), BatteryChartHistoryController (kartu Grafik Riwayat lengkap dengan slider rentang), BatteryHealthCardController (kartu Kesehatan Baterai + dialog kapasitas desain), dan BatterySnapshotExporter (pembuat teks salinan/berkas ekspor). Perilaku fitur tidak berubah.
 ### 🐞 Bug Fixes
@@ -23,14 +47,15 @@
 - 2026-08-24 00:42 — `BatteryMonitorTabController.java` — Controller orkestrasi tab Monitor: ring gauge, dua kolom metrik real-time, badge kondisi suhu, polling 1 detik hanya saat tab tampil, memegang tiga controller di atas
 
 ### ✏️ File Changed
-- 2026-08-24 08:11 — `BatteryChartView.java` — Angka nilai terkini di ujung garis diberi chip latar gelap semi-opaque + teks putih agar kontras saat grafik menumpuk
+- 2026-08-24 08:48 — `panel_debuging.xml` — Isi preview ikon rotasi (judul, sub-judul, grid 5 ikon, info) diganti placeholder "coming soon" dua baris
+- 2026-08-24 08:48 — `DebugingPanelFragment.java` — Logika klik ikon varian & Toast dihapus; fragment kembali hanya inflate layout
+- 2026-08-24 08:31 — `BatteryChartView.java` — Alpha chip latar nilai terkini diturunkan (0xCC → 0x66) agar tidak lagi menutupi tampilan grafik di bawahnya
 - 2026-08-24 07:58 — `BatteryChartView.java` — Garis grafik Suhu diwarnai gradien per segmen mengikuti nilai suhu (putih→ice blue→hijau→oranye→merah); titik crosshair ikut warna titik terpilih
 - 2026-08-24 07:58 — `colors.xml`, `values-night/colors.xml` — Tambah warna anchor ice blue gradien Suhu (#33F1FF) untuk tema terang & gelap
 - 2026-08-24 07:39 — `BatteryChartView.java` — Garis grafik Persentase/Tegangan/Arus diwarnai per segmen sesuai status pengisian (hijau isi / merah tidak); titik crosshair ikut warna status titik terpilih
 - 2026-08-24 07:32 — `colors.xml`, `values-night/colors.xml` — Tambah pasangan warna garis charging/discharging (hijau/merah) untuk tema terang & gelap
 - 2026-08-24 07:18 — `BatteryChartHistoryController.java` — Klik grafik Suhu, Daya, Tegangan & Arus membuka halaman detail metrik terkait (rentang awal mengikuti slider panel)
-- 2026-08-24 06:19 — `panel_battery.xml` — Pemilih rentang Grafik Riwayat: garis pembatas di bawah label dihapus, slider jadi transparan dan diposkan menimpa baris label agar label bisa diketuk/digeser layaknya tombol, tinggi area menyesuaikan baris label (tanpa ruang sisa), label interval diperbesar
-- 2026-08-24 06:04 — `BatteryChartHistoryController.java` — Padding dinamis 5% lebar pada slider transparan supaya tiap langkah jatuh tepat di tengah labelnya
+- 2026-08-24 06:19 — `panel_battery.xml` — Pemilih rentang Grafik Riwayat: garis pembatas di bawah label dihapus, slider jadi transparan dan diposkan menimpa baris label agar label bisa diketuk/digeser layaknya tombol, tinggi area menyesuaikan baris label (tanpa ruang sisa), label interval diperbesar- 2026-08-24 06:04 — `BatteryChartHistoryController.java` — Padding dinamis 5% lebar pada slider transparan supaya tiap langkah jatuh tepat di tengah labelnya
 - 2026-08-24 05:30 — `AndroidManifest.xml` — Daftarkan halaman detail grafik ke manifest
 - 2026-08-24 05:28 — `BatteryMonitorTabController.java` — Ketuk grafik Persentase membuka halaman detail dengan rentang awal mengikuti slider panel
 - 2026-08-24 05:26 — `BatteryChartHistoryController.java` — Buka akses daftar pilihan rentang & getter rentang aktif untuk halaman detail
@@ -41,6 +66,9 @@
 - 2026-08-24 01:07 — `panel_battery.xml` — Kartu Grafik Riwayat: RadioGroup 5 pilihan diganti slider full width tanpa label statis + deretan pembatas berlabel singkat 2m–24j di atasnya; chevron pelipat kartu dihapus (isi selalu tampil); empat grafik disusun grid 2×2 (baris 1: Suhu/Daya, baris 2: Tegangan/Arus) dengan sub-header aksen per sel, tinggi chart 130dp, divider antar chart dihapus
 - 2026-08-24 01:07 — `BatteryChartView.java` — Konstanta window baru WINDOW_2M, WINDOW_10M, WINDOW_30M, WINDOW_3H, WINDOW_12H; skala Y Suhu maksimal tetap 50°C dengan batas bawah otomatis mengikuti data
 - 2026-08-24 00:46 — `BatteryPanelController.java` — Seluruh isi tab Monitor dipindah ke controller terpisah; kini hanya mengurus tab Overlay (1.020 → ±560 baris), membuat BatteryMonitorTabController di konstruktor dan mendelegasikan onPanelShown/onPanelHidden/cleanup/refresh awal
+
+### 🔥 File Removed
+- 2026-08-24 08:48 — `ic_rotation_variant_1.xml`–`ic_rotation_variant_5.xml` — Lima drawable ikon varian rotasi tak terpakai setelah isi panel Debugging dikosongkan
 
 ---
 

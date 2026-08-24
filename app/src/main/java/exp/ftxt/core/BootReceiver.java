@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.crosshair.CrosshairConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.memory_stats.MemoryConfig;
@@ -28,6 +29,7 @@ public class BootReceiver extends BroadcastReceiver {
         BatteryBarConfig.enabled = prefs.getBoolean("batbar_enabled", false);
         MemoryConfig.enabled = prefs.getBoolean("mem_enabled", false);
         MemoryConfig.backgroundMonitor = prefs.getBoolean("mem_bg_monitor", false);
+        CrosshairConfig.enabled = prefs.getBoolean("crosshair_enabled", false);
 
         // Monitor baterai full-aktif: selalu direstart saat boot.
         try {
@@ -37,7 +39,8 @@ public class BootReceiver extends BroadcastReceiver {
         boolean anyActive = textOn || FpsConfig.enabled || ClockConfig.enabled
                 || BatteryStatsConfig.enabled || NetworkConfig.enabled
                 || BatteryBarConfig.enabled
-                || MemoryConfig.enabled || MemoryConfig.backgroundMonitor;
+                || MemoryConfig.enabled || MemoryConfig.backgroundMonitor
+                || CrosshairConfig.enabled;
 
         if (anyActive) {
             context.startForegroundService(new Intent(context, FloatingService.class));

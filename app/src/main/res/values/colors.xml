@@ -46,5 +46,9 @@
     <color name="bat_chart_voltage">#5C6BC0</color>
     <color name="bat_chart_current">#00897B</color>
     <color name="bat_chart_grid">#228A8A8E</color>
+
+    <!-- Warna panel Crosshair -->
+    <color name="ui_control_bg">#FFFFFF</color>
+    <color name="ui_accent_crosshair">#26C6DA</color>
 </resources>
 

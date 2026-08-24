@@ -28,6 +28,7 @@ import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.crosshair.CrosshairConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.memory_stats.MemoryConfig;
@@ -210,6 +211,7 @@ public class NotificationHelper {
         if (BatteryBarConfig.enabled) return true;
         if (MemoryConfig.enabled) return true;
         if (MemoryConfig.backgroundMonitor) return true;
+        if (CrosshairConfig.enabled) return true;
 
         return false;
     }
@@ -225,6 +227,7 @@ public class NotificationHelper {
         if (NetworkConfig.enabled) active.add("Network");
         if (BatteryBarConfig.enabled) active.add("Bar");
         if (MemoryConfig.enabled || MemoryConfig.backgroundMonitor) active.add("Mem");
+        if (CrosshairConfig.enabled) active.add("Xhair");
 
         if (active.isEmpty()) return "Tidak ada overlay aktif";
         return String.join(", ", active) + " aktif";

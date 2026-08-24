@@ -54,6 +54,9 @@ FTxT/
     │   │   │   ├── fps_display/
     │   │   │   │   ├── FpsConfig.java       — Konfigurasi statis FPS overlay
     │   │   │   │   └── FpsModule.java       — FPS counter via Choreographer frame callback
+    │   │   │   ├── crosshair/
+    │   │   │   │   ├── CrosshairConfig.java — Konfigurasi statis Crosshair overlay (style, size, opacity, posisi)
+    │   │   │   │   └── CrosshairModule.java — Overlay bidikan ImageView 44 gaya, posisi titik tengah, drag + safe area
     │   │   │   ├── clock_module/
     │   │   │   │   ├── ClockConfig.java     — Konfigurasi statis Clock overlay
     │   │   │   │   └── ClockModule.java     — Jam real-time HH:mm:ss, update tiap 1 detik
@@ -124,6 +127,8 @@ FTxT/
     │   │   │   ├── NetworkPanelController.java         — UI panel Network: switch, size, color, shadow
     │   │   │   ├── NetworkPositionController.java      — Kontrol posisi Network
     │   │   │   ├── ColorPickerPanelController.java     — UI panel Color Picker: wheel, sliders, saved colors
+    │   │   │   ├── CrosshairPanelController.java       — UI panel Crosshair: grid 44 gaya, size/opacity, switch + lock/safe area
+    │   │   │   ├── CrosshairPositionController.java    — Kontrol posisi Crosshair: slider X/Y + D-Pad + koordinat
     │   │   │   ├── BasePanelFragment.java              — Abstract base Fragment untuk semua panel
     │   │   │   ├── PanelManager.java                   — Kelola show/hide Fragment panel + onPanelHidden callback
     │   │   │   ├── fragment/
@@ -134,7 +139,7 @@ FTxT/
     │   │   │   │   ├── MemoryPanelFragment.java            — Fragment Memory Stats (tabbed: Monitor/Overlay)
     │   │   │   │   ├── NetworkPanelFragment.java           — Fragment Network Speed
     │   │   │   │   ├── ColorPickerPanelFragment.java       — Fragment Color Picker
-    │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair (placeholder)
+    │   │   │   │   ├── CrosshairPanelFragment.java         — Fragment Crosshair
     │   │   │   │   ├── LogoPanelFragment.java              — Fragment Logo Display (placeholder)
     │   │   │   │   └── DebugingPanelFragment.java          — Fragment panel Debugging (preview ikon rotasi)
     │   │   │   │
@@ -171,11 +176,6 @@ FTxT/
     │       │   ├── ic_notification_toggle_off.xml — Ikon toggle off untuk notifikasi
     │       │   ├── ic_notification_visible.xml — Ikon mata terbuka untuk toggle show
     │       │   ├── ic_overlay.xml           — Ikon tab Overlay
-    │       │   ├── ic_rotation_variant_1.xml — Ikon varian rotasi 1 (panel Debugging)
-    │       │   ├── ic_rotation_variant_2.xml — Ikon varian rotasi 2
-    │       │   ├── ic_rotation_variant_3.xml — Ikon varian rotasi 3
-    │       │   ├── ic_rotation_variant_4.xml — Ikon varian rotasi 4
-    │       │   ├── ic_rotation_variant_5.xml — Ikon varian rotasi 5
     │       │   ├── ic_screen_rotation.xml   — Ikon orientasi layar (toolbar)
     │       │   ├── ic_settings.xml          — Ikon gear untuk settings
     │       │   ├── ic_star_filled.xml       — Ikon bintang solid (favorit)
@@ -194,6 +194,8 @@ FTxT/
     │       │   ├── toolbar_bg.xml           — Drawable wrapper toolbar bg terang
     │       │   ├── vertical_divider.xml     — Divider vertikal untuk bottom bar preset
     │       │   ├── divider_horizontal.xml   — Divider horizontal untuk daftar dokumen
+    │   │   ├── bg_style_item.xml        — Sel grid gaya bidikan (default)
+    │   │   ├── bg_style_item_selected.xml — Sel grid gaya bidikan (terpilih, stroke aksen)
     │       │   └── main_bg.xml              — Drawable wrapper main bg terang
     │       ├── drawable-night/
     │       │   ├── drawer_bg.xml            — Drawable wrapper drawer bg gelap (flip 180°)
@@ -215,7 +217,7 @@ FTxT/
     │   │   ├── panel_battery.xml            — Panel konfigurasi Battery Info (tabbed: Monitor/Overlay/Battery Strip)
     │   │   ├── panel_memory.xml             — Panel konfigurasi Memory Stats (tabbed: Monitor/Overlay)
     │   │   ├── panel_network.xml            — Panel konfigurasi Network Speed
-    │   │   ├── panel_crosshair.xml          — Placeholder Crosshair (coming soon)
+    │   │   ├── panel_crosshair.xml          — Panel konfigurasi Crosshair (gaya bidikan, ukuran, opasitas, posisi)
     │   │   ├── panel_logo.xml               — Placeholder Logo Display (coming soon)
     │   │   ├── panel_debuging.xml           — Panel konfigurasi Debugging (preview ikon rotasi)
     │   │   ├── panel_color_picker.xml       — Panel konfigurasi Color Picker
@@ -255,10 +257,10 @@ FTxT/
 
 | Kategori | Jumlah |
 |----------|-------:|
-| Java source | 84 |
-| Layout XML | 21 |
-| Drawable XML | 47 |
-| Drawable PNG | 3 |
+| Java source | 91 |
+| Layout XML | 22 |
+| Drawable XML | 44 |
+| Drawable PNG | 47 |
 | Color XML | 2 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -270,5 +272,5 @@ FTxT/
 | Root konfigurasi | 5 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~261** |
-| **Total direktori** | **~59** |
+| **Total file** | **~306** |
+| **Total direktori** | **~60** |

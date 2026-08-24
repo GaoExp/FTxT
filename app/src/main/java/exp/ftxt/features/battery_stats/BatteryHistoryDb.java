@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.BatteryManager;
 
 import java.util.ArrayList;
 
@@ -143,13 +144,18 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         long bucketMs = Math.max(1000L, span / targetPoints);
         ArrayList<BatteryReading.Snapshot> out = new ArrayList<>();
         Cursor cur = db.rawQuery("SELECT MIN(time), AVG(temp_c), AVG(percent), AVG(voltage_v),"
-                        + " AVG(current_ma), AVG(power_w), AVG(charge_mah)"
+                        + " AVG(current_ma), AVG(power_w), AVG(charge_mah),"
+                        + " AVG(status IN (" + BatteryManager.BATTERY_STATUS_CHARGING
+                        + "," + BatteryManager.BATTERY_STATUS_FULL + "))"
                         + " FROM " + T_SAMPLES + " WHERE time >= ? AND time <= ?"
                         + " GROUP BY (time - ?) / ? ORDER BY MIN(time) ASC",
                 new String[]{String.valueOf(fromMs), String.valueOf(toMs),
                         String.valueOf(fromMs), String.valueOf(bucketMs)});
         try {
             while (cur.moveToNext()) {
+                int status = cur.getFloat(7) >= 0.5f
+                        ? BatteryManager.BATTERY_STATUS_CHARGING
+                        : BatteryManager.BATTERY_STATUS_DISCHARGING;
                 out.add(new BatteryReading.Snapshot(
                         cur.getLong(0),
                         cur.getFloat(1),
@@ -158,7 +164,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                         (int) cur.getFloat(4),
                         cur.getDouble(5),
                         Math.round(cur.getFloat(6)),
-                        -1, 0, 0, null));
+                        -1, status, 0, null));
             }
         } finally {
             cur.close();

@@ -6,10 +6,14 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.ui.BasePanelFragment;
+import exp.ftxt.ui.CrosshairPanelController;
 
 public class CrosshairPanelFragment extends BasePanelFragment {
+    private CrosshairPanelController controller;
+
     @Override
     protected int getLayoutResId() {
         return R.layout.panel_crosshair;
@@ -23,6 +27,20 @@ public class CrosshairPanelFragment extends BasePanelFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.setVisibility(View.VISIBLE);
+        controller = new CrosshairPanelController((MainActivity) requireActivity(), view);
+    }
+
+    @Override
+    public void onPanelShown() {
+        if (controller != null) controller.onPanelShown();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (controller != null) {
+            controller.cleanup();
+            controller = null;
+        }
+        super.onDestroyView();
     }
 }

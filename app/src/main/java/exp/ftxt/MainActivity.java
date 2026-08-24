@@ -48,6 +48,7 @@ import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
+import exp.ftxt.features.crosshair.CrosshairConfig;
 import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         "{\"id\":\"navNetwork\",\"l\":\"Network Stats\"}," +
         "{\"id\":\"navBattery\",\"l\":\"Battery Info\"}," +
         "{\"id\":\"navClock\",\"l\":\"Clock Module\"}," +
-        "{\"id\":\"navCrosshair\",\"l\":\"Crosshair (coming soon)\"}," +
+        "{\"id\":\"navCrosshair\",\"l\":\"Crosshair\"}," +
         "{\"id\":\"navMemory\",\"l\":\"Info Memori\"}," +
         "{\"id\":\"navLogo\",\"l\":\"Logo Display (coming soon)\"}," +
         "{\"id\":\"navColorPicker\",\"l\":\"Color Picker\"}," +
@@ -351,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
         if (BatteryBarConfig.enabled) return true;
         if (MemoryConfig.enabled) return true;
         if (MemoryConfig.backgroundMonitor) return true;
+        if (CrosshairConfig.enabled) return true;
 
         return false;
     }
@@ -567,6 +569,13 @@ public class MainActivity extends AppCompatActivity {
         MemoryConfig.updateInterval = readFloatPref(prefs, "mem_update_interval", 1f);
         MemoryConfig.posX = prefs.getFloat("mem_pos_x_port", 0.05f);
         MemoryConfig.posY = prefs.getFloat("mem_pos_y_port", 0.6f);
+
+        CrosshairConfig.enabled = prefs.getBoolean("crosshair_enabled", false);
+        CrosshairConfig.styleIndex = prefs.getInt("crosshair_style", 1);
+        CrosshairConfig.size = readFloatPref(prefs, "crosshair_size", 32f);
+        CrosshairConfig.opacity = prefs.getInt("crosshair_opacity", 100);
+        CrosshairConfig.touchPassthrough = prefs.getBoolean("crosshair_lock", true);
+        CrosshairConfig.safeArea = prefs.getBoolean("crosshair_safe_area", true);
 
         String savedText = prefs.getString("text_content", "FunText");
         if (!savedText.isEmpty()) TextConfig.text = savedText;

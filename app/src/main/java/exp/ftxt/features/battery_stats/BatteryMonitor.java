@@ -9,7 +9,7 @@ import android.os.PowerManager;
 public class BatteryMonitor {
 
     /** Interval sampling dinamis hemat baterai (§2.6 rencana rework). */
-    private static final long POLL_CHARGING_MS = 1000;
+    private static final long POLL_CHARGING_MS = 5_000;
     private static final long POLL_SCREEN_ON_MS = 5_000;
     private static final long POLL_SCREEN_OFF_MS = 30_000;
 

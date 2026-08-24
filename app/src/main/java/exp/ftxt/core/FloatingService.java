@@ -20,6 +20,8 @@ import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsModule;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.clock_module.ClockModule;
+import exp.ftxt.features.crosshair.CrosshairConfig;
+import exp.ftxt.features.crosshair.CrosshairModule;
 import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.fps_display.FpsModule;
 import exp.ftxt.features.network_stats.NetworkConfig;
@@ -46,6 +48,7 @@ public class FloatingService extends Service {
     private NetworkModule networkModule;
     private BatteryBarModule batteryBarModule;
     private MemoryModule memoryModule;
+    private CrosshairModule crosshairModule;
     private final List<OverlayModule> allModules = new ArrayList<>();
     private BroadcastReceiver configChangeReceiver;
 
@@ -83,6 +86,10 @@ public class FloatingService extends Service {
     public static MemoryModule memoryModule() {
         if (instance != null) instance.ensureMemoryModule();
         return instance != null ? instance.memoryModule : null;
+    }
+    public static CrosshairModule crosshairModule() {
+        if (instance != null) instance.ensureCrosshairModule();
+        return instance != null ? instance.crosshairModule : null;
     }
 
     private void ensureTextModule() {
@@ -138,6 +145,14 @@ public class FloatingService extends Service {
             memoryModule = new MemoryModule();
             allModules.add(memoryModule);
             memoryModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void ensureCrosshairModule() {
+        if (crosshairModule == null) {
+            crosshairModule = new CrosshairModule();
+            allModules.add(crosshairModule);
+            crosshairModule.init(windowManager, this, prefs);
         }
     }
 
@@ -218,6 +233,7 @@ public class FloatingService extends Service {
             if (FpsConfig.enabled) { ensureFpsModule(); fpsModule.start(windowManager, this); }
             if (BatteryBarConfig.enabled) { ensureBatteryBarModule(); batteryBarModule.start(windowManager, this); }
             if (MemoryConfig.enabled) { ensureMemoryModule(); memoryModule.start(windowManager, this); }
+            if (CrosshairConfig.enabled) { ensureCrosshairModule(); crosshairModule.start(windowManager, this); }
             if (MemoryConfig.backgroundMonitor) {
                 MemoryMonitor.start(this);
             }
