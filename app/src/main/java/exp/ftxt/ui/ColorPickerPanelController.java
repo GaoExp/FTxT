@@ -64,7 +64,7 @@ public class ColorPickerPanelController {
 
     private GridLayout savedColorsGrid;
     private TextView savedColorsCount, addSavedColor, collapseToggle;
-    private View rgbSliderBody, rgbHeader;
+    private View rgbSliderBody, rgbHeader, rgbCollapseToggle;
     private View savedColorsHeader;
 
     private final int[] hueProg = {0};
@@ -148,6 +148,7 @@ public class ColorPickerPanelController {
         collapseToggle.setText("\u25B2");
         rgbSliderBody = rootView.findViewById(R.id.rgbSliderBody);
         rgbHeader = rootView.findViewById(R.id.rgbHeader);
+        rgbCollapseToggle = rootView.findViewById(R.id.rgbCollapseToggle);
     }
 
     private void loadConfig() {
@@ -232,6 +233,7 @@ public class ColorPickerPanelController {
         rgbHeader.setOnClickListener(v -> {
             boolean expanded = rgbSliderBody.getVisibility() == View.VISIBLE;
             rgbSliderBody.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            ((TextView) rgbCollapseToggle).setText(expanded ? "\u25B2" : "\u25BC");
             if (!expanded) {
                 isUpdating = true;
                 updateDisplays(getCurrentColor());

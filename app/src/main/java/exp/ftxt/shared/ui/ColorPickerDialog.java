@@ -104,6 +104,7 @@ public class ColorPickerDialog {
         View savedColorsHeader = dialogView.findViewById(R.id.savedColorsHeader);
         View rgbSliderBody = dialogView.findViewById(R.id.rgbSliderBody);
         View rgbHeader = dialogView.findViewById(R.id.rgbHeader);
+        TextView rgbCollapseToggle = dialogView.findViewById(R.id.rgbCollapseToggle);
 
         Button okButton = dialogView.findViewById(R.id.okButton);
         Button cancelButton = dialogView.findViewById(R.id.cancelButton);
@@ -200,6 +201,7 @@ public class ColorPickerDialog {
         rgbHeader.setOnClickListener(v -> {
             boolean expanded = rgbSliderBody.getVisibility() == View.VISIBLE;
             rgbSliderBody.setVisibility(expanded ? View.GONE : View.VISIBLE);
+            rgbCollapseToggle.setText(expanded ? "\u25B2" : "\u25BC");
             if (!expanded) {
                 isUpdating[0] = true;
                 int c = hsvToColor(hueProg[0], satProg[0], valProg[0], opaProg[0]);
