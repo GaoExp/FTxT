@@ -73,6 +73,11 @@ public class OverlayPreset {
     public Integer chargeWaveSpeed;
     public Integer chargeWaveAmplitude;
 
+    public Integer crosshairStyleIndex;
+    public Integer crosshairOpacity;
+    public Boolean crosshairColorEnabled;
+    public Integer crosshairColor;
+
     public OverlayPreset() {
         shadow = new ShadowConfig();
     }

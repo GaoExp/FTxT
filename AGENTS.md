@@ -53,7 +53,7 @@ Entry dicatat di **versi berjalan** (bukan entry baru). Urutan section WAJIB:
 
 **Entry yang di-merge** (beberapa versi digabung dalam satu entry): section **🗒️ File Added**, **✏️ File Changed**, dan **🔥 File Removed** diabaikan (tidak ditulis).
 
-**WAJIB:** cek git log untuk tahu status commit. **JANGAN** buat entry baru sebelum versi sebelumnya di-commit (push menyusul oleh user).
+**WAJIB:** cek git log untuk tahu status commit. **JANGAN** buat entry baru sebelum versi sebelumnya di-push.
 
 **WAJIB dapat waktu WITA:** Jalankan perintah berikut untuk mendapatkan waktu WITA yang benar sebelum menulis/memperbarui jam di judul entry CHANGELOG:
 ```

@@ -576,6 +576,16 @@ public class MainActivity extends AppCompatActivity {
         CrosshairConfig.opacity = prefs.getInt("crosshair_opacity", 100);
         CrosshairConfig.touchPassthrough = prefs.getBoolean("crosshair_lock", true);
         CrosshairConfig.safeArea = prefs.getBoolean("crosshair_safe_area", true);
+        CrosshairConfig.colorEnabled = true;
+        CrosshairConfig.color = prefs.getInt("crosshair_color", Color.WHITE);
+        CrosshairConfig.rotation = prefs.getFloat("crosshair_rotation", 0f);
+        CrosshairConfig.bg.enabled = prefs.getBoolean("crosshair_bg_enabled", false);
+        CrosshairConfig.bg.color = prefs.getInt("crosshair_bg_color", 0xCC000000);
+        CrosshairConfig.bg.padding = prefs.getInt("crosshair_bg_padding", 8);
+        CrosshairConfig.bg.offsetX = prefs.getInt("crosshair_bg_offset_x", 0);
+        CrosshairConfig.bg.offsetY = prefs.getInt("crosshair_bg_offset_y", 0);
+        CrosshairConfig.bg.margin = prefs.getInt("crosshair_bg_margin", 0);
+        CrosshairConfig.bg.radius = prefs.getInt("crosshair_bg_radius", 0);
 
         String savedText = prefs.getString("text_content", "FunText");
         if (!savedText.isEmpty()) TextConfig.text = savedText;

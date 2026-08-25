@@ -9,12 +9,14 @@ import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import exp.ftxt.shared.config.BackgroundConfig;
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
+import exp.ftxt.shared.ui.ShadowImageView;
 
 public class CrosshairModule implements OverlayModule {
 
-    private ImageView view;
+    private ShadowImageView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
@@ -49,10 +51,13 @@ public class CrosshairModule implements OverlayModule {
         context = ctx;
         refreshScreenSize();
 
-        view = new ImageView(ctx);
+        view = new ShadowImageView(ctx);
         view.setImageResource(styleResId(ctx));
         view.setScaleType(ImageView.ScaleType.FIT_XY);
         view.setAlpha(CrosshairConfig.opacity / 100f);
+        view.setRotation(CrosshairConfig.rotation);
+        applyColor();
+        applyBackground();
 
         int sizePx = dpToPx(CrosshairConfig.size);
         params = new WindowManager.LayoutParams(
@@ -112,6 +117,7 @@ public class CrosshairModule implements OverlayModule {
 
     @Override
     public void updateColor(int color) {
+        applyColor();
     }
 
     @Override
@@ -124,6 +130,30 @@ public class CrosshairModule implements OverlayModule {
 
     @Override
     public void updateBackground() {
+        applyBackground();
+    }
+
+    /** Terapkan tint warna mengikuti CrosshairConfig.colorEnabled & CrosshairConfig.color. */
+    public void applyColor() {
+        if (view == null) return;
+        view.setTintEnabled(CrosshairConfig.colorEnabled);
+        view.setTintColor(CrosshairConfig.color);
+        view.invalidate();
+    }
+
+    /** Terapkan background mengikuti CrosshairConfig.bg (padding jarak gambar ke kotak). */
+    public void applyBackground() {
+        if (view == null) return;
+        BackgroundConfig bg = CrosshairConfig.bg;
+        int pad = bg.enabled ? bg.padding : 0;
+        view.setPadding(pad, pad, pad, pad);
+        view.setBgEnabled(bg.enabled);
+        view.setBgColor(bg.color);
+        view.setBgOffsetX(bg.offsetX);
+        view.setBgOffsetY(bg.offsetY);
+        view.setBgMargin(bg.margin);
+        view.setBgRadius(bg.radius);
+        view.invalidate();
     }
 
     /** Ganti gambar bidikan mengikuti CrosshairConfig.styleIndex. */
@@ -137,6 +167,11 @@ public class CrosshairModule implements OverlayModule {
     /** Terapkan opasitas mengikuti CrosshairConfig.opacity. */
     public void applyOpacity() {
         if (view != null) view.setAlpha(CrosshairConfig.opacity / 100f);
+    }
+
+    /** Terapkan rotasi mengikuti CrosshairConfig.rotation. */
+    public void applyRotation() {
+        if (view != null) view.setRotation(CrosshairConfig.rotation);
     }
 
     @Override

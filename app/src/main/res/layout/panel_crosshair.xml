@@ -62,13 +62,74 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <GridLayout
-                        android:id="@+id/crosshairStyleGrid"
-                        android:columnCount="6"
-                        android:useDefaultMargins="true"
-                        android:layout_marginTop="4dp"
+                    <LinearLayout
+                        android:orientation="horizontal"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <View
+                                android:id="@+id/crosshairColorPreview"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:background="#FFFFFF"
+                                android:clickable="true"
+                                android:focusable="true"/>
+
+                            <TextView
+                                android:text="Warna"
+                                android:textSize="10sp"
+                                android:layout_marginTop="2dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:id="@+id/crosshairPreviewImage"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:scaleType="fitCenter"
+                                android:contentDescription="@null"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_height="1dp"
+                        android:background="#CCC"
+                        android:layout_marginVertical="8dp"
+                        android:layout_width="match_parent"/>
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        android:fadeScrollbars="false">
+
+                        <LinearLayout
+                            android:id="@+id/crosshairStyleGrid"
+                            android:orientation="horizontal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="4dp"/>
+
+                    </HorizontalScrollView>
 
                     <TextView
                         android:id="@+id/crosshairSizeLabel"
@@ -81,7 +142,7 @@
 
                     <SeekBar
                         android:id="@+id/crosshairSizeSeekBar"
-                        android:min="24"
+                        android:min="4"
                         android:max="160"
                         android:progress="32"
                         android:layout_width="match_parent"
@@ -101,6 +162,23 @@
                         android:min="10"
                         android:max="100"
                         android:progress="100"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/crosshairRotationLabel"
+                        android:text="Rotasi: 0°"
+                        android:layout_marginTop="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <SeekBar
+                        android:id="@+id/crosshairRotationSeekBar"
+                        android:min="0"
+                        android:max="359"
+                        android:progress="0"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 
@@ -152,6 +230,15 @@
                         android:layout_height="wrap_content"/>
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/active_preset_label"
+                    android:textSize="12sp"
+                    android:textColor="#888888"
+                    android:visibility="gone"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
                 <LinearLayout
                     android:orientation="horizontal"

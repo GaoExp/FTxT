@@ -1,7 +1,7 @@
-# [4.89.0] - 2026-08-24 22:56 WITA versionCode 187 ***ONGOING***
+# [4.89.0] - 2026-08-26 07:01 WITA versionCode 187 ***ONGOING***
 ### ✨ Fitur Baru
 - **Changelog versi lama kini bisa dibaca di dalam aplikasi** — Daftar halaman Dokumentasi bertambah entri OLD-CHANGELOG tepat di bawah CHANGELOG, berisi arsip catatan perubahan versi-versi sebelumnya yang sudah digabung; tampil dengan pembaca markdown dan kontrol zoom yang sama seperti dokumen lainnya.
-- **Modul Crosshair: overlay bidikan untuk game** — Panel Crosshair yang semula placeholder kini berisi modul overlay sungguhan dengan 44 gaya bidikan siap pilih dari galeri thumbnail (pilihan tersorot garis aksen cyan). Ukuran bisa diatur 24–160dp lewat slider atau ketuk labelnya untuk mengetik angka persis, opasitas 10–100% agar bidikan bisa dibuat transparan, dan posisi diatur bebas tiga cara: geser langsung bidikannya di layar, slider X/Y, atau tombol panah D-Pad untuk geser halus perlahan. Posisi yang terpasang mengacu ke titik tengah bidikan (bukan pojok gambarnya), tersimpan otomatis terpisah untuk mode tegak & mendatar, dan muncul kembali sendiri saat HP direstart bila dibiarkan aktif. Opsi "Kunci Posisi" membuat sentuhan menembus ke game (bidikan tak ikut tergeser), opsi "Area Aman" menjaga bidikan tidak melolos keluar tepi layar. Status modul aktif ikut tampil di notifikasi layar mengambang.
+- **Modul Crosshair: overlay bidikan untuk game** — Panel Crosshair yang semula placeholder kini berisi modul overlay sungguhan dengan 44 gaya bidikan siap pilih dari galeri thumbnail horizontal yang bisa digeser (HorizontalScrollView, cell 48dp). Warna bidikan, preview 56dp, dan warna shadow ditampilkan dalam satu baris di atas gallery (warna | preview | shadow) dipisah divider dari grid thumbnail. Preview selalu diwarnai sesuai warna bidikan aktif (PorterDuff SRC_IN) sehingga pengguna langsung melihat bagaimana tiap gaya terlihat dengan warna yang dipilih. Ukuran bisa diatur 4–160dp lewat slider atau ketuk labelnya untuk mengetik angka persis, opasitas 10–100% agar bidikan bisa dibuat transparan (labelnya juga bisa diketuk), dan rotasi 0–359° langsung diterapkan ke overlay. Shadow (warna, blur, offset) diterapkan tanpa memperkecil bidikan — ukuran view otomatis membesar menyesuaikan kebutuhan shadow. Posisi diatur bebas tiga cara: geser langsung bidikannya di layar, slider X/Y, atau tombol panah D-Pad untuk geser halus perlahan. Posisi yang terpasang mengacu ke titik tengah bidikan (bukan pojok gambarnya), tersimpan otomatis terpisah untuk mode tegak & mendatar, dan muncul kembali sendiri saat HP direstart bila dibiarkan aktif. Opsi "Kunci Posisi" membuat sentuhan menembus ke game (bidikan tak ikut tergeser), opsi "Area Aman" menjaga bidikan tidak melolos keluar tepi layar. Bidikan selalu diwarnai otomatis lewat color picker tanpa perlu switch aktivasi; lengkap dengan section Shadow (warna, blur, offset). Seluruh konfigurasi bisa disimpan & dimuat sebagai preset khusus Crosshair dari menu Muat Preset. Status modul aktif ikut tampil di notifikasi layar mengambang.
 - **Ketuk grafik baterai membuka halaman detail fullscreen** — Kelima grafik tab Monitor kini bisa diketuk membuka halaman detail ala aplikasi pemantau baterai: Persentase di kartu Metrik Real-Time serta Suhu, Daya, Tegangan & Arus di kartu Grafik Riwayat. Tiap halaman berisi grafik besar interaktif dengan crosshair yang mengikuti jari (garis vertikal + titik penebal + gelembung nilai & jam titik terpilih) dan tetap menempel setelah jari dilepas, baris label rentang waktu 2m–24j yang bisa diketuk maupun digeser lewat slider transparan (independen dari slider panel monitor; rentang awal mengikuti rentang aktif panel), serta kartu statistik Min / Max / Rata-rata / Δ dari data periode yang tampil. Header halaman beraksen warna metrik dengan subjudul nilai terkini; data disegarkan tiap 5 detik dan ditunda saat jari sedang menelusuri grafik.
 
 ### 🚮 Fitur Dihapus
@@ -25,6 +25,7 @@
 - **Skala grafik Suhu kini maksimal tetap 45°C** — Sebelumnya skala Y Suhu otomatis simetris ±2°C dari nilai tengah data sehingga bentuk garis nyaris tidak terbaca saat suhu stabil. Kini batas atas skala selalu 45°C (melebar otomatis hanya bila suhu melebihi 45° agar garis tidak hilang) dan batas bawah otomatis mengikuti data terkecil.
 
 ### 🗒️ File Added
+- 2026-08-25 00:50 — `ShadowImageView.java` — Custom ImageView padanan ShadowTextView: menggambar shadow (blur + offset) & background (warna, offset, margin, radius) di onDraw() untuk overlay bergambar
 - 2026-08-24 10:58 — `crosshair_1.png` … `crosshair_44.png` — 44 aset gambar gaya bidikan (sumber `_schedule/drawable-nodpi-v4/chr_1..44.png`)
 - 2026-08-24 11:00 — `CrosshairConfig.java` — Konfigurasi statis modul Crosshair
 - 2026-08-24 11:01 — `CrosshairModule.java` — Modul overlay ImageView: posisi titik tengah, drag + safe area, apply style/opacity
@@ -40,6 +41,23 @@
 - 2026-08-24 00:42 — `BatteryMonitorTabController.java` — Controller orkestrasi tab Monitor: ring gauge, dua kolom metrik real-time, badge kondisi suhu, polling 1 detik hanya saat tab tampil, memegang tiga controller di atas
 
 ### ✏️ File Changed
+- 2026-08-26 06:37 — `ShadowImageView.java` — Pre-render shadow bitmap via BlurMaskFilter pada Canvas offscreen saat config berubah; tidak perlu LAYER_TYPE_SOFTWARE lagi; onDraw tinggal gambar cache shadow + crosshair di atasnya
+- 2026-08-26 06:37 — `CrosshairModule.java` — Tambah updatePosition() setelah expandForShadow() agar posisi crosshair tetap di tengah saat ukuran view berubah karena shadow
+- 2026-08-26 03:15 — `ShadowImageView.java` — Tambah getShadowPadExtra() untuk akses padding shadow dari module
+- 2026-08-26 03:15 — `CrosshairModule.java` — Shadow expand view params agar reticle tidak menyusut (sizePx + shadowPadExtra*2), terapkan di start(), updateSize(), applyShadow()
+- 2026-08-26 03:15 — `panel_crosshair.xml` — Susun ulang: warna|preview|shadow di atas gallery, divider di antara, preview 56dp
+- 2026-08-26 02:44 — `CrosshairPanelController.java` — Gallery horizontal scroll (LinearLayout 48dp, margin 6dp), preview berwarna, hapus checkbox Warnai Bidikan & section Background, min size 4dp, listener rotasi + SliderLabelEditor
+- 2026-08-26 02:44 — `CrosshairModule.java` — Tambah applyRotation() + terapkan saat module start
+- 2026-08-26 02:44 — `CrosshairConfig.java` — Default colorEnabled true (warna selalu aktif)
+- 2026-08-26 02:44 — `MainActivity.java` — colorEnabled selalu true
+- 2026-08-26 02:44 — `bg_style_item_selected.xml` — Background selected semi-transparan accent (#3326C6DA)
+- 2026-08-25 01:53 — `panel_crosshair.xml` — Baris preview Warna/Shadow/Background, switch "Warnai Bidikan", section Shadow & Background collapsible, label preset aktif
+- 2026-08-25 01:47 — `CrosshairPanelFragment.java` — Teruskan Muat Preset dari menu/PanelManager ke controller
+- 2026-08-25 01:40 — `CrosshairPanelController.java` — Binding & listener lengkap: warna bidikan + shadow + background (ColorPickerDialog), slider label edit Opasitas/Shadow/Background, checkbox tint via applyCheckboxTint
+- 2026-08-25 01:33 — `CrosshairPositionController.java` — Integrasi PresetHandler penuh: delegate moduleType "crosshair", simpan/muat preset gaya+opasitas+warna+shadow+background+posisi, label preset aktif
+- 2026-08-25 01:26 — `MainActivity.java` — Muat prefs baru Crosshair: warna, tint aktif, shadow & background
+- 2026-08-25 01:12 — `CrosshairModule.java` — View ganti ke ShadowImageView; apply warna/shadow/background; updateColor/updateShadow/updateBackground terhubung
+- 2026-08-25 01:05 — `CrosshairConfig.java` — Field colorEnabled, color, shadow, background
 - 2026-08-24 22:56 — `activity_documentation.xml` — Tambah entri daftar dokumen OLD-CHANGELOG setelah CHANGELOG
 - 2026-08-24 22:56 — `DocumentationActivity.java` — Buka arsip `old-CHANGELOG.md` dari assets saat entri OLD-CHANGELOG diketuk
 - 2026-08-24 22:29 — `ColorPickerPanelController.java` — Chevron header slider RGB ikut diganti ▲/▼ saat section dilipat/dibuka

@@ -13,6 +13,8 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.crosshair.CrosshairConfig;
 import exp.ftxt.features.crosshair.CrosshairModule;
+import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetHandler;
 import exp.ftxt.shared.ui.DpadController;
 import exp.ftxt.shared.ui.SliderPositionController;
 
@@ -27,7 +29,115 @@ public class CrosshairPositionController {
     private DpadController dpad;
     private SliderPositionController sliderController;
     private TextView coordDisplay;
+    private TextView activePresetLabel;
     private int displayWidth, displayHeight;
+
+    private final PresetHandler.StringHolder activePresetName = new PresetHandler.StringHolder();
+
+    private final PresetHandler.Delegate delegate = new PresetHandler.Delegate() {
+
+        @Override
+        public String moduleLabel() { return "Crosshair"; }
+
+        @Override
+        public String moduleType() { return "crosshair"; }
+
+        @Override
+        public String touchPassthroughPrefKey() { return "crosshair_lock"; }
+
+        @Override
+        public String safeAreaPrefKey() { return "crosshair_safe_area"; }
+
+        @Override
+        public String posXPrefKey() { return "crosshair_pos_x"; }
+
+        @Override
+        public String posYPrefKey() { return "crosshair_pos_y"; }
+
+        @Override
+        public void saveToPreset(OverlayPreset p) {
+            p.posX = CrosshairConfig.posX;
+            p.posY = CrosshairConfig.posY;
+            p.size = CrosshairConfig.size;
+            p.color = CrosshairConfig.color;
+            p.bgEnabled = CrosshairConfig.bg.enabled;
+            p.bgColor = CrosshairConfig.bg.color;
+            p.bgPadding = CrosshairConfig.bg.padding;
+            p.bgOffsetX = CrosshairConfig.bg.offsetX;
+            p.bgOffsetY = CrosshairConfig.bg.offsetY;
+            p.bgMargin = CrosshairConfig.bg.margin;
+            p.bgRadius = CrosshairConfig.bg.radius;
+            p.touchPassthrough = CrosshairConfig.touchPassthrough;
+            p.safeArea = CrosshairConfig.safeArea;
+            p.crosshairStyleIndex = CrosshairConfig.styleIndex;
+            p.crosshairOpacity = CrosshairConfig.opacity;
+            p.crosshairColorEnabled = CrosshairConfig.colorEnabled;
+            p.crosshairColor = CrosshairConfig.color;
+        }
+
+        @Override
+        public void applyFromPreset(Activity activity, OverlayPreset p, SharedPreferences prefs) {
+            CrosshairConfig.posX = p.posX;
+            CrosshairConfig.posY = p.posY;
+            CrosshairConfig.size = p.size;
+            CrosshairConfig.color = p.color;
+            CrosshairConfig.bg.enabled = p.bgEnabled;
+            CrosshairConfig.bg.color = p.bgColor;
+            CrosshairConfig.bg.padding = p.bgPadding;
+            CrosshairConfig.bg.offsetX = p.bgOffsetX;
+            CrosshairConfig.bg.offsetY = p.bgOffsetY;
+            CrosshairConfig.bg.margin = p.bgMargin;
+            CrosshairConfig.bg.radius = p.bgRadius;
+            saveBgPrefs(prefs);
+            if (p.touchPassthrough != null) {
+                CrosshairConfig.touchPassthrough = p.touchPassthrough;
+                prefs.edit().putBoolean("crosshair_lock", CrosshairConfig.touchPassthrough).apply();
+            }
+            if (p.safeArea != null) {
+                CrosshairConfig.safeArea = p.safeArea;
+                prefs.edit().putBoolean("crosshair_safe_area", CrosshairConfig.safeArea).apply();
+            }
+            if (p.crosshairStyleIndex != null) {
+                CrosshairConfig.styleIndex = Math.max(1, Math.min(44, p.crosshairStyleIndex));
+                prefs.edit().putInt("crosshair_style", CrosshairConfig.styleIndex).apply();
+            }
+            if (p.crosshairOpacity != null) {
+                CrosshairConfig.opacity = Math.max(10, Math.min(100, p.crosshairOpacity));
+                prefs.edit().putInt("crosshair_opacity", CrosshairConfig.opacity).apply();
+            }
+            if (p.crosshairColorEnabled != null) {
+                CrosshairConfig.colorEnabled = p.crosshairColorEnabled;
+                prefs.edit().putBoolean("crosshair_color_enabled", CrosshairConfig.colorEnabled).apply();
+            }
+            if (p.crosshairColor != null) {
+                CrosshairConfig.color = p.crosshairColor;
+                prefs.edit().putInt("crosshair_color", CrosshairConfig.color).apply();
+            }
+        }
+
+        @Override
+        public void syncToService() {
+            FloatingService.updatePositionForModule(FloatingService.crosshairModule());
+            FloatingService.updateSizeForModule(FloatingService.crosshairModule(), CrosshairConfig.size);
+            FloatingService.updateTouchFlagsForModule(FloatingService.crosshairModule());
+            FloatingService.updateColorForModule(FloatingService.crosshairModule(), CrosshairConfig.color);
+            FloatingService.updateBackgroundForModule(FloatingService.crosshairModule());
+            FloatingService.crosshairModule().applyStyle();
+            FloatingService.crosshairModule().applyOpacity();
+        }
+
+        private void saveBgPrefs(SharedPreferences prefs) {
+            prefs.edit()
+                    .putBoolean("crosshair_bg_enabled", CrosshairConfig.bg.enabled)
+                    .putInt("crosshair_bg_color", CrosshairConfig.bg.color)
+                    .putInt("crosshair_bg_padding", CrosshairConfig.bg.padding)
+                    .putInt("crosshair_bg_offset_x", CrosshairConfig.bg.offsetX)
+                    .putInt("crosshair_bg_offset_y", CrosshairConfig.bg.offsetY)
+                    .putInt("crosshair_bg_margin", CrosshairConfig.bg.margin)
+                    .putInt("crosshair_bg_radius", CrosshairConfig.bg.radius)
+                    .apply();
+        }
+    };
 
     private static final String PREFS_NAME = "ftxt_prefs";
 
@@ -69,12 +179,18 @@ public class CrosshairPositionController {
         btnLeft = rootView.findViewById(R.id.crosshair_btnLeft);
         btnRight = rootView.findViewById(R.id.crosshair_btnRight);
         coordDisplay = rootView.findViewById(R.id.crosshair_posCoordDisplay);
+        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
     }
 
     private void setupListeners() {
         dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
             onPositionChanged(clamp(CrosshairConfig.posX + dx), clamp(CrosshairConfig.posY + dy));
         });
+    }
+
+    public void showLoadPresetDialog() {
+        PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,
+                (onSaved) -> PresetHandler.showSavePresetDialog(activity, delegate, onSaved));
     }
 
     private static float clamp(float val) {
@@ -85,10 +201,7 @@ public class CrosshairPositionController {
         CrosshairConfig.posX = x;
         CrosshairConfig.posY = y;
         syncAll();
-        prefs.edit()
-                .putFloat("crosshair_pos_x_" + currentOrientation, x)
-                .putFloat("crosshair_pos_y_" + currentOrientation, y)
-                .apply();
+        PresetHandler.savePositionToPrefs(prefs, delegate, currentOrientation, x, y);
         FloatingService.updatePositionForModule(FloatingService.crosshairModule());
     }
 
@@ -111,6 +224,18 @@ public class CrosshairPositionController {
     public void syncAll() {
         sliderController.sync(CrosshairConfig.posX, CrosshairConfig.posY);
         updateCoordDisplay();
+        updateActivePresetLabel();
+    }
+
+    private void updateActivePresetLabel() {
+        if (activePresetLabel == null) return;
+        String name = activePresetName.value;
+        if (name != null && !name.isEmpty()) {
+            activePresetLabel.setText("Aktif: " + name);
+            activePresetLabel.setVisibility(View.VISIBLE);
+        } else {
+            activePresetLabel.setVisibility(View.GONE);
+        }
     }
 
     private void updateCoordDisplay() {
