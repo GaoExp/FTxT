@@ -29,7 +29,7 @@ public class BatteryPositionController {
     private final Activity activity;
     private final SharedPreferences prefs;
 
-    private View btnUp, btnDown, btnLeft, btnRight;
+    private View btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -173,20 +173,23 @@ public class BatteryPositionController {
         FloatingService.updatePositionForModule(FloatingService.batteryStatsModule());
     }
 
-    private void bindViews(View rootView) {
-        btnUp = rootView.findViewById(R.id.battery_btnUp);
-        btnDown = rootView.findViewById(R.id.battery_btnDown);
-        btnLeft = rootView.findViewById(R.id.battery_btnLeft);
-        btnRight = rootView.findViewById(R.id.battery_btnRight);
-        coordDisplay = rootView.findViewById(R.id.battery_posCoordDisplay);
-        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
-    }
+private void bindViews(View rootView) {
+    btnUp = rootView.findViewById(R.id.battery_btnUp);
+    btnDown = rootView.findViewById(R.id.battery_btnDown);
+    btnLeft = rootView.findViewById(R.id.battery_btnLeft);
+    btnRight = rootView.findViewById(R.id.battery_btnRight);
+    btnMinus = rootView.findViewById(R.id.battery_btnMinus);
+    btnPlus = rootView.findViewById(R.id.battery_btnPlus);
+    coordDisplay = rootView.findViewById(R.id.battery_posCoordDisplay);
+    activePresetLabel = rootView.findViewById(R.id.active_preset_label);
+    dpadCenter = rootView.findViewById(R.id.battery_dpadInterval);
+}
 
-    private void setupListeners() {
-        dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
-            onPositionChanged(clamp(BatteryStatsConfig.posX + dx), clamp(BatteryStatsConfig.posY + dy));
-        });
-    }
+private void setupListeners() {
+    dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter, displayWidth, displayHeight, (dx, dy) -> {
+        onPositionChanged(clamp(BatteryStatsConfig.posX + dx), clamp(BatteryStatsConfig.posY + dy));
+    });
+}
 
     public void showLoadPresetDialog() {
         PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,

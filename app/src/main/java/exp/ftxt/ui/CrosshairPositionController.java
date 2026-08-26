@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import exp.ftxt.R;
@@ -23,7 +24,8 @@ public class CrosshairPositionController {
     private final Activity activity;
     private final SharedPreferences prefs;
 
-    private View btnUp, btnDown, btnLeft, btnRight;
+    private View btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter;
+    private ImageButton btnReset;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -173,20 +175,27 @@ public class CrosshairPositionController {
         FloatingService.updatePositionForModule(FloatingService.crosshairModule());
     }
 
-    private void bindViews(View rootView) {
-        btnUp = rootView.findViewById(R.id.crosshair_btnUp);
-        btnDown = rootView.findViewById(R.id.crosshair_btnDown);
-        btnLeft = rootView.findViewById(R.id.crosshair_btnLeft);
-        btnRight = rootView.findViewById(R.id.crosshair_btnRight);
-        coordDisplay = rootView.findViewById(R.id.crosshair_posCoordDisplay);
-        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
-    }
+private void bindViews(View rootView) {
+    btnUp = rootView.findViewById(R.id.crosshair_btnUp);
+    btnDown = rootView.findViewById(R.id.crosshair_btnDown);
+    btnLeft = rootView.findViewById(R.id.crosshair_btnLeft);
+    btnRight = rootView.findViewById(R.id.crosshair_btnRight);
+    btnMinus = rootView.findViewById(R.id.crosshair_btnMinus);
+    btnPlus = rootView.findViewById(R.id.crosshair_btnPlus);
+    btnReset = rootView.findViewById(R.id.crosshair_btnReset);
+    coordDisplay = rootView.findViewById(R.id.crosshair_posCoordDisplay);
+    activePresetLabel = rootView.findViewById(R.id.active_preset_label);
+    dpadCenter = rootView.findViewById(R.id.crosshair_dpadInterval);
+}
 
-    private void setupListeners() {
-        dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
-            onPositionChanged(clamp(CrosshairConfig.posX + dx), clamp(CrosshairConfig.posY + dy));
-        });
+private void setupListeners() {
+    dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter, displayWidth, displayHeight, (dx, dy) -> {
+        onPositionChanged(clamp(CrosshairConfig.posX + dx), clamp(CrosshairConfig.posY + dy));
+    });
+    if (btnReset != null) {
+        btnReset.setOnClickListener(v -> onPositionChanged(0.5f, 0.5f));
     }
+}
 
     public void showLoadPresetDialog() {
         PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,

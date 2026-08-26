@@ -342,13 +342,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <ImageButton
-                            android:id="@+id/network_btnUp"
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:src="@drawable/ic_arrow_up"
-                            android:contentDescription="@null"
-                            android:scaleType="centerInside"/>
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageButton
+                                android:id="@+id/network_btnMinus"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_minus"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                            <ImageButton
+                                android:id="@+id/network_btnUp"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_arrow_up"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                            <ImageButton
+                                android:id="@+id/network_btnPlus"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_plus"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                        </LinearLayout>
 
                         <LinearLayout
                             android:orientation="horizontal"
@@ -364,9 +388,15 @@
                                 android:contentDescription="@null"
                                 android:scaleType="centerInside"/>
 
-                            <Space
+                            <TextView
+                                android:id="@+id/network_dpadInterval"
                                 android:layout_width="60dp"
-                                android:layout_height="0dp"/>
+                                android:layout_height="35dp"
+                                android:gravity="center"
+                                android:textSize="11sp"
+                                android:textColor="#888888"
+                                android:clickable="true"
+                                android:focusable="true"/>
 
                             <ImageButton
                                 android:id="@+id/network_btnRight"

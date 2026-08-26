@@ -22,7 +22,7 @@ public class BatteryStatsConfig {
     public static boolean showPower = true;
     public static boolean showOnlyValue = false;
     public static String itemOrder = "temp,pct,volt,cur,power";
-    public static float posX = 0.05f;
-    public static float posY = 0.8f;
+    public static float posX = 0.04f;
+    public static float posY = 1.0f;
     public static float updateInterval = 5f;
 }

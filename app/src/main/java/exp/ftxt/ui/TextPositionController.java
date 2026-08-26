@@ -23,7 +23,7 @@ public class TextPositionController {
     private final Activity activity;
     private final SharedPreferences prefs;
 
-    private View btnUp, btnDown, btnLeft, btnRight;
+    private View btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -151,12 +151,15 @@ public class TextPositionController {
         btnDown = rootView.findViewById(R.id.btnDown);
         btnLeft = rootView.findViewById(R.id.btnLeft);
         btnRight = rootView.findViewById(R.id.btnRight);
+        btnMinus = rootView.findViewById(R.id.btnMinus);
+        btnPlus = rootView.findViewById(R.id.btnPlus);
         coordDisplay = rootView.findViewById(R.id.posCoordDisplay);
         activePresetLabel = rootView.findViewById(R.id.active_preset_label);
+        dpadCenter = rootView.findViewById(R.id.dpadInterval);
     }
 
     private void setupListeners() {
-        dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
+        dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter, displayWidth, displayHeight, (dx, dy) -> {
             onPositionChanged(clamp(TextConfig.posX + dx), clamp(TextConfig.posY + dy));
         });
     }

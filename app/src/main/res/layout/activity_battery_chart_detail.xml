@@ -73,15 +73,6 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:text="2m"
-                android:textSize="12sp"
-                android:textColor="@color/bat_monitor_label"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"/>
-
-            <TextView
                 android:text="5m"
                 android:textSize="12sp"
                 android:textColor="@color/bat_monitor_label"
@@ -92,15 +83,6 @@
 
             <TextView
                 android:text="10m"
-                android:textSize="12sp"
-                android:textColor="@color/bat_monitor_label"
-                android:gravity="center"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:text="15m"
                 android:textSize="12sp"
                 android:textColor="@color/bat_monitor_label"
                 android:gravity="center"
@@ -155,6 +137,24 @@
 
             <TextView
                 android:text="24j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="36j"
+                android:textSize="12sp"
+                android:textColor="@color/bat_monitor_label"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="48j"
                 android:textSize="12sp"
                 android:textColor="@color/bat_monitor_label"
                 android:gravity="center"

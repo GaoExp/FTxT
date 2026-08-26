@@ -26,16 +26,16 @@ import exp.ftxt.features.battery_stats.BatteryReading;
  */
 public class BatteryChartView extends View {
 
-    public static final long WINDOW_2M = 2L * 60_000L;
     public static final long WINDOW_5M = 5L * 60_000L;
     public static final long WINDOW_10M = 10L * 60_000L;
-    public static final long WINDOW_15M = 15L * 60_000L;
     public static final long WINDOW_30M = 30L * 60_000L;
     public static final long WINDOW_1H = 60L * 60_000L;
     public static final long WINDOW_3H = 3L * 60L * 60_000L;
     public static final long WINDOW_6H = 6L * 60L * 60_000L;
     public static final long WINDOW_12H = 12L * 60L * 60_000L;
     public static final long WINDOW_24H = 24L * 60L * 60_000L;
+    public static final long WINDOW_36H = 36L * 60L * 60_000L;
+    public static final long WINDOW_48H = 48L * 60L * 60_000L;
 
     public static final int SERIES_TEMP = 0;
     public static final int SERIES_PERCENT = 1;

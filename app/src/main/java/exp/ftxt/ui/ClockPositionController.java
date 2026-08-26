@@ -29,7 +29,7 @@ public class ClockPositionController {
     private final Activity activity;
     private final SharedPreferences prefs;
 
-    private View btnUp, btnDown, btnLeft, btnRight;
+    private View btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter;
     private String currentOrientation;
 
     private DpadController dpad;
@@ -146,20 +146,23 @@ public class ClockPositionController {
         FloatingService.updatePositionForModule(FloatingService.clockModule());
     }
 
-    private void bindViews(View rootView) {
-        btnUp = rootView.findViewById(R.id.clock_btnUp);
-        btnDown = rootView.findViewById(R.id.clock_btnDown);
-        btnLeft = rootView.findViewById(R.id.clock_btnLeft);
-        btnRight = rootView.findViewById(R.id.clock_btnRight);
-        coordDisplay = rootView.findViewById(R.id.clock_posCoordDisplay);
-        activePresetLabel = rootView.findViewById(R.id.active_preset_label);
-    }
+private void bindViews(View rootView) {
+    btnUp = rootView.findViewById(R.id.clock_btnUp);
+    btnDown = rootView.findViewById(R.id.clock_btnDown);
+    btnLeft = rootView.findViewById(R.id.clock_btnLeft);
+    btnRight = rootView.findViewById(R.id.clock_btnRight);
+    btnMinus = rootView.findViewById(R.id.clock_btnMinus);
+    btnPlus = rootView.findViewById(R.id.clock_btnPlus);
+    coordDisplay = rootView.findViewById(R.id.clock_posCoordDisplay);
+    activePresetLabel = rootView.findViewById(R.id.active_preset_label);
+    dpadCenter = rootView.findViewById(R.id.clock_dpadInterval);
+}
 
-    private void setupListeners() {
-        dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, (dx, dy) -> {
-            onPositionChanged(clamp(ClockConfig.posX + dx), clamp(ClockConfig.posY + dy));
-        });
-    }
+private void setupListeners() {
+    dpad = new DpadController(btnUp, btnDown, btnLeft, btnRight, btnMinus, btnPlus, dpadCenter, displayWidth, displayHeight, (dx, dy) -> {
+        onPositionChanged(clamp(ClockConfig.posX + dx), clamp(ClockConfig.posY + dy));
+    });
+}
 
     public void showLoadPresetDialog() {
         PresetHandler.showLoadPresetDialog(activity, delegate, activePresetName, this::syncAll,

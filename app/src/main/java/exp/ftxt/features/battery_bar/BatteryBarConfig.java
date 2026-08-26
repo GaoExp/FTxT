@@ -13,9 +13,9 @@ public class BatteryBarConfig {
     public static boolean horizontal = true;
     public static boolean invert = false;
     public static float length = 0.5f;
-    public static int thickness = 8;
+    public static int thickness = 2;
     public static int color = Color.GREEN;
-    public static int colorScheme = SCHEME_NONE;
+    public static int colorScheme = SCHEME_HUE;
     public static int lowColor = Color.YELLOW;
     public static int lowThreshold = 40;
     public static boolean showEmptyStrip = true;

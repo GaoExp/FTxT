@@ -157,8 +157,8 @@ public class BatteryStatsModule implements OverlayModule {
 
     public void loadPosition() {
         String sfx = posSuffix();
-        BatteryStatsConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.05f);
-        BatteryStatsConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 0.8f);
+        BatteryStatsConfig.posX = prefs.getFloat("battery_pos_x" + sfx, 0.04f);
+        BatteryStatsConfig.posY = prefs.getFloat("battery_pos_y" + sfx, 1.0f);
         updatePosition();
     }
 

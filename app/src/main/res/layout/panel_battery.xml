@@ -185,16 +185,6 @@
 
                                     <TextView
                                         android:id="@+id/batChartTick0"
-                                        android:text="2m"
-                                        android:textSize="12sp"
-                                        android:textColor="@color/bat_monitor_label"
-                                        android:gravity="center"
-                                        android:layout_width="0dp"
-                                        android:layout_weight="1"
-                                        android:layout_height="wrap_content"/>
-
-                                    <TextView
-                                        android:id="@+id/batChartTick1"
                                         android:text="5m"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -204,7 +194,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick2"
+                                        android:id="@+id/batChartTick1"
                                         android:text="10m"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -214,17 +204,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick3"
-                                        android:text="15m"
-                                        android:textSize="12sp"
-                                        android:textColor="@color/bat_monitor_label"
-                                        android:gravity="center"
-                                        android:layout_width="0dp"
-                                        android:layout_weight="1"
-                                        android:layout_height="wrap_content"/>
-
-                                    <TextView
-                                        android:id="@+id/batChartTick4"
+                                        android:id="@+id/batChartTick2"
                                         android:text="30m"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -234,7 +214,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick5"
+                                        android:id="@+id/batChartTick3"
                                         android:text="1j"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -244,7 +224,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick6"
+                                        android:id="@+id/batChartTick4"
                                         android:text="3j"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -254,7 +234,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick7"
+                                        android:id="@+id/batChartTick5"
                                         android:text="6j"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -264,7 +244,7 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick8"
+                                        android:id="@+id/batChartTick6"
                                         android:text="12j"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
@@ -274,8 +254,28 @@
                                         android:layout_height="wrap_content"/>
 
                                     <TextView
-                                        android:id="@+id/batChartTick9"
+                                        android:id="@+id/batChartTick7"
                                         android:text="24j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
+                                        android:layout_width="0dp"
+                                        android:layout_weight="1"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/batChartTick8"
+                                        android:text="36j"
+                                        android:textSize="12sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:gravity="center"
+                                        android:layout_width="0dp"
+                                        android:layout_weight="1"
+                                        android:layout_height="wrap_content"/>
+
+                                    <TextView
+                                        android:id="@+id/batChartTick9"
+                                        android:text="48j"
                                         android:textSize="12sp"
                                         android:textColor="@color/bat_monitor_label"
                                         android:gravity="center"
@@ -953,13 +953,37 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
-                        <ImageButton
-                            android:id="@+id/battery_btnUp"
-                            android:layout_width="35dp"
-                            android:layout_height="35dp"
-                            android:src="@drawable/ic_arrow_up"
-                            android:contentDescription="@null"
-                            android:scaleType="centerInside"/>
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <ImageButton
+                                android:id="@+id/battery_btnMinus"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_minus"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                            <ImageButton
+                                android:id="@+id/battery_btnUp"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_arrow_up"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                            <ImageButton
+                                android:id="@+id/battery_btnPlus"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:src="@drawable/ic_plus"
+                                android:contentDescription="@null"
+                                android:scaleType="centerInside"/>
+
+                        </LinearLayout>
 
                         <LinearLayout
                             android:orientation="horizontal"
@@ -975,9 +999,15 @@
                                 android:contentDescription="@null"
                                 android:scaleType="centerInside"/>
 
-                            <Space
+                            <TextView
+                                android:id="@+id/battery_dpadInterval"
                                 android:layout_width="60dp"
-                                android:layout_height="0dp"/>
+                                android:layout_height="35dp"
+                                android:gravity="center"
+                                android:textSize="11sp"
+                                android:textColor="#888888"
+                                android:clickable="true"
+                                android:focusable="true"/>
 
                             <ImageButton
                                 android:id="@+id/battery_btnRight"
@@ -1450,13 +1480,37 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
 
-                            <ImageButton
-                                android:id="@+id/batbar_btnUp"
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:src="@drawable/ic_arrow_up"
-                                android:contentDescription="@null"
-                                android:scaleType="centerInside"/>
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+                                <ImageButton
+                                    android:id="@+id/batbar_btnMinus"
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_minus"
+                                    android:contentDescription="@null"
+                                    android:scaleType="centerInside"/>
+
+                                <ImageButton
+                                    android:id="@+id/batbar_btnUp"
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_arrow_up"
+                                    android:contentDescription="@null"
+                                    android:scaleType="centerInside"/>
+
+                                <ImageButton
+                                    android:id="@+id/batbar_btnPlus"
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:src="@drawable/ic_plus"
+                                    android:contentDescription="@null"
+                                    android:scaleType="centerInside"/>
+
+                            </LinearLayout>
 
                             <LinearLayout
                                 android:orientation="horizontal"
@@ -1472,9 +1526,15 @@
                                     android:contentDescription="@null"
                                     android:scaleType="centerInside"/>
 
-                                <Space
+                                <TextView
+                                    android:id="@+id/batbar_dpadInterval"
                                     android:layout_width="60dp"
-                                    android:layout_height="0dp"/>
+                                    android:layout_height="35dp"
+                                    android:gravity="center"
+                                    android:textSize="11sp"
+                                    android:textColor="#888888"
+                                    android:clickable="true"
+                                    android:focusable="true"/>
 
                                 <ImageButton
                                     android:id="@+id/batbar_btnRight"

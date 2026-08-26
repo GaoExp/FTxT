@@ -31,17 +31,18 @@ public class BatteryChartHistoryController {
     private long chartWindowMs = BatteryChartView.WINDOW_5M;
 
     static final long[] CHART_WINDOWS = {
-            BatteryChartView.WINDOW_2M, BatteryChartView.WINDOW_5M,
-            BatteryChartView.WINDOW_10M, BatteryChartView.WINDOW_15M,
+            BatteryChartView.WINDOW_5M, BatteryChartView.WINDOW_10M,
             BatteryChartView.WINDOW_30M, BatteryChartView.WINDOW_1H,
             BatteryChartView.WINDOW_3H, BatteryChartView.WINDOW_6H,
-            BatteryChartView.WINDOW_12H, BatteryChartView.WINDOW_24H};
+            BatteryChartView.WINDOW_12H, BatteryChartView.WINDOW_24H,
+            BatteryChartView.WINDOW_36H, BatteryChartView.WINDOW_48H};
 
     private static final String[] CHART_WINDOW_LABELS = {
-            "2 Menit", "5 Menit", "10 Menit", "15 Menit", "30 Menit",
-            "1 Jam", "3 Jam", "6 Jam", "12 Jam", "24 Jam"};
+            "5 Menit", "10 Menit", "30 Menit",
+            "1 Jam", "3 Jam", "6 Jam",
+            "12 Jam", "24 Jam", "36 Jam", "48 Jam"};
 
-    private static final int CHART_WINDOW_DEFAULT = 1;
+    private static final int CHART_WINDOW_DEFAULT = 0;
 
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService chartExecutor = Executors.newSingleThreadExecutor();
