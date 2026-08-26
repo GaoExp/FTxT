@@ -260,7 +260,7 @@ FTxT/
 | Java source | 91 |
 | Layout XML | 22 |
 | Drawable XML | 44 |
-| Drawable PNG | 47 |
+| Drawable PNG | 2 |
 | Color XML | 2 |
 | Values XML | 7 |
 | Mipmap XML | 2 |
@@ -272,5 +272,5 @@ FTxT/
 | Root konfigurasi | 5 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~306** |
+| **Total file** | **~267** |
 | **Total direktori** | **~60** |

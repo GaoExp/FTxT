@@ -46,7 +46,7 @@ Drawer terdiri dari menu berikut (urutan default; item panel bisa di-reorder den
 | Network Stats | Kecepatan internet real-time |
 | Battery Info | Info baterai (suhu, persentase, voltase, arus, daya) + Battery Strip |
 | Clock Module | Waktu real-time 24 jam (Jam Digital) |
-| Crosshair | Placeholder (coming soon) |
+| Crosshair | Overlay bidikan untuk game |
 | Info Memori | Monitoring memori real-time (default tersembunyi) |
 | Logo Display | Placeholder (coming soon) |
 | Color Picker | Color picker wheel + slider H/S/V/RGB |
@@ -78,7 +78,7 @@ Header toolbar menampilkan navigasi drawer dan judul modul yang aktif.
 
 Setiap panel overlay memiliki pengaturan yang dikelompokkan dalam **section collapsible**:
 - **▾ Tampilan** — Ukuran teks, warna, dan opsi tampilan
-- **▾ Posisi** — Kontrol posisi (slider X/Y, D-Pad, preset, safe area)
+- **▾ Posisi** — Kontrol posisi (slider X/Y, D-Pad pixel-based 1–20px, preset, safe area)
 - **▾ Shadow** — Konfigurasi shadow (toggle, warna, blur, offset)
 - **▾ Background** — Konfigurasi background (toggle, warna, padding, offset, margin, radius)
 
@@ -103,13 +103,25 @@ Klik header section untuk membuka/tutup grup. Semua section terbuka secara defau
 - Ukuran default 48sp, bisa diatur warna, shadow, background
 - Kontrol posisi lengkap (slider, D-Pad, preset)
 
+### Crosshair
+Overlay bidikan untuk game dengan 44 gaya siap pilih:
+- **Gaya Bidikan** — Galeri thumbnail horizontal (48dp cell) dengan 44 pilihan, bisa digeser. Preview berwarna sesuai warna bidikan aktif
+- **Ukuran** — 4–160dp, bisa diatur lewat slider atau ketuk label untuk ketik angka persis
+- **Opasitas** — 10–100%, label bisa diketuk untuk edit manual
+- **Rotasi** — 0–359° langsung diterapkan ke overlay
+- **Shadow** — Warna, blur, offset (tidak memperkecil bidikan, ukuran view otomatis membesar)
+- **Posisi** — Geser langsung bidikannya, slider X/Y, atau D-Pad. Tombol reset untuk kembali ke tengah layar
+- **Kunci Posisi** — Sentuhan menembus ke game (bidikan tak ikut tergeser)
+- **Area Aman** — Bidikan tidak melolos keluar tepi layar
+- **Preset** — Konfigurasi bisa disimpan/dimuat sebagai preset khusus Crosshair
+
 ### Battery Info
 Panel Battery Info memiliki **3 tab** di bagian bawah: **Monitor**, **Overlay**, dan **Battery Strip**.
 
 **Tab Monitor** — Pemantauan baterai perangkat real-time dalam 3 kartu:
 - **Metrik Real-Time** — Ring gauge melingkar di kiri: arc berwarna gradien hue mengikuti level baterai (skema warna yang sama dengan Battery Strip), di dalam lingkaran tampil level %, kapasitas tersisa (mAh), dan status pengisian singkat (Charging•AC/USB/Wireless / Full / Discharging). Grafik riwayat Persentase berada di sebelah kanan ring, dan grid metrik monospace berjajar di bawahnya: suhu, voltase, arus, daya, cycle count, teknologi baterai (cycle count hanya tampil jika perangkat melaporkan). Badge kondisi suhu (Normal/Panas/Dingin) tampil di header kartu.
-- **Grafik Riwayat** — Empat chart Suhu, Daya, Tegangan, dan Arus dengan pemilih rentang 5 Menit / 15 Menit / 1 Jam / 6 Jam / 24 Jam (berlaku global untuk semua chart). Tiap chart punya sumbu Y sendiri (skala otomatis mengikuti data) dan angka nilai terkini di ujung garis. Chevron di header kartu untuk melipat/membuka seluruh isi grafik. Data bersumber dari database sehingga riwayat lama tetap terlihat walau aplikasi sempat ditutup.
-- **Kesehatan Baterai** — Estimasi kapasitas penuh ala AccuBattery: saat perangkat mengisi daya, segmen pengisian dicatat lalu estimasi diagregasi dengan median lintas sesi (sesi mayoritas waktu layar mati diprioritaskan agar lebih akurat). Tampil: estimasi kapasitas, skor kesehatan (hijau ≥80% / oranye ≥50% / merah <50%), jumlah sesi tercatat, indikator keyakinan, dan status pengumpulan data. Ketuk kartu untuk input kapasitas desain (mAh) — skor kesehatan baru muncul jika kapasitas desain terisi. Tombol **Salin** & **Simpan Snapshot** ada di dalam kartu ini; hasilnya menyertakan catatan kesehatan baterai.
+- **Grafik Riwayat** — Empat chart Suhu, Daya, Tegangan, dan Arus dengan pemilih rentang 5m/10m/30m/1j/3j/6j/12j/24j/36j/48j (berlaku global untuk semua chart). Tiap chart punya sumbu Y sendiri (skala otomatis mengikuti data) dan angka nilai terkini di ujung garis. Chevron di header kartu untuk melipat/membuka seluruh isi grafik. Data bersumber dari database sehingga riwayat lama tetap terlihat walau aplikasi sempat ditutup.
+- **Kesehatan Baterai** — Estimasi kapasitas penuh ala AccuBattery: saat perangkat mengisi daya, segmen pengisian dicatat lalu estimasi diagregasi dengan median lintas sesi (sesi mayoritas waktu layar mati diprioritaskan agar lebih akurat). Tampil: estimasi kapasitas, skor kesehatan (hijau ≥80% / oranye ≥50% / merah <50%), jumlah sesi tercatat, indikator keyakinan, dan status pengumpulan data. Ketuk kartu untuk input kapasitas desain (mAh) — skor kesehatan baru muncul jika kapasitas desain terisi. Tombol **Salin** & **Simpan Snapshot** ada di dalam kartu ini; hasilnya menyertakan catatan kesehatan baterai. Tombol **Reset** untuk menghapus data estimasi dan memulai dari awal.
 - Pemantauan berjalan **otomatis full-aktif**: tanpa tombol mulai/hentikan — pencatatan tetap jalan meski overlay mati, panel tertutup, atau aplikasi ditutup, lewat foreground service ringan dengan notifikasi minimal prioritas rendah. Nyala otomatis saat aplikasi dibuka dan direstart otomatis saat boot. Sampling dinamis hemat baterai: rapat ±1 detik saat mengisi daya, ±5 detik saat layar nyala idle, ±30 detik saat layar mati.
 
 **Tab Overlay** — Konfigurasi info baterai:
