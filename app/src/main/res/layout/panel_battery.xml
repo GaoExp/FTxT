@@ -547,7 +547,7 @@
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"
-                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginEnd="4dp"
                                     android:textSize="12sp"
                                     android:minWidth="0dp"
                                     android:minHeight="0dp"
@@ -558,7 +558,22 @@
 
                                 <Button
                                     android:id="@+id/batMonitorExportButton"
-                                    android:text="Simpan Snapshot"
+                                    android:text="Simpan"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:layout_marginEnd="4dp"
+                                    android:textSize="12sp"
+                                    android:minWidth="0dp"
+                                    android:minHeight="0dp"
+                                    android:insetTop="0dp"
+                                    android:insetBottom="0dp"
+                                    android:paddingTop="10dp"
+                                    android:paddingBottom="10dp"/>
+
+                                <Button
+                                    android:id="@+id/batHealthResetButton"
+                                    android:text="Reset"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_weight="1"

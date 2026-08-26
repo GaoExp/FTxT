@@ -261,7 +261,8 @@ public class BatteryChartView extends View {
         } else {
             float range = max - min;
             if (seriesType == SERIES_TEMP) {
-                if (max < 45f) max = 45f;
+                if (max < 43f) max = 43f;
+                if (min < 33f) min = 33f;
                 if (min >= max) min = max - 1f;
             } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);

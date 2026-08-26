@@ -44,6 +44,8 @@ public class BatteryCapacityEstimator {
     private static long lastChargeMah = -1L;
     private static int lastPercent = -1;
     private static long lastSampleTime = -1L;
+    private static double accumulatedChargeMah = 0.0;
+    private static int lastCurrentMa = 0;
 
     private BatteryCapacityEstimator() {}
 
@@ -67,9 +69,10 @@ public class BatteryCapacityEstimator {
         lastSampleTime = s.time;
 
         if (!charging) {
-            finishSegment(lastChargeMah, lastPercent);
+            finishSegment(lastPercent);
             lastChargeMah = s.chargeMah;
             lastPercent = s.percent;
+            lastCurrentMa = s.currentMa;
             return;
         }
         if (!segmentActive) {
@@ -80,17 +83,25 @@ public class BatteryCapacityEstimator {
             segmentScreenOnMs = 0;
             segmentTotalMs = 0;
             segmentSamples = 0;
+            accumulatedChargeMah = 0.0;
         } else {
             segmentTotalMs += deltaMs;
             if (deltaMs > 0 && isScreenOn()) segmentScreenOnMs += deltaMs;
             segmentSamples++;
+            if (deltaMs > 0) {
+                int absMa = Math.abs(s.currentMa);
+                if (absMa > 0) {
+                    accumulatedChargeMah += absMa * (deltaMs / 3600000.0);
+                }
+            }
         }
         lastChargeMah = s.chargeMah;
         lastPercent = s.percent;
+        lastCurrentMa = s.currentMa;
     }
 
     public static synchronized void onMonitoringStopped() {
-        finishSegment(lastChargeMah, lastPercent);
+        finishSegment(lastPercent);
         lastSampleTime = -1L;
     }
 
@@ -126,17 +137,21 @@ public class BatteryCapacityEstimator {
         BatteryHistoryDb.get(appContext).setMeta("design_mah", String.valueOf(designMah));
     }
 
-    private static void finishSegment(long endChargeMah, int endPercent) {
+    public static synchronized void resetEstimationData() {
+        sessions.clear();
+        BatteryHistoryDb.get(appContext).deleteAllSessions();
+    }
+
+    private static void finishSegment(int endPercent) {
         if (!segmentActive) return;
         segmentActive = false;
         try {
-            if (segmentStartChargeMah <= 0 || endChargeMah <= 0) return;
             if (segmentStartPercent < 0 || endPercent < 0) return;
             float dPercent = endPercent - segmentStartPercent;
-            float dCharge = endChargeMah - segmentStartChargeMah;
-            if (dPercent < MIN_DELTA_PERCENT || dCharge <= 0) return;
+            if (dPercent < MIN_DELTA_PERCENT) return;
             if (segmentTotalMs < MIN_SEGMENT_MS) return;
-            float estimate = dCharge * 100f / dPercent;
+            if (accumulatedChargeMah <= 0) return;
+            float estimate = (float) (accumulatedChargeMah * 100.0 / dPercent);
             if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) return;
             boolean screenOffDominant = segmentScreenOnMs * 2 < segmentTotalMs;
             int samples = Math.max(segmentSamples, 1);
@@ -151,6 +166,7 @@ public class BatteryCapacityEstimator {
             segmentTotalMs = 0;
             segmentSamples = 0;
             segmentStartMs = 0;
+            accumulatedChargeMah = 0.0;
         }
     }
 

@@ -24,7 +24,7 @@
 ### 🐞 Bug Fixes
 - **Chevron "Tampilkan slider RGB" kini ikut berubah saat section dibuka/ditutup** — Ikon panah di header slider RGB yang selama ini selalu statis ▼ kini berganti ▲ ketika slider RGB dilipat dan kembali ▼ saat dibuka, di panel Color Picker maupun dialog color picker. Arah awal di dialog juga ikut diperbaiki — semula menampilkan ▼ padahal section dalam keadaan tertutup.
 - **Warna status pengisian grafik riwayat kini benar di semua rentang** — Pada rentang 15 Menit ke atas, garis Persentase/Tegangan/Arus seluruhnya tergambar merah padahal baterai sedang mengisi daya (rentang 2–10 Menit normal). Kini kondisi pengisian tiap titik ikut terhitung pada rentang panjang sehingga segmen hijau/merah kembali sesuai keadaan aslinya hingga rentang 24 Jam.
-- **Skala grafik Suhu kini maksimal tetap 45°C** — Sebelumnya skala Y Suhu otomatis simetris ±2°C dari nilai tengah data sehingga bentuk garis nyaris tidak terbaca saat suhu stabil. Kini batas atas skala selalu 45°C (melebar otomatis hanya bila suhu melebihi 45° agar garis tidak hilang) dan batas bawah otomatis mengikuti data terkecil.
+- **Skala grafik Suhu default 33°C–43°C** — Batas atas skala selalu 43°C, batas bawah selalu 33°C agar variasi suhu tipis tetap terlihat jelas. Melebar otomatis hanya bila suhu melebihi 43°C atau turun di bawah 33°C.
 
 ### 🗒️ File Added
 - 2026-08-26 18:35 — `ic_reset.xml` — Ikon vector panah refresh untuk tombol reset posisi
@@ -46,7 +46,7 @@
 - 2026-08-24 00:42 — `BatteryMonitorTabController.java` — Controller orkestrasi tab Monitor: ring gauge, dua kolom metrik real-time, badge kondisi suhu, polling 1 detik hanya saat tab tampil, memegang tiga controller di atas
 
 ### ✏️ File Changed
-- 2026-08-26 19:12 — `BatteryChartView.java` — Hapus WINDOW_2M & WINDOW_15M; tambah WINDOW_36H & WINDOW_48H
+- 2026-08-26 19:12 — `BatteryChartView.java` — Hapus WINDOW_2M & WINDOW_15M; tambah WINDOW_36H & WINDOW_48H; skala default Suhu: max 45→43°C, tambah min tetap 33°C
 - 2026-08-26 19:12 — `BatteryChartHistoryController.java` — Update CHART_WINDOWS/labels: hapus 2m/15m, tambah 36j/48j; komentar padding diperbarui
 - 2026-08-26 19:12 — `BatteryStatsConfig.java` — Default posX 0.05→0.04, posY 0.8→1.0
 - 2026-08-26 19:12 — `BatteryStatsModule.java` — Fallback defaults posX/posY menyesuaikan config

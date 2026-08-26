@@ -24,18 +24,21 @@ public class BatteryHealthCardController {
     private TextView batHealthText;
     private TextView batHealthDesignText;
     private TextView batHealthSessionBadge;
+    private View batHealthResetButton;
     private int monitorLabelColor;
 
     public BatteryHealthCardController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
         batHealthDesignText.setOnClickListener(v -> showDesignCapacityDialog());
+        batHealthResetButton.setOnClickListener(v -> showResetConfirmDialog());
     }
 
     private void bindViews(View rootView) {
         batHealthText = rootView.findViewById(R.id.batHealthText);
         batHealthDesignText = rootView.findViewById(R.id.batHealthDesignText);
         batHealthSessionBadge = rootView.findViewById(R.id.batHealthSessionBadge);
+        batHealthResetButton = rootView.findViewById(R.id.batHealthResetButton);
         monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
     }
 
@@ -124,6 +127,27 @@ public class BatteryHealthCardController {
                     }
                     BatteryCapacityEstimator.setDesignCapacity(value);
                     refresh();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void showResetConfirmDialog() {
+        BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
+        if (r.sessionCount == 0) {
+            Toast.makeText(activity, "Belum ada data untuk di-reset", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(activity)
+                .setTitle("Reset Data Estimasi")
+                .setMessage("Hapus semua " + r.sessionCount + " sesi pengisian yang tercatat? "
+                        + "Estimasi kapasitas dan skor kesehatan akan dihitung ulang dari nol "
+                        + "saat pengisian berikutnya.")
+                .setPositiveButton("Reset", (dialog, which) -> {
+                    BatteryCapacityEstimator.resetEstimationData();
+                    refresh();
+                    Toast.makeText(activity, "Data estimasi berhasil direset", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Batal", null)
                 .show();
