@@ -15,6 +15,7 @@ import java.util.Locale;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
+import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.features.battery_stats.BatteryRingView;
@@ -127,6 +128,21 @@ public class BatteryMonitorTabController {
                 ? String.format(Locale.US, "%.2fW", s.powerW) : "—");
         appendLine(col2, "Cycle Count", s.cycleCount >= 0 ? String.valueOf(s.cycleCount) : "—");
         appendLine(col2, "Teknologi", s.technology != null ? s.technology : "—");
+
+        boolean charging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_CHARGING
+                || s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL;
+        boolean discharging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_DISCHARGING;
+        String estLabel = null;
+        if (charging && s.percent < 100) {
+            long estMs = BatteryHistoryDb.get(activity).estimateTimeRemaining(true);
+            estLabel = estMs >= 0 ? formatDuration(estMs) : "—";
+            appendLine(col2, "Est. Penuh", estLabel);
+        } else if (discharging && s.percent > 0) {
+            long estMs = BatteryHistoryDb.get(activity).estimateTimeRemaining(false);
+            estLabel = estMs >= 0 ? formatDuration(estMs) : "—";
+            appendLine(col2, "Est. Habis", estLabel);
+        }
+
         batMonitorMetricsText2.setText(col2);
 
         batMonitorRing.setBatteryData(s.percent,
@@ -162,5 +178,16 @@ public class BatteryMonitorTabController {
         sb.append(padded).append(value).append("\n");
         sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
                 start, start + padded.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+    }
+
+    static String formatDuration(long ms) {
+        if (ms < 0) return "—";
+        long totalMin = (ms + 59_000L) / 60_000L;
+        if (totalMin < 1) return "<1 mnt";
+        if (totalMin < 60) return totalMin + " mnt";
+        long jam = totalMin / 60;
+        long sisaMin = totalMin % 60;
+        if (sisaMin == 0) return jam + " jam";
+        return jam + "j " + sisaMin + "m";
     }
 }

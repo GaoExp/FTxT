@@ -26,6 +26,9 @@ import exp.ftxt.features.battery_stats.BatteryReading;
  */
 public class BatteryChartView extends View {
 
+    /** Threshold gap waktu (ms) untuk memutus garis grafik. Gap > 5 menit dianggap putus. */
+    private static final long GAP_THRESHOLD_MS = 5L * 60_000L;
+
     public static final long WINDOW_5M = 5L * 60_000L;
     public static final long WINDOW_10M = 10L * 60_000L;
     public static final long WINDOW_30M = 30L * 60_000L;
@@ -53,9 +56,8 @@ public class BatteryChartView extends View {
     private final Paint emptyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
-    private final SimpleDateFormat timeShortFormat = new SimpleDateFormat("HH:mm:ss", Locale.US);
-    private final SimpleDateFormat timeMediumFormat = new SimpleDateFormat("HH:mm", Locale.US);
-    private final SimpleDateFormat timeLongFormat = new SimpleDateFormat("dd/MM HH:mm", Locale.US);
+    private final SimpleDateFormat timeLabelFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.US);
+    private final SimpleDateFormat timeCrosshairFormat = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.US);
 
     /** Callback saat titik data terpilih berubah lewat sentuhan (crosshair). */
     public interface OnScrubListener {
@@ -78,16 +80,29 @@ public class BatteryChartView extends View {
     private final Paint bubblePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint crosshairTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    // Zoom & pan
+    private static final float MIN_ZOOM = 1.0f;
+    private static final long MIN_VISIBLE_MS = 30_000L;
+    private float viewZoom = 1.0f;
+    private long panOffsetMs = 0L;
+
+    // Touch interaction mode
+    public static final int MODE_CROSSHAIR = 0;
+    public static final int MODE_PAN = 1;
+    private int touchMode = MODE_CROSSHAIR;
+
+    private float prevTouchX = 0f;
+
     public BatteryChartView(Context context) {
         this(context, null);
     }
 
     public BatteryChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         gridPaint.setColor(getResources().getColor(R.color.bat_chart_grid));
         gridPaint.setStrokeWidth(dp(1));
 
@@ -118,6 +133,37 @@ public class BatteryChartView extends View {
         applySeriesStyle();
     }
 
+    public void setMode(int mode) {
+        touchMode = mode;
+        if (mode == MODE_PAN) {
+            scrubbing = false;
+            selectedIndex = -1;
+            if (scrubListener != null) scrubListener.onScrub(-1, null);
+        }
+        invalidate();
+    }
+
+    public void setZoomLevel(float zoom) {
+        float maxZoom = Math.max(MIN_ZOOM, windowMs / (float) MIN_VISIBLE_MS);
+        viewZoom = Math.max(MIN_ZOOM, Math.min(maxZoom, zoom));
+        clampPanOffset();
+        invalidate();
+    }
+
+    public float getZoomLevel() {
+        return viewZoom;
+    }
+
+    private void clampPanOffset() {
+        if (viewZoom <= 1.0f) {
+            panOffsetMs = 0L;
+            return;
+        }
+        long visibleWindowMs = (long) (windowMs / viewZoom);
+        long maxPan = windowMs - visibleWindowMs;
+        panOffsetMs = Math.max(0L, Math.min(maxPan, panOffsetMs));
+    }
+
     public void setData(BatteryReading.Snapshot[] samples) {
         this.samples = samples != null ? samples : new BatteryReading.Snapshot[0];
         invalidate();
@@ -140,8 +186,21 @@ public class BatteryChartView extends View {
         if (!interactive) {
             selectedIndex = -1;
             scrubbing = false;
+            resetZoom();
         }
         invalidate();
+    }
+
+    /** Reset zoom dan pan ke kondisi normal. */
+    public void resetZoom() {
+        viewZoom = 1.0f;
+        panOffsetMs = 0L;
+        invalidate();
+    }
+
+    /** Zoom level saat ini (1.0 = tidak ada zoom). */
+    public float getViewZoom() {
+        return viewZoom;
     }
 
     /** True saat jari sedang menekan grafik (pembaruan data sebaiknya ditunda). */
@@ -161,18 +220,36 @@ public class BatteryChartView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (!interactive || lastCount < 2 || lastPlotW <= 0f) return super.onTouchEvent(event);
+
+        float touchX = event.getX();
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                scrubbing = true;
                 if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
-                selectNearest(event.getX());
+                prevTouchX = touchX;
+                if (touchMode == MODE_CROSSHAIR) {
+                    selectNearest(touchX);
+                } else if (touchMode == MODE_PAN) {
+                    if (viewZoom > 1.0f) {
+                        scrubbing = true;
+                    }
+                }
                 return true;
             case MotionEvent.ACTION_MOVE:
-                selectNearest(event.getX());
+                if (touchMode == MODE_CROSSHAIR) {
+                    selectNearest(touchX);
+                } else if (touchMode == MODE_PAN && viewZoom > 1.0f) {
+                    float dx = prevTouchX - touchX;
+                    long deltaMs = (long) (dx * lastSpanMs / lastPlotW);
+                    panOffsetMs += deltaMs;
+                    clampPanOffset();
+                    prevTouchX = touchX;
+                    invalidate();
+                }
                 return true;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                scrubbing = false;
+                if (touchMode == MODE_PAN) scrubbing = false;
                 return true;
             default:
                 return super.onTouchEvent(event);
@@ -181,7 +258,9 @@ public class BatteryChartView extends View {
 
     private void selectNearest(float touchX) {
         float x = Math.max(lastPadLeft, Math.min(lastPadLeft + lastPlotW, touchX));
-        long target = lastBaseT + (long) ((x - lastPadLeft) / lastPlotW * lastSpanMs);
+        long visibleStartT = lastBaseT + panOffsetMs;
+        long visibleWindowMs = (long) (windowMs / Math.max(1f, viewZoom));
+        long target = visibleStartT + (long) ((x - lastPadLeft) / lastPlotW * visibleWindowMs);
         int best = -1;
         long bestDiff = Long.MAX_VALUE;
         for (int i = lastFirst; i < lastFirst + lastCount && i < lastN; i++) {
@@ -236,11 +315,19 @@ public class BatteryChartView extends View {
         }
 
         long startT = endT - windowMs;
+        long visibleWindowMs = (long) (windowMs / Math.max(1f, viewZoom));
+        long visibleStartT = startT + panOffsetMs;
+        long visibleEndT = visibleStartT + visibleWindowMs;
+
         int first = n;
-        while (first > 0 && samples[first - 1].time >= startT) first--;
-        int count = n - first;
+        while (first > 0 && samples[first - 1].time >= visibleStartT) first--;
+        int count = 0;
+        int last = first;
+        while (last < n && samples[last].time <= visibleEndT) { last++; count++; }
+
         drawTimeLabels(canvas, padLeft, plotW, h, padBottom,
-                count >= 2 ? samples[first].time : startT, endT);
+                count >= 2 ? samples[first].time : visibleStartT,
+                count >= 2 ? samples[first + count - 1].time : visibleEndT);
         if (count < 2) {
             lastCount = 0;
             canvas.drawText("Belum ada data grafik", padLeft + plotW / 2f, h / 2f, emptyPaint);
@@ -261,8 +348,8 @@ public class BatteryChartView extends View {
         } else {
             float range = max - min;
             if (seriesType == SERIES_TEMP) {
-                if (max < 43f) max = 43f;
-                if (min < 33f) min = 33f;
+                if (max < 40f) max = 40f;
+                if (min < 35f) min = 35f;
                 if (min >= max) min = max - 1f;
             } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);
@@ -282,8 +369,8 @@ public class BatteryChartView extends View {
         canvas.drawText(fmt((min + max) / 2f), axisX, padTop + plotH / 2f + labelH / 3f, labelPaint);
         canvas.drawText(fmt(min), axisX, padTop + plotH, labelPaint);
 
-        float spanMs = Math.max(1f, endT - samples[first].time);
-        long baseT = samples[first].time;
+        float spanMs = Math.max(1f, visibleWindowMs);
+        long baseT = visibleStartT;
 
         lastPadLeft = padLeft;
         lastPlotW = plotW;
@@ -306,6 +393,7 @@ public class BatteryChartView extends View {
         if (seriesType == SERIES_TEMP) {
             // Garis Suhu: warna tiap segmen mengikuti nilai suhu titik datanya
             // (putih dingin ekstrem → ice blue → hijau → oranye → merah panas).
+            // Putuskan garis saat gap waktu > GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
             path.rewind();
             float prevX = padLeft + plotW * ((samples[first].time - baseT) / spanMs);
             float prevY = pointY(first, min, vRange, padTop, plotH);
@@ -313,6 +401,14 @@ public class BatteryChartView extends View {
                 int idx = first + k;
                 float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
                 float y = pointY(idx, min, vRange, padTop, plotH);
+                // Cek gap waktu antara titik sekarang dan sebelumnya
+                long gapMs = samples[idx].time - samples[idx - 1].time;
+                if (gapMs > GAP_THRESHOLD_MS) {
+                    // Putus garis: mulai path baru dari titik ini
+                    prevX = x;
+                    prevY = y;
+                    continue;
+                }
                 linePaint.setColor(tempColor(valueAt(idx - 1)));
                 canvas.drawLine(prevX, prevY, x, y, linePaint);
                 prevX = x;
@@ -324,6 +420,7 @@ public class BatteryChartView extends View {
         } else if (isStatusColored()) {
             // Garis Persentase/Tegangan/Arus diwarnai per segmen sesuai status baterai
             // titik data: hijau saat mengisi, merah saat tidak. Segmen transisi ikut run sebelumnya.
+            // Putuskan garis saat gap waktu > GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
             boolean charging = samples[first].isCharging();
             linePaint.setColor(lineColor(charging));
             path.rewind();
@@ -333,6 +430,19 @@ public class BatteryChartView extends View {
                 int idx = first + k;
                 float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
                 float y = pointY(idx, min, vRange, padTop, plotH);
+                // Cek gap waktu antara titik sekarang dan sebelumnya
+                long gapMs = samples[idx].time - samples[idx - 1].time;
+                if (gapMs > GAP_THRESHOLD_MS) {
+                    // Putus garis: gambar path saat ini lalu mulai baru
+                    canvas.drawPath(path, linePaint);
+                    path.rewind();
+                    path.moveTo(x, y);
+                    charging = samples[idx].isCharging();
+                    linePaint.setColor(lineColor(charging));
+                    lastX = x;
+                    lastY = y;
+                    continue;
+                }
                 path.lineTo(x, y);
                 lastX = x;
                 lastY = y;
@@ -346,12 +456,21 @@ public class BatteryChartView extends View {
                 }
             }
         } else {
+            // Garis default (Daya): putuskan saat gap waktu > GAP_THRESHOLD_MS
             path.rewind();
             boolean started = false;
             for (int k = 0; k < count; k++) {
                 int idx = first + k;
                 float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
                 float y = pointY(idx, min, vRange, padTop, plotH);
+                // Cek gap waktu antara titik sekarang dan sebelumnya
+                if (k > 0) {
+                    long gapMs = samples[idx].time - samples[idx - 1].time;
+                    if (gapMs > GAP_THRESHOLD_MS) {
+                        // Putus garis: tutup path lalu mulai baru
+                        started = false;
+                    }
+                }
                 if (!started) {
                     path.moveTo(x, y);
                     started = true;
@@ -499,7 +618,7 @@ public class BatteryChartView extends View {
         }
         canvas.drawCircle(x, y, dp(4), dotPaint);
 
-        String txt = fmt(valueAt(idx)) + " · " + activeTimeFormat().format(new Date(samples[idx].time));
+        String txt = fmt(valueAt(idx)) + " · " + timeCrosshairFormat.format(new Date(samples[idx].time));
         float tw = crosshairTextPaint.measureText(txt);
         float bw = tw + dp(14);
         float bh = dp(20);
@@ -514,17 +633,9 @@ public class BatteryChartView extends View {
                 by + bh / 2f - (fm.ascent + fm.descent) / 2f, crosshairTextPaint);
     }
 
-    private SimpleDateFormat activeTimeFormat() {
-        if (windowMs >= WINDOW_6H) return timeLongFormat;
-        if (windowMs >= WINDOW_1H) return timeMediumFormat;
-        return timeShortFormat;
-    }
-
     private void drawTimeLabels(Canvas canvas, float padLeft, float plotW, float h,
                                 float padBottom, long startT, long endT) {
-        SimpleDateFormat format = windowMs >= WINDOW_6H ? timeLongFormat
-                : windowMs >= WINDOW_1H ? timeMediumFormat
-                : timeShortFormat;
+        SimpleDateFormat format = timeLabelFormat;
         float y = h - padBottom / 2f + labelPaint.getTextSize() / 3f;
         labelPaint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText(format.format(new Date(startT)), padLeft, y, labelPaint);

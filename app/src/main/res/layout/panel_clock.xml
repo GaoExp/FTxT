@@ -86,6 +86,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <!-- Ukuran Tanggal -->
+                <TextView
+                    android:id="@+id/clockDateSizeLabel"
+                    android:text="Ukuran Tanggal: 10"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <SeekBar
+                    android:id="@+id/clockDateSizeSeekBar"
+                    android:max="100"
+                    android:progress="10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_marginTop="12dp"

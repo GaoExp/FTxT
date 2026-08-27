@@ -1,6 +1,6 @@
 # Fitur Tambahan dari Battery Guru & AccuBattery
 
-**Status:** Rencana — belum dikerjakan
+**Status:** Sebagian selesai (3 fitur di-[?]-tandai — kemungkinan ada masalah yang perlu dicek, 3 belum)
 **Tujuan:** Menambahkan beberapa fitur dari Battery Guru & AccuBattery ke FTxT: riwayat sesi pengisian, suhu min/max/avg per sesi, estimasi waktu pengisian/pengosongan, Activity Timeline Bar, dan Battery Usage by App.
 
 ---
@@ -286,9 +286,9 @@ Sistem     ███████████████████████
 
 ## 6. Status
 
-- [ ] Riwayat sesi pengisian
+- [?] Riwayat sesi pengisian
 - [ ] Suhu min/max/avg per sesi
-- [ ] Estimasi waktu pengisian & pengosongan
-- [ ] Activity Timeline Bar
+- [?] Estimasi waktu pengisian & pengosongan
+- [?] Activity Timeline Bar
 - [ ] Battery Usage by App
 - [ ] Backup & Restore Database

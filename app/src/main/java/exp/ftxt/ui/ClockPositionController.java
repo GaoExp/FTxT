@@ -61,6 +61,7 @@ public class ClockPositionController {
             p.posX = ClockConfig.posX;
             p.posY = ClockConfig.posY;
             p.size = ClockConfig.size;
+            p.dateSize = ClockConfig.dateSize;
             p.color = ClockConfig.color;
             p.shadow = PresetHandler.copyShadow(ClockConfig.shadow);
             p.bgEnabled = ClockConfig.bg.enabled;
@@ -79,6 +80,7 @@ public class ClockPositionController {
             ClockConfig.posX = p.posX;
             ClockConfig.posY = p.posY;
             ClockConfig.size = p.size;
+            if (p.dateSize > 0) ClockConfig.dateSize = p.dateSize;
             ClockConfig.color = p.color;
             if (p.shadow != null) {
                 ClockConfig.shadow.enabled = p.shadow.enabled;
@@ -108,6 +110,9 @@ public class ClockPositionController {
         public void syncToService() {
             FloatingService.updatePositionForModule(FloatingService.clockModule());
             FloatingService.updateSizeForModule(FloatingService.clockModule(), ClockConfig.size);
+            if (FloatingService.clockModule() != null) {
+                FloatingService.clockModule().updateDateSize(ClockConfig.dateSize);
+            }
             FloatingService.updateColorForModule(FloatingService.clockModule(), ClockConfig.color);
             FloatingService.updateShadowForModule(FloatingService.clockModule());
             FloatingService.updateBackgroundForModule(FloatingService.clockModule());

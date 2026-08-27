@@ -18,10 +18,11 @@ import java.util.ArrayList;
 public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "battery_history.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     private static final String T_SAMPLES = "samples";
     private static final String T_SESSIONS = "sessions";
+    private static final String T_ACTIVITY = "activity_log";
     private static final String T_META = "meta";
 
     private static volatile BatteryHistoryDb instance;
@@ -65,6 +66,12 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "mostly_screen_off INTEGER NOT NULL," +
                 "sample_count INTEGER NOT NULL)");
 
+        db.execSQL("CREATE TABLE " + T_ACTIVITY + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "time INTEGER NOT NULL," +
+                "status INTEGER NOT NULL)");
+        db.execSQL("CREATE INDEX idx_activity_time ON " + T_ACTIVITY + "(time)");
+
         db.execSQL("CREATE TABLE " + T_META + " (" +
                 "key TEXT PRIMARY KEY," +
                 "value TEXT)");
@@ -72,7 +79,13 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // versi 1 — belum ada upgrade
+        if (oldVersion < 2) {
+            db.execSQL("CREATE TABLE " + T_ACTIVITY + " (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "time INTEGER NOT NULL," +
+                    "status INTEGER NOT NULL)");
+            db.execSQL("CREATE INDEX idx_activity_time ON " + T_ACTIVITY + "(time)");
+        }
     }
 
     /** Baris sesi pengisian daya hasil estimasi. */
@@ -238,7 +251,126 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         return out.toArray(new BatteryReading.Snapshot[0]);
     }
 
-    // ---------- sesi pengisian ----------
+    // ---------- estimasi waktu ----------
+
+    /**
+     * Mengembalikan estimasi waktu (ms) hingga baterai penuh atau habis.
+     * Charging: rate dihitung dari 10 menit terakhir, lalu extrapolate ke 100%.
+     * Discharging: rate dihitung dari 30 menit terakhir, lalu extrapolate ke 0%.
+     * Mengembalikan -1 jika data tidak cukup.
+     */
+    public long estimateTimeRemaining(boolean charging) {
+        long now = System.currentTimeMillis();
+        long windowMs = charging ? 600_000L : 1_800_000L;
+        BatteryReading.Snapshot[] samples = query(now - windowMs, now, -1);
+        if (samples.length < 2) return -1;
+
+        long tFirst = samples[0].time;
+        long tLast = samples[samples.length - 1].time;
+        long dt = tLast - tFirst;
+        if (dt < 30_000L) return -1;
+
+        int pFirst = samples[0].percent;
+        int pLast = samples[samples.length - 1].percent;
+        double ratePerMs = (double) (pLast - pFirst) / dt;
+        if (Math.abs(ratePerMs) < 1e-9) return -1;
+
+        if (charging) {
+            int remaining = 100 - pLast;
+            if (remaining <= 0) return 0;
+            return (long) (remaining / ratePerMs);
+        } else {
+            if (pLast <= 0) return 0;
+            return (long) (pLast / -ratePerMs);
+        }
+    }
+
+    // ---------- riwayat sesi pengisian ----------
+
+    /** Hasil analisis satu sesi pengisian dari data sampel. */
+    public static final class ChargingSession {
+        public final long startTime;
+        public final long endTime;
+        public final int startPercent;
+        public final int endPercent;
+        public final long durationMs;
+        public final String pluggedType;
+
+        ChargingSession(long startTime, long endTime, int startPercent, int endPercent,
+                        long durationMs, String pluggedType) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+            this.startPercent = startPercent;
+            this.endPercent = endPercent;
+            this.durationMs = durationMs;
+            this.pluggedType = pluggedType;
+        }
+    }
+
+    /**
+     * Mengembalikan 5 sesi pengisian terakhir dari tabel sampel.
+     * Sesi = rangkaian sampel berurutan dengan status charging/full.
+     * Sesi baru dimulai setelah gap >15 menit tanpa data charging.
+     */
+    public ArrayList<ChargingSession> queryChargingSessions(int maxSessions) {
+        long now = System.currentTimeMillis();
+        long fromMs = now - 7L * 24 * 3600_000L;
+        BatteryReading.Snapshot[] all = query(fromMs, now, -1);
+        if (all.length < 2) return new ArrayList<>();
+
+        ArrayList<ChargingSession> sessions = new ArrayList<>();
+        long segStart = -1;
+        int segStartPercent = -1;
+        long segLastTime = -1;
+        int segLastPercent = -1;
+        String segPlugged = null;
+        long GAP_MS = 900_000L;
+
+        for (BatteryReading.Snapshot s : all) {
+            boolean charging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_CHARGING
+                    || s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL;
+            if (charging) {
+                if (segStart < 0) {
+                    segStart = s.time;
+                    segStartPercent = s.percent;
+                    segPlugged = pluggedLabel(s.pluggedInt);
+                }
+                segLastTime = s.time;
+                segLastPercent = s.percent;
+            } else {
+                if (segStart >= 0 && segLastPercent > segStartPercent) {
+                    sessions.add(new ChargingSession(
+                            segStart, segLastTime, segStartPercent, segLastPercent,
+                            segLastTime - segStart, segPlugged));
+                }
+                segStart = -1;
+                segStartPercent = -1;
+                segPlugged = null;
+            }
+        }
+        if (segStart >= 0 && segLastPercent > segStartPercent) {
+            sessions.add(new ChargingSession(
+                    segStart, segLastTime, segStartPercent, segLastPercent,
+                    segLastTime - segStart, segPlugged));
+        }
+
+        ArrayList<ChargingSession> result = new ArrayList<>();
+        for (int i = sessions.size() - 1; i >= 0 && result.size() < maxSessions; i--) {
+            result.add(sessions.get(i));
+        }
+        return result;
+    }
+
+    private static String pluggedLabel(int plugged) {
+        switch (plugged) {
+            case android.os.BatteryManager.BATTERY_PLUGGED_AC: return "AC";
+            case android.os.BatteryManager.BATTERY_PLUGGED_USB: return "USB";
+            case android.os.BatteryManager.BATTERY_PLUGGED_WIRELESS: return "Wireless";
+            default: return "";
+        }
+    }
+
+    // ---------- sesi pengisian (estimator) ----------
 
     public void insertSession(long time, float capacityMah, boolean mostlyScreenOff, int sampleCount) {
         ContentValues v = new ContentValues();
@@ -267,6 +399,42 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     public void deleteAllSessions() {
         getWritableDatabase().delete(T_SESSIONS, null, null);
+    }
+
+    // ---------- activity log ----------
+
+    public static final class ActivityLog {
+        public final long time;
+        public final int status;
+
+        public ActivityLog(long time, int status) {
+            this.time = time;
+            this.status = status;
+        }
+    }
+
+    public void insertActivityLog(long time, int status) {
+        ContentValues v = new ContentValues();
+        v.put("time", time);
+        v.put("status", status);
+        getWritableDatabase().insert(T_ACTIVITY, null, v);
+    }
+
+    /** Query activity log pada rentang [fromMs, toMs], urut waktu naik. */
+    public ArrayList<ActivityLog> queryActivityLog(long fromMs, long toMs) {
+        ArrayList<ActivityLog> out = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT time, status FROM " + T_ACTIVITY
+                        + " WHERE time >= ? AND time <= ? ORDER BY time ASC",
+                new String[]{String.valueOf(fromMs), String.valueOf(toMs)});
+        try {
+            while (c.moveToNext()) {
+                out.add(new ActivityLog(c.getLong(0), c.getInt(1)));
+            }
+        } finally {
+            c.close();
+        }
+        return out;
     }
 
     // ---------- meta ----------

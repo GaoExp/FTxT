@@ -57,6 +57,7 @@ public class MemoryModule implements OverlayModule {
         lastRenderedText = null;
         view.setShadowConfig(MemoryConfig.shadow);
         view.setTextSize(MemoryConfig.size);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
         updateDisplay();
 

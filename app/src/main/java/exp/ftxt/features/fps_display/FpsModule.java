@@ -74,6 +74,7 @@ public class FpsModule implements OverlayModule {
         view = new ShadowTextView(ctx);
         view.setShadowConfig(FpsConfig.shadow);
         view.setTextSize(FpsConfig.size);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
         updateDisplay();
 

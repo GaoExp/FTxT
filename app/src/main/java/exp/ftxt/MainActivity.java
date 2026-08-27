@@ -449,6 +449,8 @@ public class MainActivity extends AppCompatActivity {
         FpsConfig.posY = prefs.getFloat("fps_pos_y_port", 0.05f);
 
         ClockConfig.enabled = prefs.getBoolean("clock_enabled", false);
+        ClockConfig.size = prefs.getFloat("clock_size", 12f);
+        ClockConfig.dateSize = prefs.getFloat("clock_date_size", 10f);
         ClockConfig.color = prefs.getInt("clock_color", Color.GREEN);
         ClockConfig.shadow.enabled = prefs.getBoolean("clock_shadow_enabled", false);
         ClockConfig.shadow.color = prefs.getInt("clock_shadow_color", Color.BLACK);

@@ -98,6 +98,108 @@
 
                             <LinearLayout
                                 android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp">
+
+                                <View
+                                    android:layout_width="3dp"
+                                    android:layout_height="12dp"
+                                    android:background="@color/bat_monitor_header"/>
+
+                                <TextView
+                                    android:text="Aktivitas"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/bat_monitor_header"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"/>
+
+                            </LinearLayout>
+
+                            <exp.ftxt.shared.ui.BatteryTimelineBarView
+                                android:id="@+id/batTimelineBarView"
+                                android:layout_width="match_parent"
+                                android:layout_height="16dp"
+                                android:layout_marginTop="4dp"/>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp">
+
+                                <LinearLayout
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content">
+
+                                    <View
+                                        android:layout_width="8dp"
+                                        android:layout_height="8dp"
+                                        android:background="#3A3A3A"/>
+
+                                    <TextView
+                                        android:text="Mati"
+                                        android:textSize="9sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp">
+
+                                    <View
+                                        android:layout_width="8dp"
+                                        android:layout_height="8dp"
+                                        android:background="#7C4DFF"/>
+
+                                    <TextView
+                                        android:text="Aktif"
+                                        android:textSize="9sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"/>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp">
+
+                                    <View
+                                        android:layout_width="8dp"
+                                        android:layout_height="8dp"
+                                        android:background="#4CAF50"/>
+
+                                    <TextView
+                                        android:text="Charging"
+                                        android:textSize="9sp"
+                                        android:textColor="@color/bat_monitor_label"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="3dp"/>
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:orientation="horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp">
@@ -524,6 +626,16 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"/>
+
+                            <TextView
+                                android:id="@+id/batSessionHistoryText"
+                                android:textSize="11sp"
+                                android:typeface="monospace"
+                                android:lineSpacingExtra="2dp"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:visibility="gone"/>
 
                             <TextView
                                 android:id="@+id/batHealthDesignText"

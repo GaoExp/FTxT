@@ -6,6 +6,9 @@ import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.AbsoluteSizeSpan;
 import android.view.Gravity;
 import android.view.WindowManager;
 
@@ -63,6 +66,7 @@ public class ClockModule implements OverlayModule {
         view.setTextColor(ClockConfig.color);
         view.setLineSpacing(0, 0.85f);
         view.setIncludeFontPadding(false);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
 
         params = new WindowManager.LayoutParams(
@@ -114,6 +118,11 @@ public class ClockModule implements OverlayModule {
     public void updateSize(float size) {
         ClockConfig.size = size;
         if (view != null) view.setTextSize(size);
+    }
+
+    public void updateDateSize(float size) {
+        ClockConfig.dateSize = size;
+        if (view != null) view.setText(getCurrentTime());
     }
 
     @Override
@@ -265,11 +274,17 @@ public class ClockModule implements OverlayModule {
         }
     };
 
-    private String getCurrentTime() {
+    private CharSequence getCurrentTime() {
         String time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
         if (ClockConfig.showDate) {
             String date = new SimpleDateFormat("MMM dd EEE", Locale.ENGLISH).format(new Date());
-            return time + "\n" + date;
+            String text = time + "\n" + date;
+            SpannableString spannable = new SpannableString(text);
+            int dateStart = time.length() + 1;
+            int dateEnd = text.length();
+            int dateSizePx = (int) (ClockConfig.dateSize * context.getResources().getDisplayMetrics().scaledDensity);
+            spannable.setSpan(new AbsoluteSizeSpan(dateSizePx), dateStart, dateEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return spannable;
         }
         return time;
     }

@@ -63,6 +63,7 @@ public class NetworkModule implements OverlayModule {
         lastTimestamp = System.currentTimeMillis();
 
         view.setTextSize(NetworkConfig.size);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
         updateDisplay();
 

@@ -78,6 +78,7 @@ public class TextModule implements OverlayModule {
         view.setText(TextConfig.text);
         view.setTextSize(TextConfig.size);
         view.setTextColor(TextConfig.color);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
 
         params = new WindowManager.LayoutParams(

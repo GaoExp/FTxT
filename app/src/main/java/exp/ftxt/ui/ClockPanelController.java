@@ -23,6 +23,7 @@ public class ClockPanelController {
 
     private CheckBox clockSwitch;
     private SeekBar clockSizeSeekBar;
+    private SeekBar clockDateSizeSeekBar;
     private View clockColorPreview;
     private CheckBox clockShadowSwitch;
     private LinearLayout clockShadowConfigContainer;
@@ -41,7 +42,7 @@ public class ClockPanelController {
     private SeekBar clockBgOffsetYSeekBar;
     private SeekBar clockBgMarginSeekBar;
     private SeekBar clockBgRadiusSeekBar;
-    private TextView clockSizeLabel, clockBgPaddingLabel, clockBgOffsetXLabel, clockBgOffsetYLabel;
+    private TextView clockSizeLabel, clockDateSizeLabel, clockBgPaddingLabel, clockBgOffsetXLabel, clockBgOffsetYLabel;
     private TextView clockBgMarginLabel, clockBgRadiusLabel;
     private TextView clockShadowBlurLabel, clockShadowOffsetXLabel, clockShadowOffsetYLabel;
     private ClockPositionController clockPositionController;
@@ -76,6 +77,7 @@ public class ClockPanelController {
     private void bindViews(View rootView) {
         clockSwitch = rootView.findViewById(R.id.clockSwitch);
         clockSizeSeekBar = rootView.findViewById(R.id.clockSizeSeekBar);
+        clockDateSizeSeekBar = rootView.findViewById(R.id.clockDateSizeSeekBar);
         clockColorPreview = rootView.findViewById(R.id.clockColorPreview);
         clockShadowSwitch = rootView.findViewById(R.id.clockShadowSwitch);
         clockShadowConfigContainer = rootView.findViewById(R.id.shadowConfigClock);
@@ -95,6 +97,7 @@ public class ClockPanelController {
         clockBgMarginSeekBar = rootView.findViewById(R.id.clockBgMarginSeekBar);
         clockBgRadiusSeekBar = rootView.findViewById(R.id.clockBgRadiusSeekBar);
         clockSizeLabel = rootView.findViewById(R.id.clockSizeLabel);
+        clockDateSizeLabel = rootView.findViewById(R.id.clockDateSizeLabel);
         clockBgPaddingLabel = rootView.findViewById(R.id.clockBgPaddingLabel);
         clockBgOffsetXLabel = rootView.findViewById(R.id.clockBgOffsetXLabel);
         clockBgOffsetYLabel = rootView.findViewById(R.id.clockBgOffsetYLabel);
@@ -125,6 +128,7 @@ public class ClockPanelController {
         clockSwitch.setChecked(ClockConfig.enabled);
         activity.applyCheckboxTint(clockSwitch, ClockConfig.enabled);
         clockSizeSeekBar.setProgress((int) ClockConfig.size);
+        clockDateSizeSeekBar.setProgress((int) ClockConfig.dateSize);
         clockBgSwitch.setChecked(ClockConfig.bg.enabled);
         activity.applyCheckboxTint(clockBgSwitch, ClockConfig.bg.enabled);
         clockBgConfigContainer.setVisibility(ClockConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -145,6 +149,7 @@ public class ClockPanelController {
         activity.applyCheckboxTint(clockShowDateSwitch, ClockConfig.showDate);
         clockSafeArea.setChecked(ClockConfig.safeArea);
         clockSizeLabel.setText("Ukuran Teks: " + (int) ClockConfig.size);
+        clockDateSizeLabel.setText("Ukuran Tanggal: " + (int) ClockConfig.dateSize);
         clockColorPreview.setBackgroundColor(ClockConfig.color);
         clockBgPaddingLabel.setText("Ukuran Background: " + ClockConfig.bg.padding);
         clockBgOffsetXLabel.setText("Offset X: " + ClockConfig.bg.offsetX);
@@ -193,7 +198,25 @@ public class ClockPanelController {
                 if (progress > 200) { progress = 200; sb.setProgress(progress); }
                 ClockConfig.size = progress;
                 clockSizeLabel.setText("Ukuran Teks: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("clock_size", (float) progress).apply();
                 FloatingService.updateSizeForModule(FloatingService.clockModule(), ClockConfig.size);
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        clockDateSizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                if (progress < 6) { progress = 6; sb.setProgress(progress); }
+                if (progress > 100) { progress = 100; sb.setProgress(progress); }
+                ClockConfig.dateSize = progress;
+                clockDateSizeLabel.setText("Ukuran Tanggal: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("clock_date_size", (float) progress).apply();
+                if (FloatingService.clockModule() != null) {
+                    FloatingService.clockModule().updateDateSize(progress);
+                }
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
@@ -373,6 +396,8 @@ public class ClockPanelController {
 
         clockSizeLabel.setOnClickListener(v ->
                 SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", clockSizeSeekBar, 200, clockSizeLabel, "Ukuran Teks: "));
+        clockDateSizeLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Ukuran Tanggal", clockDateSizeSeekBar, 100, clockDateSizeLabel, "Ukuran Tanggal: "));
         clockBgPaddingLabel.setOnClickListener(v ->
                 SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", clockBgPaddingSeekBar, 80, clockBgPaddingLabel, "Ukuran Background: "));
         clockBgOffsetXLabel.setOnClickListener(v ->

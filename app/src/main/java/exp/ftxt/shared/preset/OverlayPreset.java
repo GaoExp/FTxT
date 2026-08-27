@@ -7,6 +7,7 @@ public class OverlayPreset {
     public float posX;
     public float posY;
     public float size;
+    public float dateSize;
 
     public int color;
 

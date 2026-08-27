@@ -58,6 +58,7 @@ public class BatteryStatsModule implements OverlayModule {
         view = new ShadowTextView(ctx);
         view.setShadowConfig(BatteryStatsConfig.shadow);
         view.setTextSize(BatteryStatsConfig.size);
+        view.setGravity(Gravity.CENTER_HORIZONTAL);
         applyBackground();
         updateDisplay();
 

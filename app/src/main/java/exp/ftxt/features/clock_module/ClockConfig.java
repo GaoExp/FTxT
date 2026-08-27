@@ -8,6 +8,7 @@ import exp.ftxt.shared.config.ShadowConfig;
 public class ClockConfig {
     public static boolean enabled = false;
     public static float size = 12f;
+    public static float dateSize = 10f;
     public static int color = Color.GREEN;
     public static ShadowConfig shadow = new ShadowConfig();
     public static BackgroundConfig bg = new BackgroundConfig(10);

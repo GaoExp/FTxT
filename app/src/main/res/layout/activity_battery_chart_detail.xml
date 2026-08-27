@@ -53,13 +53,45 @@
                 android:textColor="@color/bat_monitor_label"
                 android:layout_marginTop="2dp"/>
         </LinearLayout>
-    </LinearLayout>
 
-    <exp.ftxt.shared.ui.BatteryChartView
-        android:id="@+id/chartDetailView"
-        android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:layout_marginTop="8dp"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:id="@+id/radCrosshair"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tracker Grafik"
+                android:textSize="11sp"
+                android:textColor="@color/bat_monitor_label"
+                android:textStyle="bold"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <TextView
+                android:id="@+id/radPan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Geser Grafik"
+                android:textSize="11sp"
+                android:textColor="@color/bat_monitor_label"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"/>
+        </LinearLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -176,6 +208,25 @@
             android:thumbTint="@android:color/transparent"
             android:splitTrack="false"/>
     </FrameLayout>
+
+    <exp.ftxt.shared.ui.BatteryChartView
+        android:id="@+id/chartDetailView"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:layout_marginTop="8dp"/>
+
+    <SeekBar
+        android:id="@+id/chartDetailZoomSeek"
+        android:max="100"
+        android:progress="0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:progressTint="@color/bat_monitor_label"
+        android:progressBackgroundTint="@color/bat_slider_track"
+        android:thumbTint="@color/bat_slider_thumb"
+        android:splitTrack="false"/>
 
     <LinearLayout
         android:layout_width="match_parent"
