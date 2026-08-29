@@ -77,6 +77,12 @@ Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
 - Menulis isi/deskripsi entry per tahap kerja (hanya hasil akhir, lihat § 2.4).
 - Menggunakan waktu "saat menulis CHANGELOG" sebagai waktu section File.
 
+### 2.3b VersionCode naik saat entry diperbarui
+
+- **versionCode naik +1** setiap kali entry `***ONGOING***` diperbarui (ada perubahan poin/baris file pada iterasi tersebut).
+- **versionCode naik +1 lagi** setiap kali status judul berubah menjadi `***PUSH***` / `***RELEASE***`.
+- Yang dinaikkan **hanya versionCode**; versionName diatur aturannya sendiri (lihat § 4).
+
 ### 2.4 Isi entry (untuk pembaca user, bukan riwayat kerja)
 
 - **Satu perubahan = satu poin, tulis hasil akhir.** Jika dirombak berkali-kali, catat kondisi final saja.
@@ -85,9 +91,12 @@ Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
 - **Cek konsistensi** sebelum selesai: tidak boleh ada poin yang bertentangan/menduplikasi dalam satu entry.
 - **Merapikan entry lama** = jangan ubah fakta; hanya gabungkan poin yang saling menimpa atau hapus jejak iterasi yang obsolete.
 
-### 2.5 Entry yang di-merge
+### 2.5 Entry yang di-merge (tersimpan di old-CHANGELOG.md)
 
-Beberapa versi digabung dalam satu entry → section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **diabaikan** (tidak ditulis).
+- Versi yang di-merge **tidak lagi berada di CHANGELOG aktif** — keseluruhan isinya dipindah ke arsip **`old-CHANGELOG.md`** yang berada di `app/src/main/assets/` (dibaca dalam aplikasi di daftar Dokumentasi; **tidak ada salinannya di root**). Maka versi yang di-merge hanya ada di sana.
+- Saat proses merger/memindah ke arsip itulah section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **diabaikan (tidak ditulis)** — detail per-file tidak relevan lagi setelah versi dirangkum.
+- Jika kemudian ada perubahan yang menyangkut versi lama yang sudah di-merge, **edit langsung di `old-CHANGELOG.md`** (arsip di assets), bukan di CHANGELOG aktif.
+- ⚠️ **Penegasan §2.8:** dokumen di `app/src/main/assets/` umumnya ditimpa `syncDocs` saat build dan **jangan disentuh manual** — **kecuali diperintah secara eksplisit** (kasus khusus ini, edit `old-CHANGELOG.md` di assets, mengecualikan aturan itu).
 
 ### 2.6 Verifikasi waktu & status commit
 
@@ -103,6 +112,10 @@ Perubahan pada file ini tidak boleh muncul di entry manapun (baik baris file mau
 - **Dokumen root & kerja internal:** `AGENTS.md`, `README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md`, `_schedule/`, `_temp/`, `local.properties`.
 
 Konsekuensi: topik yang lahir dari file tersebut (bukn build/CI/signing/rilis, bump version, restrukturisasi internal/ganti import) juga tidak diumbar.
+
+### 2.8 Sumber dokumen = root (jangan sentuh assets)
+
+Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md`), **tidak perlu & jangan menyentuh** salinannya di `app/src/main/assets/`. Saat build, task `syncDocs` (`app/build.gradle`) otomatis menimpa `assets/` dari sumber root — mengubah `assets/` manual itu sia-sia (akan tertimpa) dan hanya membuang waktu.
 
 ---
 
@@ -125,9 +138,10 @@ Konsekuensi: topik yang lahir dari file tersebut (bukn build/CI/signing/rilis, b
 ### Edit Biasa
 1. Update kode — **saat tiap file selesai diedit**: ambil waktu WITA → tulis baris file ke CHANGELOG (atau simpan dulu waktunya bila belum bisa menulis).
 2. Rampungkan CHANGELOG entry berjalan — isi entry + semua baris section File **setelah seluruh perubahan file untuk iterasi selesai**; **tetapkan tanggal & jam judul di akhir**.
-3. Self-check hasil perubahan.
-4. **JANGAN commit / tag / push.**
-5. Ulang sampai user perintah commit/tag.
+3. Naikkan versionCode +1 saat entry diperbarui (lihat § 2.3b).
+4. Self-check hasil perubahan.
+5. **JANGAN commit / tag / push.**
+6. Ulang sampai user perintah commit/tag.
 
 ### Pre-release
 1. Periksa semua dokumen.
@@ -141,9 +155,9 @@ Konsekuensi: topik yang lahir dari file tersebut (bukn build/CI/signing/rilis, b
 4. **JANGAN push** — user menyusul.
 
 ### Setelah Push (langsung buat judul entry versi baru)
-1. versionCode +1.
+1. Ubah status judul → `***PUSH***` / `***RELEASE***` dan **naikkan versionCode +1** (lihat § 2.3b).
 2. versionName disesuaikan setelah ada perubahan.
-3. Ubah status judul → `***PUSH***` / `***RELEASE***`, perbarui tanggal & jam WITA saat itu.
+3. Perbarui tanggal & jam WITA saat itu.
 4. Buat entry CHANGELOG baru (teratas, `***ONGOING***`) di sesi kerja berikutnya.
 5. Kembali ke Edit Biasa.
 

@@ -1,6 +1,7 @@
 package exp.ftxt;
 
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -8,7 +9,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -25,6 +28,11 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.memory_stats.MemoryConfig;
@@ -43,6 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView debuggingUnlockBtn;
     private TextView debuggingRelockBtn;
     private Switch memorySidebarSwitch;
+    private TextView exportDbBtn;
 
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
     public static final String PREF_DEVELOPER_UNLOCKED = "developer_unlocked";
@@ -117,6 +126,9 @@ public class SettingsActivity extends AppCompatActivity {
         debuggingUnlockBtn = findViewById(R.id.debuggingUnlockBtn);
         debuggingRelockBtn = findViewById(R.id.debuggingRelockBtn);
         memorySidebarSwitch = findViewById(R.id.memorySidebarSwitch);
+
+        exportDbBtn = findViewById(R.id.exportDbBtn);
+        exportDbBtn.setOnClickListener(v -> exportDatabases());
 
         boolean developerUnlocked = prefs.getBoolean(PREF_DEVELOPER_UNLOCKED, false);
         boolean showDebugging = developerUnlocked && prefs.getBoolean("debugging_show_in_sidebar", false);
@@ -194,6 +206,7 @@ public class SettingsActivity extends AppCompatActivity {
         debuggingRelockBtn.setVisibility(unlocked ? android.view.View.VISIBLE : android.view.View.GONE);
         memorySidebarSwitch.setEnabled(unlocked);
         debuggingSidebarSwitch.setEnabled(unlocked);
+        exportDbBtn.setEnabled(unlocked);
     }
 
     private void turnOffMemoryPanel(SharedPreferences prefs) {
@@ -230,6 +243,67 @@ public class SettingsActivity extends AppCompatActivity {
         int altState = useAlt ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
         pm.setComponentEnabledSetting(def, defState, PackageManager.DONT_KILL_APP);
         pm.setComponentEnabledSetting(alt, altState, PackageManager.DONT_KILL_APP);
+    }
+
+    private void exportDatabases() {
+        File dbDir = getDatabasePath("ftxt_db").getParentFile();
+        if (dbDir == null || !dbDir.isDirectory()) {
+            Toast.makeText(this, "Folder database tidak ditemukan", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        File[] files = dbDir.listFiles();
+        if (files == null || files.length == 0) {
+            Toast.makeText(this, "Tidak ada database untuk diekstrak", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int ok = 0;
+        for (File f : files) {
+            if (f.isFile() && f.canRead() && f.length() > 0) {
+                if (copyDbToDocuments(f)) ok++;
+            }
+        }
+        Toast.makeText(this, ok > 0
+                        ? "Diekstrak " + ok + " file ke Documents/FTxT"
+                        : "Gagal mengekstrak database",
+                Toast.LENGTH_LONG).show();
+    }
+
+    private boolean copyDbToDocuments(File src) {
+        try {
+            String relPath = Environment.DIRECTORY_DOCUMENTS + "/FTxT/";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.MediaColumns.DISPLAY_NAME, src.getName());
+                values.put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream");
+                values.put(MediaStore.MediaColumns.RELATIVE_PATH, relPath);
+                Uri uri = getContentResolver().insert(
+                        MediaStore.Files.getContentUri("external"), values);
+                if (uri == null) return false;
+                try (OutputStream os = getContentResolver().openOutputStream(uri);
+                     FileInputStream is = new FileInputStream(src)) {
+                    if (os == null) return false;
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = is.read(buf)) > 0) os.write(buf, 0, n);
+                }
+                return true;
+            } else {
+                File dir = new File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOCUMENTS), "FTxT");
+                if (!dir.exists() && !dir.mkdirs()) return false;
+                File dst = new File(dir, src.getName());
+                try (FileInputStream is = new FileInputStream(src);
+                     FileOutputStream os = new FileOutputStream(dst)) {
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = is.read(buf)) > 0) os.write(buf, 0, n);
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private void updatePermissionSwitches() {

@@ -32,7 +32,9 @@ FTxT/
 │   │   └── build.gradle
 │   ├── color/                   ← Color picker + math + warna bersama
 │   │   └── build.gradle
-│   └── preset/                  ← Sistem preset
+│   ├── preset/                  ← Sistem preset
+│   │   └── build.gradle
+│   └── resource/                ← Sistem Resource Pack (font/reticle/logo custom)
 │       └── build.gradle
 │
 ├── features/                    ← FITUR-FITUR
@@ -151,6 +153,29 @@ Catatan: `features/color_picker/` tidak jadi module sendiri — isinya menyatu k
 - Drawable: `ic_star_filled.xml`, `ic_star_outline.xml`, `vertical_divider.xml`
 
 **Pemicu ekstraksi:** Sedang. `OverlayPreset` punya banyak field yang refer ke feature-specific data (battery bar fields, memory fields), tapi semua dalam bentuk primitive — tidak depend ke feature module.
+
+---
+
+### 3.4b `:shared:resource` — Sistem Resource Pack
+
+**Dependency internal:** `:shared:config`
+
+**Dependency dari module lain:** feature modules & `:app` (mengambil resource custom: font, reticle, logo). Resource pack dipakai **lintas fitur** — font dipakai semua overlay teks (floating-text, fps, clock, battery), reticle dipakai crosshair, logo untuk watermark — maka harus di shared, bukan feature module (aturan §4: feature tidak boleh depend feature lain).
+
+| File | Penjelasan |
+|------|-----------|
+| `ResourcePackManager.java` | Kelola import (ZIP → validasi → extract), dan akses resource tersimpan |
+| `ResourcePackDb.java` | Database SQLite metadata resource pack (nama, ukuran, tipe, tanggal import, lokasi, status aktif) — pola mengikuti `BatteryHistoryDb` |
+| `ResourcePackActivity.java` | UI kelola & import resource pack (daftar font/reticle/logo, pilih aktif, hapus, import) |
+
+**Resource:**
+- Layout: `activity_resource_pack.xml` + item list
+- Drawable: ikon import/hapus (reuse bila ada), thumbnail reticle
+- Manifest: intent filter ekstensi `.ffont`/`.frtc`/`.fimgl`/`.faddon` tetap terdaftar di `:app` (lihat §7 dokumen `RESOURCE_PACK_SYSTEM.md`)
+
+**Catatan integrasi tombol ekstrak DB:** tombol "Ekstrak Database" di `SettingsActivity` (`:app`) menyalin seluruh isi folder `databases/` tanpa menebak nama file, sehingga DB metadata `ResourcePackDb` ikut ter-backup otomatis.
+
+**Pemicu ekstraksi:** Baru (belum ada di `app/` — sedang dirancang di `_schedule/PRIORITAS/RESOURCE_PACK_SYSTEM.md`). Ditambah sebagai modul baru langsung di shared sejak awal agar lintas-fitur.
 
 ---
 
@@ -299,6 +324,7 @@ features/<name>/
 │       └── :shared:preset
 ├── :feature:battery          ← BatteryMonitorService di-start dari :app (bukan lewat core)
 └── Semua :shared:*
+    └── :shared:resource      ← dipakai feature modules (font/reticle/logo) & :app (menu kelola)
 ```
 
 **Aturan penting:**
@@ -364,6 +390,18 @@ Eksekusi dilakukan **satu module per iterasi**: kerjakan satu fase sampai tuntas
 - [ ] Test: build harus berhasil
 
 **Risiko:** Sedang. `OverlayPreset` punya banyak field tapi semuanya primitive.
+
+### Fase 4b: `:shared:resource` (Baru — dibangun dari nol, bukan ekstraksi)
+
+- [ ] Buat folder `shared/resource/` + `build.gradle`
+- [ ] Buat `ResourcePackManager.java` (ZIP → validasi → extract)
+- [ ] Buat `ResourcePackDb.java` (metadata — pola `BatteryHistoryDb`)
+- [ ] Buat `ResourcePackActivity.java` + layout (UI kelola & import)
+- [ ] Tambah intent filter ekstensi `.ffont`/`.frtc`/`.fimgl`/`.faddon` di Manifest `:app`
+- [ ] Integrasi font ke overlay teks & reticle ke crosshair
+- [ ] Test: import + pakai resource berfungsi
+
+**Risiko:** Sedang. Modul baru lintas-fitur; validasi ZIP & integrasi overlay adalah titik rawan.
 
 ### Fase 5: Feature Modules (satu per satu)
 
@@ -490,12 +528,13 @@ Urutan ekstraksi berdasarkan kompleksitas:
 |------|----------|------------|
 | Fase 0: Persiapan | 15 menit | Setup build files |
 | Fase 1-4: Shared modules | 1-2 jam | Relatif straightforward |
+| Fase 4b: `:shared:resource` | 7-12 jam | Baru dari nol (import/validasi ZIP + UI + integrasi font/reticle) — mengikuti `RESOURCE_PACK_SYSTEM.md`; bisa dikerjakan parsial |
 | Fase 5: Feature modules | 3-4 jam | Repetitive tapi many files; battery membengkak sejak v4.88 (±25 file) |
 | Fase 6: Core service | 30-60 menit | Paling tricky |
 | Fase 7: App cleanup | 30 menit | Sisa file |
 | Fase 8: Optimasi | 30 menit | Setup shared config |
 | Fase 9: Testing | 1-2 jam | Test semua fitur |
-| **Total** | **6-9 jam** | Tergantung kompleksitas debug |
+| **Total** | **13-21 jam** | Tergantung kompleksitas debug; Fase 4b dominan |
 
 ---
 

@@ -46,6 +46,10 @@ public class BatteryCapacityEstimator {
     private static long lastSampleTime = -1L;
     private static double accumulatedChargeMah = 0.0;
     private static int lastCurrentMa = 0;
+    private static float segTempMin = Float.MAX_VALUE;
+    private static float segTempMax = Float.MIN_VALUE;
+    private static double segTempSum;
+    private static int segTempCount;
 
     private BatteryCapacityEstimator() {}
 
@@ -84,6 +88,10 @@ public class BatteryCapacityEstimator {
             segmentTotalMs = 0;
             segmentSamples = 0;
             accumulatedChargeMah = 0.0;
+            segTempMin = s.tempC;
+            segTempMax = s.tempC;
+            segTempSum = 0;
+            segTempCount = 0;
         } else {
             segmentTotalMs += deltaMs;
             if (deltaMs > 0 && isScreenOn()) segmentScreenOnMs += deltaMs;
@@ -93,6 +101,12 @@ public class BatteryCapacityEstimator {
                 if (absMa > 0) {
                     accumulatedChargeMah += absMa * (deltaMs / 3600000.0);
                 }
+            }
+            if (s.tempC > 0f) {
+                segTempSum += s.tempC;
+                segTempCount++;
+                if (s.tempC < segTempMin) segTempMin = s.tempC;
+                if (s.tempC > segTempMax) segTempMax = s.tempC;
             }
         }
         lastChargeMah = s.chargeMah;
@@ -155,10 +169,24 @@ public class BatteryCapacityEstimator {
             if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) return;
             boolean screenOffDominant = segmentScreenOnMs * 2 < segmentTotalMs;
             int samples = Math.max(segmentSamples, 1);
-            BatteryHistoryDb.get(appContext).insertSession(
-                    System.currentTimeMillis(), estimate, screenOffDominant, samples);
-            sessions.add(new BatteryHistoryDb.SessionRow(
-                    System.currentTimeMillis(), estimate, screenOffDominant, samples));
+            long now = System.currentTimeMillis();
+            long endMs = lastSampleTime > 0 ? lastSampleTime : now;
+            double deltaChargeMah = 0d;
+            if (segmentStartChargeMah > 0 && lastChargeMah > 0) {
+                deltaChargeMah = (double) (lastChargeMah - segmentStartChargeMah);
+            }
+            double mAhCounter = Math.max(0d, deltaChargeMah);
+            float tempMin = segTempMin == Float.MAX_VALUE ? 0f : segTempMin;
+            float tempMax = segTempMax == Float.MIN_VALUE ? 0f : segTempMax;
+            float tempAvg = segTempCount > 0
+                    ? (float) (segTempSum / segTempCount) : 0f;
+            BatteryHistoryDb.SessionRow row = new BatteryHistoryDb.SessionRow(
+                    now, estimate, screenOffDominant, samples,
+                    segmentStartMs, endMs, segmentStartPercent, endPercent,
+                    mAhCounter, accumulatedChargeMah, deltaChargeMah,
+                    tempMin, tempMax, tempAvg);
+            BatteryHistoryDb.get(appContext).insertSessionFull(row);
+            sessions.add(row);
         } finally {
             segmentStartChargeMah = -1L;
             segmentStartPercent = -1;
@@ -167,6 +195,10 @@ public class BatteryCapacityEstimator {
             segmentSamples = 0;
             segmentStartMs = 0;
             accumulatedChargeMah = 0.0;
+            segTempMin = Float.MAX_VALUE;
+            segTempMax = Float.MIN_VALUE;
+            segTempSum = 0;
+            segTempCount = 0;
         }
     }
 

@@ -15,13 +15,12 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
-import exp.ftxt.features.battery_stats.BatteryHistoryDb;
+import exp.ftxt.shared.ui.InfoTooltip;
 
 public class BatteryHealthCardController {
 
@@ -30,24 +29,29 @@ public class BatteryHealthCardController {
     private TextView batHealthText;
     private TextView batHealthDesignText;
     private TextView batHealthSessionBadge;
-    private TextView batSessionHistoryText;
     private View batHealthResetButton;
     private int monitorLabelColor;
-    private long lastSessionQueryTime = 0;
-    private static final long SESSION_CACHE_MS = 30_000L;
 
     public BatteryHealthCardController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
         batHealthDesignText.setOnClickListener(v -> showDesignCapacityDialog());
         batHealthResetButton.setOnClickListener(v -> showResetConfirmDialog());
+        rootView.findViewById(R.id.batHealthInfoButton)
+                .setOnClickListener(v -> InfoTooltip.show(activity, v,
+                        "Kesehatan Baterai",
+                        "Estimasi kapasitas = perkiraan kapasitas penuh baterai, "
+                                + "dihitung dari segmen pengisian (memakai integrasi arus I), "
+                                + "diagregasi median lintas sesi valid.\n\n"
+                                + "Skor kesehatan = estimasi ÷ kapasitas desain. "
+                                + "Isi kapasitas desain (mAh) sesuai spesifikasi pabrik "
+                                + "agar skor muncul."));
     }
 
     private void bindViews(View rootView) {
         batHealthText = rootView.findViewById(R.id.batHealthText);
         batHealthDesignText = rootView.findViewById(R.id.batHealthDesignText);
         batHealthSessionBadge = rootView.findViewById(R.id.batHealthSessionBadge);
-        batSessionHistoryText = rootView.findViewById(R.id.batSessionHistoryText);
         batHealthResetButton = rootView.findViewById(R.id.batHealthResetButton);
         monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
     }
@@ -57,8 +61,8 @@ public class BatteryHealthCardController {
         BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
-        appendLineColored(sb, "Estimasi Kapasitas",
-                r.medianMah > 0 ? String.format(Locale.US, "%.0f mAh", r.medianMah) : "—", null);
+        appendLineColored(sb, "Kapasitas", r.medianMah > 0
+                ? String.format(Locale.US, "≈ %.0f mAh", r.medianMah) : "—", null);
 
         int scoreColor;
         String score;
@@ -76,7 +80,7 @@ public class BatteryHealthCardController {
         }
         appendLineColored(sb, "Skor Kesehatan", score, scoreColor);
 
-        appendLineColored(sb, "Sesi Tercatat", String.valueOf(r.sessionCount), null);
+        appendLineColored(sb, "Sesi Estimasi", String.valueOf(r.sessionCount), null);
         String confidence = r.totalSamples > 0
                 ? (r.fromScreenOffSessions
                         ? r.totalSamples + " sampel (layar mati)"
@@ -93,12 +97,10 @@ public class BatteryHealthCardController {
                 collecting ? activity.getColor(R.color.bat_monitor_active) : monitorLabelColor);
 
         batHealthText.setText(sb);
-        batHealthSessionBadge.setText(r.sessionCount + " sesi");
+        batHealthSessionBadge.setText(r.sessionCount + " sesi valid");
         batHealthDesignText.setText(r.designMah > 0
                 ? "Kapasitas Desain: " + r.designMah + " mAh · Ketuk untuk mengatur"
                 : "Kapasitas Desain: Belum diatur · Ketuk untuk mengatur");
-
-        refreshSessionHistory();
     }
 
     private void appendLineColored(SpannableStringBuilder sb, String label, String value, Integer valueColor) {
@@ -111,41 +113,6 @@ public class BatteryHealthCardController {
             sb.setSpan(new ForegroundColorSpan(valueColor),
                     start + padded.length(), sb.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-    }
-
-    private void refreshSessionHistory() {
-        if (batSessionHistoryText == null) return;
-        long now = System.currentTimeMillis();
-        if (now - lastSessionQueryTime < SESSION_CACHE_MS && batSessionHistoryText.getText().length() > 0) {
-            return;
-        }
-        lastSessionQueryTime = now;
-        ArrayList<BatteryHistoryDb.ChargingSession> sessions =
-                BatteryHistoryDb.get(activity).queryChargingSessions(5);
-        if (sessions.isEmpty()) {
-            batSessionHistoryText.setVisibility(View.GONE);
-            return;
-        }
-        SpannableStringBuilder sb = new SpannableStringBuilder();
-        String header = String.format(Locale.US, "%-16s  %-5s  %-7s  %s\n",
-                "Waktu", "Dur.", "Delta", "Colokan");
-        int hStart = sb.length();
-        sb.append(header);
-        sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
-                hStart, sb.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MM/dd HH:mm", Locale.US);
-        for (BatteryHistoryDb.ChargingSession cs : sessions) {
-            String startStr = sdf.format(new java.util.Date(cs.startTime));
-            String endStr = sdf.format(new java.util.Date(cs.endTime));
-            String dur = BatteryMonitorTabController.formatDuration(cs.durationMs);
-            String delta = cs.startPercent + "→" + cs.endPercent + "%";
-            String line = String.format(Locale.US, "%s–%s  %-5s  %-7s  %s\n",
-                    startStr, endStr, dur, delta, cs.pluggedType);
-            sb.append(line);
-        }
-        batSessionHistoryText.setText(sb);
-        batSessionHistoryText.setVisibility(View.VISIBLE);
     }
 
     private void showDesignCapacityDialog() {

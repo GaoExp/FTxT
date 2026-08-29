@@ -32,6 +32,7 @@ public class BatteryMonitor {
                     final BatteryReading.Snapshot s = BatteryReading.read(appContext);
                     BatteryHistoryDb.get(appContext).insertSample(s);
                     BatteryCapacityEstimator.onSample(s);
+                    DischargeTracker.onSample(s);
 
                     int activityStatus;
                     if (s.isCharging()) {
@@ -69,6 +70,7 @@ public class BatteryMonitor {
         appContext = context != null ? context.getApplicationContext() : appContext;
         if (appContext == null) return;
         BatteryCapacityEstimator.init(appContext);
+        DischargeTracker.init(appContext);
         running = true;
         lastSnapshot = BatteryReading.Snapshot.empty();
         lastActivityStatus = -1;
@@ -82,6 +84,7 @@ public class BatteryMonitor {
         running = false;
         mainHandler.removeCallbacks(tick);
         BatteryCapacityEstimator.onMonitoringStopped();
+        DischargeTracker.onMonitoringStopped();
         if (bgThread != null) {
             bgThread.quitSafely();
             bgThread = null;

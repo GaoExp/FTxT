@@ -34,6 +34,7 @@
     <color name="bat_monitor_hot">#E53935</color>
     <color name="bat_monitor_cold">#1E88E5</color>
     <color name="bat_monitor_stroke">#1F8E8E93</color>
+    <color name="bat_badge_active_bg">#1A34C759</color>
     <color name="bat_badge_stopped_bg">#1A8E8E93</color>
 
     <!-- Battery Chart -->

@@ -223,6 +223,18 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/exportDbBtn"
+            android:text="Ekstrak Database ke Documents/FTxT"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3"
+            android:gravity="center"
+            android:padding="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"/>
+
     </LinearLayout>
 
     </ScrollView>

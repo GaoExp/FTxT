@@ -17,6 +17,11 @@
         <item name="android:popupAnimationStyle">@style/SettingsPopupAnimation</item>
     </style>
 
+    <style name="TooltipFadeAnimation" parent="android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/tooltip_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/tooltip_fade_out</item>
+    </style>
+
     <style name="BatNavActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@android:color/transparent</item>
     </style>
