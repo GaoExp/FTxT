@@ -54,7 +54,8 @@ public final class CrashLogger {
             pw.flush();
             String content = sw.toString();
 
-            String fileName = "FTxT_crash_" + System.currentTimeMillis() + ".txt";
+            String fileName = "FTxT_crash_" + new SimpleDateFormat(
+                    "yyyyMMddHHmmss", Locale.getDefault()).format(new Date()) + ".txt";
             writeToDownload(ctx, content, fileName);
 
             ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
@@ -68,17 +69,17 @@ public final class CrashLogger {
             ContentValues values = new ContentValues();
             values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
             values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS + "/FTxT/Log_Crash/");
             Uri uri = ctx.getContentResolver().insert(
-                    MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                    MediaStore.Files.getContentUri("external"), values);
             if (uri == null) return;
             try (OutputStream os = ctx.getContentResolver().openOutputStream(uri)) {
                 if (os == null) return;
                 os.write(content.getBytes("UTF-8"));
             }
         } else {
-            File dir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS);
+            File dir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS), "FTxT/Log_Crash");
             if (!dir.exists()) dir.mkdirs();
             File file = new File(dir, fileName);
             try (FileOutputStream fos = new FileOutputStream(file)) {

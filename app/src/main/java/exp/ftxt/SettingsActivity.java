@@ -263,14 +263,14 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
         Toast.makeText(this, ok > 0
-                        ? "Diekstrak " + ok + " file ke Documents/FTxT"
+                        ? "Diekstrak " + ok + " file ke Documents/FTxT/extract/db"
                         : "Gagal mengekstrak database",
                 Toast.LENGTH_LONG).show();
     }
 
     private boolean copyDbToDocuments(File src) {
         try {
-            String relPath = Environment.DIRECTORY_DOCUMENTS + "/FTxT/";
+            String relPath = Environment.DIRECTORY_DOCUMENTS + "/FTxT/extract/db/";
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.MediaColumns.DISPLAY_NAME, src.getName());
@@ -289,7 +289,7 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             } else {
                 File dir = new File(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOCUMENTS), "FTxT");
+                        Environment.DIRECTORY_DOCUMENTS), "FTxT/extract/db");
                 if (!dir.exists() && !dir.mkdirs()) return false;
                 File dst = new File(dir, src.getName());
                 try (FileInputStream is = new FileInputStream(src);

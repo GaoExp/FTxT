@@ -43,8 +43,10 @@ public class BatterySnapshotExporter {
         sb.append("Status          : ").append(BatteryMonitorTabController.shortChargingStatus(s)).append("\n\n");
         sb.append("Metrik Real-Time\n").append(combineMetricColumns());
         sb.append("\n\nKesehatan Baterai\n");
-        sb.append("Estimasi Kapasitas : ").append(healthMedianText(h)).append("\n");
-        sb.append("Skor Kesehatan     : ").append(healthScoreText(h)).append("\n");
+        sb.append("Kapasitas Pengisian  : ").append(healthMedianText(h.chargeMedianMah)).append("\n");
+        sb.append("Kapasitas Pengosongan: ").append(healthMedianText(h.dischargeMedianMah)).append("\n");
+        sb.append("Kapasitas Gabungan   : ").append(healthMedianText(h.medianMah)).append("\n");
+        sb.append("Skor Kesehatan       : ").append(healthScoreText(h)).append("\n");
         sb.append("Sesi Tercatat      : ").append(h.sessionCount).append("\n");
         sb.append("Keyakinan          : ").append(healthConfidenceText(h)).append("\n");
         ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
@@ -53,8 +55,8 @@ public class BatterySnapshotExporter {
         Toast.makeText(activity, "Disalin ke clipboard", Toast.LENGTH_SHORT).show();
     }
 
-    private String healthMedianText(BatteryCapacityEstimator.HealthResult r) {
-        return r.medianMah > 0 ? String.format(Locale.US, "%.0f mAh", r.medianMah) : "—";
+    private String healthMedianText(float mah) {
+        return mah > 0 ? String.format(Locale.US, "%.0f mAh", mah) : "—";
     }
 
     private String healthScoreText(BatteryCapacityEstimator.HealthResult r) {
@@ -89,7 +91,9 @@ public class BatterySnapshotExporter {
         sb.append("Ekspor: ").append(exportTime).append("\n");
         sb.append("Jumlah snapshot: ").append(history.length).append("\n\n");
         sb.append("=== Kesehatan Baterai ===\n");
-        sb.append("Estimasi Kapasitas : ").append(healthMedianText(health)).append("\n");
+        sb.append("Kapasitas Pengisian  : ").append(healthMedianText(health.chargeMedianMah)).append("\n");
+        sb.append("Kapasitas Pengosongan: ").append(healthMedianText(health.dischargeMedianMah)).append("\n");
+        sb.append("Kapasitas Gabungan   : ").append(healthMedianText(health.medianMah)).append("\n");
         String scoreText = healthScoreText(health);
         if (health.designMah > 0 && health.medianMah > 0) {
             scoreText += " (kapasitas desain " + health.designMah + " mAh)";

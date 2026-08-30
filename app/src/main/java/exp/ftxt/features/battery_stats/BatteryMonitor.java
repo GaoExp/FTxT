@@ -71,6 +71,8 @@ public class BatteryMonitor {
         if (appContext == null) return;
         BatteryCapacityEstimator.init(appContext);
         DischargeTracker.init(appContext);
+        BatteryCapacityEstimator.rebuildPendingSessions();
+        DischargeTracker.rebuildPendingSessions();
         running = true;
         lastSnapshot = BatteryReading.Snapshot.empty();
         lastActivityStatus = -1;

@@ -22,7 +22,12 @@ public class BatteryCapacityEstimator {
     private static final long MIN_SEGMENT_MS = 60_000L;
 
     public static class HealthResult {
+        /** Median gabungan (pengisian + pengosongan) — sumber skor kesehatan. */
         public float medianMah = -1f;
+        /** Median hanya dari segmen pengisian; -1 bila belum ada sesi valid. */
+        public float chargeMedianMah = -1f;
+        /** Median hanya dari segmen pengosongan; -1 bila belum ada sesi valid. */
+        public float dischargeMedianMah = -1f;
         public int designMah = 0;
         public int sessionCount = 0;
         public long totalSamples = 0;
@@ -33,6 +38,9 @@ public class BatteryCapacityEstimator {
     private static boolean loaded = false;
     private static int designMah = 0;
     private static final ArrayList<BatteryHistoryDb.SessionRow> sessions = new ArrayList<>();
+
+    private static long healthCacheUntil = 0L;
+    private static HealthResult healthCache;
 
     private static boolean segmentActive = false;
     private static long segmentStartMs;
@@ -124,22 +132,115 @@ public class BatteryCapacityEstimator {
     }
 
     public static synchronized HealthResult getResult() {
+        long now = System.currentTimeMillis();
+        if (healthCache != null && now < healthCacheUntil) return healthCache;
+
+        HealthResult r = reconstructFromSamples(now);
+        if (r == null) r = fallbackFromSessions();
+
+        healthCache = r;
+        healthCacheUntil = now + 60_000L;
+        return r;
+    }
+
+    /**
+     * Estimasi kapasitas dari data mentah samples (sumber kebenaran, §7).
+     * Rekonstruksi segmen pengisian & pengosongan → kapasitas = mAh integral ÷ Δ% × 100.
+     * Segmen pendek/ekstrem dibuang (Δ% ≥ 5, durasi ≥ 1 menit). Mengembalikan
+     * null bila belum ada segmen valid sehingga tidak mengganggu fallback.
+     */
+    private static HealthResult reconstructFromSamples(long now) {
+        if (appContext == null || !loaded) return null;
+        int design = designMah;
+
+        HealthResult r = new HealthResult();
+        r.designMah = design;
+
+        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        long span = 7L * 24 * 3600_000L;
+        BatteryReading.Snapshot[] asc;
+        try {
+            asc = db.querySamples(now - span);
+        } catch (Exception e) {
+            return null;
+        }
+        if (asc == null || asc.length == 0) return null;
+
+        BatteryReading.Snapshot[] desc = SessionSegmentBuilder.toDesc(asc);
+        ArrayList<SessionSegmentBuilder.Segment> segments =
+                SessionSegmentBuilder.buildSegments(desc);
+
+        ArrayList<Float> chargeEstimates = new ArrayList<>();
+        ArrayList<Float> dischargeEstimates = new ArrayList<>();
+        ArrayList<Float> combinedEstimates = new ArrayList<>();
+        int validSamples = 0;
+        int screenOffCount = 0;
+        for (SessionSegmentBuilder.Segment seg : segments) {
+            if (seg.direction == SessionSegmentBuilder.Direction.FLAT) continue;
+            float dPercent = Math.abs(seg.endPercent - seg.startPercent);
+            if (dPercent < MIN_DELTA_PERCENT) continue;
+            if (seg.durationMs() < MIN_SEGMENT_MS) continue;
+            if (seg.mAhIntegral <= 0) continue;
+            float estimate = (float) (seg.mAhIntegral * 100.0 / dPercent);
+            if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) continue;
+            combinedEstimates.add(estimate);
+            if (seg.direction == SessionSegmentBuilder.Direction.CHARGE) {
+                chargeEstimates.add(estimate);
+            } else {
+                dischargeEstimates.add(estimate);
+            }
+            validSamples += seg.sampleCount;
+            if (seg.screenOnMs * 2 < seg.durationMs()) screenOffCount++;
+        }
+        if (combinedEstimates.isEmpty()) return null;
+
+        r.sessionCount = combinedEstimates.size();
+        r.totalSamples = validSamples;
+        r.medianMah = median(combinedEstimates);
+        r.chargeMedianMah = chargeEstimates.isEmpty() ? -1f : median(chargeEstimates);
+        r.dischargeMedianMah = dischargeEstimates.isEmpty() ? -1f : median(dischargeEstimates);
+        r.fromScreenOffSessions = screenOffCount * 2 >= combinedEstimates.size();
+        return r;
+    }
+
+    /** Fallback: bila belum ada segmen valid dari samples, pakai tabel sessions & discharge_sessions. */
+    private static HealthResult fallbackFromSessions() {
         HealthResult r = new HealthResult();
         r.designMah = designMah;
-        r.sessionCount = sessions.size();
-        for (BatteryHistoryDb.SessionRow sn : sessions) r.totalSamples += sn.sampleCount;
 
+        ArrayList<Float> chargePool = new ArrayList<>();
+        ArrayList<Float> dischargePool = new ArrayList<>();
         ArrayList<Float> offPool = new ArrayList<>();
         for (BatteryHistoryDb.SessionRow sn : sessions) {
+            if (sn.capacityMah <= 0f) continue;
+            chargePool.add(sn.capacityMah);
+            r.totalSamples += sn.sampleCount;
             if (sn.mostlyScreenOff) offPool.add(sn.capacityMah);
         }
+        try {
+            BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+            for (BatteryHistoryDb.DischargeSession d : db.queryDischargeSessions(0L, Long.MAX_VALUE)) {
+                float dPercent = d.startPercent - d.endPercent;
+                if (dPercent < MIN_DELTA_PERCENT) continue;
+                if (d.usedMahIntegral <= 0) continue;
+                float estimate = (float) (d.usedMahIntegral * 100.0 / dPercent);
+                if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) continue;
+                dischargePool.add(estimate);
+                r.totalSamples += d.sampleCount;
+                if (d.screenOffDominant) offPool.add(estimate);
+            }
+        } catch (Exception ignored) {}
+
+        ArrayList<Float> combinedPool = new ArrayList<>(chargePool);
+        combinedPool.addAll(dischargePool);
+        r.sessionCount = combinedPool.size();
+        r.chargeMedianMah = chargePool.isEmpty() ? -1f : median(chargePool);
+        r.dischargeMedianMah = dischargePool.isEmpty() ? -1f : median(dischargePool);
         if (offPool.size() >= 3) {
             r.medianMah = median(offPool);
             r.fromScreenOffSessions = true;
-        } else if (!sessions.isEmpty()) {
-            ArrayList<Float> all = new ArrayList<>();
-            for (BatteryHistoryDb.SessionRow sn : sessions) all.add(sn.capacityMah);
-            r.medianMah = median(all);
+        } else if (!combinedPool.isEmpty()) {
+            r.medianMah = median(combinedPool);
             r.fromScreenOffSessions = false;
         }
         return r;
@@ -153,7 +254,10 @@ public class BatteryCapacityEstimator {
 
     public static synchronized void resetEstimationData() {
         sessions.clear();
-        BatteryHistoryDb.get(appContext).deleteAllSessions();
+        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        db.deleteAllSessions();
+        db.deleteAllDischargeSessions();
+        healthCache = null;
     }
 
     private static void finishSegment(int endPercent) {
@@ -228,6 +332,86 @@ public class BatteryCapacityEstimator {
         }
         sessions.clear();
         sessions.addAll(db.getSessions());
+    }
+
+    /**
+     * Rekonstruksi segmen pengisian yang belum sempat tersimpan saat proses
+     * dibunuh (§7.6 — Solusi A). Dipanggil dari {@code BatteryMonitor.start()}.
+     * Sesi yang benar-benar berakhir saat proses mati di-INSERT (dedup dengan
+     * endTime > sesi terakhir tersimpan); sesi yang masih berjalan disambungkan
+     * ke state live agar akumulasi berlanjut. Tidak dobel: segmen yang masih
+     * berjalan belum pernah tersimpan, dan segmen lama yang overlap diabaikan.
+     */
+    public static synchronized void rebuildPendingSessions() {
+        if (appContext == null || !loaded) return;
+        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        long lastEnd = db.lastChargeSessionEnd();
+        long now = System.currentTimeMillis();
+        long from = now - 24L * 3600_000L;
+
+        BatteryReading.Snapshot[] asc;
+        try {
+            asc = db.querySamples(from);
+        } catch (Exception e) {
+            return;
+        }
+        if (asc == null || asc.length == 0) return;
+
+        BatteryReading.Snapshot[] desc = SessionSegmentBuilder.toDesc(asc);
+        SessionSegmentBuilder.ScreenOnOracle oracle = db.screenOnOracle(from, now);
+        ArrayList<SessionSegmentBuilder.Segment> segs =
+                SessionSegmentBuilder.buildSegments(desc, SessionSegmentBuilder.WINDOW_MS,
+                        SessionSegmentBuilder.SESSION_GAP_MS, oracle);
+        if (segs.isEmpty()) return;
+
+        if (lastEnd > 0) {
+            for (int k = 0; k < segs.size() - 1; k++) {
+                SessionSegmentBuilder.Segment seg = segs.get(k);
+                if (seg.direction != SessionSegmentBuilder.Direction.CHARGE) continue;
+                if (seg.endTime <= lastEnd) continue;
+                float dPercent = seg.endPercent - seg.startPercent;
+                if (dPercent < MIN_DELTA_PERCENT) continue;
+                if (seg.durationMs() < MIN_SEGMENT_MS) continue;
+                if (seg.mAhIntegral <= 0) continue;
+                float estimate = (float) (seg.mAhIntegral * 100.0 / dPercent);
+                if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) continue;
+                db.insertSessionFull(segmentToRow(seg, estimate));
+            }
+        }
+
+        SessionSegmentBuilder.Segment last = segs.get(segs.size() - 1);
+        if (last.direction == SessionSegmentBuilder.Direction.CHARGE) {
+            setActiveSegment(last);
+        }
+    }
+
+    private static void setActiveSegment(SessionSegmentBuilder.Segment seg) {
+        segmentActive = true;
+        segmentStartMs = seg.startTime;
+        segmentStartChargeMah = -1L;
+        segmentStartPercent = seg.startPercent;
+        segmentScreenOnMs = seg.screenOnMs;
+        segmentTotalMs = seg.durationMs();
+        segmentSamples = seg.sampleCount;
+        accumulatedChargeMah = seg.mAhIntegral;
+        segTempMin = seg.tempMin > 0f ? seg.tempMin : Float.MAX_VALUE;
+        segTempMax = seg.tempMax > 0f ? seg.tempMax : Float.MIN_VALUE;
+        segTempSum = seg.tempAvg > 0f ? seg.tempAvg * seg.sampleCount : 0;
+        segTempCount = seg.tempAvg > 0f ? seg.sampleCount : 0;
+        lastChargeMah = -1L;
+        lastPercent = seg.endPercent;
+        lastSampleTime = -1L;
+        lastCurrentMa = 0;
+    }
+
+    private static BatteryHistoryDb.SessionRow segmentToRow(
+            SessionSegmentBuilder.Segment seg, float estimate) {
+        boolean screenOffDominant = seg.screenOnMs * 2 < seg.durationMs();
+        return new BatteryHistoryDb.SessionRow(System.currentTimeMillis(), estimate,
+                screenOffDominant, seg.sampleCount,
+                seg.startTime, seg.endTime, seg.startPercent, seg.endPercent,
+                Math.max(0d, seg.deltaChargeMah), seg.mAhIntegral, seg.deltaChargeMah,
+                seg.tempMin, seg.tempMax, seg.tempAvg);
     }
 
     /** Import sekali file JSON lama ke database lalu file dihapus. */

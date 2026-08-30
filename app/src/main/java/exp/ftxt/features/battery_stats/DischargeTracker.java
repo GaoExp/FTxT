@@ -3,6 +3,8 @@ package exp.ftxt.features.battery_stats;
 import android.content.Context;
 import android.os.PowerManager;
 
+import java.util.ArrayList;
+
 /** Pencatat sesi pengosongan baterai (mAh terpakai, suhu, efisiensi discharge). */
 public class DischargeTracker {
 
@@ -130,6 +132,83 @@ public class DischargeTracker {
         if (r.medianMah > 0f) return r.medianMah;
         if (r.designMah > 0) return r.designMah;
         return 0f;
+    }
+
+    /**
+     * Rekonstruksi segmen pengosongan yang belum sempat tersimpan saat proses
+     * dibunuh (§7.6 — Solusi A). Dipanggil dari {@code BatteryMonitor.start()}.
+     * Sesi yang berakhir saat proses mati di-INSERT (dedup dengan endTime > sesi
+     * terakhir tersimpan); sesi yang masih berjalan disambungkan ke state live.
+     */
+    public static synchronized void rebuildPendingSessions() {
+        if (appContext == null) return;
+        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        long lastEnd = db.lastDischargeSessionEnd();
+        long now = System.currentTimeMillis();
+        long from = now - 24L * 3600_000L;
+
+        BatteryReading.Snapshot[] asc;
+        try {
+            asc = db.querySamples(from);
+        } catch (Exception e) {
+            return;
+        }
+        if (asc == null || asc.length == 0) return;
+
+        BatteryReading.Snapshot[] desc = SessionSegmentBuilder.toDesc(asc);
+        SessionSegmentBuilder.ScreenOnOracle oracle = db.screenOnOracle(from, now);
+        ArrayList<SessionSegmentBuilder.Segment> segs =
+                SessionSegmentBuilder.buildSegments(desc, SessionSegmentBuilder.WINDOW_MS,
+                        SessionSegmentBuilder.SESSION_GAP_MS, oracle);
+        if (segs.isEmpty()) return;
+
+        if (lastEnd > 0) {
+            for (int k = 0; k < segs.size() - 1; k++) {
+                SessionSegmentBuilder.Segment seg = segs.get(k);
+                if (seg.direction != SessionSegmentBuilder.Direction.DISCHARGE) continue;
+                if (seg.endTime <= lastEnd) continue;
+                float dPercent = seg.startPercent - seg.endPercent;
+                if (dPercent < MIN_DELTA_PERCENT) continue;
+                if (seg.durationMs() < MIN_SEGMENT_MS) continue;
+                if (seg.mAhIntegral <= 0) continue;
+                db.insertDischargeSession(toDischargeRow(seg));
+            }
+        }
+
+        SessionSegmentBuilder.Segment last = segs.get(segs.size() - 1);
+        if (last.direction == SessionSegmentBuilder.Direction.DISCHARGE) {
+            setActiveSegment(last);
+        }
+    }
+
+    private static void setActiveSegment(SessionSegmentBuilder.Segment seg) {
+        active = true;
+        segStartMs = seg.startTime;
+        segStartChargeMah = -1L;
+        segStartPercent = seg.startPercent;
+        screenOnMs = seg.screenOnMs;
+        totalMs = seg.durationMs();
+        samples = seg.sampleCount;
+        useIntegral = seg.mAhIntegral;
+        tempMin = seg.tempMin > 0f ? seg.tempMin : Float.MAX_VALUE;
+        tempMax = seg.tempMax > 0f ? seg.tempMax : Float.MIN_VALUE;
+        tempSum = seg.tempAvg > 0f ? seg.tempAvg * seg.sampleCount : 0;
+        tempCount = seg.tempAvg > 0f ? seg.sampleCount : 0;
+        lastChargeMah = -1L;
+        lastPercent = seg.endPercent;
+        lastSampleTime = -1L;
+    }
+
+    private static BatteryHistoryDb.DischargeSession toDischargeRow(
+            SessionSegmentBuilder.Segment seg) {
+        double usedCounter = Math.max(0d, seg.deltaChargeMah);
+        float cap = capacityForEfficiency();
+        float efficiency = cap > 0f ? (float) (usedCounter * 100.0 / cap) : -1f;
+        boolean screenOffDominant = seg.screenOnMs * 2 < seg.durationMs();
+        return new BatteryHistoryDb.DischargeSession(
+                seg.startTime, seg.endTime, seg.startPercent, seg.endPercent,
+                usedCounter, seg.mAhIntegral, cap, efficiency, screenOffDominant,
+                seg.tempMin, seg.tempMax, seg.tempAvg, seg.sampleCount);
     }
 
     private static boolean isScreenOn() {

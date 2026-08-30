@@ -1,7 +1,8 @@
 # Desain — Tab "Sesi Berjalan" (Live Session)
 
-**Status:** 🔵 DRAF (ada keputusan, masih ada tunda)
-**Tanggal:** (isi saat rampung)
+**Status:** ✅ SELESAI — desain inti sudah diimplementasikan di v4.89.0 (`BatterySessionLiveController`, sub-tab tengah tab Monitor)
+**Tanggal:** 2026-08-29
+**Catatan:** Redesign visual ala AccuBattery (mengikuti `_sample/contoh_sample_desain_sesi_berjalan`) belum dikerjakan; ide tersebut tersimpan untuk iterasi berikutnya.
 **Tujuan:** Menambah sub-tab "Sesi Berjalan" pada tab Monitor (Battery Info) yang menampilkan satu sesi aktif real-time — pengosongan maupun pengisian — yang otomatis berpindah menjadi riwayat saat status berubah.
 
 > Catatan: `DESAIN_RIWAYAT_SESI.md` lama direncanakan 3 sub-tab (Info & Grafik | Kondisi Baterai | Riwayat Sesi) tapi sudah **tidak relevan** — implementasi nyata menggabung "Kondisi Baterai" & "Riwayat Sesi" jadi satu tab "Kondisi & Riwayat" (total 2 sub-tab).
@@ -28,7 +29,7 @@
 
 ---
 
-## 3. Data yang Ditampilkan (DRAFT — menunggu keputusan user)
+## 3. Data yang Ditampilkan
 
 Sumber tersedia di `samples` (`BatteryReading.Snapshot`): `time`, `status`, `percent`, `voltage_v`, `current_ma`, `power_w`, `charge_mah`, `temp_c`.
 
@@ -103,4 +104,4 @@ Panel Battery Info
 
 ---
 
-*Dokumen ini draft awal; isi akan dirampungkan setelah diskusi desain selesai.*
+*Desain inti selesai & terimplementasi di v4.89.0 (status `***ONGOING***` di CHANGELOG).*

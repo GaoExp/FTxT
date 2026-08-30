@@ -149,3 +149,65 @@ Ide:
 - Risiko dobel-pencatatan saat rekonstruksi (perlu dedup dengan segmen tersimpan). Mesti diverifikasi di langkah 5.
 - Perubahan estimator kesehatan mengubah angka yang tampil di kartu — bukan hanya internal. Konfirmasi ke user sebelum rilis.
 - `build.gradle`, `app/src/main/assets/AssetsDoc.docx`, dsb. (daftar §2.7) tidak dicatat di CHANGELOG.
+
+---
+
+## 7. Keputusan Desain Final (hasil diskusi, 29/08/2026)
+
+> Lampiran keputusan — disepakati user; menjadi acuan implementasi saat eksekusi.
+
+### 7.1 Sumber kebenaran & otoritas arah sesi
+
+- **`samples` mentah = sumber kebenaran** (`time`, `percent`, `current_ma`, `charge_mah`, `temp_c`, dll). Segmen ringkasan (tabel `sessions`/`discharge_sessions`) hanya turunan dan dapat dibangun ulang.
+- **Otoritas penentu arah sesi = pergerakan persen**, bukan `status` Android (terbukti tidak stabil: bisa CHARGING tapi arus ≤0; ada jeda deteksi yang status-nya berbalik ke DISCHARGING padahal charger tetap tersambung).
+- **Jeda pengamatan: 10 menit = 1%.** Arah dianggap bergeser jika dalam jendela 10 menit persen berubah ≥1%:
+  - naik ≥1% → charging;
+  - turun ≥1% → discharge;
+  - persen diam → bukan sesi baru (sesi yang berjalan tetap berlanjut).
+- Tampilan cepat/di tab "Sesi Berjalan" boleh memakai status/arus sesaat sebagai perantara, tetapi **keabsahan & penutupan sesi hanya oleh aturan persen** di atas.
+
+### 7.2 Sesi charging (berlaku untuk pemecahan yang tadinya "charge terpecah")
+
+- Sesi charging **tidak diputus** oleh persen diam (termasuk melambat di atas 80% yang bisa >10 menit per 1%).
+- Periode persen-diam dalam sesi charging dicatat sebagai **daftar interval bypass**: `[mulai lambat, selesai lambat]`. Interval tersebut tetap **terhitung masuk durasi sesi charging** (bukan sesi terpisah).
+- Contoh target: 1 pengisian nyata `2→100%` (dengan jeda deteksi 171 detik di titik 71%) harus tersimpan sebagai **1 sesi**, bukan 2 (`2→71`, `71→100`).
+
+### 7.3 Sesi discharge
+
+- Discharge bersifat menurun berkelanjutan; **tidak ada konsep label bypass** di discharge.
+- Persen diam sesaat pada discharge = efek pembulatan 1%, **tetap bagian sesi yang sama** (jangan dipotong jadi sesi-sesi kecil).
+- Sesi discharge berakhir saat arah **berbalik naik** (mulai charging), atau persen mencapai 0%, atau perangkat mati.
+
+### 7.4 Peran ambang arus (hasil catatan diskusi)
+
+- Ambang arus (`<-150 mA` = discharge, `>+25 mA` = charging, di antaranya = bypass) **TIDAK dipakai untuk memecah sesi**: analisis data membuktikan 9 jeda deteksi palsu dalam pengisian semuanya berarus rata-rata `< -150 mA` (mis. `-829 mA` pada gap 171 detik yang memecah `2→71`/`71→100`), sehingga ambang arus murni tidak bisa membedakan jeda palsu dengan discharge asli.
+- Ambang arus tetap dipakai sebagai **label/kategori cepat** (tampilan), mis. menandai periode bypass/top-up saat asupan ~0, dan untuk **filter estimator** (buang segmen mAh ≈ 0).
+
+### 7.5 Estimasi kesehatan (keputusan C)
+
+- Estimasi kapasitas & skor kesehatan dihitung **dari data mentah `samples`** (integrasi mAh antara dua titik %, bagi selisih % → kapasitas penuh), konsisten dengan `BatterySessionLiveController`, bukan median tabel `sessions` yang rapuh.
+- Tetap pertahankan filter stabilitas: buang segmen pendek/ekstrem (Δ% < 5 %, durasi < 1 menit) dan agregasi median lintas sesi valid.
+
+### 7.6 Kesepakatan solusi lain
+
+- **A (persist)** disetujui: samples selalu tersimpan → saat proses hidup kembali, segmen revisi direkonstruksi dari `samples` di titik `BatteryMonitor.start()`; checkpoint berkala opsional; perlu dedup agar tidak dobel dengan segmen yang sudah tersimpan.
+- Titik-titik regresi `§2.5` tetap berlaku sebagai acuan self-check saat eksekusi.
+
+---
+
+## 8. Redesign Visual Tab "Sesi Berjalan" (disepakati user, 29/08/2026)
+
+> Umpan balik user (29/08): desain visual ala AccuBattery juga diminta — **ikut dikerjakan** pada iterasi eksekusi. Jangan terlewat.
+
+- **Referensi tampilan:** `_sample/contoh_sample_desain_sesi_berjalan` (dua layar: mode discharge & charge ala AccuBattery Pro). Sketsa ASCII turunan sudah ada di `_temp/sketsa_sesi_berjalan.txt` dan dipakai sebagai acuan layout.
+- **Komponen yang dikehendaki (mode discharge):**
+  - Ring persen besar di tengah atas (mis. `68%`).
+  - Baris estimasi bertahan 3 kondisi: layar hidup / layar mati / kombinasi (mis. `🟠 3j 6m`, `🟡 2j 12m`, `🟣 35j 27m`).
+  - Kartu "Status pelepasan": masa pakai (W/%jam), penggunaan rata-rata (%/jam), temperatur, tegangan.
+  - Kartu "Penggunaan baterai": total vs terpakai sesi ini, lalu layar hidup vs layar mati (mAh).
+  - Kartu "Kecepatan penggunaan": kombinasi (%/jam) + arus (mA).
+  - Kartu "Rincian sesi": mulai, durasi live, progress bar daya/tegangan/kecepatan/suhu, siklus.
+- **Komponen mode charge:** ring %, kapsul status, kartu "Status pengisian" (arus W/mA, tegangan, kecepatan rata-rata, temperatur — semua dengan progress bar), "Perkiraan waktu pengisian" (sisa baterai & waktu hingga 100%), "Telah terisi" (total + sedang diisi), "Kecepatan pengisian" (rata-rata %/jam vs sekarang mA), "Rincian sesi" (mulai, durasi, colokan/layar, siklus).
+- **Dikecualikan** (tidak punya datanya): penggunaan baterai per-aplikasi dan breakdown awake/deep sleep (catatan sketsa).
+- **Status sub-tab:** tetap di tengah `Info & Grafik | Sesi Berjalan | Kondisi & Riwayat`, dengan selector interval `1s/2s/5s` di baris atas.
+- Estimasi "bertahan sampai" per kondisi layar memanfaatkan data laju per kondisi dari `activity_log` (layar nyala/mati) — detail teknis diputuskan saat eksekusi.

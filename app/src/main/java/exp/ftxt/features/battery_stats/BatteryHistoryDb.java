@@ -632,6 +632,10 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         getWritableDatabase().delete(T_SESSIONS, null, null);
     }
 
+    public void deleteAllDischargeSessions() {
+        getWritableDatabase().delete(T_DISCHARGE, null, null);
+    }
+
     /** Sesi pengisian (tabel serial resmi estimator) pada rentang [fromMs, toMs]. */
     public ArrayList<SessionRow> queryChargeSessions(long fromMs, long toMs) {
         ArrayList<SessionRow> out = new ArrayList<>();
@@ -784,6 +788,41 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
     }
 
     // ---------- activity log ----------
+
+    /** Akhir sesi pengisian terakhir yang tersimpan (end_time maks); -1 bila kosong/tanpa waktu. */
+    public long lastChargeSessionEnd() {
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT MAX(end_time) FROM " + T_SESSIONS, null);
+        try {
+            return c.moveToFirst() && !c.isNull(0) ? c.getLong(0) : -1L;
+        } finally {
+            c.close();
+        }
+    }
+
+    /** Akhir sesi pengosongan terakhir yang tersimpan (end_time maks); -1 bila kosong. */
+    public long lastDischargeSessionEnd() {
+        Cursor c = getReadableDatabase().rawQuery(
+                "SELECT MAX(end_time) FROM " + T_DISCHARGE, null);
+        try {
+            return c.moveToFirst() && !c.isNull(0) ? c.getLong(0) : -1L;
+        } finally {
+            c.close();
+        }
+    }
+
+    /** Oracle layar-nyala pada rentang [fromMs, toMs] dari activity log. */
+    public SessionSegmentBuilder.ScreenOnOracle screenOnOracle(long fromMs, long toMs) {
+        ArrayList<ActivityLog> logs = queryActivityLog(fromMs, toMs);
+        int n = logs.size();
+        long[] times = new long[n];
+        boolean[] on = new boolean[n];
+        for (int i = 0; i < n; i++) {
+            times[i] = logs.get(i).time;
+            on[i] = logs.get(i).status == 1;
+        }
+        return SessionSegmentBuilder.screenOnOracle(times, on);
+    }
 
     public static final class ActivityLog {
         public final long time;

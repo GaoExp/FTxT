@@ -32,18 +32,20 @@ public class BatteryHealthCardController {
     private View batHealthResetButton;
     private int monitorLabelColor;
 
-    public BatteryHealthCardController(MainActivity activity, View rootView) {
+    public BatteryHealthCardController(MainActivity activity, View pageView) {
         this.activity = activity;
-        bindViews(rootView);
+        bindViews(pageView);
         batHealthDesignText.setOnClickListener(v -> showDesignCapacityDialog());
         batHealthResetButton.setOnClickListener(v -> showResetConfirmDialog());
-        rootView.findViewById(R.id.batHealthInfoButton)
+        pageView.findViewById(R.id.batHealthInfoButton)
                 .setOnClickListener(v -> InfoTooltip.show(activity, v,
                         "Kesehatan Baterai",
                         "Estimasi kapasitas = perkiraan kapasitas penuh baterai, "
-                                + "dihitung dari segmen pengisian (memakai integrasi arus I), "
-                                + "diagregasi median lintas sesi valid.\n\n"
-                                + "Skor kesehatan = estimasi ÷ kapasitas desain. "
+                                + "ditampilkan dalam tiga nilai: dari segmen pengisian, "
+                                + "dari segmen pengosongan, dan gabungan keduanya. "
+                                + "Semua memakai integrasi arus (I) diagregasi median "
+                                + "lintas sesi valid.\n\n"
+                                + "Skor kesehatan = estimasi GABUNGAN ÷ kapasitas desain. "
                                 + "Isi kapasitas desain (mAh) sesuai spesifikasi pabrik "
                                 + "agar skor muncul."));
     }
@@ -55,14 +57,14 @@ public class BatteryHealthCardController {
         batHealthResetButton = rootView.findViewById(R.id.batHealthResetButton);
         monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
     }
-
     public void refresh() {
         if (batHealthText == null) return;
         BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
-        appendLineColored(sb, "Kapasitas", r.medianMah > 0
-                ? String.format(Locale.US, "≈ %.0f mAh", r.medianMah) : "—", null);
+        appendLineColored(sb, "Pengisian", capacityText(r.chargeMedianMah), null);
+        appendLineColored(sb, "Pengosongan", capacityText(r.dischargeMedianMah), null);
+        appendLineColored(sb, "Gabungan", capacityText(r.medianMah), null);
 
         int scoreColor;
         String score;
@@ -113,6 +115,10 @@ public class BatteryHealthCardController {
             sb.setSpan(new ForegroundColorSpan(valueColor),
                     start + padded.length(), sb.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+    }
+
+    private String capacityText(float v) {
+        return v > 0f ? String.format(Locale.US, "≈ %.0f mAh", v) : "—";
     }
 
     private void showDesignCapacityDialog() {
@@ -167,9 +173,9 @@ public class BatteryHealthCardController {
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Reset Data Estimasi")
-                .setMessage("Hapus semua " + r.sessionCount + " sesi pengisian yang tercatat? "
+                .setMessage("Hapus semua " + r.sessionCount + " sesi yang tercatat (pengisian & pengosongan)? "
                         + "Estimasi kapasitas dan skor kesehatan akan dihitung ulang dari nol "
-                        + "saat pengisian berikutnya.\n\n"
+                        + "saat sesi berikutnya berlangsung.\n\n"
                         + "Ketik \"RESET\" untuk melanjutkan.")
                 .setView(container)
                 .setPositiveButton("Reset", (d, which) -> {

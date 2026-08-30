@@ -51,9 +51,9 @@ public class BatteryChartHistoryController {
     private final ExecutorService chartExecutor = Executors.newSingleThreadExecutor();
     private boolean chartQueryInFlight = false;
 
-    public BatteryChartHistoryController(MainActivity activity, View rootView) {
+    public BatteryChartHistoryController(MainActivity activity, View pageView) {
         this.activity = activity;
-        bindViews(rootView);
+        bindViews(pageView);
         setupChartControls();
     }
 
@@ -84,6 +84,8 @@ public class BatteryChartHistoryController {
 
         batChartTempView.setOnClickListener(v ->
                 BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_TEMP, chartWindowMs));
+        batChartPercentView.setOnClickListener(v ->
+                BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_PERCENT, chartWindowMs));
         batChartPowerView.setOnClickListener(v ->
                 BatteryChartDetailActivity.start(activity, BatteryChartView.SERIES_POWER, chartWindowMs));
         batChartVoltageView.setOnClickListener(v ->

@@ -8,13 +8,15 @@ import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.core.widget.NestedScrollView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.Locale;
 
@@ -25,7 +27,6 @@ import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.features.battery_stats.BatteryRingView;
-import exp.ftxt.shared.ui.BatteryChartView;
 
 public class BatteryMonitorTabController {
 
@@ -41,10 +42,10 @@ public class BatteryMonitorTabController {
     private int monitorLabelColor;
 
     private final Handler monitorHandler = new Handler(Looper.getMainLooper());
-    private final BatteryChartHistoryController charts;
-    private final BatteryHealthCardController health;
-    private final BatterySessionHistoryController history;
-    private final BatterySessionLiveController live;
+    private BatteryChartHistoryController charts;
+    private BatteryHealthCardController health;
+    private BatterySessionHistoryController history;
+    private BatterySessionLiveController live;
     private final BatterySnapshotExporter snapshotExporter;
 
     private View batSubInfoPanel;
@@ -53,7 +54,10 @@ public class BatteryMonitorTabController {
     private TextView batSubTabInfo;
     private TextView batSubTabLive;
     private TextView batSubTabHealth;
-    private NestedScrollView batSubScroll;
+    private ViewPager2 batSubPager;
+    private final SubTabAdapter subTabAdapter = new SubTabAdapter();
+
+    private int currentSubTab = 0;
 
     private final Runnable monitorRunnable = new Runnable() {
         @Override
@@ -66,74 +70,117 @@ public class BatteryMonitorTabController {
     public BatteryMonitorTabController(MainActivity activity, View rootView) {
         this.activity = activity;
         bindViews(rootView);
-        charts = new BatteryChartHistoryController(activity, rootView);
-        health = new BatteryHealthCardController(activity, rootView);
-        history = new BatterySessionHistoryController(activity, rootView);
-        live = new BatterySessionLiveController(activity, rootView);
         snapshotExporter = new BatterySnapshotExporter(activity, this);
         BatteryCapacityEstimator.init(activity);
-        batMonitorExportButton.setOnClickListener(v -> snapshotExporter.exportBatterySnapshot());
-        batMonitorCopyButton.setOnClickListener(v -> snapshotExporter.copyToClipboard());
-        rootView.findViewById(R.id.batChartPercentView).setOnClickListener(v ->
-                BatteryChartDetailActivity.start(activity,
-                        BatteryChartView.SERIES_PERCENT, charts.getCurrentWindowMs()));
-        setupSubTabs();
+
+        // Offscreen limit = 2 agar ketiga halaman selalu ter-inflate oleh pager,
+        // sehingga page view tersedia untuk bindPanels/setupSubTabs.
+        batSubPager.setOffscreenPageLimit(2);
+        batSubPager.setAdapter(subTabAdapter);
+        batSubPager.post(() -> {
+            bindPanels();
+            setupSubTabs();
+        });
     }
+
+    private static final class SubTabAdapter extends RecyclerView.Adapter<SubTabAdapter.Holder> {
+
+        static final class Holder extends RecyclerView.ViewHolder {
+            Holder(@NonNull View itemView) {
+                super(itemView);
+            }
+        }
+
+        private final int[] layouts = {R.layout.panel_bat_sub_info,
+                R.layout.panel_bat_sub_live,
+                R.layout.panel_bat_sub_health};
+        private final View[] pages = new View[3];
+
+        @NonNull
+        @Override
+        public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            View page = inflater.inflate(layouts[viewType], parent, false);
+            pages[viewType] = page;
+            return new Holder(page);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull Holder holder, int position) {
+        }
+
+        @Override
+        public int getItemCount() {
+            return 3;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return position;
+        }
+
+        View getPage(int position) {
+            return pages[position];
+        }
+    }
+
 
     private void setupSubTabs() {
         batSubTabInfo.setOnClickListener(v -> selectSubTab(0));
         batSubTabLive.setOnClickListener(v -> selectSubTab(1));
         batSubTabHealth.setOnClickListener(v -> selectSubTab(2));
-        setupSubTabSwipe();
-        refreshSubTabState();
-        showSubPanel(0);
-    }
 
-    private void setupSubTabSwipe() {
-        GestureDetector detector = new GestureDetector(activity,
-                new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onFling(MotionEvent e1, MotionEvent e2, float vx, float vy) {
-                        if (e1 == null || e2 == null) return false;
-                        float dx = e2.getX() - e1.getX();
-                        float dy = Math.abs(e2.getY() - e1.getY());
-                        if (Math.abs(dx) > 100 && Math.abs(dx) > dy * 1.5f) {
-                            if (dx < 0) swipeTo(currentSubTab + 1);
-                            else swipeTo(currentSubTab - 1);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-        batSubScroll.setOnTouchListener((v, event) -> {
-            detector.onTouchEvent(event);
-            return false;
+        applySubTabState(batSubTabInfo, true);
+        applySubTabState(batSubTabLive, false);
+        applySubTabState(batSubTabHealth, false);
+
+        batSubPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                currentSubTab = position;
+                refreshTabHighlight(position);
+                if (position == 1) live.onPanelShown();
+                else live.onPanelHidden();
+                if (position == 2) history.refresh();
+            }
         });
     }
 
-    private void swipeTo(int index) {
-        if (index < 0 || index > 2) return;
-        selectSubTab(index);
+    private void bindPanels() {
+        View infoPage = subTabAdapter.getPage(0);
+        View livePage = subTabAdapter.getPage(1);
+        View healthPage = subTabAdapter.getPage(2);
+
+        batSubInfoPanel = infoPage.findViewById(R.id.batSubInfoPanel);
+        batSubLivePanel = livePage.findViewById(R.id.batSubLivePanel);
+        batSubHealthPanel = healthPage.findViewById(R.id.batSubHealthPanel);
+
+        batMonitorRing = infoPage.findViewById(R.id.batMonitorRing);
+        batMonitorMetricsText1 = infoPage.findViewById(R.id.batMonitorMetricsText1);
+        batMonitorMetricsText2 = infoPage.findViewById(R.id.batMonitorMetricsText2);
+        batMonitorConditionBadge = infoPage.findViewById(R.id.batMonitorConditionBadge);
+
+        batMonitorExportButton = healthPage.findViewById(R.id.batMonitorExportButton);
+        batMonitorCopyButton = healthPage.findViewById(R.id.batMonitorCopyButton);
+        batMonitorExportButton.setOnClickListener(v -> snapshotExporter.exportBatterySnapshot());
+        batMonitorCopyButton.setOnClickListener(v -> snapshotExporter.copyToClipboard());
+
+        charts = new BatteryChartHistoryController(activity, infoPage);
+        health = new BatteryHealthCardController(activity, healthPage);
+        history = new BatterySessionHistoryController(activity, healthPage);
+        live = new BatterySessionLiveController(activity, livePage);
+    }
+
+    private void refreshTabHighlight(int index) {
+        applySubTabState(batSubTabInfo, index == 0);
+        applySubTabState(batSubTabLive, index == 1);
+        applySubTabState(batSubTabHealth, index == 2);
     }
 
     private void selectSubTab(int index) {
-        currentSubTab = index;
-        boolean liveShown = index == 1;
-        TextView[] tabs = {batSubTabInfo, batSubTabLive, batSubTabHealth};
-        for (int i = 0; i < tabs.length; i++) {
-            applySubTabState(tabs[i], i == index);
-        }
-        showSubPanel(index);
-        if (index == 2) history.refresh();
-        if (liveShown) live.onPanelShown();
-        else live.onPanelHidden();
-    }
-
-    private void refreshSubTabState() {
-        TextView[] tabs = {batSubTabInfo, batSubTabLive, batSubTabHealth};
-        for (int i = 0; i < tabs.length; i++) {
-            applySubTabState(tabs[i], i == 0);
-        }
+        if (index == currentSubTab) return;
+        batSubPager.setCurrentItem(index, true);
     }
 
     private void applySubTabState(TextView tv, boolean active) {
@@ -144,39 +191,23 @@ public class BatteryMonitorTabController {
         tv.setCompoundDrawableTintList(ColorStateList.valueOf(color));
     }
 
-    private void showSubPanel(int index) {
-        batSubInfoPanel.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
-        batSubLivePanel.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
-        batSubHealthPanel.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
-    }
-
     private void bindViews(View rootView) {
         batTabMonitorView = rootView.findViewById(R.id.batTabMonitor);
-        batMonitorRing = rootView.findViewById(R.id.batMonitorRing);
-        batMonitorMetricsText1 = rootView.findViewById(R.id.batMonitorMetricsText1);
-        batMonitorMetricsText2 = rootView.findViewById(R.id.batMonitorMetricsText2);
-        batMonitorConditionBadge = rootView.findViewById(R.id.batMonitorConditionBadge);
-        batMonitorExportButton = rootView.findViewById(R.id.batMonitorExportButton);
-        batMonitorCopyButton = rootView.findViewById(R.id.batMonitorCopyButton);
         batSubTabInfo = rootView.findViewById(R.id.batSubTabInfo);
         batSubTabLive = rootView.findViewById(R.id.batSubTabLive);
         batSubTabHealth = rootView.findViewById(R.id.batSubTabHealth);
-        batSubInfoPanel = rootView.findViewById(R.id.batSubInfoPanel);
-        batSubLivePanel = rootView.findViewById(R.id.batSubLivePanel);
-        batSubHealthPanel = rootView.findViewById(R.id.batSubHealthPanel);
-        batSubScroll = rootView.findViewById(R.id.batSubScroll);
+        batSubPager = rootView.findViewById(R.id.batSubPager);
         monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
     }
-
-    private int currentSubTab = 0;
 
     public void onPanelShown() {
         applySnapshotButtonsLock();
         resumeMonitorPolling();
-        if (currentSubTab == 1) live.onPanelShown();
+        if (currentSubTab == 1 && live != null) live.onPanelShown();
     }
 
     private void applySnapshotButtonsLock() {
+        if (batMonitorExportButton == null || batMonitorCopyButton == null) return;
         boolean unlocked = activity.getSharedPreferences("ftxt_prefs", android.content.Context.MODE_PRIVATE)
                 .getBoolean(exp.ftxt.SettingsActivity.PREF_DEVELOPER_UNLOCKED, false);
         batMonitorExportButton.setEnabled(unlocked);
@@ -187,14 +218,14 @@ public class BatteryMonitorTabController {
 
     public void onPanelHidden() {
         stopMonitorPolling();
-        live.onPanelHidden();
+        if (live != null) live.onPanelHidden();
     }
 
     public void cleanup() {
         stopMonitorPolling();
-        charts.cleanup();
-        history.cleanup();
-        live.cleanup();
+        if (charts != null) charts.cleanup();
+        if (history != null) history.cleanup();
+        if (live != null) live.cleanup();
     }
 
     public void refreshNow() {
@@ -257,9 +288,9 @@ public class BatteryMonitorTabController {
                 : condLevel < 0 ? R.color.bat_monitor_cold : R.color.bat_monitor_active);
         batMonitorConditionBadge.setTextColor(condColor);
 
-        health.refresh();
-        charts.refresh();
-        history.refresh();
+        if (health != null) health.refresh();
+        if (charts != null) charts.refresh();
+        if (history != null) history.refresh();
     }
 
     static String shortChargingStatus(BatteryReading.Snapshot s) {

@@ -94,7 +94,7 @@ Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
 ### 2.5 Entry yang di-merge (tersimpan di old-CHANGELOG.md)
 
 - Versi yang di-merge **tidak lagi berada di CHANGELOG aktif** — keseluruhan isinya dipindah ke arsip **`old-CHANGELOG.md`** yang berada di `app/src/main/assets/` (dibaca dalam aplikasi di daftar Dokumentasi; **tidak ada salinannya di root**). Maka versi yang di-merge hanya ada di sana.
-- Saat proses merger/memindah ke arsip itulah section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **diabaikan (tidak ditulis)** — detail per-file tidak relevan lagi setelah versi dirangkum.
+- Saat proses merger/memindah ke arsip section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **diabaikan (tidak ditulis)** — detail per-file tidak relevan lagi setelah versi dirangkum.
 - Jika kemudian ada perubahan yang menyangkut versi lama yang sudah di-merge, **edit langsung di `old-CHANGELOG.md`** (arsip di assets), bukan di CHANGELOG aktif.
 - ⚠️ **Penegasan §2.8:** dokumen di `app/src/main/assets/` umumnya ditimpa `syncDocs` saat build dan **jangan disentuh manual** — **kecuali diperintah secara eksplisit** (kasus khusus ini, edit `old-CHANGELOG.md` di assets, mengecualikan aturan itu).
 

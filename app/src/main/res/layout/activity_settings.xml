@@ -225,7 +225,7 @@
 
         <TextView
             android:id="@+id/exportDbBtn"
-            android:text="Ekstrak Database ke Documents/FTxT"
+            android:text="Ekstrak Database ke Documents/FTxT/extract/db"
             android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="#2196F3"

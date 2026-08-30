@@ -59,9 +59,9 @@ public class BatterySessionHistoryController {
     private boolean queryInFlight = false;
     private ArrayList<BatteryHistoryDb.SessionEntry> sessionEntriesCache = new ArrayList<>();
 
-    public BatterySessionHistoryController(MainActivity activity, View rootView) {
+    public BatterySessionHistoryController(MainActivity activity, View pageView) {
         this.activity = activity;
-        bindViews(rootView);
+        bindViews(pageView);
         bindTabs();
         setFilter(FILTER_ALL);
         chartView.setOnBarClickListener((index, aggregate) -> {
