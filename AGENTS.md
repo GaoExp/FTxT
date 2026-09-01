@@ -18,7 +18,7 @@ Semver `major.minor.patch`:
 
 ### 2.1 Struktur & judul entry
 
-Entry dicatat di **versi berjalan** (bukan entry baru per file). Urutan section WAJIB:
+Entry dicatat di **versi berjalan** (bukan entry baru per file) — CHANGELOG hanya mencatat **poin perubahan**, bukan detail file. Urutan section WAJIB:
 
 ```
 ✨ Fitur Baru
@@ -26,23 +26,18 @@ Entry dicatat di **versi berjalan** (bukan entry baru per file). Urutan section 
 ♻️ Perubahan Fitur
 🔧 Optimasi & Penyesuaian
 🐞 Bug Fixes
-🗒️ File Added
-✏️ File Changed
-🔥 File Removed
 💡 Memo
 ```
 
 **Format judul entry:**
-`# [major.minor.patch] yyMMddHHmm versionCode ***STATUS***`
- # [4.90.0] 2608280500 188 ***ONGOING***
-**Status `yyMMddHHmm`:** dua digit tahun (yy), bulan (MM), tanggal (dd), jam (HH), menit (mm) — semua memakai WITA (Asia/Makassar), tanpa label zona. Berlaku juga untuk timestamp di section File (baris `🗒️`/`✏️`/`🔥`). Dapatkan via `TZ=Asia/Makassar date +"%y%m%d%H%M"`.
+`# [major.minor.patch] yyyy/MM/dd HH:mm WITA versionCode ***STATUS***`
+ # [4.90.0] 2026/08/28 05:00 WITA 188 ***ONGOING***
+**format `yyyy/MM/dd HH:mm WITA` di judul:** empat digit tahun (yyyy), bulan (MM), tanggal (dd), jam (HH), menit (mm) — 24 jam, memakai WITA (Asia/Makassar), dengan label zona `WITA`. Dapatkan via `date +"%Y/%m/%d %H:%M WITA"` (pastikan TZ=Asia/Makassar).
 
 **STATUS** (salah satu):
 - `***ONGOING***` — entry versi berjalan sedang dikerjakan.
 - `***PUSH***` — saat commit tanpa tag.
 - `***RELEASE***` — saat commit + tag (bisa berawal dari PUSH lalu di-upgrade).
-
-Hubungan status ↔ pencatatan waktu — lihat § 2.3.
 
 ### 2.1b Kriteria section
 
@@ -50,36 +45,25 @@ Hubungan status ↔ pencatatan waktu — lihat § 2.3.
 - Untuk versi `***ONGOING***` yang masih dikerjakan, tiap perubahan ditulis sebagai **satu poin hasil akhir di ✨ Fitur Baru** — tidak dikotak-kotakkan ke dalam ♻️/🔧/🐞 dulu. Section ♻️/🔧/🐞 baru boleh dipakai pada entry berstatus PUSH/RELEASE (mis. saat merapikan/upgrade entry lama atau memindahkan poin saat rilis).
 - Poin yang menyangkut fitur masih ONGOING tidak boleh tampil di ♻️/🔧/🐞.
 
-### 2.2 Dua jenis waktu yang dicatat — JANGAN TERTUKAR
+### 2.2 Waktu yang dicatat
 
-Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
+Waktu yang dicatat di setiap entry adalah **waktu di judul entry**, yaitu waktu **saat seluruh perubahan untuk iterasi/entry itu selesai** dikerjakan.
 
-1. **Waktu di section File** (`🗒️` / `✏️` / `🔥`)
-   - = waktu **saat suatu file selesai diedit**.
-   - Diambil dengan menjalankan `TZ=Asia/Makassar date +"%y%m%d%H%M"` **tepat saat file itu selesai**.
-   - Jam ini TETAP tidak berubah meski file tersebut nanti diedit lagi di iterasi yang sama — tiap iterasi edit adalah baris terpisah (kecuali dimerger, lihat § 2.5).
-
-2. **Waktu di judul entry**
-   - = waktu **saat seluruh perubahan file untuk iterasi itu selesai** dikerjakan.
-   - Ditetapkan **di akhir**, setelah semua baris section File & semua poin deskripsi ditulis/dirampungkan.
-   - Diperbarui **hanya ketika iterasi kerja berikutnya** menyentuh entry yang sama, bukan per file / per edit.
-
-> Ringkas: **waktu section File menyusul jalannya edit per file; waktu judul ditetapkan satu kali di akhir.**
+- Ditetapkan **di akhir**, setelah semua poin deskripsi ditulis/dirampungkan.
+- Diperbarui **ketika iterasi kerja berikutnya** menyentuh entry yang sama, bukan per poin / per edit.
 
 ### 2.3 Alur pencatatan yang benar
 
-1. **Saat satu file selesai diedit** → langsung jalankan perintah waktu, lalu **tulis baris file-nya ke CHANGELOG** memakai jam itu.
-2. **Jika saat itu belum bisa menulis** barisnya (mis. belum ada entry, atau sedang buru-buru) → **simpan dulu jamnya**, lalu tulis barisnya kemudian. Yang penting: **jam di baris = saat file selesai diedit**, bukan saat penulisannya baru sempat dilakukan.
-3. **Setelah seluruh perubahan file untuk iterasi itu selesai** → rampungkan isi entry (poin deskripsi + semua baris file), lalu **tetapkan tanggal & jam judul** di akhir dengan `TZ=Asia/Makassar date +"%y%m%d%H%M"`.
+1. **Kerjakan seluruh perubahan untuk iterasi** — tidak perlu mencatat apa pun per file.
+2. **Setelah seluruh perubahan selesai** → rampungkan isi entry (poin deskripsi hasil akhir, lihat § 2.4), lalu **tetapkan tanggal & jam judul** di akhir dengan `date +"%Y/%m/%d %H:%M WITA"` (TZ=Asia/Makassar).
 
 **JANGAN:**
-- Meng-update judul setiap kali satu file selesai.
+- Meng-update judul setiap kali satu perubahan selesai.
 - Menulis isi/deskripsi entry per tahap kerja (hanya hasil akhir, lihat § 2.4).
-- Menggunakan waktu "saat menulis CHANGELOG" sebagai waktu section File.
 
 ### 2.3b VersionCode naik saat entry diperbarui
 
-- **versionCode naik +1** setiap kali entry `***ONGOING***` diperbarui (ada perubahan poin/baris file pada iterasi tersebut).
+- **versionCode naik +1** setiap kali entry `***ONGOING***` diperbarui (ada perubahan pada iterasi tersebut).
 - **versionCode naik +1 lagi** setiap kali status judul berubah menjadi `***PUSH***` / `***RELEASE***`.
 - Yang dinaikkan **hanya versionCode**; versionName diatur aturannya sendiri (lihat § 4).
 
@@ -94,7 +78,6 @@ Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
 ### 2.5 Entry yang di-merge (tersimpan di old-CHANGELOG.md)
 
 - Versi yang di-merge **tidak lagi berada di CHANGELOG aktif** — keseluruhan isinya dipindah ke arsip **`old-CHANGELOG.md`** yang berada di `app/src/main/assets/` (dibaca dalam aplikasi di daftar Dokumentasi; **tidak ada salinannya di root**). Maka versi yang di-merge hanya ada di sana.
-- Saat proses merger/memindah ke arsip section `🗒️ File Added`, `✏️ File Changed`, `🔥 File Removed` **diabaikan (tidak ditulis)** — detail per-file tidak relevan lagi setelah versi dirangkum.
 - Jika kemudian ada perubahan yang menyangkut versi lama yang sudah di-merge, **edit langsung di `old-CHANGELOG.md`** (arsip di assets), bukan di CHANGELOG aktif.
 - ⚠️ **Penegasan §2.8:** dokumen di `app/src/main/assets/` umumnya ditimpa `syncDocs` saat build dan **jangan disentuh manual** — **kecuali diperintah secara eksplisit** (kasus khusus ini, edit `old-CHANGELOG.md` di assets, mengecualikan aturan itu).
 
@@ -105,13 +88,13 @@ Ada **dua jam berbeda** di setiap entry, dan keduanya punya asal yang berbeda:
 
 ### 2.7 File yang DILARANG dicatat di changelog
 
-Perubahan pada file ini tidak boleh muncul di entry manapun (baik baris file maupun poin deskripsi):
+Perubahan pada file ini tidak boleh dicatat di entry manapun (tidak boleh muncul sebagai poin deskripsi):
 
 - **Build system:** `build.gradle` (root, `app/`, module `shared/*/build.gradle`), `settings.gradle`, `gradle.properties`, `gradle/wrapper/`, `gradlew`, `gradlew.bat`, `proguard-rules.pro`, folder `build/`.
 - **CI/CD & signing:** `.github/workflows/`, `keystore.properties`, folder `key/`.
 - **Dokumen root & kerja internal:** `AGENTS.md`, `README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md`, `_schedule/`, `_temp/`, `local.properties`.
 
-Konsekuensi: topik yang lahir dari file tersebut (bukn build/CI/signing/rilis, bump version, restrukturisasi internal/ganti import) juga tidak diumbar.
+Konsekuensi: topik yang lahir dari file tersebut (bukan build/CI/signing/rilis, bump version, restrukturisasi internal/ganti import) juga tidak diumbar.
 
 ### 2.8 Sumber dokumen = root (jangan sentuh assets)
 
@@ -129,15 +112,14 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 6. **Hal kecil yang bisa ditafsirkan** (nama, warna, tata letak) → ambil yang paling konsisten dengan pola existing, kerjakan, sebutkan asumsinya.
 7. **Selesai sesuai perintah, berhenti.**
 8. **Self-check WAJIB** sebelum selesai: `git diff`/file — sesuai permintaan, tidak menyentuh file di luar scope, tidak ada yang terlewat.
-9. **Catat waktu WITA aktual saat mengedit file** — lihat § 2.2–2.3 (waktu section File = waktu edit, bukan waktu menulis CHANGELOG).
 
 ---
 
 ## 4. Workflow
 
 ### Edit Biasa
-1. Update kode — **saat tiap file selesai diedit**: ambil waktu WITA → tulis baris file ke CHANGELOG (atau simpan dulu waktunya bila belum bisa menulis).
-2. Rampungkan CHANGELOG entry berjalan — isi entry + semua baris section File **setelah seluruh perubahan file untuk iterasi selesai**; **tetapkan tanggal & jam judul di akhir**.
+1. Update kode — **tidak perlu mencatat per file**.
+2. Rampungkan CHANGELOG entry berjalan — isi entry (poin deskripsi hasil akhir) **setelah seluruh perubahan untuk iterasi selesai**; **tetapkan tanggal & jam judul di akhir**.
 3. Naikkan versionCode +1 saat entry diperbarui (lihat § 2.3b).
 4. Self-check hasil perubahan.
 5. **JANGAN commit / tag / push.**
@@ -165,14 +147,22 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 
 ## 5. Perilaku AI
 
-| ✅ Lakukan | ❌ JANGAN |
-|------------|-----------|
-| baca AGENTS dulu | refactor tanpa diminta |
-| cek git status/log | ubah file di luar scope |
-| perubahan minimal & fokus | audit project tanpa diminta |
-| jawab singkat & actionable | checklist panjang |
-| Bahasa Indonesia | build / revert tanpa konfirmasi |
-| self-check sebelum selesai | — |
+**Lakukan:**
+
+- Baca AGENTS dulu.
+- Cek git status/log.
+- Perubahan minimal & fokus.
+- Jawab singkat & actionable.
+- Bahasa Indonesia.
+- Self-check sebelum selesai.
+
+**JANGAN:**
+
+- Refactor tanpa diminta.
+- Ubah file di luar scope.
+- Audit project tanpa diminta.
+- Buat checklist panjang.
+- Build / revert tanpa konfirmasi.
 
 ---
 
