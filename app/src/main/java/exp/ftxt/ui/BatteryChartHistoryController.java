@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,7 +15,6 @@ import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.shared.ui.BatteryChartView;
-import exp.ftxt.shared.ui.BatteryTimelineBarView;
 
 public class BatteryChartHistoryController {
 
@@ -27,7 +25,6 @@ public class BatteryChartHistoryController {
     private BatteryChartView batChartPowerView;
     private BatteryChartView batChartVoltageView;
     private BatteryChartView batChartCurrentView;
-    private BatteryTimelineBarView batTimelineBarView;
     private SeekBar batChartRangeSeek;
     private TextView batChartRangeLabel;
     private final TextView[] rangeTicks = new TextView[10];
@@ -63,7 +60,6 @@ public class BatteryChartHistoryController {
         batChartPowerView = rootView.findViewById(R.id.batChartPowerView);
         batChartVoltageView = rootView.findViewById(R.id.batChartVoltageView);
         batChartCurrentView = rootView.findViewById(R.id.batChartCurrentView);
-        batTimelineBarView = rootView.findViewById(R.id.batTimelineBarView);
         batChartRangeSeek = rootView.findViewById(R.id.batChartRangeSeek);
         batChartRangeLabel = rootView.findViewById(R.id.batChartRangeLabel);
         int[] tickIds = {R.id.batChartTick0, R.id.batChartTick1, R.id.batChartTick2,
@@ -161,8 +157,6 @@ public class BatteryChartHistoryController {
         chartExecutor.execute(() -> {
             BatteryReading.Snapshot[] data =
                     BatteryHistoryDb.get(activity).queryChart(from, now, 600);
-            ArrayList<BatteryHistoryDb.ActivityLog> activityLogs =
-                    BatteryHistoryDb.get(activity).queryActivityLog(from, now);
             uiHandler.post(() -> {
                 chartQueryInFlight = false;
                 if (batChartTempView == null) return;
@@ -171,10 +165,6 @@ public class BatteryChartHistoryController {
                 batChartPowerView.setData(data);
                 batChartVoltageView.setData(data);
                 batChartCurrentView.setData(data);
-                if (batTimelineBarView != null) {
-                    batTimelineBarView.setTimeWindow(from, now);
-                    batTimelineBarView.setActivityLogs(activityLogs);
-                }
             });
         });
     }

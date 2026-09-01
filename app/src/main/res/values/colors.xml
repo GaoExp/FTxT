@@ -52,6 +52,14 @@
     <color name="bat_slider_thumb">#1A1A1A</color>
     <color name="bat_slider_track">#C7C7CC</color>
 
+    <!-- Activity Bar (grafik detail) -->
+    <color name="bat_activity_screen_on">#FFFFFF</color>
+    <color name="bat_activity_screen_off">#0A2C4A</color>
+    <color name="bat_activity_charging">#4CAF50</color>
+    <color name="bat_activity_discharging">#F44336</color>
+    <color name="bat_activity_bg">#1A000000</color>
+    <color name="bat_activity_label">#8A8A8E</color>
+
     <!-- Warna panel Crosshair -->
     <color name="ui_control_bg">#FFFFFF</color>
     <color name="ui_accent_crosshair">#26C6DA</color>

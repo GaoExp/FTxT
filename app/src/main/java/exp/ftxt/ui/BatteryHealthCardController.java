@@ -16,6 +16,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
@@ -25,6 +27,7 @@ import exp.ftxt.shared.ui.InfoTooltip;
 public class BatteryHealthCardController {
 
     private final MainActivity activity;
+    private final ExecutorService healthExecutor = Executors.newSingleThreadExecutor();
 
     private TextView batHealthText;
     private TextView batHealthDesignText;
@@ -59,7 +62,19 @@ public class BatteryHealthCardController {
     }
     public void refresh() {
         if (batHealthText == null) return;
-        BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
+        healthExecutor.execute(() -> {
+            BatteryCapacityEstimator.HealthResult r;
+            try {
+                r = BatteryCapacityEstimator.getResult();
+            } catch (Exception ignored) {
+                return;
+            }
+            activity.runOnUiThread(() -> applyResult(r));
+        });
+    }
+
+    void applyResult(BatteryCapacityEstimator.HealthResult r) {
+        if (batHealthText == null) return;
 
         SpannableStringBuilder sb = new SpannableStringBuilder();
         appendLineColored(sb, "Pengisian", capacityText(r.chargeMedianMah), null);

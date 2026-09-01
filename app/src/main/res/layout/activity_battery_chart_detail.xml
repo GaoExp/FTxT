@@ -228,6 +228,16 @@
         android:thumbTint="@color/bat_slider_thumb"
         android:splitTrack="false"/>
 
+    <exp.ftxt.shared.ui.ActivityBarView
+        android:id="@+id/chartActivityBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp"
+        android:background="@drawable/bat_card_bg"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -235,7 +245,7 @@
         android:background="@drawable/bat_card_bg"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:padding="14dp">
 
         <TextView

@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
@@ -42,6 +44,7 @@ public class BatteryMonitorTabController {
     private int monitorLabelColor;
 
     private final Handler monitorHandler = new Handler(Looper.getMainLooper());
+    private final ExecutorService monitorExecutor = Executors.newSingleThreadExecutor();
     private BatteryChartHistoryController charts;
     private BatteryHealthCardController health;
     private BatterySessionHistoryController history;
@@ -77,9 +80,21 @@ public class BatteryMonitorTabController {
         // sehingga page view tersedia untuk bindPanels/setupSubTabs.
         batSubPager.setOffscreenPageLimit(2);
         batSubPager.setAdapter(subTabAdapter);
+        // bindPanels/setupSubTabs hanya dijalankan setelah ketiga halaman
+        // benar-benar di-inflate oleh adapter (onCreateViewHolder), karena inflate
+        // menggunakan parent agar LayoutParams match_parent terpasang dengan benar
+        // — meng-inflate tanpa parent membuat halaman menyalahi syarat ViewPager2.
+        waitAndBind();
+    }
+
+    private void waitAndBind() {
         batSubPager.post(() -> {
-            bindPanels();
-            setupSubTabs();
+            if (subTabAdapter.allPagesReady()) {
+                bindPanels();
+                setupSubTabs();
+            } else {
+                waitAndBind();
+            }
         });
     }
 
@@ -95,6 +110,13 @@ public class BatteryMonitorTabController {
                 R.layout.panel_bat_sub_live,
                 R.layout.panel_bat_sub_health};
         private final View[] pages = new View[3];
+
+        boolean allPagesReady() {
+            for (View p : pages) {
+                if (p == null) return false;
+            }
+            return true;
+        }
 
         @NonNull
         @Override
@@ -223,6 +245,7 @@ public class BatteryMonitorTabController {
 
     public void cleanup() {
         stopMonitorPolling();
+        monitorExecutor.shutdownNow();
         if (charts != null) charts.cleanup();
         if (history != null) history.cleanup();
         if (live != null) live.cleanup();
@@ -256,28 +279,6 @@ public class BatteryMonitorTabController {
                 ? String.format(Locale.US, "%+d mA", s.currentMa) : "—");
         batMonitorMetricsText1.setText(col1);
 
-        SpannableStringBuilder col2 = new SpannableStringBuilder();
-        appendLine(col2, "Daya", s.powerW > 0
-                ? String.format(Locale.US, "%.2fW", s.powerW) : "—");
-        appendLine(col2, "Cycle Count", s.cycleCount >= 0 ? String.valueOf(s.cycleCount) : "—");
-        appendLine(col2, "Teknologi", s.technology != null ? s.technology : "—");
-
-        boolean charging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_CHARGING
-                || s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL;
-        boolean discharging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_DISCHARGING;
-        String estLabel = null;
-        if (charging && s.percent < 100) {
-            long estMs = BatteryHistoryDb.get(activity).estimateTimeRemaining(true);
-            estLabel = estMs >= 0 ? formatDuration(estMs) : "—";
-            appendLine(col2, "Est. Penuh", estLabel);
-        } else if (discharging && s.percent > 0) {
-            long estMs = BatteryHistoryDb.get(activity).estimateTimeRemaining(false);
-            estLabel = estMs >= 0 ? formatDuration(estMs) : "—";
-            appendLine(col2, "Est. Habis", estLabel);
-        }
-
-        batMonitorMetricsText2.setText(col2);
-
         batMonitorRing.setBatteryData(s.percent,
                 s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—",
                 shortChargingStatus(s));
@@ -288,9 +289,54 @@ public class BatteryMonitorTabController {
                 : condLevel < 0 ? R.color.bat_monitor_cold : R.color.bat_monitor_active);
         batMonitorConditionBadge.setTextColor(condColor);
 
-        if (health != null) health.refresh();
         if (charts != null) charts.refresh();
         if (history != null) history.refresh();
+
+        updateEstimateAndHealth(s);
+    }
+
+    /**
+     * Bagian berat (DB query + rekonstruksi estimator) dipindah ke thread
+     * background agar tidak memblok UI (penyebab ANR saat tab Monitor dibuka).
+     * Hasil di-post kembali ke main thread untuk update tampilan kolom 2
+     * (Daya/Cycle/Teknologi/Estimasi) serta kartu Kesehatan Baterai.
+     */
+    private void updateEstimateAndHealth(BatteryReading.Snapshot s) {
+        final boolean charging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_CHARGING
+                || s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL;
+        final boolean discharging = s.statusInt == android.os.BatteryManager.BATTERY_STATUS_DISCHARGING;
+        final int percent = s.percent;
+        final String powerText = s.powerW > 0
+                ? String.format(Locale.US, "%.2fW", s.powerW) : "—";
+        final String cycleText = s.cycleCount >= 0 ? String.valueOf(s.cycleCount) : "—";
+        final String techText = s.technology != null ? s.technology : "—";
+        final boolean showEst = (charging && percent < 100) || (discharging && percent > 0);
+        monitorExecutor.execute(() -> {
+            long estMs = -1L;
+            if (showEst) {
+                try {
+                    estMs = BatteryHistoryDb.get(activity).estimateTimeRemaining(charging);
+                } catch (Exception ignored) {}
+            }
+            final long estFinal = estMs;
+            final String estLabel = charging ? "Est. Penuh" : "Est. Habis";
+            final String estValue = estFinal >= 0 ? formatDuration(estFinal) : "—";
+            BatteryCapacityEstimator.HealthResult h = null;
+            try {
+                h = BatteryCapacityEstimator.getResult();
+            } catch (Exception ignored) {}
+            final BatteryCapacityEstimator.HealthResult healthFinal = h;
+            monitorHandler.post(() -> {
+                if (batMonitorMetricsText2 == null) return;
+                SpannableStringBuilder col2 = new SpannableStringBuilder();
+                appendLine(col2, "Daya", powerText);
+                appendLine(col2, "Cycle Count", cycleText);
+                appendLine(col2, "Teknologi", techText);
+                if (showEst) appendLine(col2, estLabel, estValue);
+                batMonitorMetricsText2.setText(col2);
+                if (health != null && healthFinal != null) health.applyResult(healthFinal);
+            });
+        });
     }
 
     static String shortChargingStatus(BatteryReading.Snapshot s) {

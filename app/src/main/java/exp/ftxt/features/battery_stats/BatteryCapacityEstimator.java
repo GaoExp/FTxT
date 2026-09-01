@@ -68,8 +68,10 @@ public class BatteryCapacityEstimator {
         }
         if (!loaded) {
             loaded = true;
-            migrateLegacyJsonIfNeeded();
-            loadFromDb();
+            new Thread(() -> {
+                migrateLegacyJsonIfNeeded();
+                loadFromDb();
+            }, "BatteryEstimatorInit").start();
         }
     }
 
@@ -322,7 +324,7 @@ public class BatteryCapacityEstimator {
         }
     }
 
-    private static void loadFromDb() {
+    private static synchronized void loadFromDb() {
         BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
         String savedDesign = db.getMeta("design_mah");
         try {
@@ -415,7 +417,7 @@ public class BatteryCapacityEstimator {
     }
 
     /** Import sekali file JSON lama ke database lalu file dihapus. */
-    private static void migrateLegacyJsonIfNeeded() {
+    private static synchronized void migrateLegacyJsonIfNeeded() {
         try {
             BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
             if ("1".equals(db.getMeta("json_migrated"))) return;

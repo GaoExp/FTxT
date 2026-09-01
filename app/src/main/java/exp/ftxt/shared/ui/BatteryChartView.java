@@ -64,10 +64,16 @@ public class BatteryChartView extends View {
         void onScrub(int index, BatteryReading.Snapshot snapshot);
     }
 
+    /** Callback saat pan selesai (jari dilepas) — dipakai halaman detail untuk requery. */
+    public interface OnPanSettledListener {
+        void onPanSettled();
+    }
+
     private boolean interactive = false;
     private boolean scrubbing = false;
     private int selectedIndex = -1;
     private OnScrubListener scrubListener;
+    private OnPanSettledListener panSettledListener;
 
     // Geometri render terakhir — dipakai memetakan posisi sentuhan ke titik data.
     private float lastPadLeft, lastPlotW, lastPadTop, lastPlotH;
@@ -83,8 +89,19 @@ public class BatteryChartView extends View {
     // Zoom & pan
     private static final float MIN_ZOOM = 1.0f;
     private static final long MIN_VISIBLE_MS = 30_000L;
+
+    /** Jendela tampil minimum saat zoom (30 detik). */
+    public static long getMinVisibleMs() {
+        return MIN_VISIBLE_MS;
+    }
     private float viewZoom = 1.0f;
     private long panOffsetMs = 0L;
+
+    // Viewport eksplisit (mode zoom halaman detail): data yang di-set memiliki
+    // cakupan waktu nyata [viewportStartT, viewportEndT] dengan buffer di kedua sisi.
+    // Bila MIN_VALUE, memakai mode lama: rentang dihitung dari sampel terakhir - windowMs.
+    private long viewportStartT = Long.MIN_VALUE;
+    private long viewportEndT = 0L;
 
     // Touch interaction mode
     public static final int MODE_CROSSHAIR = 0;
@@ -154,13 +171,83 @@ public class BatteryChartView extends View {
         return viewZoom;
     }
 
+    /**
+     * Atur cakupan eksplisit data & jendela tampil — dipakai halaman detail saat
+     * zoom/pan: data di-query ulang untuk [dataStartT, dataEndT] (dengan buffer di
+     * kedua sisi) dan [visibleStartT, visibleEndT] menjadi jendela yang tampil penuh.
+     */
+    public void setViewport(long visibleStartT, long visibleEndT, long dataStartT, long dataEndT) {
+        viewportStartT = dataStartT;
+        viewportEndT = dataEndT;
+        long dataSpan = Math.max(1L, dataEndT - dataStartT);
+        long visibleSpan = Math.max(MIN_VISIBLE_MS, Math.min(dataSpan, visibleEndT - visibleStartT));
+        windowMs = dataSpan;
+        viewZoom = (float) dataSpan / (float) visibleSpan;
+        panOffsetMs = Math.max(0L, visibleStartT - dataStartT);
+        clampPanOffset();
+        invalidate();
+    }
+
+    /** Kembali ke mode lama: rentang dihitung dari sampel terakhir dikurangi windowMs. */
+    public void clearViewport() {
+        viewportStartT = Long.MIN_VALUE;
+        viewportEndT = 0L;
+        viewZoom = 1.0f;
+        panOffsetMs = 0L;
+        invalidate();
+    }
+
+    /** True bila viewport eksplisit aktif (sedang zoom di halaman detail). */
+    public boolean hasViewport() {
+        return viewportStartT != Long.MIN_VALUE;
+    }
+
+    /** Awal cakupan data (viewport aktif) atau startT mode lama. */
+    public long getViewportStartMs() {
+        return hasViewport() ? viewportStartT : getEffectiveStartT();
+    }
+
+    /** Akhir cakupan data (viewport aktif) atau endT mode lama. */
+    public long getViewportEndMs() {
+        return hasViewport() ? viewportEndT : getEffectiveEndT();
+    }
+
+    /** Waktu mulai jendela tampil saat ini (sudah termasuk pan). */
+    public long getVisibleStartMs() {
+        return getEffectiveStartT() + panOffsetMs;
+    }
+
+    /** Waktu akhir jendela tampil saat ini. */
+    public long getVisibleEndMs() {
+        return getVisibleStartMs() + getVisibleWindowMs();
+    }
+
+    /** Durasi jendela tampil saat ini mengikuti zoom. */
+    public long getVisibleWindowMs() {
+        return (long) (windowMs / Math.max(1f, getZoomLevel()));
+    }
+
+    /** Waktu sampel terakhir yang dijadikan acuan kanan rentang (sama dengan onDraw). */
+    public long getDataEndTime() {
+        return getEffectiveEndT();
+    }
+
+    private long getEffectiveEndT() {
+        return hasViewport() ? viewportEndT
+                : (samples.length > 0 ? samples[samples.length - 1].time : System.currentTimeMillis());
+    }
+
+    private long getEffectiveStartT() {
+        return hasViewport() ? viewportStartT : getEffectiveEndT() - windowMs;
+    }
+
     private void clampPanOffset() {
-        if (viewZoom <= 1.0f) {
+        if (getZoomLevel() <= 1.0f) {
             panOffsetMs = 0L;
             return;
         }
-        long visibleWindowMs = (long) (windowMs / viewZoom);
-        long maxPan = windowMs - visibleWindowMs;
+        long visibleWindowMs = getVisibleWindowMs();
+        long maxPan = Math.max(0L, windowMs - visibleWindowMs);
         panOffsetMs = Math.max(0L, Math.min(maxPan, panOffsetMs));
     }
 
@@ -187,11 +274,12 @@ public class BatteryChartView extends View {
             selectedIndex = -1;
             scrubbing = false;
             resetZoom();
+            clearViewport();
         }
         invalidate();
     }
 
-    /** Reset zoom dan pan ke kondisi normal. */
+    /** Reset zoom dan pan ke kondisi normal (viewport eksplisit dibiarkan). */
     public void resetZoom() {
         viewZoom = 1.0f;
         panOffsetMs = 0L;
@@ -215,6 +303,10 @@ public class BatteryChartView extends View {
 
     public void setOnScrubListener(OnScrubListener listener) {
         this.scrubListener = listener;
+    }
+
+    public void setOnPanSettledListener(OnPanSettledListener listener) {
+        this.panSettledListener = listener;
     }
 
     @Override
@@ -249,7 +341,10 @@ public class BatteryChartView extends View {
                 return true;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                if (touchMode == MODE_PAN) scrubbing = false;
+                if (touchMode == MODE_PAN) {
+                    scrubbing = false;
+                    if (panSettledListener != null && hasViewport()) panSettledListener.onPanSettled();
+                }
                 return true;
             default:
                 return super.onTouchEvent(event);
@@ -306,7 +401,7 @@ public class BatteryChartView extends View {
         }
 
         int n = samples.length;
-        long endT = n > 0 ? samples[n - 1].time : System.currentTimeMillis();
+        long endT = getEffectiveEndT();
         if (n == 0) {
             lastCount = 0;
             drawTimeLabels(canvas, padLeft, plotW, h, padBottom, endT - windowMs, endT);
@@ -314,8 +409,8 @@ public class BatteryChartView extends View {
             return;
         }
 
-        long startT = endT - windowMs;
-        long visibleWindowMs = (long) (windowMs / Math.max(1f, viewZoom));
+        long startT = getEffectiveStartT();
+        long visibleWindowMs = getVisibleWindowMs();
         long visibleStartT = startT + panOffsetMs;
         long visibleEndT = visibleStartT + visibleWindowMs;
 
