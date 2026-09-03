@@ -42,7 +42,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import exp.ftxt.core.BatteryMonitorService;
 import exp.ftxt.core.CrashLogger;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
@@ -127,13 +126,12 @@ public class MainActivity extends AppCompatActivity {
         navItemContainer = findViewById(R.id.navItemContainer);
 
         initSidebar();
+        updateNavSelection(savedNavItem);
 
         findViewById(R.id.navTutupAplikasi).setOnClickListener(v -> forceClose());
         findViewById(R.id.navKeluar).setOnClickListener(v -> finishAffinity());
 
         loadShadowConfigs();
-
-        startBatteryMonitorService();
 
         panelVisibilityReceiver = new BroadcastReceiver() {
             @Override
@@ -157,14 +155,6 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(panelVisibilityReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         requestAllPermissionsOnFirstLaunch();
-    }
-
-    private void startBatteryMonitorService() {
-        try {
-            startForegroundService(new Intent(this, BatteryMonitorService.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void requestAllPermissionsOnFirstLaunch() {
@@ -229,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void autoRequestAndStart() {
-        if (!isAnyModuleActive()) return;
         if (FloatingService.instance != null) return;
 
         if (!PermissionHelper.hasOverlayPermission(this)) {
@@ -340,23 +329,6 @@ public class MainActivity extends AppCompatActivity {
                 .getBoolean("text_overlay_on", false);
     }
 
-    public boolean isAnyModuleActive() {
-        if (getSharedPreferences("ftxt_prefs", MODE_PRIVATE).getBoolean("text_overlay_on", false)) {
-            return true;
-        }
-
-        if (FpsConfig.enabled) return true;
-        if (ClockConfig.enabled) return true;
-        if (BatteryStatsConfig.enabled) return true;
-        if (NetworkConfig.enabled) return true;
-        if (BatteryBarConfig.enabled) return true;
-        if (MemoryConfig.enabled) return true;
-        if (MemoryConfig.backgroundMonitor) return true;
-        if (CrosshairConfig.enabled) return true;
-
-        return false;
-    }
-
     private void showSettingsPopup() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         PopupMenu popup = new PopupMenu(this, toolbar, Gravity.END, 0, R.style.SettingsPopupMenu);
@@ -392,9 +364,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void killService() {
-        if (FloatingService.instance != null) {
-            stopService(new Intent(this, FloatingService.class));
-        }
+        // Hentikan seluruh overlay; pemantau baterai full-aktif tetap berjalan
+        // seperti sebelumnya, sehingga FloatingService tidak di-stop paksa.
+        FloatingService.stopAllModules();
     }
 
     private void forceClose() {
@@ -604,26 +576,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateNavSelection(int selectedId) {
-        int[] allIds = {R.id.navFloatingText, R.id.navFps, R.id.navNetwork, R.id.navBattery,
-                R.id.navClock, R.id.navCrosshair, R.id.navLogo, R.id.navColorPicker, R.id.navMemory,
-                R.id.navDebuging};
-        for (int id : allIds) {
-            View v = findViewById(id);
-            if (v != null) {
-                v.setSelected(v.getId() == selectedId);
-            }
+        if (sidebarAdapter != null) {
+            sidebarAdapter.setSelectedItemId(selectedId);
         }
-    }
-
-    private int selectableBgResId = -1;
-
-    private int resolveSelectableItemBackground() {
-        if (selectableBgResId == -1) {
-            TypedValue out = new TypedValue();
-            getTheme().resolveAttribute(android.R.attr.selectableItemBackground, out, true);
-            selectableBgResId = out.resourceId;
-        }
-        return selectableBgResId;
     }
 
     private void saveSidebarState() {
@@ -675,7 +630,7 @@ public class MainActivity extends AppCompatActivity {
                 if ("navMemory".equals(id) && !showMemory) {
                     continue;
                 }
-                list.add(new SidebarItem(item.getString("l"), id));
+                list.add(new SidebarItem(item.getString("l"), id, getIconForSidebarId(id)));
             }
         } catch (Exception e) {
             try {
@@ -692,7 +647,7 @@ public class MainActivity extends AppCompatActivity {
                     if ("navMemory".equals(id) && !showMemory) {
                         continue;
                     }
-                    list.add(new SidebarItem(item.getString("l"), id));
+                    list.add(new SidebarItem(item.getString("l"), id, getIconForSidebarId(id)));
                 }
             } catch (Exception e2) { }
         }
@@ -719,7 +674,7 @@ public class MainActivity extends AppCompatActivity {
                     if ("navMemory".equals(id) && !showMemory) {
                         continue;
                     }
-                    list.add(new SidebarItem(o.getString("l"), id));
+                    list.add(new SidebarItem(o.getString("l"), id, getIconForSidebarId(id)));
                     existing.add(id);
                 }
             }
@@ -783,21 +738,46 @@ public class MainActivity extends AppCompatActivity {
     private static class SidebarItem {
         final String label;
         final String id;
+        final int iconRes;
 
-        SidebarItem(String label, String id) {
+        SidebarItem(String label, String id, int iconRes) {
             this.label = label;
             this.id = id;
+            this.iconRes = iconRes;
+        }
+    }
+
+    private int getIconForSidebarId(String id) {
+        if (id == null) return 0;
+        switch (id) {
+            case "navFloatingText": return R.drawable.ic_text_format;
+            case "navFps": return R.drawable.ic_monitor;
+            case "navNetwork": return R.drawable.ic_signal_wifi;
+            case "navBattery": return R.drawable.ic_battery_full;
+            case "navClock": return R.drawable.ic_schedule;
+            case "navCrosshair": return R.drawable.ic_crosshair;
+            case "navMemory": return R.drawable.ic_memory;
+            case "navLogo": return R.drawable.ic_image;
+            case "navColorPicker": return R.drawable.ic_palette;
+            case "navDebuging": return R.drawable.ic_build;
+            default: return 0;
         }
     }
 
     private class SidebarAdapter extends RecyclerView.Adapter<SidebarAdapter.ViewHolder> {
         private final List<SidebarItem> items;
+        private int selectedItemId = -1;
 
         SidebarAdapter(List<SidebarItem> items) {
             this.items = items;
         }
 
         List<SidebarItem> getItems() { return items; }
+
+        void setSelectedItemId(int selectedId) {
+            this.selectedItemId = selectedId;
+            notifyDataSetChanged();
+        }
 
         void setItems(List<SidebarItem> newItems) {
             items.clear();
@@ -809,6 +789,12 @@ public class MainActivity extends AppCompatActivity {
             SidebarItem item = items.remove(from);
             items.add(to, item);
             notifyItemMoved(from, to);
+        }
+
+        private boolean isInDragZone(View v, android.view.MotionEvent event) {
+            float x = event.getX();
+            float right = v.getWidth();
+            return x >= right - dp(48);
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
@@ -834,6 +820,13 @@ public class MainActivity extends AppCompatActivity {
                     sidebarTouchHelper.startDrag(this);
                     return true;
                 });
+                tv.setOnTouchListener((v, event) -> {
+                    if (event.getActionMasked() == android.view.MotionEvent.ACTION_DOWN
+                            && SidebarAdapter.this.isInDragZone(v, event)) {
+                        sidebarTouchHelper.startDrag(ViewHolder.this);
+                    }
+                    return false;
+                });
             }
         }
 
@@ -842,9 +835,11 @@ public class MainActivity extends AppCompatActivity {
             TextView tv = new TextView(MainActivity.this);
             tv.setTextSize(16);
             tv.setPadding(dp(16), dp(12), dp(16), dp(12));
+            tv.setCompoundDrawablePadding(dp(12));
+            tv.setGravity(android.view.Gravity.CENTER_VERTICAL);
             tv.setLayoutParams(new RecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            tv.setBackgroundResource(resolveSelectableItemBackground());
+            tv.setBackgroundResource(R.drawable.sidebar_item_bg);
             tv.setClickable(true);
             tv.setFocusable(true);
             return new ViewHolder(tv);
@@ -854,9 +849,20 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder h, int pos) {
             SidebarItem item = items.get(pos);
             h.textView.setText(item.label);
+            h.textView.setTextColor(getColorStateList(R.color.sidebar_nav_text));
+            h.textView.setCompoundDrawableTintList(
+                    androidx.core.content.ContextCompat.getColorStateList(MainActivity.this, R.color.sidebar_nav_text));
+            if (item.iconRes != 0) {
+                h.textView.setCompoundDrawablesRelativeWithIntrinsicBounds(item.iconRes, 0, R.drawable.ic_drag_handle, 0);
+            } else {
+                h.textView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_drag_handle, 0);
+            }
             if (item.id != null) {
                 int idRes = getResources().getIdentifier(item.id, "id", getPackageName());
-                if (idRes != 0) h.textView.setId(idRes);
+                if (idRes != 0) {
+                    h.textView.setId(idRes);
+                    h.textView.setSelected(idRes == selectedItemId);
+                }
             }
         }
 
@@ -879,7 +885,25 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
+    public void setToolbarSubtitle(CharSequence subtitle) {
+        setToolbarSubtitle(subtitle, 1f);
+    }
+
+    public void setToolbarSubtitle(CharSequence subtitle, float sizeRatio) {
+        if (getSupportActionBar() != null) {
+            if (subtitle != null && sizeRatio < 1f) {
+                android.text.SpannableString span = new android.text.SpannableString(subtitle);
+                span.setSpan(new android.text.style.RelativeSizeSpan(sizeRatio),
+                        0, subtitle.length(), android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                getSupportActionBar().setSubtitle(span);
+            } else {
+                getSupportActionBar().setSubtitle(subtitle);
+            }
+        }
+    }
+
     private void updateActionBarTitle(int itemId) {
+        setToolbarSubtitle(null);
         if (itemId == R.id.navFps) {
             getSupportActionBar().setTitle(R.string.nav_fps);
         } else if (itemId == R.id.navBattery) {

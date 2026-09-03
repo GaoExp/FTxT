@@ -129,9 +129,6 @@ public class CrosshairPanelController {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.crosshairModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

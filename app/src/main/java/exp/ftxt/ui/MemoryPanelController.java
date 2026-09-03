@@ -309,9 +309,6 @@ public class MemoryPanelController implements DefaultLifecycleObserver {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.memoryModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

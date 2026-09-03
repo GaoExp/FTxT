@@ -130,16 +130,35 @@ public class BatterySessionHistoryController {
         c.setTimeInMillis(now);
         switch (period) {
             case PERIOD_WEEKLY:
-                c.add(Calendar.DAY_OF_YEAR, -56);
+                trimToWeek(c);
+                c.add(Calendar.DAY_OF_YEAR, -77);
                 break;
             case PERIOD_MONTHLY:
-                c.add(Calendar.MONTH, -12);
+                c.set(Calendar.DAY_OF_MONTH, 1);
+                trimToDay(c);
+                c.add(Calendar.MONTH, -11);
                 break;
             default:
-                c.add(Calendar.DAY_OF_YEAR, -30);
+                trimToDay(c);
+                c.add(Calendar.DAY_OF_YEAR, -11);
                 break;
         }
         return new long[] {c.getTimeInMillis(), now};
+    }
+
+    private void trimToDay(Calendar c) {
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+    }
+
+    private void trimToWeek(Calendar c) {
+        int dow = c.get(Calendar.DAY_OF_WEEK);
+        if (dow != Calendar.MONDAY) {
+            c.add(Calendar.DAY_OF_YEAR, -(dow - Calendar.MONDAY));
+        }
+        trimToDay(c);
     }
 
     public void refresh() {
@@ -152,14 +171,17 @@ public class BatterySessionHistoryController {
     private void reloadChart() {
         if (queryInFlight) return;
         final long[] range = rangeForPeriod();
-        final boolean monthly = period == PERIOD_MONTHLY;
+        final int mode = period == PERIOD_MONTHLY ? BatteryHistoryDb.MODE_MONTHLY
+                : period == PERIOD_WEEKLY ? BatteryHistoryDb.MODE_WEEKLY
+                : BatteryHistoryDb.MODE_DAILY;
+        final int slotCount = 12;
         queryInFlight = true;
         sessionExecutor.execute(() -> {
             final ArrayList<BatteryHistoryDb.BarAggregate> aggregates =
-                    BatteryHistoryDb.get(activity).queryBarAggregates(range[0], range[1], monthly);
+                    BatteryHistoryDb.get(activity).queryBarAggregates(range[0], range[1], mode);
             uiHandler.post(() -> {
                 queryInFlight = false;
-                chartView.setMonthly(monthly);
+                chartView.setRange(range[0], range[1], mode, slotCount);
                 chartView.setData(aggregates);
                 updatePeriodRangeLabel(range);
                 if (!aggregates.isEmpty()) {
@@ -170,7 +192,7 @@ public class BatterySessionHistoryController {
                     selectedBucket = -1;
                     sessionEntriesCache = new ArrayList<>();
                 }
-                chartView.setSelectedIndex(bucketIndex(aggregates, selectedBucket));
+                chartView.setSelectedBucket(selectedBucket);
                 refreshSessionsForSelection();
             });
         });
@@ -183,24 +205,17 @@ public class BatterySessionHistoryController {
         return false;
     }
 
-    private int bucketIndex(ArrayList<BatteryHistoryDb.BarAggregate> a, long bucket) {
-        for (int i = 0; i < a.size(); i++) {
-            if (a.get(i).bucketStartMs == bucket) return i;
-        }
-        return a.size() - 1;
-    }
-
     private void updatePeriodRangeLabel(long[] range) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy", Locale.US);
-        String periodLabel = period == PERIOD_DAILY ? "30 hari terakhir"
-                : period == PERIOD_WEEKLY ? "8 minggu terakhir" : "12 bulan terakhir";
+        String periodLabel = period == PERIOD_DAILY ? "12 hari terakhir"
+                : period == PERIOD_WEEKLY ? "12 minggu terakhir" : "12 bulan terakhir";
         rangeText.setText(String.format(Locale.US, "%s · %s – %s", periodLabel,
                 sdf.format(new Date(range[0])), sdf.format(new Date(range[1]))));
     }
 
     private void updateSelectedRangeText() {
-        String periodLabel = period == PERIOD_DAILY ? "30 hari terakhir"
-                : period == PERIOD_WEEKLY ? "8 minggu terakhir" : "12 bulan terakhir";
+        String periodLabel = period == PERIOD_DAILY ? "12 hari terakhir"
+                : period == PERIOD_WEEKLY ? "12 minggu terakhir" : "12 bulan terakhir";
         if (selectedBucket < 0) {
             rangeText.setText(periodLabel);
             return;
@@ -294,6 +309,9 @@ public class BatterySessionHistoryController {
             c.setTimeInMillis(bucketStart);
             c.add(Calendar.MONTH, 1);
             return c.getTimeInMillis();
+        }
+        if (period == PERIOD_WEEKLY) {
+            return bucketStart + 7L * DAY_MS;
         }
         return bucketStart + DAY_MS;
     }

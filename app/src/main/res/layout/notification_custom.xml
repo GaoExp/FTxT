@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     android:gravity="center_vertical"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="4dp"
@@ -9,9 +9,8 @@
 
     <TextView
         android:id="@+id/noti_title"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="FTxT"
         android:textStyle="bold"
         android:textSize="14sp"
@@ -22,33 +21,40 @@
         android:paddingEnd="4dp"
         android:textColor="@android:color/white" />
 
-    <ImageButton
-        android:id="@+id/noti_toggle_btn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="center"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Toggle"
-        android:padding="8dp"
-        android:tint="@android:color/white" />
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <ImageButton
-        android:id="@+id/noti_close_btn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="center"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Kill"
-        android:padding="8dp"
-        android:tint="@android:color/white" />
+        <ImageButton
+            android:id="@+id/noti_toggle_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Toggle"
+            android:padding="8dp"
+            android:tint="@android:color/white" />
 
-    <ImageButton
-        android:id="@+id/noti_open_btn"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:scaleType="center"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Open"
-        android:padding="8dp"
-        android:tint="@android:color/white" />
+        <ImageButton
+            android:id="@+id/noti_close_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kill"
+            android:padding="8dp"
+            android:tint="@android:color/white" />
+
+        <ImageButton
+            android:id="@+id/noti_open_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="center"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Open"
+            android:padding="8dp"
+            android:tint="@android:color/white" />
+    </LinearLayout>
 </LinearLayout>

@@ -4,6 +4,11 @@
     <color name="drawer_header_background">#121212</color>
     <color name="drawer_header_text">#FFFFFF</color>
 
+    <color name="sidebar_nav_text_default">#FFFFFF</color>
+    <color name="sidebar_nav_text_selected">#4DB6AC</color>
+
+    <color name="bat_session_white">#E8E8EA</color>
+
     <color name="mem_monitor_card">#232327</color>
     <color name="mem_monitor_header">#4DA8FF</color>
     <color name="mem_monitor_label">#9A9AA0</color>

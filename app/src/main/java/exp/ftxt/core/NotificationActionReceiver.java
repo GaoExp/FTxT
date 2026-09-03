@@ -42,8 +42,9 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     }
 
     private void handleKillService(Context context) {
+        // Hentikan seluruh overlay; pemantau baterai tetap berjalan, jadi
+        // service tidak di-stop paksa (stopSelfIfEmpty mengaturnya).
         FloatingService.stopAllModules();
-        context.stopService(new Intent(context, FloatingService.class));
     }
 
     private void handleOpenApp(Context context) {

@@ -21,7 +21,6 @@ public class BootReceiver extends BroadcastReceiver {
 
         SharedPreferences prefs = context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
 
-        boolean textOn = prefs.getBoolean("text_overlay_on", false);
         FpsConfig.enabled = prefs.getBoolean("fps_enabled", false);
         ClockConfig.enabled = prefs.getBoolean("clock_enabled", false);
         BatteryStatsConfig.enabled = prefs.getBoolean("battery_enabled", false);
@@ -31,19 +30,10 @@ public class BootReceiver extends BroadcastReceiver {
         MemoryConfig.backgroundMonitor = prefs.getBoolean("mem_bg_monitor", false);
         CrosshairConfig.enabled = prefs.getBoolean("crosshair_enabled", false);
 
-        // Monitor baterai full-aktif: selalu direstart saat boot.
+        // FloatingService menampung pemantau baterai full-aktif sekaligus overlay
+        // yang diaktifkan via prefs, jadi selalu direstart saat boot.
         try {
-            context.startForegroundService(new Intent(context, BatteryMonitorService.class));
-        } catch (Exception ignored) {}
-
-        boolean anyActive = textOn || FpsConfig.enabled || ClockConfig.enabled
-                || BatteryStatsConfig.enabled || NetworkConfig.enabled
-                || BatteryBarConfig.enabled
-                || MemoryConfig.enabled || MemoryConfig.backgroundMonitor
-                || CrosshairConfig.enabled;
-
-        if (anyActive) {
             context.startForegroundService(new Intent(context, FloatingService.class));
-        }
+        } catch (Exception ignored) {}
     }
 }

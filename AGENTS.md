@@ -1,6 +1,6 @@
 # AGENTS.md — Aturan AI Project FTxT
 
-> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. JANGAN build. Gunakan bahasa Indonesia untuk thinking & respons.
+> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. JANGAN build — rule gradle di opencode diset `deny`, build tidak akan pernah bisa dijalankan. Gunakan bahasa Indonesia untuk thinking & respons.
 
 ---
 
@@ -21,6 +21,7 @@ Semver `major.minor.patch`:
 Entry dicatat di **versi berjalan** (bukan entry baru per file) — CHANGELOG hanya mencatat **poin perubahan**, bukan detail file. Urutan section WAJIB:
 
 ```
+🔖 Deskripsi
 ✨ Fitur Baru
 🚮 Fitur Dihapus
 ♻️ Perubahan Fitur
@@ -162,7 +163,7 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 - Ubah file di luar scope.
 - Audit project tanpa diminta.
 - Buat checklist panjang.
-- Build / revert tanpa konfirmasi.
+- Build / revert tanpa konfirmasi — khusus build: rule gradle di opencode sudah diset `deny`, sehingga perintah build apa pun pasti ditolak. Verifikasi kode cukup via inspeksi (grep/diff), bukan build.
 
 ---
 

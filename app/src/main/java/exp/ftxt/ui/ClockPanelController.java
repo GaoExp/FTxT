@@ -186,9 +186,6 @@ public class ClockPanelController {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.clockModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

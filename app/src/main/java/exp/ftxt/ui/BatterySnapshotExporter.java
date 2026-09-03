@@ -48,7 +48,7 @@ public class BatterySnapshotExporter {
         sb.append("Kapasitas Gabungan   : ").append(healthMedianText(h.medianMah)).append("\n");
         sb.append("Skor Kesehatan       : ").append(healthScoreText(h)).append("\n");
         sb.append("Sesi Tercatat      : ").append(h.sessionCount).append("\n");
-        sb.append("Keyakinan          : ").append(healthConfidenceText(h)).append("\n");
+        sb.append("Jumlah Data        : ").append(healthConfidenceText(h)).append("\n");
         ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
         if (cm == null) return;
         cm.setPrimaryClip(ClipData.newPlainText("FTxT Monitor Baterai", sb.toString()));
@@ -67,9 +67,7 @@ public class BatterySnapshotExporter {
 
     private String healthConfidenceText(BatteryCapacityEstimator.HealthResult r) {
         if (r.totalSamples <= 0) return "—";
-        return r.fromScreenOffSessions
-                ? r.totalSamples + " sampel (layar mati)"
-                : r.totalSamples + " sampel";
+        return r.totalSamples + " sampel";
     }
 
     private String combineMetricColumns() {
@@ -100,7 +98,7 @@ public class BatterySnapshotExporter {
         }
         sb.append("Skor Kesehatan     : ").append(scoreText).append("\n");
         sb.append("Sesi Tercatat      : ").append(health.sessionCount).append("\n");
-        sb.append("Keyakinan          : ").append(healthConfidenceText(health)).append("\n\n");
+        sb.append("Jumlah Data        : ").append(healthConfidenceText(health)).append("\n\n");
         int index = 1;
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         for (BatteryReading.Snapshot snap : history) {

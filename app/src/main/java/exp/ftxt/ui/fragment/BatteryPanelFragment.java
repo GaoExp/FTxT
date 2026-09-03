@@ -56,14 +56,17 @@ public class BatteryPanelFragment extends BasePanelFragment {
             if (id == R.id.batTabNavMonitor) {
                 showTab(tabMonitor);
                 currentTabId = id;
+                ((MainActivity) requireActivity()).setToolbarSubtitle("\u2022 Eksperimental", 0.75f);
                 if (batteryPanelController != null) batteryPanelController.onPanelShown();
             } else if (id == R.id.batTabNavOverlay) {
                 showTab(tabOverlay);
                 currentTabId = id;
+                ((MainActivity) requireActivity()).setToolbarSubtitle(null);
                 if (batteryPanelController != null) batteryPanelController.onPanelShown();
             } else {
                 showTab(tabStrip);
                 currentTabId = id;
+                ((MainActivity) requireActivity()).setToolbarSubtitle(null);
                 if (batteryBarPanelController != null) batteryBarPanelController.onPanelShown();
             }
             return true;
@@ -79,12 +82,16 @@ public class BatteryPanelFragment extends BasePanelFragment {
 
     @Override
     public void onPanelShown() {
+        if (currentTabId == R.id.batTabNavMonitor) {
+            ((MainActivity) requireActivity()).setToolbarSubtitle("\u2022 Eksperimental", 0.75f);
+        }
         if (batteryPanelController != null) batteryPanelController.onPanelShown();
         if (batteryBarPanelController != null) batteryBarPanelController.onPanelShown();
     }
 
     @Override
     public void onPanelHidden() {
+        ((MainActivity) requireActivity()).setToolbarSubtitle(null);
         if (batteryPanelController != null) batteryPanelController.onPanelHidden();
     }
 

@@ -16,6 +16,7 @@ import java.util.List;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_bar.BatteryBarModule;
+import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.battery_stats.BatteryStatsModule;
 import exp.ftxt.features.clock_module.ClockConfig;
@@ -199,7 +200,7 @@ public class FloatingService extends Service {
     }
 
     private void stopSelfIfEmpty() {
-        if (!isAnyModuleActive()) {
+        if (!isAnyModuleActive() && !BatteryMonitor.isRunning()) {
             stopSelf();
         }
     }
@@ -222,6 +223,10 @@ public class FloatingService extends Service {
 
         try {
             windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+            // Pemantau baterai full-aktif: berjalan selama FloatingService hidup,
+            // sehingga hanya ada satu notifikasi foreground untuk seluruh aplikasi.
+            BatteryMonitor.start(this);
 
             if (prefs.getBoolean("text_overlay_on", false)) {
                 ensureTextModule();
@@ -448,6 +453,7 @@ public class FloatingService extends Service {
         NotificationHelper.stopIconCycling();
         unregisterConfigReceiver();
         MemoryMonitor.stop();
+        BatteryMonitor.stop();
 
         for (OverlayModule module : allModules) {
             module.stop();

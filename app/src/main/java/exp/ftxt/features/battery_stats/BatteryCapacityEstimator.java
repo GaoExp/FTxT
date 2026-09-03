@@ -71,6 +71,7 @@ public class BatteryCapacityEstimator {
             new Thread(() -> {
                 migrateLegacyJsonIfNeeded();
                 loadFromDb();
+                getResult();
             }, "BatteryEstimatorInit").start();
         }
     }

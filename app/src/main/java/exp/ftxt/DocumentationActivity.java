@@ -1,6 +1,7 @@
 package exp.ftxt;
 
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -52,6 +53,8 @@ public class DocumentationActivity extends AppCompatActivity {
         docList = findViewById(R.id.docList);
         docContent = findViewById(R.id.docContent);
         docTextView = findViewById(R.id.docTextView);
+        docTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        docTextView.setLineSpacing(0, 1.15f);
 
         zoomView = getLayoutInflater().inflate(R.layout.toolbar_zoom, toolbar, false);
         zoomValue = zoomView.findViewById(R.id.toolbarZoomValue);

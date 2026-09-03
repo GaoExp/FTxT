@@ -51,8 +51,8 @@
 - **Tab Overlay di panel Memory terlihat aktif sebelum latar belakang diaktifkan** — Saat seleksi tab Overlay ditolak (background monitor belum aktif), tab kini tetap di posisi Monitor.
 
 ### 💡 Memo
-- Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama project seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog.
-- seluruh catatan versi sebelumnya berada di old-CHANGELOG.md
+> Mulai saat ini perubahan file apapun yang tidak berkaitan dengan konten utama project seperti Dokumen, file dan folder root, build/release dll tidak lagi disertakan dalam changelog.
+> seluruh catatan versi sebelumnya berada di old-CHANGELOG.md
 
 ---
 

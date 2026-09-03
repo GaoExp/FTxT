@@ -129,58 +129,6 @@ public class BatteryChartDetailActivity extends AppCompatActivity {
         });
         chartView.setOnPanSettledListener(this::refreshViewportAfterPan);
 
-        TextView radCrosshair = findViewById(R.id.radCrosshair);
-        TextView radPan = findViewById(R.id.radPan);
-        int labelColor = getResources().getColor(R.color.bat_monitor_label);
-
-        radCrosshair.setOnClickListener(v -> {
-            chartView.setMode(BatteryChartView.MODE_CROSSHAIR);
-            radCrosshair.setTextColor(accentColor);
-            radCrosshair.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-            radPan.setTextColor(labelColor);
-            radPan.setTypeface(android.graphics.Typeface.DEFAULT);
-        });
-
-        radPan.setOnClickListener(v -> {
-            chartView.setMode(BatteryChartView.MODE_PAN);
-            radPan.setTextColor(accentColor);
-            radPan.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-            radCrosshair.setTextColor(labelColor);
-            radCrosshair.setTypeface(android.graphics.Typeface.DEFAULT);
-        });
-
-        radCrosshair.setTextColor(accentColor);
-        radCrosshair.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        radPan.setTextColor(labelColor);
-        radPan.setTypeface(android.graphics.Typeface.DEFAULT);
-
-        SeekBar zoomSeek = findViewById(R.id.chartDetailZoomSeek);
-        zoomSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (!fromUser) return;
-                float maxZoom = Math.max(1f, (float) windowMs / 30_000f);
-                float zoom = 1f + (progress / 100f) * (maxZoom - 1f);
-                if (zoom <= 1.001f) {
-                    if (chartView.hasViewport()) {
-                        chartView.clearViewport();
-                        queryNow();
-                    }
-                    return;
-                }
-                long anchorEnd = ensureAnchorEnd();
-                long targetW = Math.min(windowMs,
-                        Math.max(BatteryChartView.getMinVisibleMs(), (long) (windowMs / zoom)));
-                long spanStart = anchorEnd - windowMs;
-                long mid = (chartView.getVisibleStartMs() + chartView.getVisibleEndMs()) / 2L;
-                long visStart = Math.max(spanStart,
-                        Math.min(anchorEnd - targetW, mid - targetW / 2L));
-                requeryViewport(visStart, visStart + targetW);
-            }
-            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
         setupRangeControls();
         applyWindow(windowMs, false);
     }
@@ -242,8 +190,6 @@ public class BatteryChartDetailActivity extends AppCompatActivity {
         chartView.clearViewport();
         chartView.setWindowMs(ms);
         chartView.resetZoom();
-        SeekBar zoomSeek = findViewById(R.id.chartDetailZoomSeek);
-        if (zoomSeek != null) zoomSeek.setProgress(0);
         for (int i = 0; i < BatteryChartHistoryController.CHART_WINDOWS.length; i++) {
             if (BatteryChartHistoryController.CHART_WINDOWS[i] == ms) {
                 rangeSeek.setProgress(i);

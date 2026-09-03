@@ -212,9 +212,6 @@ public class BatteryPanelController {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.batteryStatsModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

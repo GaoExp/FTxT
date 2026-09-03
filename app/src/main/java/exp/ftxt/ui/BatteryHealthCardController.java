@@ -76,42 +76,27 @@ public class BatteryHealthCardController {
     void applyResult(BatteryCapacityEstimator.HealthResult r) {
         if (batHealthText == null) return;
 
-        SpannableStringBuilder sb = new SpannableStringBuilder();
-        appendLineColored(sb, "Pengisian", capacityText(r.chargeMedianMah), null);
-        appendLineColored(sb, "Pengosongan", capacityText(r.dischargeMedianMah), null);
-        appendLineColored(sb, "Gabungan", capacityText(r.medianMah), null);
+        float design = r.designMah > 0 ? r.designMah : 0f;
 
-        int scoreColor;
-        String score;
-        if (r.designMah <= 0) {
-            score = "Isi kapasitas desain";
-            scoreColor = monitorLabelColor;
-        } else if (r.medianMah <= 0) {
-            score = "Belum ada data";
-            scoreColor = monitorLabelColor;
-        } else {
-            float pctScore = r.medianMah / r.designMah * 100f;
-            score = String.format(Locale.US, "%.1f%%", pctScore);
+        int scoreColor = monitorLabelColor;
+        if (design > 0 && r.medianMah > 0) {
+            float pctScore = r.medianMah / design * 100f;
             scoreColor = activity.getColor(pctScore >= 80f ? R.color.bat_monitor_active
                     : pctScore >= 50f ? R.color.bat_monitor_header : R.color.bat_monitor_stop);
         }
-        appendLineColored(sb, "Skor Kesehatan", score, scoreColor);
 
-        appendLineColored(sb, "Sesi Estimasi", String.valueOf(r.sessionCount), null);
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+        appendLineColored(sb, "Kapasitas Pengisian", capacityWithPct(r.chargeMedianMah, design), null);
+        appendLineColored(sb, "Kapasitas Pengosongan", capacityWithPct(r.dischargeMedianMah, design), null);
+        appendLineColored(sb, "Kapasitas Gabungan", capacityWithPct(r.medianMah, design), scoreColor);
+
+        appendLineColored(sb, "Sesi Valid Tercatat", String.valueOf(r.sessionCount), null);
+
         String confidence = r.totalSamples > 0
-                ? (r.fromScreenOffSessions
-                        ? r.totalSamples + " sampel (layar mati)"
-                        : r.totalSamples + " sampel")
+                ? r.totalSamples + " sampel"
                 : "—";
-        appendLineColored(sb, "Keyakinan", confidence,
+        appendLineColored(sb, "Jumlah Data", confidence,
                 r.totalSamples <= 0 ? monitorLabelColor : null);
-
-        boolean collecting = BatteryCapacityEstimator.isSegmentActive();
-        String status = collecting
-                ? "Mengumpulkan saat mengisi…"
-                : "Menunggu pengisian daya";
-        appendLineColored(sb, "Status", status,
-                collecting ? activity.getColor(R.color.bat_monitor_active) : monitorLabelColor);
 
         batHealthText.setText(sb);
         batHealthSessionBadge.setText(r.sessionCount + " sesi valid");
@@ -121,7 +106,7 @@ public class BatteryHealthCardController {
     }
 
     private void appendLineColored(SpannableStringBuilder sb, String label, String value, Integer valueColor) {
-        String padded = String.format(Locale.US, "%-17s", label);
+        String padded = String.format(Locale.US, "%-20s: ", label);
         int start = sb.length();
         sb.append(padded).append(value).append("\n");
         sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
@@ -132,8 +117,14 @@ public class BatteryHealthCardController {
         }
     }
 
-    private String capacityText(float v) {
-        return v > 0f ? String.format(Locale.US, "≈ %.0f mAh", v) : "—";
+    private String capacityWithPct(float v, float design) {
+        if (v <= 0f) return "—";
+        String base = String.format(Locale.US, "%.0f mAh", v);
+        if (design > 0f) {
+            float pct = v / design * 100f;
+            return String.format(Locale.US, "%s (%.1f%%)", base, pct);
+        }
+        return base;
     }
 
     private void showDesignCapacityDialog() {

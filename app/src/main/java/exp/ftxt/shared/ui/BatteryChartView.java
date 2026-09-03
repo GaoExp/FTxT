@@ -7,7 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import androidx.core.graphics.ColorUtils;
 
@@ -103,12 +105,22 @@ public class BatteryChartView extends View {
     private long viewportStartT = Long.MIN_VALUE;
     private long viewportEndT = 0L;
 
-    // Touch interaction mode
-    public static final int MODE_CROSSHAIR = 0;
-    public static final int MODE_PAN = 1;
-    private int touchMode = MODE_CROSSHAIR;
+    // State gesture sentuhan. Pembeda target ditentukan saat ACTION_DOWN
+    // (tekan di tracker = drag tracker, tekan di grafik = ketuk/pan); aksi baru
+    // dieksekusi setelah pergeseran melewati ambang touch slop.
+    private static final int GESTURE_NONE = 0;
+    private static final int GESTURE_TAP_OR_PAN = 1;
+    private static final int GESTURE_TRACKER = 2;
+    private static final int GESTURE_PAN = 3;
+    private static final int GESTURE_TRACKER_DRAG = 4;
 
-    private float prevTouchX = 0f;
+    private ScaleGestureDetector scaleDetector;
+    private int touchSlop;
+    private int gesture = GESTURE_NONE;
+    private boolean gestureLocked = false;
+    private float downX;
+    private float downY;
+    private float prevPanX;
 
     public BatteryChartView(Context context) {
         this(context, null);
@@ -147,17 +159,80 @@ public class BatteryChartView extends View {
         crosshairTextPaint.setTextSize(sp(10));
         crosshairTextPaint.setTextAlign(Paint.Align.CENTER);
 
+        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        scaleDetector = new ScaleGestureDetector(getContext(), scaleListener);
+
         applySeriesStyle();
     }
 
-    public void setMode(int mode) {
-        touchMode = mode;
-        if (mode == MODE_PAN) {
-            scrubbing = false;
-            selectedIndex = -1;
-            if (scrubListener != null) scrubListener.onScrub(-1, null);
+    /**
+     * Pinch-to-zoom: dua jari mengubah level zoom dengan menahan waktu tepat di
+     * titik tengah jari (fokus) sebagai acuan, lalu memicu query buffer data baru.
+     */
+    private final ScaleGestureDetector.OnScaleGestureListener scaleListener =
+            new ScaleGestureDetector.OnScaleGestureListener() {
+                @Override
+                public boolean onScaleBegin(ScaleGestureDetector detector) {
+                    gesture = GESTURE_NONE;
+                    gestureLocked = true;
+                    return true;
+                }
+
+                @Override
+                public boolean onScale(ScaleGestureDetector detector) {
+                    applyPinchZoom(detector.getScaleFactor(), detector.getFocusX());
+                    return true;
+                }
+
+                @Override
+                public void onScaleEnd(ScaleGestureDetector detector) {
+                    scrubbing = false;
+                    if (panSettledListener != null && hasViewport()) panSettledListener.onPanSettled();
+                }
+            };
+
+    private void applyPinchZoom(float factor, float focusX) {
+        float maxZoom = Math.max(1f, windowMs / (float) MIN_VISIBLE_MS);
+        float newZoom = Math.max(1f, Math.min(maxZoom, viewZoom * factor));
+        if (newZoom <= 1.0f) {
+            viewZoom = 1.0f;
+            panOffsetMs = 0L;
+            invalidate();
+            return;
         }
+        float fx = (focusX - lastPadLeft) / lastPlotW;
+        fx = Math.max(0f, Math.min(1f, fx));
+        long curVisStart = getEffectiveStartT() + panOffsetMs;
+        long curVisW = (long) (windowMs / viewZoom);
+        long focusTime = curVisStart + (long) (fx * curVisW);
+        long newVisW = Math.max(MIN_VISIBLE_MS, (long) (windowMs / newZoom));
+        viewZoom = windowMs / (float) newVisW;
+        long wantStart = focusTime - (long) (fx * newVisW);
+        panOffsetMs = wantStart - getEffectiveStartT();
+        clampPanOffset();
         invalidate();
+    }
+
+    /** Geser grafik untuk memindahkan jendela tampil (pan). */
+    private void panBy(float dx) {
+        long deltaMs = (long) (dx * lastSpanMs / lastPlotW);
+        panOffsetMs += deltaMs;
+        clampPanOffset();
+        invalidate();
+    }
+
+    /** True bila sentuhan mulai berada tepat di atas titik tracker (crosshair). */
+    private boolean hitTracker(float x, float y) {
+        if (selectedIndex < lastFirst || selectedIndex >= lastFirst + lastCount) return false;
+        if (selectedIndex < 0 || selectedIndex >= samples.length) return false;
+        float tx = lastPadLeft + lastPlotW * ((samples[selectedIndex].time - lastBaseT) / lastSpanMs);
+        float norm = (valueAt(selectedIndex) - lastMin) / lastVRange;
+        norm = Math.max(0f, Math.min(1f, norm));
+        float ty = lastPadTop + lastPlotH * (1f - norm);
+        float r = dp(24);
+        float dx = x - tx;
+        float dy = y - ty;
+        return (dx * dx + dy * dy) <= (r * r);
     }
 
     public void setZoomLevel(float zoom) {
@@ -313,41 +388,74 @@ public class BatteryChartView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         if (!interactive || lastCount < 2 || lastPlotW <= 0f) return super.onTouchEvent(event);
 
-        float touchX = event.getX();
+        scaleDetector.onTouchEvent(event);
+        boolean pinching = scaleDetector.isInProgress();
 
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
-                prevTouchX = touchX;
-                if (touchMode == MODE_CROSSHAIR) {
-                    selectNearest(touchX);
-                } else if (touchMode == MODE_PAN) {
-                    if (viewZoom > 1.0f) {
-                        scrubbing = true;
-                    }
+                downX = event.getX();
+                downY = event.getY();
+                prevPanX = downX;
+                gesture = hitTracker(downX, downY) ? GESTURE_TRACKER : GESTURE_TAP_OR_PAN;
+                gestureLocked = false;
+                return true;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (event.getPointerCount() >= 2) {
+                    gesture = GESTURE_NONE;
+                    gestureLocked = true;
+                }
+                return true;
+            case MotionEvent.ACTION_POINTER_UP:
+                if (event.getPointerCount() == 2) {
+                    gesture = GESTURE_NONE;
+                    gestureLocked = false;
+                    scrubbing = false;
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
-                if (touchMode == MODE_CROSSHAIR) {
-                    selectNearest(touchX);
-                } else if (touchMode == MODE_PAN && viewZoom > 1.0f) {
-                    float dx = prevTouchX - touchX;
-                    long deltaMs = (long) (dx * lastSpanMs / lastPlotW);
-                    panOffsetMs += deltaMs;
-                    clampPanOffset();
-                    prevTouchX = touchX;
-                    invalidate();
+                if (pinching) return true;
+                if (!gestureLocked) {
+                    float dx = event.getX() - downX;
+                    float dy = event.getY() - downY;
+                    if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop) {
+                        gestureLocked = true;
+                        if (gesture == GESTURE_TRACKER) {
+                            gesture = GESTURE_TRACKER_DRAG;
+                            scrubbing = true;
+                            selectNearest(event.getX());
+                        } else {
+                            gesture = GESTURE_PAN;
+                            scrubbing = true;
+                            prevPanX = event.getX();
+                        }
+                    }
+                }
+                if (gesture == GESTURE_TRACKER_DRAG) {
+                    selectNearest(event.getX());
+                } else if (gesture == GESTURE_PAN) {
+                    panBy(prevPanX - event.getX());
+                    prevPanX = event.getX();
                 }
                 return true;
             case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                if (touchMode == MODE_PAN) {
-                    scrubbing = false;
-                    if (panSettledListener != null && hasViewport()) panSettledListener.onPanSettled();
+                if (!gestureLocked && gesture == GESTURE_TAP_OR_PAN) {
+                    selectNearest(event.getX());
                 }
+                scrubbing = false;
+                if (gesture == GESTURE_PAN && panSettledListener != null && hasViewport()) {
+                    panSettledListener.onPanSettled();
+                }
+                gesture = GESTURE_NONE;
+                gestureLocked = false;
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                scrubbing = false;
+                gesture = GESTURE_NONE;
+                gestureLocked = false;
                 return true;
             default:
-                return super.onTouchEvent(event);
+                return true;
         }
     }
 
@@ -478,10 +586,6 @@ public class BatteryChartView extends View {
         lastN = n;
         lastMin = min;
         lastVRange = vRange;
-        if (interactive) {
-            if (selectedIndex < first) selectedIndex = first;
-            else if (selectedIndex >= first + count) selectedIndex = first + count - 1;
-        }
 
         float lastX = 0f;
         float lastY = 0f;

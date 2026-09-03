@@ -8,7 +8,12 @@
     <color name="drawer_header_background">#222222</color>
     <color name="drawer_header_text">#000000</color>
 
+    <!-- Sidebar navigation -->
+    <color name="sidebar_nav_text_default">#212121</color>
+    <color name="sidebar_nav_text_selected">#008577</color>
+
     <color name="white">#FFFFFF</color>
+    <color name="bat_session_white">#37474F</color>
 
     <!-- Memory Monitor -->
     <color name="mem_monitor_card">#F2F2F7</color>

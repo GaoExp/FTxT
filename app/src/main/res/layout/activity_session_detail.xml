@@ -55,135 +55,133 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scrollbars="vertical">
+        android:scrollbars="vertical"
+        android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/sesDetailScrollContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="12dp">
 
+            <!-- Kartu utama: ring level + ringkasan status -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/bat_card_bg"
-                android:padding="14dp"
+                android:padding="12dp"
                 android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:id="@+id/sesDetailSubtitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:textColor="@color/bat_monitor_label"
-                    android:layout_marginBottom="10dp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/sesDetailStatusBig"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/bat_monitor_active"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Waktu Mulai"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesStartTime"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <View
                         android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/sesDetailRangeBadge"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Waktu Selesai"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesEndTime"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/bat_monitor_label"
+                        android:gravity="center"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:background="@drawable/bat_badge_stopped_bg"/>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
+                    android:gravity="center"
+                    android:layout_marginTop="8dp">
+
+                    <exp.ftxt.features.battery_stats.BatteryRingView
+                        android:id="@+id/sesDetailRing"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
 
                         <TextView
+                            android:text="Rentang waktu"
+                            android:textSize="11sp"
+                            android:textColor="@color/bat_monitor_label"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/sesDetailRange"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/bat_monitor_header"
+                            android:layout_marginTop="2dp"/>
+
+                        <TextView
                             android:text="Durasi"
                             android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesDuration"
+                            android:textColor="@color/bat_monitor_label"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
+                            android:layout_marginTop="8dp"/>
+
+                        <TextView
+                            android:id="@+id/sesDetailDuration"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/bat_monitor_header"
                             android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
 
                         <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Level Awal → Akhir"
+                            android:text="Kecepatan"
                             android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesLevel"
+                            android:textColor="@color/bat_monitor_label"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
+                            android:layout_marginTop="8dp"/>
+
+                        <TextView
+                            android:id="@+id/sesDetailRate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/bat_monitor_header"
                             android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Kartu Status / Energi -->
             <LinearLayout
+                android:id="@+id/sesDetailStatusCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -191,118 +189,42 @@
                 android:padding="14dp"
                 android:layout_marginBottom="10dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <View
+                        android:layout_width="3dp"
+                        android:layout_height="14dp"
+                        android:background="@android:color/transparent"/>
+
+                    <TextView
+                        android:id="@+id/sesDetailStatusTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="13sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
+
                 <TextView
-                    android:id="@+id/sesEnergyTitle"
+                    android:id="@+id/sesDetailStatusSubtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:textSize="13sp"/>
+                    android:textSize="11sp"
+                    android:textColor="@color/bat_monitor_label"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="6dp"/>
 
                 <LinearLayout
+                    android:id="@+id/sesDetailStatusRows"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="mAh (Integral)"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesMahIntegral"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="mAh (Coulomb)"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesMahCounter"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Delta mAh"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesDeltaMah"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Efisiensi"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesEfficiency"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:orientation="vertical"/>
             </LinearLayout>
 
+            <!-- Kartu Rincian sesi -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -310,162 +232,31 @@
                 android:background="@drawable/bat_card_bg"
                 android:padding="14dp">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Suhu &amp; Sampel"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/bat_monitor_header"/>
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
+                    android:gravity="center_vertical">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <View
+                        android:layout_width="3dp"
+                        android:layout_height="14dp"
+                        android:background="@android:color/transparent"/>
+
+                    <TextView
+                        android:id="@+id/sesDetailDetailTitle"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Min"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesTempMin"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Maks"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesTempMax"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Rata²"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesTempAvg"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/bat_monitor_header"/>
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/sesDetailDetailRows"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Kapasitas Terestimasi"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesCapacity"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Kondisi Layar"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesScreen"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Sampel"
-                            android:textSize="11sp"
-                            android:textColor="@color/bat_monitor_label"/>
-
-                        <TextView
-                            android:id="@+id/sesSamples"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:fontFamily="monospace"
-                            android:layout_marginTop="2dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    android:orientation="vertical"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

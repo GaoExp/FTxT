@@ -9,6 +9,7 @@ import android.view.View;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -16,10 +17,13 @@ import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 
 /**
- * Bar chart riwayat sesi: satu batang per hari/bulan. Setiap batang terdiri
- * dari dua segmen — hijau (pengisian %) dan oranye (pengosongan %) — sehingga
- * skala sumbu Y otomatis mengikuti nilai agregat maksimum periode. Batang bisa
- * diketuk untuk memilih tanggal itu; batang terpilih disorot stroke aksen.
+ * Bar chart riwayat sesi: satu batang per slot waktu (hari/minggu/bulan) pada
+ * rentang tetap. Setiap batang terdiri dari dua segmen — hijau (pengisian %)
+ * dan oranye (pengosongan %) — sehingga skala sumbu Y otomatis mengikuti nilai
+ * agregat maksimum. Slot dihitung berdasarkan posisi waktu (slotCount + rentang),
+ * bukan jumlah hari yang berisi data, sehingga hari tanpa data tampil kosong dan
+ * grafik tidak melebar saat data masih sedikit. Batang bisa diketuk untuk memilih
+ * slot tersebut; batang terpilih disorot stroke aksen.
  */
 public class BatterySessionBarChartView extends View {
 
@@ -34,12 +38,15 @@ public class BatterySessionBarChartView extends View {
     private final Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint emptyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private final SimpleDateFormat fmtDay = new SimpleDateFormat("dd/MM", Locale.US);
-    private final SimpleDateFormat fmtMonth = new SimpleDateFormat("MM/yy", Locale.US);
+    private final SimpleDateFormat fmtDay = new SimpleDateFormat("d", Locale.US);
+    private final SimpleDateFormat fmtMonth = new SimpleDateFormat("M", Locale.US);
 
     private ArrayList<BatteryHistoryDb.BarAggregate> data = new ArrayList<>();
     private int selectedIndex = -1;
-    private boolean monthly = false;
+    private int mode = BatteryHistoryDb.MODE_DAILY;
+    private long rangeStartMs;
+    private long rangeEndMs;
+    private int slotCount = 0;
     private OnBarClickListener barClickListener;
 
     public BatterySessionBarChartView(Context context) {
@@ -71,7 +78,16 @@ public class BatterySessionBarChartView extends View {
 
     public void setData(ArrayList<BatteryHistoryDb.BarAggregate> aggregates) {
         this.data = aggregates != null ? aggregates : new ArrayList<>();
-        if (selectedIndex >= data.size()) selectedIndex = -1;
+        if (selectedIndex >= slotCount) selectedIndex = -1;
+        invalidate();
+    }
+
+    /** Mengatur rentang sumbu waktu yang ditampilkan (slot tetap ber-rolling). */
+    public void setRange(long startMs, long endMs, int mode, int slotCount) {
+        this.rangeStartMs = startMs;
+        this.rangeEndMs = Math.max(startMs, endMs);
+        this.mode = mode;
+        this.slotCount = Math.max(1, slotCount);
         invalidate();
     }
 
@@ -80,9 +96,9 @@ public class BatterySessionBarChartView extends View {
         invalidate();
     }
 
-    public void setMonthly(boolean monthly) {
-        this.monthly = monthly;
-        invalidate();
+    /** Menyorot slot yang berisi bucket tertentu (berdasarkan posisi waktunya). */
+    public void setSelectedBucket(long bucketStart) {
+        setSelectedIndex(slotIndexFor(bucketStart));
     }
 
     public void setOnBarClickListener(OnBarClickListener listener) {
@@ -96,14 +112,14 @@ public class BatterySessionBarChartView extends View {
         int h = getHeight();
         if (w <= 0 || h <= 0) return;
 
-        float padL = dp(6), padR = dp(6), padT = dp(14), padB = dp(18);
+        float padL = dp(30), padR = dp(6), padT = dp(14), padB = dp(18);
         float left = padL, right = w - padR;
         float top = padT, bottom = h - padB;
         float chartH = bottom - top;
 
-        if (data.isEmpty()) {
+        if (data.isEmpty() || slotCount <= 0) {
             emptyPaint.setTextSize(dp(12));
-            canvas.drawText("Belum ada data", w / 2f, h / 2f, emptyPaint);
+            canvas.drawText("Belum ada data", (left + right) / 2f, (top + bottom) / 2f, emptyPaint);
             return;
         }
 
@@ -113,23 +129,32 @@ public class BatterySessionBarChartView extends View {
             if (total > maxVal) maxVal = total;
         }
 
+        // Sumbu Y: nilai max di garis teratas, 0 di garis terbawah, dengan satuan %
         gridPaint.setStrokeWidth(dp(1));
         for (int i = 0; i <= 2; i++) {
-            float y = top + chartH * (1f - i / 2f);
+            float ratio = i / 2f;
+            float y = top + chartH * ratio;
             canvas.drawLine(left, y, right, y, gridPaint);
-            String label = i == 0 ? fmt((int) maxVal)
-                    : i == 1 ? fmt((int) (maxVal / 2f)) : "0";
-            textPaint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(label, dp(2), y - dp(3), textPaint);
+            String label = (i == 0 ? fmt((int) Math.round(maxVal))
+                    : i == 1 ? fmt((int) Math.round(maxVal / 2f)) : "0") + "%";
+            textPaint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(label, left - dp(4), y + dp(3), textPaint);
         }
         textPaint.setTextAlign(Paint.Align.CENTER);
 
-        int n = data.size();
-        float slot = (right - left) / n;
-        for (int i = 0; i < n; i++) {
-            BatteryHistoryDb.BarAggregate a = data.get(i);
-            float x0 = left + slot * i + slot * 0.15f;
-            float x1 = left + slot * (i + 1) - slot * 0.15f;
+        float slotW = (right - left) / slotCount;
+        float barW = slotW * 0.7f;
+
+        for (BatteryHistoryDb.BarAggregate a : data) {
+            long bucket = a.bucketStartMs;
+            if (bucket >= rangeEndMs) continue;
+            int slot = slotIndexFor(bucket);
+            if (slot < 0) slot = 0;
+            if (slot >= slotCount) slot = slotCount - 1;
+
+            float cx = left + slot * slotW + slotW / 2f;
+            float x0 = cx - barW / 2f;
+            float x1 = cx + barW / 2f;
 
             float chargeH = chartH * (a.chargePercent / maxVal);
             float dischargeH = chartH * (a.dischargePercent / maxVal);
@@ -143,36 +168,106 @@ public class BatterySessionBarChartView extends View {
                         x1, yBase - chargeH), dischargePaint);
             }
 
-            String dayLabel = monthly
-                    ? fmtMonth.format(new Date(a.bucketStartMs))
-                    : fmtDay.format(new Date(a.bucketStartMs));
-            canvas.drawText(dayLabel, left + slot * i + slot / 2f, h - dp(4), textPaint);
-
-            if (i == selectedIndex && a.chargePercent + a.dischargePercent > 0f) {
+            if (slot == selectedIndex && a.chargePercent + a.dischargePercent > 0f) {
                 canvas.drawRect(new RectF(x0 - dp(1), bottom - chargeH - dischargeH,
                         x1 + dp(1), bottom), strokePaint);
             }
+        }
+
+        // Label sumbu X: ditulis untuk semua slot agar konsisten & tidak tumpang tindih.
+        for (int slot = 0; slot < slotCount; slot++) {
+            long bucket = slotBucketStart(slot);
+            String label = slotLabel(bucket);
+            float cx = left + slot * slotW + slotW / 2f;
+            canvas.drawText(label, cx, h - dp(4), textPaint);
         }
     }
 
     @Override
     public boolean onTouchEvent(android.view.MotionEvent event) {
-        if (data.isEmpty()) return super.onTouchEvent(event);
+        if (data.isEmpty() || slotCount <= 0) return super.onTouchEvent(event);
         if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-            float padL = dp(6), padR = dp(6);
+            float padL = dp(30), padR = dp(6);
             float left = padL, right = getWidth() - padR;
-            int n = data.size();
-            if (n <= 0 || right <= left) return true;
-            int index = (int) ((event.getX() - left) / ((right - left) / n));
-            if (index < 0) index = 0;
-            if (index >= n) index = n - 1;
-            setSelectedIndex(index);
-            if (barClickListener != null) {
-                barClickListener.onBarClicked(index, data.get(index));
-            }
+            if (right <= left) return true;
+            float slotW = (right - left) / slotCount;
+            int slot = (int) ((event.getX() - left) / slotW);
+            if (slot < 0) slot = 0;
+            if (slot >= slotCount) slot = slotCount - 1;
+            IntentForClick(slot);
             return true;
         }
         return true;
+    }
+
+    private void IntentForClick(int slot) {
+        BatteryHistoryDb.BarAggregate found = null;
+        for (BatteryHistoryDb.BarAggregate a : data) {
+            if (slotIndexFor(a.bucketStartMs) == slot) {
+                found = a;
+                break;
+            }
+        }
+        if (found == null) return;
+        setSelectedIndex(slot);
+        if (barClickListener != null) {
+            barClickListener.onBarClicked(slot, found);
+        }
+    }
+
+    private int slotIndexFor(long bucket) {
+        if (slotCount <= 0) return -1;
+        int slot;
+        if (mode == BatteryHistoryDb.MODE_MONTHLY) {
+            java.util.Calendar cb = java.util.Calendar.getInstance();
+            cb.setTimeInMillis(bucket);
+            java.util.Calendar cr = java.util.Calendar.getInstance();
+            cr.setTimeInMillis(rangeStartMs);
+            slot = (cb.get(java.util.Calendar.YEAR) - cr.get(java.util.Calendar.YEAR)) * 12
+                    + (cb.get(java.util.Calendar.MONTH) - cr.get(java.util.Calendar.MONTH));
+        } else if (mode == BatteryHistoryDb.MODE_WEEKLY) {
+            slot = (int) ((bucket - rangeStartMs) / WEEK_MS);
+        } else {
+            slot = (int) ((bucket - rangeStartMs) / DAY_MS);
+        }
+        if (slot < 0) return 0;
+        if (slot >= slotCount) return slotCount - 1;
+        return slot;
+    }
+
+    private static final long DAY_MS = 24L * 60L * 60L * 1000L;
+    private static final long WEEK_MS = 7L * DAY_MS;
+
+    /** Waktu mulai (bucket) untuk slot ke-0..slotCount-1 pada rentang aktif. */
+    private long slotBucketStart(int slot) {
+        if (mode == BatteryHistoryDb.MODE_MONTHLY) {
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(rangeStartMs);
+            c.add(Calendar.MONTH, slot);
+            return c.getTimeInMillis();
+        }
+        long unit = mode == BatteryHistoryDb.MODE_WEEKLY ? WEEK_MS : DAY_MS;
+        return rangeStartMs + slot * unit;
+    }
+
+    /** Label sumbu X untuk sebuah bucket: harian = tanggal, mingguan = nomor minggu ISO, bulanan = nomor bulan. */
+    private String slotLabel(long bucket) {
+        if (mode == BatteryHistoryDb.MODE_MONTHLY) {
+            return fmtMonth.format(new Date(bucket));
+        }
+        if (mode == BatteryHistoryDb.MODE_WEEKLY) {
+            return String.valueOf(isoWeekNumber(bucket));
+        }
+        return fmtDay.format(new Date(bucket));
+    }
+
+    /** Nomor minggu menurut ISO 8601 (minggu mulai Senin, minggu-1 berisi minimal 4 hari). */
+    private static int isoWeekNumber(long ms) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(ms);
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.setMinimalDaysInFirstWeek(4);
+        return c.get(Calendar.WEEK_OF_YEAR);
     }
 
     private String fmt(int v) {

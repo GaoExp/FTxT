@@ -43,8 +43,7 @@ FTxT/
     │   │   │   ├── NotificationHelper.java  — Notifikasi foreground service (custom RemoteViews + ikon dinamis Bitmap suhu, caching)
     │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
     │   │   │   ├── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
-    │   │   │   ├── BootReceiver.java        — Restore overlay aktif saat boot
-    │   │   │   ├── BatteryMonitorService.java — Foreground service ringan monitor baterai full-aktif (notifikasi minimal prioritas rendah, auto-start app & boot)
+    │   │   │   ├── BootReceiver.java        — Restore overlay & pemantau baterai aktif saat boot
     │   │   │   └── CrashLogger.java         — Crash logger otomatis: stack trace ke folder Download saat force close
     │   │   │
     │   │   ├── features/
@@ -208,9 +207,8 @@ FTxT/
     │       │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
     │       │   ├── dialog_color_picker.xml      — Dialog color picker gabungan wheel + sliders
     │       │   ├── dialog_preset_browser.xml    — Dialog browser preset dengan search & list
-    │       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
-    │       │   ├── notification_custom.xml      — Custom notification layout (RemoteViews + ImageButton)
-    │   │   ├── nav_header.xml               — Header navigation drawer: logo + versi
+│       │   ├── drawer_content.xml           — Konten navigation drawer: RecyclerView item list
+    │       │   ├── nav_header.xml               — Header navigation drawer: logo + versi
     │   │   ├── panel_text.xml               — Panel konfigurasi Floating Text
     │   │   ├── panel_fps.xml                — Panel konfigurasi FPS Display
     │   │   ├── panel_clock.xml              — Panel konfigurasi Jam Digital

@@ -61,6 +61,8 @@ public class BatteryMonitorTabController {
     private final SubTabAdapter subTabAdapter = new SubTabAdapter();
 
     private int currentSubTab = 0;
+    private long lastEstimateTime = 0;
+    private static final long ESTIMATE_THROTTLE_MS = 10_000L;
 
     private final Runnable monitorRunnable = new Runnable() {
         @Override
@@ -292,7 +294,11 @@ public class BatteryMonitorTabController {
         if (charts != null) charts.refresh();
         if (history != null) history.refresh();
 
-        updateEstimateAndHealth(s);
+        long now = System.currentTimeMillis();
+        if (now - lastEstimateTime >= ESTIMATE_THROTTLE_MS) {
+            lastEstimateTime = now;
+            updateEstimateAndHealth(s);
+        }
     }
 
     /**

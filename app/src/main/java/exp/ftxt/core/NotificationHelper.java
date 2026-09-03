@@ -26,6 +26,8 @@ import java.util.List;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
+import exp.ftxt.features.battery_stats.BatteryMonitor;
+import exp.ftxt.features.battery_stats.BatteryReading;
 import exp.ftxt.features.battery_stats.BatteryStatsConfig;
 import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.crosshair.CrosshairConfig;
@@ -45,7 +47,6 @@ public class NotificationHelper {
     private static Bitmap cachedIconBitmap;
     private static String cachedIconText;
     private static RemoteViews cachedContentView;
-    private static String lastNotifiedKey;
 
     private static Bitmap generateIcon(String text) {
         if (cachedIconBitmap != null && text.equals(cachedIconText)) {
@@ -91,16 +92,50 @@ public class NotificationHelper {
         ensureCachedViews(context);
         cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
 
+        String title = getSessionTitle(context);
+        cachedContentView.setTextViewText(R.id.noti_title, title);
+
         android.graphics.drawable.Icon smallIcon = android.graphics.drawable.Icon.createWithBitmap(iconBitmap);
         return new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIcon)
-                .setContentTitle("FTxT " + tempValue + "\u00B0C")
+                .setContentTitle(title)
                 .setContentText(getActiveModulesText(context))
                 .setCustomContentView(cachedContentView)
                 .setCustomBigContentView(cachedContentView)
                 .setStyle(new Notification.DecoratedCustomViewStyle())
                 .setOngoing(true)
                 .build();
+    }
+
+    private static String getSessionTitle(Context context) {
+        BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
+        if (s == null || s.time == 0) {
+            return "FTxT " + getBatteryTemp(context) + "\u00B0C";
+        }
+
+        int currentMa = s.currentMa;
+        float tempC = s.tempC;
+        boolean charging = s.isCharging();
+
+        String tempStr = String.valueOf(Math.round(tempC));
+        StringBuilder sb = new StringBuilder();
+        sb.append(s.percent).append("% ");
+        if (s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL) {
+            sb.append("\u2705");
+        } else if (charging) {
+            sb.append("\u26A1+").append(currentMa).append("mA");
+        } else {
+            sb.append("\uD83D\uDD0B").append(currentMa).append("mA");
+        }
+        sb.append(" ").append(String.format(java.util.Locale.US, "%.1f", s.voltageV)).append("V");
+        if (s.powerW >= 0.1d) {
+            sb.append(" ").append(String.format(java.util.Locale.US, "%.1f", s.powerW)).append("W");
+        }
+        if (s.chargeMah > 0) {
+            sb.append(" ").append(s.chargeMah).append("mAh");
+        }
+        sb.append(" | ").append(tempStr).append("\u00B0C");
+        return sb.toString();
     }
 
     private static void ensureCachedViews(Context context) {
@@ -144,18 +179,11 @@ public class NotificationHelper {
             @Override
             public void run() {
                 if (!iconCycling) return;
-                String tempValue = getBatteryTemp(context);
-                boolean allHidden = FloatingService.areAllOverlaysHidden();
-                int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
-                String key = tempValue + "|" + toggleIcon;
-                if (!key.equals(lastNotifiedKey)) {
-                    lastNotifiedKey = key;
-                    NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    nm2.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
-                }
-                iconHandler.postDelayed(this, 10000);
+                NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                nm2.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+                iconHandler.postDelayed(this, 1000);
             }
-        }, 10000);
+        }, 1000);
     }
 
     public static void stopIconCycling() {
@@ -182,6 +210,7 @@ public class NotificationHelper {
 
         ensureCachedViews(context);
         cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
+        cachedContentView.setTextViewText(R.id.noti_title, getSessionTitle(context));
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_toggle)

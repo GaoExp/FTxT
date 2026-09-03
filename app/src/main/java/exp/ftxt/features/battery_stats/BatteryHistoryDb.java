@@ -734,14 +734,19 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         return out;
     }
 
-    /**
-     * Agregat sesi per hari (monthly=false) atau per bulan (monthly=true)
-     * pada rentang [fromMs, toMs] untuk grafik batang. Urut naik.
-     */
-    public ArrayList<BarAggregate> queryBarAggregates(long fromMs, long toMs, boolean monthly) {
+/**
+      * Agregat sesi per hari (MODE_DAILY), per minggu (MODE_WEEKLY), atau
+      * per bulan (MODE_MONTHLY) pada rentang [fromMs, toMs] untuk grafik
+      * batang. Urut naik.
+      */
+    public static final int MODE_DAILY = 0;
+    public static final int MODE_WEEKLY = 1;
+    public static final int MODE_MONTHLY = 2;
+
+    public ArrayList<BarAggregate> queryBarAggregates(long fromMs, long toMs, int mode) {
         Map<Long, BarAggregate> map = new HashMap<>();
         for (SessionRow r : queryChargeSessions(fromMs, toMs)) {
-            long bucket = bucketStart(r.endTime, monthly);
+            long bucket = bucketStart(r.endTime, mode);
             BarAggregate a = map.get(bucket);
             if (a == null) {
                 a = new BarAggregate(bucket, 0f, 0f, 0, 0);
@@ -753,7 +758,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                     a.dischargePercent, a.chargeCount + 1, a.dischargeCount));
         }
         for (DischargeSession d : queryDischargeSessions(fromMs, toMs)) {
-            long bucket = bucketStart(d.endTime, monthly);
+            long bucket = bucketStart(d.endTime, mode);
             BarAggregate a = map.get(bucket);
             if (a == null) {
                 a = new BarAggregate(bucket, 0f, 0f, 0, 0);
@@ -773,17 +778,21 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         return out;
     }
 
-    private static long bucketStart(long ms, boolean monthly) {
+    private static long bucketStart(long ms, int mode) {
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(ms);
-        if (monthly) {
+        if (mode == MODE_MONTHLY) {
             c.set(Calendar.DAY_OF_MONTH, 1);
-        } else {
-            c.set(Calendar.HOUR_OF_DAY, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
-            c.set(Calendar.MILLISECOND, 0);
+        } else if (mode == MODE_WEEKLY) {
+            int dow = c.get(Calendar.DAY_OF_WEEK);
+            if (dow != Calendar.MONDAY) {
+                c.add(Calendar.DAY_OF_YEAR, -(dow - Calendar.MONDAY));
+            }
         }
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
         return c.getTimeInMillis();
     }
 

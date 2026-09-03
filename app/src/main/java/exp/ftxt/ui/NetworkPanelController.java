@@ -198,9 +198,6 @@ public class NetworkPanelController {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.networkModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

@@ -192,9 +192,6 @@ public class FpsPanelController {
                 }
             } else {
                 FloatingService.stopModule(FloatingService.fpsModule());
-                if (!activity.isAnyModuleActive()) {
-                    activity.stopService(new Intent(activity, FloatingService.class));
-                }
             }
         });
 

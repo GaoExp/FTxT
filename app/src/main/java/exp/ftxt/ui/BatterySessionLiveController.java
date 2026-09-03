@@ -51,6 +51,7 @@ public class BatterySessionLiveController {
     private int monitorLabelColor;
 
     private boolean running = false;
+    private boolean queryInFlight = false;
     private final Runnable refreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -101,7 +102,8 @@ public class BatterySessionLiveController {
     }
 
     private void refresh() {
-        if (content == null) return;
+        if (content == null || queryInFlight) return;
+        queryInFlight = true;
         final long now = System.currentTimeMillis();
         executor.execute(() -> {
             final BatteryHistoryDb db = BatteryHistoryDb.get(activity);
@@ -109,15 +111,15 @@ public class BatterySessionLiveController {
             try {
                 samples = db.querySamples(now - SAMPLE_WINDOW_MS);
             } catch (Exception e) {
-                uiHandler.post(this::renderEmpty);
+                uiHandler.post(() -> { queryInFlight = false; renderEmpty(); });
                 return;
             }
             if (samples == null || samples.length == 0) {
-                uiHandler.post(this::renderEmpty);
+                uiHandler.post(() -> { queryInFlight = false; renderEmpty(); });
                 return;
             }
             final LiveData data = compute(db, samples, now);
-            uiHandler.post(() -> render(data));
+            uiHandler.post(() -> { queryInFlight = false; render(data); });
         });
     }
 
@@ -126,6 +128,7 @@ public class BatterySessionLiveController {
     private static final class LiveData {
         boolean charging;
         int percent;
+        int startPercent;
         int deltaPct;
         long startTime;
         long durMs;
@@ -168,6 +171,7 @@ public class BatterySessionLiveController {
         LiveData d = new LiveData();
         d.charging = charging;
         d.percent = last.percent;
+        d.startPercent = start.percent;
         d.deltaPct = charging
                 ? last.percent - start.percent
                 : start.percent - last.percent;
@@ -266,8 +270,8 @@ public class BatterySessionLiveController {
         }
         statusDetail.setText(detail);
 
-        ring.setBatteryData(d.percent, fmtMah(d.totalMah),
-                d.charging ? "Mengisi" : "Menguras");
+        ring.setSessionData(d.percent, d.startPercent, d.charging,
+                fmtMah(d.totalMah), d.charging ? "Mengisi" : "Menguras");
 
         boolean showEst = !d.charging && d.durMs > 30_000L;
         estSection.setVisibility(showEst ? View.VISIBLE : View.GONE);
@@ -289,7 +293,7 @@ public class BatterySessionLiveController {
         badge.setText("● MONITORING");
         statusSub.setText("—");
         statusDetail.setText("Tidak ada data sampel tersedia.");
-        ring.setBatteryData(0, "—", "—");
+        ring.setSessionData(0, 0, true, "—", "—");
         estSection.setVisibility(View.GONE);
         content.removeAllViews();
     }
