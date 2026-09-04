@@ -73,6 +73,10 @@ public class BatteryHealthCardController {
         });
     }
 
+    void shutdown() {
+        healthExecutor.shutdown();
+    }
+
     void applyResult(BatteryCapacityEstimator.HealthResult r) {
         if (batHealthText == null) return;
 
@@ -128,9 +132,22 @@ public class BatteryHealthCardController {
     }
 
     private void showDesignCapacityDialog() {
+        // getResult() berat (query DB 7 hari) → jalankan di background, baru buka dialog.
+        healthExecutor.execute(() -> {
+            int current;
+            try {
+                current = BatteryCapacityEstimator.getResult().designMah;
+            } catch (Exception ignored) {
+                current = 0;
+            }
+            final int initialValue = current;
+            activity.runOnUiThread(() -> buildDesignCapacityDialog(initialValue));
+        });
+    }
+
+    private void buildDesignCapacityDialog(final int current) {
         final EditText input = new EditText(activity);
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        int current = BatteryCapacityEstimator.getResult().designMah;
         input.setText(current > 0 ? String.valueOf(current) : "");
         input.setHint("mis. 5000");
 
@@ -159,8 +176,21 @@ public class BatteryHealthCardController {
     }
 
     private void showResetConfirmDialog() {
-        BatteryCapacityEstimator.HealthResult r = BatteryCapacityEstimator.getResult();
-        if (r.sessionCount == 0) {
+        // getResult() berat → background, baru tampilkan konfirmasi / toast.
+        healthExecutor.execute(() -> {
+            BatteryCapacityEstimator.HealthResult r;
+            try {
+                r = BatteryCapacityEstimator.getResult();
+            } catch (Exception ignored) {
+                r = null;
+            }
+            final int sessionCount = r != null ? r.sessionCount : 0;
+            activity.runOnUiThread(() -> buildResetConfirmDialog(sessionCount));
+        });
+    }
+
+    private void buildResetConfirmDialog(final int sessionCount) {
+        if (sessionCount == 0) {
             Toast.makeText(activity, "Belum ada data untuk di-reset", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -179,7 +209,7 @@ public class BatteryHealthCardController {
 
         AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Reset Data Estimasi")
-                .setMessage("Hapus semua " + r.sessionCount + " sesi yang tercatat (pengisian & pengosongan)? "
+                .setMessage("Hapus semua " + sessionCount + " sesi yang tercatat (pengisian & pengosongan)? "
                         + "Estimasi kapasitas dan skor kesehatan akan dihitung ulang dari nol "
                         + "saat sesi berikutnya berlangsung.\n\n"
                         + "Ketik \"RESET\" untuk melanjutkan.")

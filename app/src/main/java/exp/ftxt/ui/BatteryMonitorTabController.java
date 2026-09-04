@@ -35,6 +35,7 @@ public class BatteryMonitorTabController {
     private final MainActivity activity;
 
     View batTabMonitorView;
+    private View loadingOverlay;
     private BatteryRingView batMonitorRing;
     TextView batMonitorMetricsText1;
     TextView batMonitorMetricsText2;
@@ -194,6 +195,8 @@ public class BatteryMonitorTabController {
         health = new BatteryHealthCardController(activity, healthPage);
         history = new BatterySessionHistoryController(activity, healthPage);
         live = new BatterySessionLiveController(activity, livePage);
+
+        charts.setOnFirstDataReady(this::hideLoadingOverlay);
     }
 
     private void refreshTabHighlight(int index) {
@@ -217,6 +220,7 @@ public class BatteryMonitorTabController {
 
     private void bindViews(View rootView) {
         batTabMonitorView = rootView.findViewById(R.id.batTabMonitor);
+        loadingOverlay = rootView.findViewById(R.id.batMonitorLoadingOverlay);
         batSubTabInfo = rootView.findViewById(R.id.batSubTabInfo);
         batSubTabLive = rootView.findViewById(R.id.batSubTabLive);
         batSubTabHealth = rootView.findViewById(R.id.batSubTabHealth);
@@ -226,9 +230,32 @@ public class BatteryMonitorTabController {
 
     public void onPanelShown() {
         applySnapshotButtonsLock();
+        boolean loaded = charts != null && charts.hasFirstData();
+        if (loaded) {
+            hideLoadingOverlay();
+        } else {
+            showLoadingOverlay();
+        }
         resumeMonitorPolling();
         if (currentSubTab == 1 && live != null) live.onPanelShown();
     }
+
+    private void showLoadingOverlay() {
+        if (loadingOverlay == null) return;
+        if (loadingOverlay.getVisibility() != View.VISIBLE) {
+            loadingOverlay.setVisibility(View.VISIBLE);
+        }
+        monitorHandler.removeCallbacks(hideLoadingRunnable);
+        monitorHandler.postDelayed(hideLoadingRunnable, 4000);
+    }
+
+    private void hideLoadingOverlay() {
+        if (loadingOverlay == null) return;
+        loadingOverlay.setVisibility(View.GONE);
+        monitorHandler.removeCallbacks(hideLoadingRunnable);
+    }
+
+    private final Runnable hideLoadingRunnable = this::hideLoadingOverlay;
 
     private void applySnapshotButtonsLock() {
         if (batMonitorExportButton == null || batMonitorCopyButton == null) return;
@@ -248,7 +275,9 @@ public class BatteryMonitorTabController {
     public void cleanup() {
         stopMonitorPolling();
         monitorExecutor.shutdownNow();
+        snapshotExporter.shutdown();
         if (charts != null) charts.cleanup();
+        if (health != null) health.shutdown();
         if (history != null) history.cleanup();
         if (live != null) live.cleanup();
     }

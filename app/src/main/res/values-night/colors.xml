@@ -31,6 +31,7 @@
     <color name="bat_monitor_hot">#FF453A</color>
     <color name="bat_monitor_cold">#64B5F6</color>
     <color name="bat_monitor_stroke">#26FFFFFF</color>
+    <color name="bat_loading_bg">#E61E1E1E</color>
     <color name="bat_badge_stopped_bg">#1A8E8E93</color>
 
     <color name="bat_chart_temp">#FF453A</color>

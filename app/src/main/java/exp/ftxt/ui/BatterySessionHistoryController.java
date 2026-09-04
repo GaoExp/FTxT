@@ -7,9 +7,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -49,20 +47,18 @@ public class BatterySessionHistoryController {
     private TextView rangeText;
     private TextView summaryText;
     private TextView[] filterTabs;
-    private LinearLayout sessionList;
     private int monitorLabelColor;
 
     private int period = PERIOD_DAILY;
-    private int filter = FILTER_ALL;
     private long selectedBucket = -1;
     private long lastRefreshTime = 0;
     private boolean queryInFlight = false;
-    private ArrayList<BatteryHistoryDb.SessionEntry> sessionEntriesCache = new ArrayList<>();
 
     public BatterySessionHistoryController(MainActivity activity, View pageView) {
         this.activity = activity;
         bindViews(pageView);
         bindTabs();
+        highlightTabs(periodTabs, PERIOD_DAILY);
         setFilter(FILTER_ALL);
         chartView.setOnBarClickListener((index, aggregate) -> {
             selectedBucket = aggregate.bucketStartMs;
@@ -91,7 +87,6 @@ public class BatterySessionHistoryController {
                 rootView.findViewById(R.id.batHistFilterAll),
                 rootView.findViewById(R.id.batHistFilterCharge),
                 rootView.findViewById(R.id.batHistFilterDischarge)};
-        sessionList = rootView.findViewById(R.id.batSessionList);
     }
 
     private void bindTabs() {
@@ -107,21 +102,29 @@ public class BatterySessionHistoryController {
         if (period == p) return;
         period = p;
         selectedBucket = -1;
-        refresh();
+        highlightTabs(periodTabs, p);
+        reloadChart();
     }
 
     private void setFilter(int f) {
-        filter = f;
-        for (int i = 0; i < filterTabs.length; i++) {
-            setBadge(filterTabs[i], i == f);
+        if (selectedBucket < 0) {
+            highlightTabs(filterTabs, f);
+            return;
         }
-        renderSessionRows(sessionEntriesCache);
+        highlightTabs(filterTabs, f);
+        long end = bucketEnd(selectedBucket);
+        SessionListActivity.start(activity, selectedBucket, end, f);
     }
 
-    private void setBadge(TextView tv, boolean active) {
-        tv.setTextColor(activity.getColor(active ? R.color.bat_monitor_header : R.color.bat_monitor_label));
-        tv.setTypeface(active ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
-        tv.setBackgroundResource(active ? R.drawable.bat_badge_active_bg : R.drawable.bat_badge_stopped_bg);
+    private void highlightTabs(TextView[] tabs, int active) {
+        for (int i = 0; i < tabs.length; i++) {
+            boolean isActive = (i == active);
+            tabs[i].setTextColor(activity.getColor(
+                    isActive ? R.color.bat_monitor_header : R.color.bat_monitor_label));
+            tabs[i].setTypeface(isActive ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
+            tabs[i].setBackgroundResource(isActive
+                    ? R.drawable.bat_badge_active_bg : R.drawable.bat_badge_stopped_bg);
+        }
     }
 
     private long[] rangeForPeriod() {
@@ -190,7 +193,6 @@ public class BatterySessionHistoryController {
                     }
                 } else {
                     selectedBucket = -1;
-                    sessionEntriesCache = new ArrayList<>();
                 }
                 chartView.setSelectedBucket(selectedBucket);
                 refreshSessionsForSelection();
@@ -318,10 +320,8 @@ public class BatterySessionHistoryController {
 
     private void refreshSessionsForSelection() {
         if (selectedBucket < 0) {
-            sessionEntriesCache = new ArrayList<>();
             updateSelectedRangeText();
-            updateSummary(sessionEntriesCache);
-            renderSessionRows(sessionEntriesCache);
+            updateSummary(new ArrayList<>());
             return;
         }
         if (queryInFlight) return;
@@ -333,96 +333,10 @@ public class BatterySessionHistoryController {
                     BatteryHistoryDb.get(activity).querySessionEntries(from, to);
             uiHandler.post(() -> {
                 queryInFlight = false;
-                sessionEntriesCache = entries;
                 updateSelectedRangeText();
                 updateSummary(entries);
-                renderSessionRows(entries);
             });
         });
-    }
-
-    private void renderSessionRows(ArrayList<BatteryHistoryDb.SessionEntry> entries) {
-        sessionList.removeAllViews();
-        ArrayList<BatteryHistoryDb.SessionEntry> shown = new ArrayList<>();
-        for (BatteryHistoryDb.SessionEntry e : entries) {
-            if (filter == FILTER_ALL) {
-                shown.add(e);
-            } else if (filter == FILTER_CHARGE && e.isCharge) {
-                shown.add(e);
-            } else if (filter == FILTER_DISCHARGE && !e.isCharge) {
-                shown.add(e);
-            }
-        }
-        if (shown.isEmpty()) {
-            TextView empty = smallText("Tidak ada sesi");
-            sessionList.addView(empty);
-            return;
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm", Locale.US);
-        for (BatteryHistoryDb.SessionEntry e : shown) {
-            sessionList.addView(entryRow(e, sdf));
-        }
-    }
-
-    private View entryRow(final BatteryHistoryDb.SessionEntry e,
-                          SimpleDateFormat sdf) {
-        LinearLayout row = new LinearLayout(activity);
-        row.setOrientation(LinearLayout.VERTICAL);
-        row.setPadding(0, dp(6), 0, dp(6));
-        row.setOnClickListener(v -> SessionDetailActivity.start(activity, e));
-
-        int accent = activity.getColor(e.isCharge
-                ? R.color.bat_monitor_active : R.color.bat_chart_power);
-        String typeTag = e.isCharge ? "PENGISIAN" : "PENGOSONGAN";
-        String time = sdf.format(new Date(e.startTime)) + "–" + sdf.format(new Date(e.endTime));
-
-        TextView head = new TextView(activity);
-        head.setTextSize(12);
-        head.setText(typeTag + "  " + time);
-        head.setTextColor(accent);
-        head.setTextSize(12);
-        head.setTypeface(Typeface.DEFAULT_BOLD);
-        row.addView(head);
-
-        String dur = BatteryMonitorTabController.formatDuration(e.durationMs());
-        StringBuilder detail = new StringBuilder();
-        detail.append(String.format(Locale.US, "%d→%d%%", e.startPercent, e.endPercent));
-        detail.append(" · ").append(dur);
-        if (e.mAhCounter > 0 || e.mAhIntegral > 0) {
-            detail.append(String.format(Locale.US, " · C %.0f · I %.0f mAh",
-                    e.mAhCounter, e.mAhIntegral));
-        }
-        if (e.tempMax > 0) {
-            detail.append(String.format(Locale.US, " · %.1f–%.1f°C", e.tempMin, e.tempMax));
-        }
-        if (!e.isCharge) {
-            String eff = e.efficiencyPercent >= 0
-                    ? String.format(Locale.US, "%.0f%%", e.efficiencyPercent) : "—";
-            detail.append(" · efisiensi ").append(eff);
-        }
-
-        TextView body = new TextView(activity);
-        body.setTextSize(11);
-        body.setTypeface(Typeface.MONOSPACE);
-        body.setTextColor(activity.getColor(R.color.bat_monitor_label));
-        body.setText("  " + detail);
-        row.addView(body);
-
-        return row;
-    }
-
-    private TextView smallText(String text) {
-        TextView tv = new TextView(activity);
-        tv.setText(text);
-        tv.setTextSize(12);
-        tv.setTextColor(activity.getColor(R.color.bat_monitor_label));
-        tv.setGravity(Gravity.CENTER);
-        tv.setPadding(0, dp(8), 0, dp(8));
-        return tv;
-    }
-
-    private int dp(float value) {
-        return (int) (value * activity.getResources().getDisplayMetrics().density);
     }
 
     public void cleanup() {

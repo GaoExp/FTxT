@@ -49,6 +49,20 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         super(context, DB_NAME, null, DB_VERSION);
     }
 
+    /**
+     * Aktifkan Write-Ahead Logging (WAL) sejak awal. WAL membuat operasi baca tidak
+     * pernah diblokir oleh operasi tulis (reader mendapat snapshot), sehingga query
+     * grafik/estimasi dari thread UI/background tidak saling mengantre saat sampling
+     * menulis setiap beberapa detik. Murni konfigurasi — tidak mengubah skema.
+     */
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        try {
+            db.enableWriteAheadLogging();
+        } catch (Exception ignored) {}
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + T_SAMPLES + " (" +
@@ -309,7 +323,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     // ---------- sampel metrik ----------
 
-    public void insertSample(BatteryReading.Snapshot s) {
+    public synchronized void insertSample(BatteryReading.Snapshot s) {
         ContentValues v = new ContentValues();
         v.put("time", s.time);
         v.put("temp_c", s.tempC);
@@ -580,7 +594,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         insertSessionFull(new SessionRow(time, capacityMah, mostlyScreenOff, sampleCount));
     }
 
-    public void insertSessionFull(SessionRow r) {
+    public synchronized void insertSessionFull(SessionRow r) {
         ContentValues v = new ContentValues();
         v.put("time", r.time);
         v.put("capacity_mah", r.capacityMah);
@@ -628,12 +642,24 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         return out;
     }
 
-    public void deleteAllSessions() {
+    public synchronized void deleteAllSessions() {
         getWritableDatabase().delete(T_SESSIONS, null, null);
     }
 
-    public void deleteAllDischargeSessions() {
+    public synchronized void deleteAllDischargeSessions() {
         getWritableDatabase().delete(T_DISCHARGE, null, null);
+    }
+
+    /** Hapus sampel metrik yang lebih tua dari {@code beforeMs} (pruning data lama agar riwayat tidak membengkak). */
+    public synchronized void deleteSamplesOlderThan(long beforeMs) {
+        getWritableDatabase().delete(T_SAMPLES, "time < ?",
+                new String[]{String.valueOf(beforeMs)});
+    }
+
+    /** Hapus log aktivitas layar/status yang lebih tua dari {@code beforeMs}. */
+    public synchronized void deleteActivityLogOlderThan(long beforeMs) {
+        getWritableDatabase().delete(T_ACTIVITY, "time < ?",
+                new String[]{String.valueOf(beforeMs)});
     }
 
     /** Sesi pengisian (tabel serial resmi estimator) pada rentang [fromMs, toMs]. */
@@ -671,7 +697,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     // ---------- sesi pengosongan (discharge tracker) ----------
 
-    public void insertDischargeSession(DischargeSession s) {
+    public synchronized void insertDischargeSession(DischargeSession s) {
         ContentValues v = new ContentValues();
         v.put("start_time", s.startTime);
         v.put("end_time", s.endTime);
@@ -843,7 +869,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         }
     }
 
-    public void insertActivityLog(long time, int status) {
+    public synchronized void insertActivityLog(long time, int status) {
         ContentValues v = new ContentValues();
         v.put("time", time);
         v.put("status", status);
@@ -869,7 +895,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     // ---------- meta ----------
 
-    public void setMeta(String key, String value) {
+    public synchronized void setMeta(String key, String value) {
         ContentValues v = new ContentValues();
         v.put("key", key);
         v.put("value", value);

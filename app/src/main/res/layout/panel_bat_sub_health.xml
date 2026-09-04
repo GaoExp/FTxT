@@ -193,12 +193,12 @@
                             <TextView
                                 android:id="@+id/batHistPeriodDaily"
                                 android:text="Harian"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_header"
                                 android:textStyle="bold"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_active_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -207,11 +207,11 @@
                             <TextView
                                 android:id="@+id/batHistPeriodWeekly"
                                 android:text="Mingguan"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_label"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_stopped_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -221,11 +221,11 @@
                             <TextView
                                 android:id="@+id/batHistPeriodMonthly"
                                 android:text="Bulanan"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_label"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_stopped_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -284,11 +284,11 @@
                             <TextView
                                 android:id="@+id/batHistFilterCharge"
                                 android:text="Pengisian"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_label"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_stopped_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -297,11 +297,11 @@
                             <TextView
                                 android:id="@+id/batHistFilterDischarge"
                                 android:text="Pengosongan"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_label"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_stopped_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -311,12 +311,12 @@
                             <TextView
                                 android:id="@+id/batHistFilterAll"
                                 android:text="Semua Sesi"
-                                android:textSize="12sp"
+                                android:textSize="13sp"
                                 android:textColor="@color/bat_monitor_header"
                                 android:textStyle="bold"
                                 android:gravity="center"
-                                android:paddingHorizontal="10dp"
-                                android:paddingVertical="5dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="7dp"
                                 android:background="@drawable/bat_badge_active_bg"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
@@ -324,23 +324,6 @@
                                 android:layout_marginStart="4dp"/>
 
                         </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/batSessionListTitle"
-                            android:text="Daftar Sesi"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/bat_monitor_header"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:layout_marginBottom="4dp"/>
-
-                        <LinearLayout
-                            android:id="@+id/batSessionList"
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
 
                     </LinearLayout>
 

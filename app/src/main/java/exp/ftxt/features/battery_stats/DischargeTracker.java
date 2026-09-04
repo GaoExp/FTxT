@@ -136,30 +136,17 @@ public class DischargeTracker {
 
     /**
      * Rekonstruksi segmen pengosongan yang belum sempat tersimpan saat proses
-     * dibunuh (§7.6 — Solusi A). Dipanggil dari {@code BatteryMonitor.start()}.
+     * dibunuh (§7.6 — Solusi A). Dipanggil dari {@code BatteryMonitor.start()}
+     * dengan segmen yang sudah dihitung sekali oleh {@link SessionRebuild}
+     * (shared dengan {@link BatteryCapacityEstimator} agar query 24 jam +
+     * segmentasi tidak dijalankan dua kali saat start).
      * Sesi yang berakhir saat proses mati di-INSERT (dedup dengan endTime > sesi
      * terakhir tersimpan); sesi yang masih berjalan disambungkan ke state live.
      */
-    public static synchronized void rebuildPendingSessions() {
+    public static synchronized void rebuildPendingSessions(
+            long lastEnd, ArrayList<SessionSegmentBuilder.Segment> segs) {
         if (appContext == null) return;
         BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
-        long lastEnd = db.lastDischargeSessionEnd();
-        long now = System.currentTimeMillis();
-        long from = now - 24L * 3600_000L;
-
-        BatteryReading.Snapshot[] asc;
-        try {
-            asc = db.querySamples(from);
-        } catch (Exception e) {
-            return;
-        }
-        if (asc == null || asc.length == 0) return;
-
-        BatteryReading.Snapshot[] desc = SessionSegmentBuilder.toDesc(asc);
-        SessionSegmentBuilder.ScreenOnOracle oracle = db.screenOnOracle(from, now);
-        ArrayList<SessionSegmentBuilder.Segment> segs =
-                SessionSegmentBuilder.buildSegments(desc, SessionSegmentBuilder.WINDOW_MS,
-                        SessionSegmentBuilder.SESSION_GAP_MS, oracle);
         if (segs.isEmpty()) return;
 
         if (lastEnd > 0) {

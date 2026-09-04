@@ -68,6 +68,10 @@
             android:name=".ui.SessionDetailActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".ui.SessionListActivity"
+            android:exported="false"/>
+
         <service
             android:name=".core.FloatingService"
             android:enabled="true"

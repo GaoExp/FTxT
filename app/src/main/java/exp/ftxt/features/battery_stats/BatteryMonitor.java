@@ -13,6 +13,14 @@ public class BatteryMonitor {
     private static final long POLL_SCREEN_ON_MS = 1_000;
     private static final long POLL_SCREEN_OFF_MS = 1_000;
 
+    /**
+     * Persistensi sampel ke database ditulis tiap 5 detik, sementara pembacaan &
+     * perhitungan (estimator kapasitas, discharge tracker) tetap dijalankan tiap
+     * detik agar overlay & estimasi real-time. Hasilnya beban query riwayat DB
+     * menjadi jauh lebih ringan (1/5 baris) tanpa mengorbankan presisi real-time.
+     */
+    private static final long DB_WRITE_INTERVAL_MS = 5_000;
+
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static boolean running = false;
     private static Context appContext;
@@ -21,6 +29,7 @@ public class BatteryMonitor {
     private static Handler bgHandler;
     private static volatile boolean busy;
     private static int lastActivityStatus = -1;
+    private static long lastDbWriteTime = 0L;
 
     private static final Runnable tick = new Runnable() {
         @Override
@@ -30,7 +39,8 @@ public class BatteryMonitor {
                 busy = true;
                 bgHandler.post(() -> {
                     final BatteryReading.Snapshot s = BatteryReading.read(appContext);
-                    BatteryHistoryDb.get(appContext).insertSample(s);
+                    // Perhitungan (kapasitas & discharge) selalu tiap sampel (1 detik)
+                    // agar estimasi tetap real-time & presisi.
                     BatteryCapacityEstimator.onSample(s);
                     DischargeTracker.onSample(s);
 
@@ -45,8 +55,20 @@ public class BatteryMonitor {
                             activityStatus = 0;
                         }
                     }
+
+                    // Persistensi sampel dikurangi frekuensinya (tiap 5 detik) agar
+                    // database riwayat tidak membengkak, sehingga query grafik/estimasi
+                    // lebih ringan (mengurangi risiko ANR jangka panjang).
+                    if (s.time - lastDbWriteTime >= DB_WRITE_INTERVAL_MS) {
+                        try {
+                            BatteryHistoryDb.get(appContext).insertSample(s);
+                        } catch (Exception ignored) {}
+                        lastDbWriteTime = s.time;
+                    }
                     if (activityStatus != lastActivityStatus) {
-                        BatteryHistoryDb.get(appContext).insertActivityLog(s.time, activityStatus);
+                        try {
+                            BatteryHistoryDb.get(appContext).insertActivityLog(s.time, activityStatus);
+                        } catch (Exception ignored) {}
                         lastActivityStatus = activityStatus;
                     }
 
@@ -71,8 +93,19 @@ public class BatteryMonitor {
         if (appContext == null) return;
         BatteryCapacityEstimator.init(appContext);
         DischargeTracker.init(appContext);
-        BatteryCapacityEstimator.rebuildPendingSessions();
-        DischargeTracker.rebuildPendingSessions();
+        // Rekonstruksi sesi yang belum tersimpan & pruning data lama dipindah ke
+        // thread latar agar query berat (querySamples 24 jam + segmentasi) tidak
+        // memblokir main thread saat service start (penyebab ANR saat membuka aplikasi).
+        // Query + segmentasi dijalankan sekali oleh SessionRebuild lalu hasilnya
+        // dibagikan ke estimator & discharge tracker (tanpa duplikasi query).
+        new Thread(() -> {
+            try {
+                SessionRebuild.run(appContext);
+            } catch (Exception ignored) {}
+            try {
+                pruneOldData();
+            } catch (Exception ignored) {}
+        }, "BatterySessionRebuild").start();
         running = true;
         lastSnapshot = BatteryReading.Snapshot.empty();
         lastActivityStatus = -1;
@@ -102,6 +135,20 @@ public class BatteryMonitor {
 
     public static synchronized BatteryReading.Snapshot getLastSnapshot() {
         return lastSnapshot;
+    }
+
+    /**
+     * Pruning data riwayat yang tidak lagi dibutuhkan. Riwayat metrik sampel &
+     * log aktivitas hanya dibutuhkan sejauh 7 hari (estimator kapasitas memakai
+     * rentang 7 hari, grafik riwayat maksimal 48 jam), sehingga baris yang lebih
+     * tua dihapus agar database tidak membengkak dan query tetap ringan.
+     * Berjalan di thread latar (dipanggil dari thread rebuild saat start).
+     */
+    private static void pruneOldData() {
+        long cutoff = System.currentTimeMillis() - 7L * 24 * 3600_000L;
+        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        db.deleteSamplesOlderThan(cutoff);
+        db.deleteActivityLogOlderThan(cutoff);
     }
 
     private static void scheduleNext(long delayMs) {

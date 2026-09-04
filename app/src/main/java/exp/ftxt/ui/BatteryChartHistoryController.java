@@ -47,6 +47,16 @@ public class BatteryChartHistoryController {
     private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private final ExecutorService chartExecutor = Executors.newSingleThreadExecutor();
     private boolean chartQueryInFlight = false;
+    private Runnable onFirstDataReady;
+    private boolean firstDataDelivered = false;
+
+    public void setOnFirstDataReady(Runnable r) {
+        onFirstDataReady = r;
+    }
+
+    public boolean hasFirstData() {
+        return firstDataDelivered;
+    }
 
     public BatteryChartHistoryController(MainActivity activity, View pageView) {
         this.activity = activity;
@@ -165,6 +175,10 @@ public class BatteryChartHistoryController {
                 batChartPowerView.setData(data);
                 batChartVoltageView.setData(data);
                 batChartCurrentView.setData(data);
+                if (!firstDataDelivered) {
+                    firstDataDelivered = true;
+                    if (onFirstDataReady != null) onFirstDataReady.run();
+                }
             });
         });
     }

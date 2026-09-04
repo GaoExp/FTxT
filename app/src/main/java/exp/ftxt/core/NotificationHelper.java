@@ -119,20 +119,20 @@ public class NotificationHelper {
 
         String tempStr = String.valueOf(Math.round(tempC));
         StringBuilder sb = new StringBuilder();
-        sb.append(s.percent).append("% ");
+        sb.append(s.percent).append("%");
         if (s.statusInt == android.os.BatteryManager.BATTERY_STATUS_FULL) {
-            sb.append("\u2705");
+            sb.append(" \u2705");
         } else if (charging) {
-            sb.append("\u26A1+").append(currentMa).append("mA");
+            sb.append(" \u26A1+").append(currentMa).append("mA");
         } else {
-            sb.append("\uD83D\uDD0B").append(currentMa).append("mA");
+            sb.append(" \uD83D\uDD0B").append(currentMa).append("mA");
         }
-        sb.append(" ").append(String.format(java.util.Locale.US, "%.1f", s.voltageV)).append("V");
+        sb.append(" | ").append(String.format(java.util.Locale.US, "%.1f", s.voltageV)).append("V");
         if (s.powerW >= 0.1d) {
-            sb.append(" ").append(String.format(java.util.Locale.US, "%.1f", s.powerW)).append("W");
+            sb.append(" | ").append(String.format(java.util.Locale.US, "%.1f", s.powerW)).append("W");
         }
         if (s.chargeMah > 0) {
-            sb.append(" ").append(s.chargeMah).append("mAh");
+            sb.append(" | ").append(s.chargeMah).append("mAh");
         }
         sb.append(" | ").append(tempStr).append("\u00B0C");
         return sb.toString();

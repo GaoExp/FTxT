@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
@@ -26,33 +28,50 @@ public class BatterySnapshotExporter {
 
     private final MainActivity activity;
     private final BatteryMonitorTabController monitor;
+    private final ExecutorService exporterExecutor = Executors.newSingleThreadExecutor();
 
     public BatterySnapshotExporter(MainActivity activity, BatteryMonitorTabController monitor) {
         this.activity = activity;
         this.monitor = monitor;
     }
 
+    public void shutdown() {
+        exporterExecutor.shutdown();
+    }
+
     public void copyToClipboard() {
         if (monitor.batMonitorMetricsText1 == null) return;
-        BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
-        BatteryCapacityEstimator.HealthResult h = BatteryCapacityEstimator.getResult();
-        StringBuilder sb = new StringBuilder();
-        sb.append("Baterai Perangkat\n\n");
-        sb.append("Level           : ").append(s.percent).append("%\n");
-        sb.append("Kapasitas       : ").append(s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—").append("\n");
-        sb.append("Status          : ").append(BatteryMonitorTabController.shortChargingStatus(s)).append("\n\n");
-        sb.append("Metrik Real-Time\n").append(combineMetricColumns());
-        sb.append("\n\nKesehatan Baterai\n");
-        sb.append("Kapasitas Pengisian  : ").append(healthMedianText(h.chargeMedianMah)).append("\n");
-        sb.append("Kapasitas Pengosongan: ").append(healthMedianText(h.dischargeMedianMah)).append("\n");
-        sb.append("Kapasitas Gabungan   : ").append(healthMedianText(h.medianMah)).append("\n");
-        sb.append("Skor Kesehatan       : ").append(healthScoreText(h)).append("\n");
-        sb.append("Sesi Tercatat      : ").append(h.sessionCount).append("\n");
-        sb.append("Jumlah Data        : ").append(healthConfidenceText(h)).append("\n");
-        ClipboardManager cm = (ClipboardManager) activity.getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-        if (cm == null) return;
-        cm.setPrimaryClip(ClipData.newPlainText("FTxT Monitor Baterai", sb.toString()));
-        Toast.makeText(activity, "Disalin ke clipboard", Toast.LENGTH_SHORT).show();
+        exporterExecutor.execute(() -> {
+            BatteryReading.Snapshot s = BatteryMonitor.getLastSnapshot();
+            BatteryCapacityEstimator.HealthResult h;
+            try {
+                h = BatteryCapacityEstimator.getResult();
+            } catch (Exception ignored) {
+                h = null;
+            }
+            final StringBuilder sb = new StringBuilder();
+            sb.append("Baterai Perangkat\n\n");
+            sb.append("Level           : ").append(s.percent).append("%\n");
+            sb.append("Kapasitas       : ").append(s.chargeMah >= 0 ? s.chargeMah + " mAh" : "—").append("\n");
+            sb.append("Status          : ").append(BatteryMonitorTabController.shortChargingStatus(s)).append("\n\n");
+            sb.append("Metrik Real-Time\n").append(combineMetricColumns());
+            sb.append("\n\nKesehatan Baterai\n");
+            if (h != null) {
+                sb.append("Kapasitas Pengisian  : ").append(healthMedianText(h.chargeMedianMah)).append("\n");
+                sb.append("Kapasitas Pengosongan: ").append(healthMedianText(h.dischargeMedianMah)).append("\n");
+                sb.append("Kapasitas Gabungan   : ").append(healthMedianText(h.medianMah)).append("\n");
+                sb.append("Skor Kesehatan       : ").append(healthScoreText(h)).append("\n");
+                sb.append("Sesi Tercatat      : ").append(h.sessionCount).append("\n");
+                sb.append("Jumlah Data        : ").append(healthConfidenceText(h)).append("\n");
+            }
+            activity.runOnUiThread(() -> {
+                ClipboardManager cm = (ClipboardManager) activity
+                        .getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                if (cm == null) return;
+                cm.setPrimaryClip(ClipData.newPlainText("FTxT Monitor Baterai", sb.toString()));
+                Toast.makeText(activity, "Disalin ke clipboard", Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 
     private String healthMedianText(float mah) {
@@ -79,58 +98,76 @@ public class BatterySnapshotExporter {
     }
 
     public void exportBatterySnapshot() {
-        String exportTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
-                .format(new Date());
-        BatteryReading.Snapshot[] history =
-                BatteryHistoryDb.get(activity).queryLastSamples(20);
-        BatteryCapacityEstimator.HealthResult health = BatteryCapacityEstimator.getResult();
-        StringBuilder sb = new StringBuilder();
-        sb.append("FTxT - Monitor Baterai (Riwayat 20 Snapshot Terakhir)\n");
-        sb.append("Ekspor: ").append(exportTime).append("\n");
-        sb.append("Jumlah snapshot: ").append(history.length).append("\n\n");
-        sb.append("=== Kesehatan Baterai ===\n");
-        sb.append("Kapasitas Pengisian  : ").append(healthMedianText(health.chargeMedianMah)).append("\n");
-        sb.append("Kapasitas Pengosongan: ").append(healthMedianText(health.dischargeMedianMah)).append("\n");
-        sb.append("Kapasitas Gabungan   : ").append(healthMedianText(health.medianMah)).append("\n");
-        String scoreText = healthScoreText(health);
-        if (health.designMah > 0 && health.medianMah > 0) {
-            scoreText += " (kapasitas desain " + health.designMah + " mAh)";
-        }
-        sb.append("Skor Kesehatan     : ").append(scoreText).append("\n");
-        sb.append("Sesi Tercatat      : ").append(health.sessionCount).append("\n");
-        sb.append("Jumlah Data        : ").append(healthConfidenceText(health)).append("\n\n");
-        int index = 1;
-        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-        for (BatteryReading.Snapshot snap : history) {
-            String time = timeFormat.format(new Date(snap.time));
-            sb.append("--- Snapshot ").append(index++)
-                    .append("/").append(history.length)
-                    .append(" (").append(time).append(") ---\n");
-            sb.append("Persentase       : ").append(snap.percent).append("%\n");
-            sb.append("Suhu             : ").append(String.format(Locale.US, "%.1f°C", snap.tempC)).append("\n");
-            sb.append("Voltase          : ").append(String.format(Locale.US, "%.3fV", snap.voltageV)).append("\n");
-            sb.append("Arus             : ").append(snap.currentMa != 0
-                    ? String.format(Locale.US, "%+d mA", snap.currentMa) : "—").append("\n");
-            sb.append("Daya             : ").append(snap.powerW > 0
-                    ? String.format(Locale.US, "%.2fW", snap.powerW) : "—").append("\n");
-            sb.append("Kapasitas Tersisa: ").append(snap.chargeMah >= 0 ? snap.chargeMah + " mAh" : "—").append("\n");
-            sb.append("Cycle Count      : ").append(snap.cycleCount >= 0 ? String.valueOf(snap.cycleCount) : "—").append("\n");
-            sb.append("Status           : ").append(snap.chargingText()).append("\n");
-            sb.append("Teknologi        : ").append(snap.technology != null ? snap.technology : "—").append("\n");
-            sb.append("Kondisi          : ").append(snap.conditionText()).append("\n\n");
-        }
-
-        String fileName = "FTxT_baterai_" + System.currentTimeMillis() + ".txt";
-        try {
-            if (writeSnapshotToDownload(sb.toString(), fileName)) {
-                Toast.makeText(activity, "Tersimpan: Download/" + fileName +
-                        " (" + history.length + " snapshot)", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(activity, "Gagal menyimpan snapshot", Toast.LENGTH_SHORT).show();
+        exporterExecutor.execute(() -> {
+            String exportTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+                    .format(new Date());
+            final BatteryReading.Snapshot[] history;
+            BatteryCapacityEstimator.HealthResult health;
+            try {
+                history = BatteryHistoryDb.get(activity).queryLastSamples(20);
+            } catch (Exception ignored) {
+                String err = "Gagal memuat data";
+                Toast.makeText(activity, err, Toast.LENGTH_SHORT).show();
+                return;
             }
-        } catch (Exception e) {
-            Toast.makeText(activity, "Gagal menyimpan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+            try {
+                health = BatteryCapacityEstimator.getResult();
+            } catch (Exception ignored) {
+                health = null;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("FTxT - Monitor Baterai (Riwayat 20 Snapshot Terakhir)\n");
+            sb.append("Ekspor: ").append(exportTime).append("\n");
+            sb.append("Jumlah snapshot: ").append(history.length).append("\n\n");
+            sb.append("=== Kesehatan Baterai ===\n");
+            if (health != null) {
+                sb.append("Kapasitas Pengisian  : ").append(healthMedianText(health.chargeMedianMah)).append("\n");
+                sb.append("Kapasitas Pengosongan: ").append(healthMedianText(health.dischargeMedianMah)).append("\n");
+                sb.append("Kapasitas Gabungan   : ").append(healthMedianText(health.medianMah)).append("\n");
+                String scoreText = healthScoreText(health);
+                if (health.designMah > 0 && health.medianMah > 0) {
+                    scoreText += " (kapasitas desain " + health.designMah + " mAh)";
+                }
+                sb.append("Skor Kesehatan     : ").append(scoreText).append("\n");
+                sb.append("Sesi Tercatat      : ").append(health.sessionCount).append("\n");
+                sb.append("Jumlah Data        : ").append(healthConfidenceText(health)).append("\n\n");
+            }
+            int index = 1;
+            SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+            for (BatteryReading.Snapshot snap : history) {
+                String time = timeFormat.format(new Date(snap.time));
+                sb.append("--- Snapshot ").append(index++)
+                        .append("/").append(history.length)
+                        .append(" (").append(time).append(") ---\n");
+                sb.append("Persentase       : ").append(snap.percent).append("%\n");
+                sb.append("Suhu             : ").append(String.format(Locale.US, "%.1f°C", snap.tempC)).append("\n");
+                sb.append("Voltase          : ").append(String.format(Locale.US, "%.3fV", snap.voltageV)).append("\n");
+                sb.append("Arus             : ").append(snap.currentMa != 0
+                        ? String.format(Locale.US, "%+d mA", snap.currentMa) : "—").append("\n");
+                sb.append("Daya             : ").append(snap.powerW > 0
+                        ? String.format(Locale.US, "%.2fW", snap.powerW) : "—").append("\n");
+                sb.append("Kapasitas Tersisa: ").append(snap.chargeMah >= 0 ? snap.chargeMah + " mAh" : "—").append("\n");
+                sb.append("Cycle Count      : ").append(snap.cycleCount >= 0 ? String.valueOf(snap.cycleCount) : "—").append("\n");
+                sb.append("Status           : ").append(snap.chargingText()).append("\n");
+                sb.append("Teknologi        : ").append(snap.technology != null ? snap.technology : "—").append("\n");
+                sb.append("Kondisi          : ").append(snap.conditionText()).append("\n\n");
+            }
+
+            String fileName = "FTxT_baterai_" + System.currentTimeMillis() + ".txt";
+            try {
+                if (writeSnapshotToDownload(sb.toString(), fileName)) {
+                    activity.runOnUiThread(() -> Toast.makeText(activity,
+                            "Tersimpan: Download/" + fileName +
+                                    " (" + history.length + " snapshot)", Toast.LENGTH_LONG).show());
+                } else {
+                    activity.runOnUiThread(() -> Toast.makeText(activity,
+                            "Gagal menyimpan snapshot", Toast.LENGTH_SHORT).show());
+                }
+            } catch (Exception e) {
+                activity.runOnUiThread(() -> Toast.makeText(activity,
+                        "Gagal menyimpan: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private boolean writeSnapshotToDownload(String content, String fileName) throws Exception {
