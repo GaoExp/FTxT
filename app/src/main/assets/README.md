@@ -1,7 +1,7 @@
 # FTxT (FunText) — Floating Text Overlay
 
 >**Current Release:** `4.89.0` **Beta** 
-**Last Updated:** `2026-08-27`
+**Last Updated:** `2026-09-05`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
 
@@ -17,7 +17,8 @@
 - **Battery Monitor** — Pemantauan baterai perangkat di tab Monitor panel Battery Info: ring gauge level bergradien hue + grid metrik real-time, grafik riwayat Suhu/Daya/Tegangan/Arus/Persentase rentang 5 menit–24 jam dari database SQLite lokal, estimasi kapasitas & skor kesehatan ala AccuBattery; pencatatan otomatis full-aktif via foreground service ringan (nyala saat aplikasi dibuka & saat boot, sampling dinamis hemat baterai)
 - **Network Speed Meter Overlay** — Kecepatan internet real-time (↓ ↑) dengan warna nilai & label terpisah
 - **Memory Stats Overlay** — Monitoring memori real-time 14 nilai (Java Heap, Native Heap, Graphics, Total, Gagal, Execution Time, Free RAM, Total RAM, jumlah proses, dll) dengan urutan item via OrderZones, background monitor yang tetap berjalan meski service tidak aktif, export/copy snapshot
-- **Crash Logger** — Saat force close, stack trace otomatis ditulis ke folder Download (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
+- **Crash Logger** — Saat force close, stack trace otomatis ditulis ke Documents/FTxT/Log_Crash (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
+- **Log ANR** — Saat main thread macet ≥5 detik (ANR), trace seluruh thread otomatis ditulis ke Documents/FTxT/Log_ANR (plus cadangan prefs) agar peristiwa ANR mudah dilaporkan tanpa logcat/adb
 - **Konfigurasi Panel Sidebar** — Toggle tampil/sembunyi panel Info Memori & Debugging dari Navigation Drawer via Pengaturan > Konfigurasi; switch Debugging terkunci password dengan tombol Unlock/Relock
 - **Color Wheel & Hue Slider** — Dua mode color picker: Classic Color Wheel dengan crosshair + ARGB slider, atau Hue/Saturation/Brightness/Alpha slider. Two-way sync, color name auto-detection, HEX edit manual, saved colors
 - **Safe Area** — Batasi posisi overlay agar tidak masuk area notch/cutout
