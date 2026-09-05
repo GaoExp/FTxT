@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -17,6 +19,8 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 import exp.ftxt.core.FloatingService;
+import exp.ftxt.core.NotificationHelper;
 import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.memory_stats.MemoryMonitor;
 import exp.ftxt.features.memory_stats.MemoryModule;
@@ -52,6 +57,9 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView debuggingRelockBtn;
     private Switch memorySidebarSwitch;
     private TextView exportDbBtn;
+    private RadioGroup statusBarModeGroup;
+    private ImageView statusBarPreview;
+    private Handler statusBarPreviewHandler;
 
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
     public static final String PREF_DEVELOPER_UNLOCKED = "developer_unlocked";
@@ -120,6 +128,29 @@ public class SettingsActivity extends AppCompatActivity {
             setIcon(isChecked);
         });
 
+        statusBarModeGroup = findViewById(R.id.statusBarModeGroup);
+        statusBarPreview = findViewById(R.id.statusBarPreview);
+
+        String statusBarMode = prefs.getString(NotificationHelper.PREF_STATUS_BAR_MODE, "temp");
+        if ("percent".equals(statusBarMode)) {
+            statusBarModeGroup.check(R.id.statusBarModePercent);
+        } else if ("date".equals(statusBarMode)) {
+            statusBarModeGroup.check(R.id.statusBarModeDate);
+        } else {
+            statusBarModeGroup.check(R.id.statusBarModeTemp);
+        }
+
+        statusBarModeGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            String mode = "temp";
+            if (checkedId == R.id.statusBarModePercent) mode = "percent";
+            else if (checkedId == R.id.statusBarModeDate) mode = "date";
+            prefs.edit().putString(NotificationHelper.PREF_STATUS_BAR_MODE, mode).apply();
+            FloatingService.updateNotification();
+            updateStatusBarPreview();
+        });
+
+        statusBarPreviewHandler = new Handler(Looper.getMainLooper());
+
         debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
         debuggingPasswordInput = findViewById(R.id.debuggingPasswordInput);
         developerStatusLabel = findViewById(R.id.developerStatusLabel);
@@ -182,6 +213,37 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updatePermissionSwitches();
+        startStatusBarPreview();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (statusBarPreviewHandler != null) {
+            statusBarPreviewHandler.removeCallbacksAndMessages(null);
+        }
+    }
+
+    private void startStatusBarPreview() {
+        if (statusBarPreviewHandler == null || statusBarPreview == null) return;
+        statusBarPreviewHandler.removeCallbacksAndMessages(null);
+        final Runnable updater = new Runnable() {
+            @Override
+            public void run() {
+                updateStatusBarPreview();
+                statusBarPreviewHandler.postDelayed(this, 1000);
+            }
+        };
+        statusBarPreviewHandler.post(updater);
+    }
+
+    private void updateStatusBarPreview() {
+        if (statusBarModeGroup == null || statusBarPreview == null) return;
+        int checkedId = statusBarModeGroup.getCheckedRadioButtonId();
+        String mode = "temp";
+        if (checkedId == R.id.statusBarModePercent) mode = "percent";
+        else if (checkedId == R.id.statusBarModeDate) mode = "date";
+        statusBarPreview.setImageBitmap(NotificationHelper.buildStatusIconBitmap(this, mode));
     }
 
     private void applySwitchTint(Switch sw, boolean isChecked) {

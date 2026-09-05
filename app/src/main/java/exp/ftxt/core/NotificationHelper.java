@@ -21,8 +21,11 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
@@ -39,6 +42,7 @@ public class NotificationHelper {
 
     public static final String CHANNEL_ID = "ftxt_overlay";
     public static final int NOTIFICATION_ID = 1;
+    public static final String PREF_STATUS_BAR_MODE = "status_bar_mode";
 
     private static Handler iconHandler;
     private static boolean iconCycling = false;
@@ -47,9 +51,11 @@ public class NotificationHelper {
     private static Bitmap cachedIconBitmap;
     private static String cachedIconText;
     private static RemoteViews cachedContentView;
+    private static String lastSignature;
 
-    private static Bitmap generateIcon(String text) {
-        if (cachedIconBitmap != null && text.equals(cachedIconText)) {
+    private static Bitmap generateIcon(String top, String bottom) {
+        String cacheKey = (bottom == null || bottom.isEmpty()) ? top : top + "\n" + bottom;
+        if (cachedIconBitmap != null && cacheKey.equals(cachedIconText)) {
             return cachedIconBitmap;
         }
         int size = 96;
@@ -57,16 +63,33 @@ public class NotificationHelper {
         bitmap.setDensity(android.util.DisplayMetrics.DENSITY_XXXHIGH);
         Canvas canvas = new Canvas(bitmap);
 
-        Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(68);
-        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        textPaint.setTextAlign(Paint.Align.CENTER);
-        Paint.FontMetrics fm = textPaint.getFontMetrics();
-        float y = size / 2f - (fm.ascent + fm.descent) / 2f;
-        canvas.drawText(text, size / 2f, y, textPaint);
+        Paint topPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        topPaint.setColor(Color.WHITE);
+        topPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        topPaint.setTextAlign(Paint.Align.CENTER);
 
-        cachedIconText = text;
+        if (bottom == null || bottom.isEmpty()) {
+            topPaint.setTextSize(68);
+            Paint.FontMetrics fm = topPaint.getFontMetrics();
+            float y = size / 2f - (fm.ascent + fm.descent) / 2f;
+            canvas.drawText(top, size / 2f, y, topPaint);
+        } else {
+            topPaint.setTextSize(50);
+            Paint.FontMetrics fmTop = topPaint.getFontMetrics();
+            float yTop = 54f - (fmTop.ascent + fmTop.descent) / 2f;
+            canvas.drawText(top, size / 2f, yTop, topPaint);
+
+            Paint bottomPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            bottomPaint.setColor(Color.WHITE);
+            bottomPaint.setTextSize(30);
+            bottomPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            bottomPaint.setTextAlign(Paint.Align.CENTER);
+            Paint.FontMetrics fmBottom = bottomPaint.getFontMetrics();
+            float yBottom = 84f - (fmBottom.ascent + fmBottom.descent) / 2f;
+            canvas.drawText(bottom, size / 2f, yBottom, bottomPaint);
+        }
+
+        cachedIconText = cacheKey;
         cachedIconBitmap = bitmap;
         return bitmap;
     }
@@ -82,21 +105,65 @@ public class NotificationHelper {
         }
     }
 
+    private static String getBatteryPercent(Context context) {
+        try {
+            Intent intent = context.registerReceiver(null, BATTERY_FILTER);
+            if (intent == null) return "--";
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+            if (level < 0 || scale <= 0) return "--";
+            return String.valueOf(Math.round(level * 100f / scale));
+        } catch (Exception e) {
+            return "--";
+        }
+    }
+
+    public static String getStatusBarMode(Context context) {
+        return context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
+                .getString(PREF_STATUS_BAR_MODE, "temp");
+    }
+
+    private static String[] getStatusIconLines(Context context, String mode) {
+        if ("date".equals(mode)) {
+            Calendar c = Calendar.getInstance();
+            String day = String.valueOf(c.get(Calendar.DAY_OF_MONTH));
+            String weekday = new SimpleDateFormat("EEE", Locale.ENGLISH).format(c.getTime());
+            return new String[]{day, weekday};
+        }
+        if ("percent".equals(mode)) {
+            return new String[]{getBatteryPercent(context) + "%", null};
+        }
+        return new String[]{getBatteryTemp(context) + "\u00B0", null};
+    }
+
+    public static Bitmap buildStatusIconBitmap(Context context, String mode) {
+        String[] lines = getStatusIconLines(context, mode);
+        return generateIcon(lines[0], lines[1]);
+    }
+
     private static Notification buildNotificationDynamic(Context context) {
-        String tempValue = getBatteryTemp(context);
-        Bitmap iconBitmap = generateIcon(tempValue + "\u00B0");
+        String mode = getStatusBarMode(context);
+        String[] iconLines = getStatusIconLines(context, mode);
+        Bitmap iconBitmap = generateIcon(iconLines[0], iconLines[1]);
 
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
         String title = getSessionTitle(context);
+        String activeModules = getActiveModulesText(context);
+
+        String iconKey = iconLines[0] + "/" + (iconLines[1] == null ? "-" : iconLines[1]);
+        String signature = title + "|" + toggleIcon + "|" + activeModules + "|" + mode + "|" + iconKey;
+        if (signature.equals(lastSignature)) return null;
+        lastSignature = signature;
+
         RemoteViews contentView = buildContentView(context, toggleIcon, title);
 
         android.graphics.drawable.Icon smallIcon = android.graphics.drawable.Icon.createWithBitmap(iconBitmap);
         return new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIcon)
                 .setContentTitle(title)
-                .setContentText(getActiveModulesText(context))
+                .setContentText(activeModules)
                 .setCustomContentView(contentView)
                 .setStyle(new Notification.DecoratedCustomViewStyle())
                 .setOngoing(true)
@@ -174,17 +241,20 @@ public class NotificationHelper {
     public static void startIconCycling(Context context) {
         if (iconCycling) return;
         iconCycling = true;
+        lastSignature = null;
         iconHandler = new Handler(Looper.getMainLooper());
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+        Notification first = buildNotificationDynamic(context);
+        if (first != null) nm.notify(NOTIFICATION_ID, first);
 
         iconHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (!iconCycling) return;
                 NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                nm2.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+                Notification n = buildNotificationDynamic(context);
+                if (n != null) nm2.notify(NOTIFICATION_ID, n);
                 iconHandler.postDelayed(this, 1000);
             }
         }, 1000);
@@ -192,6 +262,7 @@ public class NotificationHelper {
 
     public static void stopIconCycling() {
         iconCycling = false;
+        lastSignature = null;
         if (iconHandler != null) {
             iconHandler.removeCallbacksAndMessages(null);
             iconHandler = null;
@@ -222,11 +293,11 @@ public class NotificationHelper {
     }
 
     public static void updateNotification(Context context) {
+        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (iconCycling) {
-            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.notify(NOTIFICATION_ID, buildNotificationDynamic(context));
+            Notification n = buildNotificationDynamic(context);
+            if (n != null) nm.notify(NOTIFICATION_ID, n);
         } else {
-            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.notify(NOTIFICATION_ID, buildNotification(context));
         }
     }

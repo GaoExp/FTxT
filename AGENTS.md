@@ -42,9 +42,10 @@ Entry dicatat di **versi berjalan** (bukan entry baru per file) — CHANGELOG ha
 
 ### 2.1b Kriteria section
 
-- **✨ Fitur Baru / 🚮 Fitur Dihapus / ♻️ Perubahan Fitur / 🔧 Optimasi / 🐞 Bug Fixes** hanya untuk **fitur yang sudah rilis** (versi berstatus `***PUSH***`/`***RELEASE***`).
-- Untuk versi `***ONGOING***` yang masih dikerjakan, tiap perubahan ditulis sebagai **satu poin hasil akhir di ✨ Fitur Baru** — tidak dikotak-kotakkan ke dalam ♻️/🔧/🐞 dulu. Section ♻️/🔧/🐞 baru boleh dipakai pada entry berstatus PUSH/RELEASE (mis. saat merapikan/upgrade entry lama atau memindahkan poin saat rilis).
-- Poin yang menyangkut fitur masih ONGOING tidak boleh tampil di ♻️/🔧/🐞.
+- Tiap perubahan pada entry berjalan (**`***ONGOING***`**) langsung ditulis di section yang sesuai **natur perubahannya**, tidak ditunda sampai rilis: **✨ Fitur Baru** (fitur baru), **🚮 Fitur Dihapus** (fitur dihapus/dinonaktifkan), **♻️ Perubahan Fitur** (perombakan fitur existing), **🔧 Optimasi & Penyesuaian** (optimasi/penyesuaian kecil), **🐞 Bug Fixes** (perbaikan bug).
+- Status judul (`***ONGOING***`/`***PUSH***`/`***RELEASE***`) **tidak menentukan** section tujuan — penentuan section murni mengikuti natur perubahan.
+- Tiap perubahan ditulis sebagai **satu poin hasil akhir** (kondisi final iterasi, bukan jejak tahapan kerja).
+- Saat merapikan/upgrade entry lama, poin boleh dipindah antar section agar sesuai naturnya, dan poin yang saling menimpa boleh digabung (jangan ubah fakta, hanya susun ulang).
 
 ### 2.2 Waktu yang dicatat
 

@@ -1,3 +1,16 @@
+# [4.89.1] 2026/09/06 02:56 WITA 247 ***ONGOING***
+### 🔖 Deskripsi
+> Isi ikon status bar bisa diatur, penyesuaian kecil pada ikon launcher versi rilis, dan penghematan refresh notifikasi overlay.
+
+### ✨ Fitur Baru
+- **Isi ikon status bar bisa diatur** — Halaman Konfigurasi bertambah section "Status Bar" untuk memilih isi ikon notifikasi status bar: **Suhu** (`32°`), **Persen** (`58%`), atau **Tanggal** dua baris (tanggal + nama hari, mis. `6` / `sun`). Pilihan tersimpan otomatis, ikon status bar langsung berganti, dan ada pratinjau ikon live yang diperbarui tiap detik.
+
+### 🔧 Optimasi & Penyesuaian
+- **Notifikasi overlay hanya di-refresh saat nilainya berubah** — Ikon status bar (suhu) dan judul notifikasi kini hanya dikirim pembaruannya ketika salah satu nilai yang ditampilkan benar-benar berbeda dari nilai sebelumnya; saat tidak ada perubahan (persen, arus, tegangan, daya, suhu, status overlay sama), pembaruan yang sia-sia dikirim tiap detik dihentikan sehingga ikon & judul tidak dibangun ulang tanpa alasan — data yang tampil tetap akurat dan real-time.
+- **Ikon launcher rilis disamakan ukurannya dengan ikon alternatif** — Ikon aplikasi default (riwayat rilis) yang sebelumnya dibuat dari gambar beresolusi sangat rendah (200×200px) sehingga tampak membesar, kasar, dan terpotong mask launcher kini dibuat ulang beresolusi 1024×1024 dengan area aman yang sama seperti ikon alternatif — rilis tetap memakai desain ikon default, hanya proporsi & ketajamannya menjadi pas.
+
+---
+
 # [4.89.0] 2026/09/05 12:12 WITA 244 ***RELEASE***
 ### 🔖 Deskripsi
 > Pembaruan utama rilis ini berpusat pada pemantauan baterai dan overlay bidikan.
