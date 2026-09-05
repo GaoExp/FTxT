@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,9 +19,16 @@ import android.provider.Settings;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RadioGroup;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,7 +67,32 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView exportDbBtn;
     private RadioGroup statusBarModeGroup;
     private ImageView statusBarPreview;
+    private LinearLayout statusBarTempScaleGroup;
+    private LinearLayout statusBarPercentScaleGroup;
+    private LinearLayout statusBarDateScaleGroup;
+    private SeekBar statusBarTempScaleBar;
+    private SeekBar statusBarPercentScaleBar;
+    private SeekBar statusBarDateScaleBar;
+    private TextView statusBarTempScaleValue;
+    private TextView statusBarPercentScaleValue;
+    private TextView statusBarDateScaleValue;
+    private SeekBar statusBarDateTopScaleBar;
+    private TextView statusBarDateTopScaleValue;
+    private SeekBar statusBarDateBottomScaleBar;
+    private TextView statusBarDateBottomScaleValue;
+    private SeekBar statusBarPercentRingBar;
+    private TextView statusBarPercentRingValue;
+    private SeekBar statusBarPercentNumBar;
+    private TextView statusBarPercentNumValue;
+    private RadioGroup statusBarDateLangGroup;
+    private TextView statusBarDateFormatValue;
+    private PopupWindow statusBarFormatPopup;
     private Handler statusBarPreviewHandler;
+
+    private static final String[] DATE_FORMATS = {
+            "d + Hari", "dd + Hari", "d + Bulan", "dd + Bulan",
+            "d/M + Hari", "dd/MM + Hari", "Hari + d/M", "Hari + dd/MM"
+    };
 
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
     public static final String PREF_DEVELOPER_UNLOCKED = "developer_unlocked";
@@ -146,10 +179,56 @@ public class SettingsActivity extends AppCompatActivity {
             else if (checkedId == R.id.statusBarModeDate) mode = "date";
             prefs.edit().putString(NotificationHelper.PREF_STATUS_BAR_MODE, mode).apply();
             FloatingService.updateNotification();
+            applyStatusBarScaleVisibility();
             updateStatusBarPreview();
         });
 
         statusBarPreviewHandler = new Handler(Looper.getMainLooper());
+
+        statusBarTempScaleGroup = findViewById(R.id.statusBarTempScaleGroup);
+        statusBarPercentScaleGroup = findViewById(R.id.statusBarPercentScaleGroup);
+        statusBarDateScaleGroup = findViewById(R.id.statusBarDateScaleGroup);
+        statusBarTempScaleBar = findViewById(R.id.statusBarTempScaleBar);
+        statusBarPercentScaleBar = findViewById(R.id.statusBarPercentScaleBar);
+        statusBarDateScaleBar = findViewById(R.id.statusBarDateScaleBar);
+        statusBarTempScaleValue = findViewById(R.id.statusBarTempScaleValue);
+        statusBarPercentScaleValue = findViewById(R.id.statusBarPercentScaleValue);
+        statusBarDateScaleValue = findViewById(R.id.statusBarDateScaleValue);
+        statusBarDateTopScaleBar = findViewById(R.id.statusBarDateTopScaleBar);
+        statusBarDateTopScaleValue = findViewById(R.id.statusBarDateTopScaleValue);
+        statusBarDateBottomScaleBar = findViewById(R.id.statusBarDateBottomScaleBar);
+        statusBarDateBottomScaleValue = findViewById(R.id.statusBarDateBottomScaleValue);
+        statusBarPercentRingBar = findViewById(R.id.statusBarPercentRingBar);
+        statusBarPercentRingValue = findViewById(R.id.statusBarPercentRingValue);
+        statusBarPercentNumBar = findViewById(R.id.statusBarPercentNumBar);
+        statusBarPercentNumValue = findViewById(R.id.statusBarPercentNumValue);
+
+        bindStatusBarScale(statusBarTempScaleBar, statusBarTempScaleValue, "temp");
+        bindStatusBarScale(statusBarPercentScaleBar, statusBarPercentScaleValue, "percent");
+        bindStatusBarScale(statusBarDateScaleBar, statusBarDateScaleValue, "date");
+        bindStatusBarScale(statusBarDateTopScaleBar, statusBarDateTopScaleValue, "date_top");
+        bindStatusBarScale(statusBarDateBottomScaleBar, statusBarDateBottomScaleValue, "date_bottom");
+        bindStatusBarScale(statusBarPercentRingBar, statusBarPercentRingValue, "percent_ring");
+        bindStatusBarScale(statusBarPercentNumBar, statusBarPercentNumValue, "percent_num");
+
+        statusBarDateLangGroup = findViewById(R.id.statusBarDateLangGroup);
+        statusBarDateFormatValue = findViewById(R.id.statusBarDateFormatValue);
+
+        String dateLang = prefs.getString(NotificationHelper.PREF_STATUS_BAR_DATE_LANG, "eng");
+        statusBarDateLangGroup.check("in".equals(dateLang)
+                ? R.id.statusBarDateLangIn : R.id.statusBarDateLangEng);
+
+        statusBarDateLangGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            String lang = (checkedId == R.id.statusBarDateLangIn) ? "in" : "eng";
+            prefs.edit().putString(NotificationHelper.PREF_STATUS_BAR_DATE_LANG, lang).apply();
+            FloatingService.updateNotification();
+            updateStatusBarPreview();
+        });
+
+        statusBarDateFormatValue.setText(DATE_FORMATS[NotificationHelper.getStatusBarDateFormat(this)]);
+        statusBarDateFormatValue.setOnClickListener(v -> showDateFormatPopup(v, prefs));
+
+        applyStatusBarScaleVisibility();
 
         debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
         debuggingPasswordInput = findViewById(R.id.debuggingPasswordInput);
@@ -237,13 +316,104 @@ public class SettingsActivity extends AppCompatActivity {
         statusBarPreviewHandler.post(updater);
     }
 
+    private String getSelectedStatusBarMode() {
+        int checkedId = statusBarModeGroup.getCheckedRadioButtonId();
+        if (checkedId == R.id.statusBarModePercent) return "percent";
+        if (checkedId == R.id.statusBarModeDate) return "date";
+        return "temp";
+    }
+
     private void updateStatusBarPreview() {
         if (statusBarModeGroup == null || statusBarPreview == null) return;
-        int checkedId = statusBarModeGroup.getCheckedRadioButtonId();
-        String mode = "temp";
-        if (checkedId == R.id.statusBarModePercent) mode = "percent";
-        else if (checkedId == R.id.statusBarModeDate) mode = "date";
-        statusBarPreview.setImageBitmap(NotificationHelper.buildStatusIconBitmap(this, mode));
+        statusBarPreview.setImageBitmap(
+                NotificationHelper.buildStatusIconBitmap(this, getSelectedStatusBarMode()));
+    }
+
+    private void bindStatusBarScale(SeekBar bar, TextView value, String mode) {
+        float scale = NotificationHelper.getStatusBarScale(this, mode);
+        bar.setProgress(Math.round((scale - 0.6f) * 100f));
+        value.setText(Math.round(scale * 100f) + "%");
+        bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (!fromUser) return;
+                float scale = 0.6f + progress * 0.01f;
+                getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                        .edit().putFloat(NotificationHelper.getStatusBarScalePref(mode), scale).apply();
+                value.setText(Math.round(scale * 100f) + "%");
+                FloatingService.updateNotification();
+                updateStatusBarPreview();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void showDateFormatPopup(View anchor, SharedPreferences prefs) {
+        if (statusBarFormatPopup != null && statusBarFormatPopup.isShowing()) {
+            statusBarFormatPopup.dismiss();
+            return;
+        }
+
+        int currentIdx = NotificationHelper.getStatusBarDateFormat(this);
+
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setBackgroundColor(0xFFFFFFFF);
+
+        for (int i = 0; i < DATE_FORMATS.length; i++) {
+            TextView item = new TextView(this);
+            item.setText(DATE_FORMATS[i]);
+            item.setPadding(dp(16), dp(10), dp(16), dp(10));
+            item.setTextSize(14);
+            item.setGravity(Gravity.CENTER_VERTICAL);
+            item.setTextColor(0xFF222222);
+            item.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            if (i == currentIdx) {
+                item.setBackgroundColor(0xFF4A90D9);
+                item.setTextColor(0xFFFFFFFF);
+            }
+
+            final int idx = i;
+            item.setOnClickListener(v -> {
+                prefs.edit().putInt(NotificationHelper.PREF_STATUS_BAR_DATE_FORMAT, idx).apply();
+                statusBarDateFormatValue.setText(DATE_FORMATS[idx]);
+                FloatingService.updateNotification();
+                updateStatusBarPreview();
+                if (statusBarFormatPopup != null) statusBarFormatPopup.dismiss();
+            });
+            content.addView(item);
+        }
+
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(content);
+
+        statusBarFormatPopup = new PopupWindow(scrollView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dp(200), true);
+        statusBarFormatPopup.setBackgroundDrawable(new ColorDrawable(0xFFFFFFFF));
+        statusBarFormatPopup.setOutsideTouchable(true);
+        statusBarFormatPopup.setElevation(dp(4));
+        statusBarFormatPopup.showAsDropDown(anchor, 0, dp(2));
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources().getDisplayMetrics().density);
+    }
+
+    private void applyStatusBarScaleVisibility() {
+        String mode = getSelectedStatusBarMode();
+        statusBarTempScaleGroup.setVisibility("temp".equals(mode) ? View.VISIBLE : View.GONE);
+        statusBarPercentScaleGroup.setVisibility("percent".equals(mode) ? View.VISIBLE : View.GONE);
+        statusBarDateScaleGroup.setVisibility("date".equals(mode) ? View.VISIBLE : View.GONE);
     }
 
     private void applySwitchTint(Switch sw, boolean isChecked) {
