@@ -217,6 +217,7 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
   - **Tampilkan panel Debugging** — Toggle untuk menampilkan/menyembunyikan panel Debugging dari Navigation Drawer (default OFF). Switch terkunci password: masukkan password lalu tap Unlock untuk membuka, tombol Relock untuk mengunci ulang. Status unlock tersimpan persisten.
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon
 - **Crash Logger** — Saat force close, stack trace otomatis ditulis ke `FTxT_crash_*.txt` di Documents/FTxT/Log_Crash (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
+- **Log ANR** — Saat main thread macet ≥5 detik (ANR), trace seluruh thread otomatis ditulis ke `FTxT_anr_*.txt` di Documents/FTxT/Log_ANR (plus cadangan prefs) agar peristiwa ANR bisa dilaporkan tanpa logcat/adb
 
 ---
 
