@@ -37,7 +37,7 @@ Entry dicatat di **versi berjalan** (bukan entry baru per file) — CHANGELOG ha
 
 **STATUS** (salah satu):
 - `***ONGOING***` — entry versi berjalan sedang dikerjakan.
-- `***PUSH***` — saat commit tanpa tag.
+- `***PUSH***` — saat commit + push (tanpa tag).
 - `***RELEASE***` — saat commit + tag (bisa berawal dari PUSH lalu di-upgrade).
 
 ### 2.1b Kriteria section
@@ -124,26 +124,32 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 2. Rampungkan CHANGELOG entry berjalan — isi entry (poin deskripsi hasil akhir) **setelah seluruh perubahan untuk iterasi selesai**; **tetapkan tanggal & jam judul di akhir**.
 3. Naikkan versionCode +1 saat entry diperbarui (lihat § 2.3b).
 4. Self-check hasil perubahan.
-5. **JANGAN commit / tag / push.**
-6. Ulang sampai user perintah commit/tag.
+5. **JANGAN commit / tag / push.** Kecuali perintah mencakup push/tag (lihat di bawah).
+6. Ulang sampai user perintah commit (dengan/tanpa push/tag).
 
 ### Pre-release
-1. Periksa semua dokumen.
-2. Pastikan status judul `***ONGOING***` dengan tanggal & jam WITA terbaru.
-3. Bilang user siap di-commit & tag.
+1. Periksa & perbarui dokumen yang menyangkut perubahan fitur: `README.md`, `PANDUAN.md`, `STRUKTUR.md`, `CHANGELOG.md`.
+2. Analisa & rapikan poin-poin CHANGELOG entry berjalan — kategori sesuai natur perubahan (§ 2.1b), tulis hasil akhir, gabung poin yang menimpa (§ 2.4).
+3. Pastikan status judul `***ONGOING***` dengan tanggal & jam WITA terbaru.
+4. Bilang user siap commit/push/tag. **JANGAN commit / tag / push.**
 
-### Rilis (hanya jika diperintah)
+### Commit (hanya jika diperintah)
 1. `git add -A && git commit -m "vX.X.X deskripsi"`.
-2. **JANGAN ubah status CHANGELOG** — tetap `***ONGOING***` sampai user bilang push.
-3. `git tag vX.X.X` bila akan di-tag.
-4. **JANGAN push** — user menyusul.
+2. Status judul **tetap** `***ONGOING***` — kecuali perintah mencakup push/tag (lihat di bawah).
+3. **JANGAN push / tag** jika tidak diperintah.
 
-### Setelah Push (langsung buat judul entry versi baru)
-1. Ubah status judul → `***PUSH***` / `***RELEASE***` dan **naikkan versionCode +1** (lihat § 2.3b).
-2. versionName disesuaikan setelah ada perubahan.
-3. Perbarui tanggal & jam WITA saat itu.
-4. Buat entry CHANGELOG baru (teratas, `***ONGOING***`) di sesi kerja berikutnya.
-5. Kembali ke Edit Biasa.
+### Push (commit + push)
+1. Sebelum commit: ubah status judul → `***PUSH***`, **naikkan versionCode +1** (§ 2.3b), perbarui tanggal & jam WITA.
+2. `git commit` mencakup perubahan status, lalu `git push`.
+
+### Tag (commit + tag)
+1. Sebelum commit: ubah status judul → `***RELEASE***`, **naikkan versionCode +1** (§ 2.3b), perbarui tanggal & jam WITA.
+2. `git commit` mencakup perubahan status, lalu `git tag vX.X.X`.
+3. `***RELEASE***` bisa berawal dari `***PUSH***` lalu di-upgrade saat tag ditambahkan.
+
+### Setelah status PUSH/RELEASE
+1. Buat entry CHANGELOG baru (teratas, `***ONGOING***`) di sesi kerja berikutnya; versionName disesuaikan setelah ada perubahan.
+2. Kembali ke Edit Biasa.
 
 ---
 
