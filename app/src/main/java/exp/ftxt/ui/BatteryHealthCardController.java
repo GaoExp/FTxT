@@ -168,8 +168,11 @@ public class BatteryHealthCardController {
                         Toast.makeText(activity, "Kapasitas harus 500–30000 mAh", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    BatteryCapacityEstimator.setDesignCapacity(value);
-                    refresh();
+                    final int capacity = value;
+                    healthExecutor.execute(() -> {
+                        BatteryCapacityEstimator.setDesignCapacity(capacity);
+                        activity.runOnUiThread(() -> refresh());
+                    });
                 })
                 .setNegativeButton("Batal", null)
                 .show();
@@ -215,9 +218,13 @@ public class BatteryHealthCardController {
                         + "Ketik \"RESET\" untuk melanjutkan.")
                 .setView(container)
                 .setPositiveButton("Reset", (d, which) -> {
-                    BatteryCapacityEstimator.resetEstimationData();
-                    refresh();
-                    Toast.makeText(activity, "Data estimasi berhasil direset", Toast.LENGTH_SHORT).show();
+                    healthExecutor.execute(() -> {
+                        BatteryCapacityEstimator.resetEstimationData();
+                        activity.runOnUiThread(() -> {
+                            refresh();
+                            Toast.makeText(activity, "Data estimasi berhasil direset", Toast.LENGTH_SHORT).show();
+                        });
+                    });
                 })
                 .setNegativeButton("Batal", null)
                 .create();

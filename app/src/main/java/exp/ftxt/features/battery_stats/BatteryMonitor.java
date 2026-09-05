@@ -118,10 +118,18 @@ public class BatteryMonitor {
     public static synchronized void stop() {
         running = false;
         mainHandler.removeCallbacks(tick);
-        BatteryCapacityEstimator.onMonitoringStopped();
-        DischargeTracker.onMonitoringStopped();
-        if (bgThread != null) {
-            bgThread.quitSafely();
+        // onMonitoringStopped() memicu finishSegment() yang melakukan DB write.
+        // Dipindah ke bgHandler agar tidak memblokir main thread (penyebab ANR).
+        if (bgHandler != null) {
+            bgHandler.post(() -> {
+                try {
+                    BatteryCapacityEstimator.onMonitoringStopped();
+                } catch (Exception ignored) {}
+                try {
+                    DischargeTracker.onMonitoringStopped();
+                } catch (Exception ignored) {}
+                bgThread.quitSafely();
+            });
             bgThread = null;
             bgHandler = null;
         }

@@ -47,10 +47,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PresetManager {
 
     private static final String PREFS_NAME = "ftxt_presets";
+    private static final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
 
     private static final String KEY_INDEX = "preset_index_v2";
 
@@ -152,6 +155,12 @@ public class PresetManager {
     }
 
     public static void save(Context context, String name, OverlayPreset preset) {
+        // Gson serialize, thumbnail PNG compress, & file I/O dipindah ke background
+        // agar tidak memblokir main thread (sumber ANR saat user save/load preset).
+        saveExecutor.execute(() -> saveInternal(context, name, preset));
+    }
+
+    private static void saveInternal(Context context, String name, OverlayPreset preset) {
         SharedPreferences prefs = getPrefs(context);
         Gson gson = getGson();
 
@@ -209,6 +218,7 @@ public class PresetManager {
             bmp.compress(Bitmap.CompressFormat.PNG, 90, fos);
             fos.flush();
             fos.close();
+            bmp.recycle();
             item.thumbnailPath = thumbPath;
         } catch (Exception e) {
             e.printStackTrace();

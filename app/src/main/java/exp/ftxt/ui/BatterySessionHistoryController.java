@@ -3,10 +3,7 @@ package exp.ftxt.ui;
 import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.TextView;
 
@@ -47,7 +44,6 @@ public class BatterySessionHistoryController {
     private TextView rangeText;
     private TextView summaryText;
     private TextView[] filterTabs;
-    private int monitorLabelColor;
 
     private int period = PERIOD_DAILY;
     private long selectedBucket = -1;
@@ -74,7 +70,6 @@ public class BatterySessionHistoryController {
         chartView = rootView.findViewById(R.id.batSessionBarChart);
         rangeText = rootView.findViewById(R.id.batHistRangeText);
         summaryText = rootView.findViewById(R.id.batHistSummaryText);
-        monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
         rootView.findViewById(R.id.batHistInfoButton)
                 .setOnClickListener(v -> InfoTooltip.show(activity, v,
                         "Meter mAh — Riwayat Sesi",
@@ -234,23 +229,16 @@ public class BatterySessionHistoryController {
             return;
         }
         int charges = 0, discharges = 0;
-        float chargePct = 0f, dischargePct = 0f;
-        double mAhCounter = 0d, mAhIntegral = 0d;
-        float effSum = 0f;
+        double chargeMah = 0d, dischargeMah = 0d;
+        double effSum = 0d;
         int effCount = 0;
         for (BatteryHistoryDb.SessionEntry e : entries) {
-            mAhCounter += e.mAhCounter;
-            mAhIntegral += e.mAhIntegral;
             if (e.isCharge) {
                 charges++;
-                if (e.startPercent >= 0 && e.endPercent >= 0) {
-                    chargePct += e.endPercent - e.startPercent;
-                }
+                chargeMah += e.mAhCounter > 0 ? e.mAhCounter : e.mAhIntegral;
             } else {
                 discharges++;
-                if (e.startPercent >= 0 && e.endPercent >= 0) {
-                    dischargePct += e.startPercent - e.endPercent;
-                }
+                dischargeMah += e.mAhCounter > 0 ? e.mAhCounter : e.mAhIntegral;
                 if (e.efficiencyPercent >= 0) {
                     effSum += e.efficiencyPercent;
                     effCount++;
@@ -258,51 +246,24 @@ public class BatterySessionHistoryController {
             }
         }
         SpannableStringBuilder sb = new SpannableStringBuilder();
-        sb.append(String.format(Locale.US, "Sesi (periode ini): %d isi · %d buang\n",
+        sb.append(String.format(Locale.US, "Sesi: %d isi · %d buang\n",
                 charges, discharges));
-        sb.append(String.format(Locale.US, "Telah terisi: %s%% · Penggunaan: %s%%\n",
-                fmtPct(chargePct), fmtPct(dischargePct)));
-        sb.append(String.format(Locale.US, "Pengikisan: %.1f siklus\n", dischargePct / 100f));
-        if (effCount > 0) {
-            sb.append(String.format(Locale.US, "Efficiency: %.0f%%\n", effSum / effCount));
+        sb.append(String.format(Locale.US, "Terisi: %s mAh\n",
+                fmtMah(chargeMah)));
+        sb.append(String.format(Locale.US, "Terpakai: %s mAh\n",
+                fmtMah(dischargeMah)));
+        if (chargeMah > 0 && dischargeMah > 0) {
+            float efficiency = (float) (chargeMah / dischargeMah * 100.0);
+            sb.append(String.format(Locale.US, "Efisiensi: %.0f%%\n", efficiency));
         }
-        appendEnergyMah(sb,
-                mAhCounter, mAhIntegral,
-                activity.getColor(R.color.bat_monitor_header));
+        if (effCount > 0) {
+            sb.append(String.format(Locale.US, "Wear: %.1f%%\n", effSum / effCount));
+        }
         summaryText.setText(sb);
-    }
-
-    private void appendEnergyMah(SpannableStringBuilder sb, double counter, double integral, int accent) {
-        int labelStart = sb.length();
-        sb.append("Energi masuk: ");
-        int cLabelStart = sb.length();
-        sb.append("Coulomb ");
-        int cValStart = sb.length();
-        String cVal = fmtMah(counter);
-        sb.append(cVal).append(" mAh");
-        sb.append(" · ");
-        int iLabelStart = sb.length();
-        sb.append("Integral ");
-        int iValStart = sb.length();
-        String iVal = fmtMah(integral);
-        sb.append(iVal).append(" mAh");
-
-        sb.setSpan(new ForegroundColorSpan(monitorLabelColor),
-                labelStart, cLabelStart, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new StyleSpan(Typeface.BOLD), cLabelStart, cValStart, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new ForegroundColorSpan(accent), cValStart, cValStart + cVal.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new StyleSpan(Typeface.BOLD), iLabelStart, iValStart, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        sb.setSpan(new ForegroundColorSpan(accent), iValStart, iValStart + iVal.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     private String fmtMah(double v) {
         return v > 0 ? String.format(Locale.US, "%.0f", v) : "—";
-    }
-
-    private String fmtPct(float v) {
-        return v == Math.floor(v) ? String.valueOf((int) v) : String.format(Locale.US, "%.1f", v);
     }
 
     private long bucketEnd(long bucketStart) {

@@ -61,6 +61,15 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         try {
             db.enableWriteAheadLogging();
         } catch (Exception ignored) {}
+        // Jaring pengaman: pastikan index pada kolom waktu SELALU ada, termasuk
+        // untuk database lama yang dibuat sebelum index ditambahkan. Tanpa index,
+        // query rentang (WHERE time >= x ORDER BY time) menjadi full-scan + sort
+        // dan bisa memakan puluhan detik (penyebab ANR Estimator). Idempoten.
+        try {
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_samples_time ON samples(time)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_activity_time ON activity_log(time)");
+            db.execSQL("CREATE INDEX IF NOT EXISTS idx_discharge_time ON discharge_sessions(start_time)");
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -303,19 +312,19 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         }
     }
 
-    /** Agregasi harian/bulanan untuk grafik batang riwayat sesi. */
+    /** Agregasi harian/bulanan untuk grafik batang riwayat sesi (mAh). */
     public static final class BarAggregate {
         public final long bucketStartMs;
-        public final float chargePercent;
-        public final float dischargePercent;
+        public final float chargeMah;
+        public final float dischargeMah;
         public final int chargeCount;
         public final int dischargeCount;
 
-        BarAggregate(long bucketStartMs, float chargePercent, float dischargePercent,
+        BarAggregate(long bucketStartMs, float chargeMah, float dischargeMah,
                      int chargeCount, int dischargeCount) {
             this.bucketStartMs = bucketStartMs;
-            this.chargePercent = chargePercent;
-            this.dischargePercent = dischargePercent;
+            this.chargeMah = chargeMah;
+            this.dischargeMah = dischargeMah;
             this.chargeCount = chargeCount;
             this.dischargeCount = dischargeCount;
         }
@@ -778,10 +787,11 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 a = new BarAggregate(bucket, 0f, 0f, 0, 0);
                 map.put(bucket, a);
             }
+            float mAh = r.mAhCounter > 0 ? (float) r.mAhCounter
+                    : r.mAhIntegral > 0 ? (float) r.mAhIntegral : 0f;
             map.put(bucket, new BarAggregate(a.bucketStartMs,
-                    a.chargePercent + (float) (r.endPercent >= 0 && r.startPercent >= 0
-                            ? (r.endPercent - r.startPercent) : 0),
-                    a.dischargePercent, a.chargeCount + 1, a.dischargeCount));
+                    a.chargeMah + mAh, a.dischargeMah,
+                    a.chargeCount + 1, a.dischargeCount));
         }
         for (DischargeSession d : queryDischargeSessions(fromMs, toMs)) {
             long bucket = bucketStart(d.endTime, mode);
@@ -790,8 +800,10 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 a = new BarAggregate(bucket, 0f, 0f, 0, 0);
                 map.put(bucket, a);
             }
-            map.put(bucket, new BarAggregate(a.bucketStartMs, a.chargePercent,
-                    a.dischargePercent + (float) (d.startPercent - d.endPercent),
+            float mAh = d.usedMahCounter > 0 ? (float) d.usedMahCounter
+                    : d.usedMahIntegral > 0 ? (float) d.usedMahIntegral : 0f;
+            map.put(bucket, new BarAggregate(a.bucketStartMs, a.chargeMah,
+                    a.dischargeMah + mAh,
                     a.chargeCount, a.dischargeCount + 1));
         }
         ArrayList<BarAggregate> out = new ArrayList<>(map.values());

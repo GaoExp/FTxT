@@ -66,7 +66,7 @@ public class BatterySessionBarChartView extends View {
         gridPaint.setColor(gridColor);
         gridPaint.setStyle(Paint.Style.STROKE);
         textPaint.setColor(labelColor);
-        textPaint.setTextSize(dp(10));
+        textPaint.setTextSize(dp(9));
         textPaint.setTextAlign(Paint.Align.CENTER);
         strokePaint.setColor(accent);
         strokePaint.setStyle(Paint.Style.STROKE);
@@ -125,18 +125,18 @@ public class BatterySessionBarChartView extends View {
 
         float maxVal = 1f;
         for (BatteryHistoryDb.BarAggregate a : data) {
-            float total = a.chargePercent + a.dischargePercent;
+            float total = a.chargeMah + a.dischargeMah;
             if (total > maxVal) maxVal = total;
         }
 
-        // Sumbu Y: nilai max di garis teratas, 0 di garis terbawah, dengan satuan %
+        // Sumbu Y: nilai max di garis teratas, 0 di garis terbawah (angka saja)
         gridPaint.setStrokeWidth(dp(1));
         for (int i = 0; i <= 2; i++) {
             float ratio = i / 2f;
             float y = top + chartH * ratio;
             canvas.drawLine(left, y, right, y, gridPaint);
             String label = (i == 0 ? fmt((int) Math.round(maxVal))
-                    : i == 1 ? fmt((int) Math.round(maxVal / 2f)) : "0") + "%";
+                    : i == 1 ? fmt((int) Math.round(maxVal / 2f)) : "0");
             textPaint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(label, left - dp(4), y + dp(3), textPaint);
         }
@@ -156,19 +156,19 @@ public class BatterySessionBarChartView extends View {
             float x0 = cx - barW / 2f;
             float x1 = cx + barW / 2f;
 
-            float chargeH = chartH * (a.chargePercent / maxVal);
-            float dischargeH = chartH * (a.dischargePercent / maxVal);
+            float chargeH = chartH * (a.chargeMah / maxVal);
+            float dischargeH = chartH * (a.dischargeMah / maxVal);
             float yBase = bottom;
 
-            if (a.chargePercent > 0f) {
+            if (a.chargeMah > 0f) {
                 canvas.drawRect(new RectF(x0, yBase - chargeH, x1, yBase), chargePaint);
             }
-            if (a.dischargePercent > 0f) {
+            if (a.dischargeMah > 0f) {
                 canvas.drawRect(new RectF(x0, yBase - chargeH - dischargeH,
                         x1, yBase - chargeH), dischargePaint);
             }
 
-            if (slot == selectedIndex && a.chargePercent + a.dischargePercent > 0f) {
+            if (slot == selectedIndex && a.chargeMah + a.dischargeMah > 0f) {
                 canvas.drawRect(new RectF(x0 - dp(1), bottom - chargeH - dischargeH,
                         x1 + dp(1), bottom), strokePaint);
             }

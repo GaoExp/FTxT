@@ -41,6 +41,8 @@ public class BatteryCapacityEstimator {
 
     private static long healthCacheUntil = 0L;
     private static HealthResult healthCache;
+    /** Menandai satu thread sedang menghitung getResult agar tidak dobel hitung. */
+    private static boolean computing = false;
 
     private static boolean segmentActive = false;
     private static long segmentStartMs;
@@ -134,15 +136,54 @@ public class BatteryCapacityEstimator {
         return segmentActive;
     }
 
-    public static synchronized HealthResult getResult() {
-        long now = System.currentTimeMillis();
-        if (healthCache != null && now < healthCacheUntil) return healthCache;
+    /**
+     * Hasil estimasi kapasitas/kesehatan baterai (cache 60 detik).
+     * Query & rekonstruksi segmen (berat) dijalankan DI LUAR monitor class agar
+     * lock estimator tidak dipegang lama — sebelumnya query riwayat 7 hari penuh
+     * memonopoli lock dan membuat pemanggil lain (termasuk main thread di init())
+     * menunggu hingga memicu ANR. State dibaca di dalam blok sinkron singkat,
+     * lalu komputasi dilakukan tanpa lock; bila thread lain sedang menghitung,
+     * pemanggil menunggu hasilnya (wait/notify) tanpa ikut menghitung dobel.
+     */
+    public static HealthResult getResult() {
+        int design;
+        boolean isLoaded;
+        Context ctx;
+        ArrayList<BatteryHistoryDb.SessionRow> sessionsCopy;
+        synchronized (BatteryCapacityEstimator.class) {
+            long now = System.currentTimeMillis();
+            if (healthCache != null && now < healthCacheUntil) return healthCache;
+            while (computing) {
+                try {
+                    BatteryCapacityEstimator.class.wait(250L);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+                now = System.currentTimeMillis();
+                if (healthCache != null && now < healthCacheUntil) return healthCache;
+            }
+            computing = true;
+            design = designMah;
+            isLoaded = loaded;
+            ctx = appContext;
+            sessionsCopy = new ArrayList<>(sessions);
+        }
 
-        HealthResult r = reconstructFromSamples(now);
-        if (r == null) r = fallbackFromSessions();
+        HealthResult r;
+        try {
+            r = computeResult(ctx, isLoaded, design, sessionsCopy, System.currentTimeMillis());
+        } catch (Throwable t) {
+            r = new HealthResult();
+            r.designMah = design;
+        }
 
-        healthCache = r;
-        healthCacheUntil = now + 60_000L;
+        synchronized (BatteryCapacityEstimator.class) {
+            healthCache = r;
+            healthCacheUntil = System.currentTimeMillis() + 60_000L;
+            computing = false;
+            BatteryCapacityEstimator.class.notifyAll();
+        }
         return r;
     }
 
@@ -152,22 +193,28 @@ public class BatteryCapacityEstimator {
      * Segmen pendek/ekstrem dibuang (Δ% ≥ 5, durasi ≥ 1 menit). Mengembalikan
      * null bila belum ada segmen valid sehingga tidak mengganggu fallback.
      */
-    private static HealthResult reconstructFromSamples(long now) {
-        if (appContext == null || !loaded) return null;
-        int design = designMah;
+    private static HealthResult computeResult(Context ctx, boolean isLoaded, int design,
+                                              ArrayList<BatteryHistoryDb.SessionRow> sessionsCopy,
+                                              long now) {
+        if (ctx == null) {
+            HealthResult empty = new HealthResult();
+            empty.designMah = design;
+            return empty;
+        }
+        if (!isLoaded) return fallbackFromSessions(ctx, sessionsCopy, design);
 
         HealthResult r = new HealthResult();
         r.designMah = design;
 
-        BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+        BatteryHistoryDb db = BatteryHistoryDb.get(ctx);
         long span = 7L * 24 * 3600_000L;
         BatteryReading.Snapshot[] asc;
         try {
             asc = db.querySamples(now - span);
         } catch (Exception e) {
-            return null;
+            return fallbackFromSessions(ctx, sessionsCopy, design);
         }
-        if (asc == null || asc.length == 0) return null;
+        if (asc == null || asc.length == 0) return fallbackFromSessions(ctx, sessionsCopy, design);
 
         BatteryReading.Snapshot[] desc = SessionSegmentBuilder.toDesc(asc);
         ArrayList<SessionSegmentBuilder.Segment> segments =
@@ -195,7 +242,7 @@ public class BatteryCapacityEstimator {
             validSamples += seg.sampleCount;
             if (seg.screenOnMs * 2 < seg.durationMs()) screenOffCount++;
         }
-        if (combinedEstimates.isEmpty()) return null;
+        if (combinedEstimates.isEmpty()) return fallbackFromSessions(ctx, sessionsCopy, design);
 
         r.sessionCount = combinedEstimates.size();
         r.totalSamples = validSamples;
@@ -207,21 +254,22 @@ public class BatteryCapacityEstimator {
     }
 
     /** Fallback: bila belum ada segmen valid dari samples, pakai tabel sessions & discharge_sessions. */
-    private static HealthResult fallbackFromSessions() {
+    private static HealthResult fallbackFromSessions(Context ctx,
+            ArrayList<BatteryHistoryDb.SessionRow> sessionsCopy, int design) {
         HealthResult r = new HealthResult();
-        r.designMah = designMah;
+        r.designMah = design;
 
         ArrayList<Float> chargePool = new ArrayList<>();
         ArrayList<Float> dischargePool = new ArrayList<>();
         ArrayList<Float> offPool = new ArrayList<>();
-        for (BatteryHistoryDb.SessionRow sn : sessions) {
+        for (BatteryHistoryDb.SessionRow sn : sessionsCopy) {
             if (sn.capacityMah <= 0f) continue;
             chargePool.add(sn.capacityMah);
             r.totalSamples += sn.sampleCount;
             if (sn.mostlyScreenOff) offPool.add(sn.capacityMah);
         }
         try {
-            BatteryHistoryDb db = BatteryHistoryDb.get(appContext);
+            BatteryHistoryDb db = BatteryHistoryDb.get(ctx);
             for (BatteryHistoryDb.DischargeSession d : db.queryDischargeSessions(0L, Long.MAX_VALUE)) {
                 float dPercent = d.startPercent - d.endPercent;
                 if (dPercent < MIN_DELTA_PERCENT) continue;

@@ -25,6 +25,7 @@ public final class CrashLogger {
         if (initialized) return;
         initialized = true;
         final Context app = context.getApplicationContext();
+        AnrWatcher.start(app);
         final Thread.UncaughtExceptionHandler defaultHandler =
                 Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
@@ -55,7 +56,7 @@ public final class CrashLogger {
             String content = sw.toString();
 
             String fileName = "FTxT_crash_" + System.currentTimeMillis() + ".txt";
-            writeToDownload(ctx, content, fileName);
+            writeToDocuments(ctx, content, fileName);
 
             ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
                     .edit().putString("last_crash", content).apply();
@@ -63,22 +64,22 @@ public final class CrashLogger {
         }
     }
 
-    private static void writeToDownload(Context ctx, String content, String fileName) throws Exception {
+    private static void writeToDocuments(Context ctx, String content, String fileName) throws Exception {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContentValues values = new ContentValues();
             values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
             values.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");
-            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, "Documents/FTxT/Log_Crash");
             Uri uri = ctx.getContentResolver().insert(
-                    MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                    MediaStore.Files.getContentUri("external"), values);
             if (uri == null) return;
             try (OutputStream os = ctx.getContentResolver().openOutputStream(uri)) {
                 if (os == null) return;
                 os.write(content.getBytes("UTF-8"));
             }
         } else {
-            File dir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DOWNLOADS);
+            File dir = new File(Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOCUMENTS), "FTxT/Log_Crash");
             if (!dir.exists()) dir.mkdirs();
             File file = new File(dir, fileName);
             try (FileOutputStream fos = new FileOutputStream(file)) {

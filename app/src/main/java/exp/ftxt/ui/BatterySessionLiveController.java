@@ -52,6 +52,7 @@ public class BatterySessionLiveController {
 
     private boolean running = false;
     private boolean queryInFlight = false;
+    private boolean lastChargingState = false;
     private final Runnable refreshRunnable = new Runnable() {
         @Override
         public void run() {
@@ -83,6 +84,7 @@ public class BatterySessionLiveController {
     public void onPanelShown() {
         if (running) return;
         running = true;
+        lastChargingState = !lastChargingState; // paksa rebuild saat pertama buka
         uiHandler.post(refreshRunnable);
     }
 
@@ -281,9 +283,15 @@ public class BatterySessionLiveController {
             estBoth.setText(fmtEst(d.estBothMs));
         }
 
-        content.removeAllViews();
-        if (d.charging) renderChargeCards(d, accent);
-        else renderDischargeCards(d, accent);
+        // Hanya rebuild view hierarchy saat arah sesi berubah (charge↔discharge).
+        // Saat arah sama, skip rebuild untuk hindari alokasi 50-70 view tiap detik
+        // yang menyebabkan ANR/jank.
+        if (d.charging != lastChargingState) {
+            lastChargingState = d.charging;
+            content.removeAllViews();
+            if (d.charging) renderChargeCards(d, accent);
+            else renderDischargeCards(d, accent);
+        }
     }
 
     private void renderEmpty() {

@@ -162,6 +162,13 @@ public class BatteryChartView extends View {
         touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
         scaleDetector = new ScaleGestureDetector(getContext(), scaleListener);
 
+        // Precompute temperature color LUT (0–60°C, 0.1°C resolution = 600 entries).
+        // Menghindari 600-800× panggilan blendARGB() per frame di onDraw().
+        tempColorLut = new int[601];
+        for (int i = 0; i <= 600; i++) {
+            tempColorLut[i] = computeTempColor(i / 10f);
+        }
+
         applySeriesStyle();
     }
 
@@ -734,6 +741,9 @@ public class BatteryChartView extends View {
 
     private int[] tempAnchors;
 
+    /** Cache warna temperatur: indeks = suhu × 10 (0–600), hindari blendARGB berulang tiap frame. */
+    private int[] tempColorLut;
+
     /** Anchor warna gradien Suhu: ice blue → hijau → oranye → merah. */
     private int[] tempAnchors() {
         if (tempAnchors == null) {
@@ -749,8 +759,15 @@ public class BatteryChartView extends View {
     /**
      * Warna garis Suhu per nilai (°C): ≤5° putih, 5–24° putih→ice blue,
      * 25–34° ice blue→hijau, 35–39° hijau→oranye, 40–45°+ oranye→merah.
+     * Memakai LUT untuk hindari blendARGB berulang tiap frame.
      */
     private int tempColor(float c) {
+        int idx = Math.max(0, Math.min(600, Math.round(c * 10f)));
+        return tempColorLut[idx];
+    }
+
+    /** Komputasi warna temperatur tanpa cache — dipanggil sekali saat init LUT. */
+    private int computeTempColor(float c) {
         int[] a = tempAnchors();
         if (c <= 5f) return Color.WHITE;
         if (c < 24f) return ColorUtils.blendARGB(Color.WHITE, a[0], (c - 5f) / 19f);

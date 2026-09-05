@@ -44,7 +44,7 @@ FTxT/
     │   │   │   ├── NotificationActionReceiver.java — Handle aksi notifikasi (toggle, kill, open)
     │   │   │   ├── WakeLockManager.java     — Partial wake lock biar CPU tetap aktif
     │   │   │   ├── BootReceiver.java        — Restore overlay & pemantau baterai aktif saat boot
-    │   │   │   └── CrashLogger.java         — Crash logger otomatis: stack trace ke folder Download saat force close
+    │   │   │   └── CrashLogger.java         — Crash logger otomatis: stack trace ke Documents/FTxT/Log_Crash saat force close
     │   │   │
     │   │   ├── features/
     │   │   │   ├── floating_text/

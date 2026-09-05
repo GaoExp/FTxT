@@ -52,14 +52,14 @@ public class NotificationHelper {
         if (cachedIconBitmap != null && text.equals(cachedIconText)) {
             return cachedIconBitmap;
         }
-        int size = 192;
+        int size = 96;
         Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
         bitmap.setDensity(android.util.DisplayMetrics.DENSITY_XXXHIGH);
         Canvas canvas = new Canvas(bitmap);
 
         Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(140);
+        textPaint.setTextSize(68);
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
         textPaint.setTextAlign(Paint.Align.CENTER);
         Paint.FontMetrics fm = textPaint.getFontMetrics();
@@ -89,19 +89,15 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        ensureCachedViews(context);
-        cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
-
         String title = getSessionTitle(context);
-        cachedContentView.setTextViewText(R.id.noti_title, title);
+        RemoteViews contentView = buildContentView(context, toggleIcon, title);
 
         android.graphics.drawable.Icon smallIcon = android.graphics.drawable.Icon.createWithBitmap(iconBitmap);
         return new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIcon)
                 .setContentTitle(title)
                 .setContentText(getActiveModulesText(context))
-                .setCustomContentView(cachedContentView)
-                .setCustomBigContentView(cachedContentView)
+                .setCustomContentView(contentView)
                 .setStyle(new Notification.DecoratedCustomViewStyle())
                 .setOngoing(true)
                 .build();
@@ -167,6 +163,14 @@ public class NotificationHelper {
         cachedContentView = contentView;
     }
 
+    private static RemoteViews buildContentView(Context context, int toggleIcon, String title) {
+        ensureCachedViews(context);
+        RemoteViews contentView = cachedContentView.clone();
+        contentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
+        contentView.setTextViewText(R.id.noti_title, title);
+        return contentView;
+    }
+
     public static void startIconCycling(Context context) {
         if (iconCycling) return;
         iconCycling = true;
@@ -208,13 +212,11 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        ensureCachedViews(context);
-        cachedContentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
-        cachedContentView.setTextViewText(R.id.noti_title, getSessionTitle(context));
+        RemoteViews contentView = buildContentView(context, toggleIcon, getSessionTitle(context));
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_toggle)
-                .setCustomContentView(cachedContentView)
+                .setCustomContentView(contentView)
                 .setOngoing(true)
                 .build();
     }

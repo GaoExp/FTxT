@@ -163,7 +163,7 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 - Ubah file di luar scope.
 - Audit project tanpa diminta.
 - Buat checklist panjang.
-- Build / revert tanpa konfirmasi — khusus build: rule gradle di opencode sudah diset `deny`, sehingga perintah build apa pun pasti ditolak. Verifikasi kode cukup via inspeksi (grep/diff), bukan build.
+- Build / revert tanpa konfirmasi — khusus build: rule gradle di opencode diset `ask`, sehingga perintah build apa pun pasti ditolak jika tidak diminta user secara eksplisit. Verifikasi kode cukup via inspeksi (grep/diff), bukan build.
 
 ---
 
@@ -171,4 +171,4 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 
 - JANGAN gunakan tabel markdown di chat.
 - DILARANG tulis laporan section (Accomplished, Next Steps, Ringkasan, dll) di chat — langsung ke inti.
-- Bicaralah manusiawi & praktis (saya programmer, tapi bukan AI yang hafal seluruh ekosistem Android).
+- Bicaralah yang jelas, manusiawi & praktis namun akurat (saya programmer, bukan AI yang hafal seluruh ekosistem Android).
