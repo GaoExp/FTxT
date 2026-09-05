@@ -1,4 +1,4 @@
-# [4.89.0] 2026/09/05 11:44 WITA 243 ***ONGOING***
+# [4.89.0] 2026/09/05 12:12 WITA 244 ***RELEASE***
 ### 🔖 Deskripsi
 > Pembaruan utama rilis ini berpusat pada pemantauan baterai dan overlay bidikan.
 
