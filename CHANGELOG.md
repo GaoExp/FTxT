@@ -1,4 +1,4 @@
-# [4.91.0] 2026/09/06 08:36 WITA 265 ***ONGOING***
+# [4.91.0] 2026/09/06 08:36 WITA 265 ***RELEASE***
 ### 🔖 Deskripsi
 > Notifikasi overlay kini jauh lebih ringan bagi panel notifikasi: mode kustom bisa dimatikan (judul disembunyikan, hanya tombol aksi yang tersisa) dan interval perbarui judul bisa diatur 1/3/5/10 detik. Di sisi lain, deteksi ANR tidak lagi menghasilkan log palsu saat aplikasi tidak berada di latar depan, dan tab Monitor lebih ringan karena query grafik dibatasi intervalnya.
 
