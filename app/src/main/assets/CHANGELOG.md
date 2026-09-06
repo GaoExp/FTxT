@@ -1,18 +1,30 @@
-# [4.89.1] 2026/09/06 06:27 WITA 259 ***ONGOING***
+# [4.91.0] 2026/09/06 08:36 WITA 265 ***ONGOING***
 ### 🔖 Deskripsi
-> Isi ikon status bar bisa diatur, penyesuaian kecil pada ikon launcher versi rilis, dan penghematan refresh notifikasi overlay.
+> Notifikasi overlay kini jauh lebih ringan bagi panel notifikasi: mode kustom bisa dimatikan (judul disembunyikan, hanya tombol aksi yang tersisa) dan interval perbarui judul bisa diatur 1/3/5/10 detik. Di sisi lain, deteksi ANR tidak lagi menghasilkan log palsu saat aplikasi tidak berada di latar depan, dan tab Monitor lebih ringan karena query grafik dibatasi intervalnya.
+
+### ✨ Fitur Baru
+- **Notifikasi kustom bisa dimatikan & interval judul bisa diatur** — Halaman Konfigurasi kini menampung pengaturan ini di section "Notifikasi Kustom" tersendiri yang berada tepat di atas section Status Bar, berisi saklar "Notifikasi Kustom". Saat aktif (default), judul notifikasi menampilkan info baterai lengkap secara real-time; saat nonaktif, judul disembunyikan sehingga hanya tombol aksi (toggle/kill/open) yang tampil, sementara ikon status bar tetap dinamis mengikuti mode pilihan dan pembaruan notifikasi hanya dikirim saat isinya benar-benar berubah — bukan tiap hitungan detik. Interval perbarui judul dipilih lewat radio button 1/3/5/10 detik (default 3 detik); perubahan langsung diterapkan tanpa restart aplikasi.
+
+### 🔧 Optimasi & Penyesuaian
+- **Grafik tab Monitor tidak lagi di-query tiap detik** — Query database untuk grafik riwayat dan riwayat sesi di tab Monitor dibatasi setiap 5 detik (sebelumnya tiap detik); info ringan lain (persen, suhu, arus, ring) tetap diperbarui setiap detik. Warna gradien garis grafik Suhu yang sebelumnya di-cache ulang tiap chart kini di-cache sekali per proses dan dipakai bersama semua chart sehingga muat chart lebih ringan.
+
+### 🐞 Bug Fixes
+- **Log ANR palsu tidak lagi membanjiri Documents/FTxT/Log_ANR** — AnrWatcher kini hanya mendeteksi saat aplikasi berada di latar depan dan mengabaikan selang detak di atas 60 detik (artefak seperti device sleep / main thread ditahan debugger), sehingga 17 dari 18 log ANR yang ternyata bukan ANR sungguhan tidak akan terulang.
+
+---
+
+# [4.90.0] 2026/09/06 06:54 WITA 263 ***RELEASE***
+### 🔖 Deskripsi
+> Fitur utama rilis ini adalah isi ikon notifikasi status bar yang bisa diatur: suhu, persen, atau tanggal dua baris — lengkap dengan ukuran per bagian, format, dan bahasa nama hari/bulan yang bisa disesuaikan. Pembaruan notifikasi kini hanya dikirim saat nilainya benar-benar berubah, dan ikon launcher versi rilis disetarakan proporsinya dengan ikon alternatif.
 
 ### ✨ Fitur Baru
 - **Isi ikon status bar bisa diatur** — Halaman Konfigurasi bertambah section "Status Bar" untuk memilih isi ikon notifikasi status bar: **Suhu** (`32°`), **Persen**, atau **Tanggal** dua baris (tanggal + nama hari, mis. `6` / `sun`). Mode Persen tampil sebagai ring lingkaran putih dengan nilai persen di tengahnya (ala AccuBattery) sehingga tidak terpotong saat diperkecil status bar; ketebalan ring dan ukuran angka di tengahnya bisa diatur sendiri-sendiri. Ukuran isi ketiga mode bisa diatur lewat slider "Ukuran Isi Ikon" (Suhu/Persen/Tanggal) 60%–160% dari ukuran standar — mode Persen memakai tiga slider: **Ketebalan Ring**, **Ukuran Angka**, dan **Ukuran Isi Ikon (Persen)** untuk skala keseluruhan. Slider tersimpan terpisah per mode dan hanya yang sesuai mode terpilih yang tampil. Pilihan tersimpan otomatis, ikon status bar langsung berganti, dan ada pratinjau ikon live yang diperbarui tiap detik.
 - **Format & bahasa tanggal ikon status bar bisa dipilih** — Mode Tanggal kini punya pengaturan format dan bahasa di halaman Konfigurasi: radio **Bahasa** (`in`/`eng`) menentukan nama hari/bulan (bahasa Indonesia `Min Sen Sel …`/`Jan Feb Mar …` atau Inggris `Sun Mon Tue …`/`Jan Feb Mar …`), dan daftar **Format** menyediakan 8 kombinasi isi & urutan dua baris (`d + Hari`, `dd + Hari`, `d + Bulan`, `dd + Bulan`, `d/M + Hari`, `dd/MM + Hari`, `Hari + d/M`, `Hari + dd/MM`). Dua baris ikon (mis. `6`/`Sun`, `06/09`/`Sun`) langsung mengikuti pilihan tanpa nol depan sesuai format, tersimpan otomatis terpisah, dan pratinjau ikon live ikut berganti. Ukuran tiap baris juga bisa diatur sendiri-sendiri lewat tiga slider: **Ukuran Tanggal**, **Ukuran Hari**, dan **Ukuran Isi Ikon (Tanggal)** untuk skala keseluruhan — jadi baris tanggal dan hari bisa punya ukuran berbeda tanpa mengubah yang lain.
+- **Tata letak dua baris ikon status bar mode Tanggal rapi & seimbang** — Blok dua baris (tanggal + nama hari) dipusatkan di tengah bitmap sehingga perbesaran isi menyebar simetris ke segala arah dan baris hari tidak terdorong keluar batas ikon; jarak antar baris dihitung pas sehingga kedua baris tampil rapat dengan jarak tipis yang konsisten tanpa ruang kosong besar, dan slider "Ukuran Isi Ikon" tetap berfungsi penuh.
 
 ### 🔧 Optimasi & Penyesuaian
 - **Notifikasi overlay hanya di-refresh saat nilainya berubah** — Ikon status bar (suhu) dan judul notifikasi kini hanya dikirim pembaruannya ketika salah satu nilai yang ditampilkan benar-benar berbeda dari nilai sebelumnya; saat tidak ada perubahan (persen, arus, tegangan, daya, suhu, status overlay sama), pembaruan yang sia-sia dikirim tiap detik dihentikan sehingga ikon & judul tidak dibangun ulang tanpa alasan — data yang tampil tetap akurat dan real-time.
 - **Ikon launcher rilis disamakan ukurannya dengan ikon alternatif** — Ikon aplikasi default (riwayat rilis) yang sebelumnya dibuat dari gambar beresolusi sangat rendah (200×200px) sehingga tampak membesar, kasar, dan terpotong mask launcher kini dibuat ulang beresolusi 1024×1024 dengan area aman yang sama seperti ikon alternatif — rilis tetap memakai desain ikon default, hanya proporsi & ketajamannya menjadi pas.
-
-### 🐞 Bug Fixes
-- **Isi ikon status bar mode Tanggal dipusatkan sehingga hari tidak lagi terpotong** — Blok dua baris (tanggal + nama hari) yang sebelumnya ditaruh menempel ke bawah (tengah blok di 69, bukan tengah bitmap) membuat perbesaran isi menyebar tidak seimbang: ruang atas sudah mentok sehingga overflow menumpuk ke bawah dan baris hari terdorong keluar batas ikon. Kini blok dipusatkan di tengah bitmap sehingga perbesaran menyebar simetris ke segala arah, baris hari tidak lagi menumpuk keluar, dan slider "Ukuran Isi Ikon" tetap bekerja penuh.
-- **Ruang kosong antara tanggal dan hari pada ikon status bar mode Tanggal dihilangkan** — Kedua baris ikon (tanggal & nama hari) kini tampil rapat dengan jarak tipis yang konsisten di antaranya, tidak lagi menyisakan ruang kosong besar di tengah ikon akibat perhitungan tinggi baris yang berlebihan; blok dua baris tetap rata tengah pada ikon.
 
 ---
 

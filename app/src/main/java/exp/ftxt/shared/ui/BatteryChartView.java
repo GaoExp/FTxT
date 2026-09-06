@@ -164,10 +164,8 @@ public class BatteryChartView extends View {
 
         // Precompute temperature color LUT (0–60°C, 0.1°C resolution = 600 entries).
         // Menghindari 600-800× panggilan blendARGB() per frame di onDraw().
-        tempColorLut = new int[601];
-        for (int i = 0; i <= 600; i++) {
-            tempColorLut[i] = computeTempColor(i / 10f);
-        }
+        // LUT dibangun sekali per proses (static) agar tidak diulang per instansiasi.
+        tempColorLut(context);
 
         applySeriesStyle();
     }
@@ -739,21 +737,26 @@ public class BatteryChartView extends View {
                 || seriesType == SERIES_CURRENT;
     }
 
-    private int[] tempAnchors;
+    private static int[] tempAnchors;
 
-    /** Cache warna temperatur: indeks = suhu × 10 (0–600), hindari blendARGB berulang tiap frame. */
-    private int[] tempColorLut;
+    /** Cache warna temperatur: indeks = suhu × 10 (0–600), hindari blendARGB berulang tiap frame.
+     *  Static — dibangun sekali per proses, dipakai bersama semua instance chart. */
+    private static int[] tempColorLut;
 
-    /** Anchor warna gradien Suhu: ice blue → hijau → oranye → merah. */
-    private int[] tempAnchors() {
-        if (tempAnchors == null) {
+    /** Membangun LUT warna suhu sekali per proses. */
+    private static int[] tempColorLut(Context context) {
+        if (tempColorLut == null) {
             tempAnchors = new int[] {
-                    getResources().getColor(R.color.bat_chart_temp_ice),
-                    getResources().getColor(R.color.bat_chart_percent),
-                    getResources().getColor(R.color.bat_chart_power),
-                    getResources().getColor(R.color.bat_chart_temp)};
+                    context.getResources().getColor(R.color.bat_chart_temp_ice),
+                    context.getResources().getColor(R.color.bat_chart_percent),
+                    context.getResources().getColor(R.color.bat_chart_power),
+                    context.getResources().getColor(R.color.bat_chart_temp)};
+            tempColorLut = new int[601];
+            for (int i = 0; i <= 600; i++) {
+                tempColorLut[i] = computeTempColor(i / 10f, tempAnchors);
+            }
         }
-        return tempAnchors;
+        return tempColorLut;
     }
 
     /**
@@ -766,9 +769,8 @@ public class BatteryChartView extends View {
         return tempColorLut[idx];
     }
 
-    /** Komputasi warna temperatur tanpa cache — dipanggil sekali saat init LUT. */
-    private int computeTempColor(float c) {
-        int[] a = tempAnchors();
+    /** Komputasi warna temperatur tanpa cache — dipanggil sekali saat membangun LUT static. */
+    private static int computeTempColor(float c, int[] a) {
         if (c <= 5f) return Color.WHITE;
         if (c < 24f) return ColorUtils.blendARGB(Color.WHITE, a[0], (c - 5f) / 19f);
         if (c < 25f) return a[0];

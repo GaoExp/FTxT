@@ -1,3 +1,18 @@
+# [4.91.0] 2026/09/06 08:36 WITA 265 ***ONGOING***
+### 🔖 Deskripsi
+> Notifikasi overlay kini jauh lebih ringan bagi panel notifikasi: mode kustom bisa dimatikan (judul disembunyikan, hanya tombol aksi yang tersisa) dan interval perbarui judul bisa diatur 1/3/5/10 detik. Di sisi lain, deteksi ANR tidak lagi menghasilkan log palsu saat aplikasi tidak berada di latar depan, dan tab Monitor lebih ringan karena query grafik dibatasi intervalnya.
+
+### ✨ Fitur Baru
+- **Notifikasi kustom bisa dimatikan & interval judul bisa diatur** — Halaman Konfigurasi kini menampung pengaturan ini di section "Notifikasi Kustom" tersendiri yang berada tepat di atas section Status Bar, berisi saklar "Notifikasi Kustom". Saat aktif (default), judul notifikasi menampilkan info baterai lengkap secara real-time; saat nonaktif, judul disembunyikan sehingga hanya tombol aksi (toggle/kill/open) yang tampil, sementara ikon status bar tetap dinamis mengikuti mode pilihan dan pembaruan notifikasi hanya dikirim saat isinya benar-benar berubah — bukan tiap hitungan detik. Interval perbarui judul dipilih lewat radio button 1/3/5/10 detik (default 3 detik); perubahan langsung diterapkan tanpa restart aplikasi.
+
+### 🔧 Optimasi & Penyesuaian
+- **Grafik tab Monitor tidak lagi di-query tiap detik** — Query database untuk grafik riwayat dan riwayat sesi di tab Monitor dibatasi setiap 5 detik (sebelumnya tiap detik); info ringan lain (persen, suhu, arus, ring) tetap diperbarui setiap detik. Warna gradien garis grafik Suhu yang sebelumnya di-cache ulang tiap chart kini di-cache sekali per proses dan dipakai bersama semua chart sehingga muat chart lebih ringan.
+
+### 🐞 Bug Fixes
+- **Log ANR palsu tidak lagi membanjiri Documents/FTxT/Log_ANR** — AnrWatcher kini hanya mendeteksi saat aplikasi berada di latar depan dan mengabaikan selang detak di atas 60 detik (artefak seperti device sleep / main thread ditahan debugger), sehingga 17 dari 18 log ANR yang ternyata bukan ANR sungguhan tidak akan terulang.
+
+---
+
 # [4.90.0] 2026/09/06 06:54 WITA 263 ***RELEASE***
 ### 🔖 Deskripsi
 > Fitur utama rilis ini adalah isi ikon notifikasi status bar yang bisa diatur: suhu, persen, atau tanggal dua baris — lengkap dengan ukuran per bagian, format, dan bahasa nama hari/bulan yang bisa disesuaikan. Pembaruan notifikasi kini hanya dikirim saat nilainya benar-benar berubah, dan ikon launcher versi rilis disetarakan proporsinya dengan ikon alternatif.

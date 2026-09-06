@@ -88,6 +88,9 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView statusBarDateFormatValue;
     private PopupWindow statusBarFormatPopup;
     private Handler statusBarPreviewHandler;
+    private Switch notifCustomSwitch;
+    private LinearLayout notifIntervalRow;
+    private RadioGroup notifIntervalGroup;
 
     private static final String[] DATE_FORMATS = {
             "d + Hari", "dd + Hari", "d + Bulan", "dd + Bulan",
@@ -229,6 +232,42 @@ public class SettingsActivity extends AppCompatActivity {
         statusBarDateFormatValue.setOnClickListener(v -> showDateFormatPopup(v, prefs));
 
         applyStatusBarScaleVisibility();
+
+        notifCustomSwitch = findViewById(R.id.notifCustomSwitch);
+        notifIntervalRow = findViewById(R.id.notifIntervalRow);
+        notifIntervalGroup = findViewById(R.id.notifIntervalGroup);
+
+        boolean notifCustom = prefs.getBoolean(NotificationHelper.PREF_NOTIF_CUSTOM, true);
+        notifCustomSwitch.setChecked(notifCustom);
+        applySwitchTint(notifCustomSwitch, notifCustom);
+
+        long interval = NotificationHelper.getNotificationTitleIntervalMs(this);
+        if (interval == 1000) {
+            notifIntervalGroup.check(R.id.notifInterval1);
+        } else if (interval == 5000) {
+            notifIntervalGroup.check(R.id.notifInterval5);
+        } else if (interval == 10000) {
+            notifIntervalGroup.check(R.id.notifInterval10);
+        } else {
+            notifIntervalGroup.check(R.id.notifInterval3);
+        }
+        applyNotifIntervalEnabled(notifCustom);
+
+        notifCustomSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(notifCustomSwitch, isChecked);
+            prefs.edit().putBoolean(NotificationHelper.PREF_NOTIF_CUSTOM, isChecked).apply();
+            applyNotifIntervalEnabled(isChecked);
+            FloatingService.updateNotification();
+        });
+
+        notifIntervalGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            int ms = 3000;
+            if (checkedId == R.id.notifInterval1) ms = 1000;
+            else if (checkedId == R.id.notifInterval5) ms = 5000;
+            else if (checkedId == R.id.notifInterval10) ms = 10000;
+            prefs.edit().putInt(NotificationHelper.PREF_NOTIF_CUSTOM_INTERVAL, ms).apply();
+            FloatingService.restartIconCycling();
+        });
 
         debuggingSidebarSwitch = findViewById(R.id.debuggingSidebarSwitch);
         debuggingPasswordInput = findViewById(R.id.debuggingPasswordInput);
@@ -414,6 +453,14 @@ public class SettingsActivity extends AppCompatActivity {
         statusBarTempScaleGroup.setVisibility("temp".equals(mode) ? View.VISIBLE : View.GONE);
         statusBarPercentScaleGroup.setVisibility("percent".equals(mode) ? View.VISIBLE : View.GONE);
         statusBarDateScaleGroup.setVisibility("date".equals(mode) ? View.VISIBLE : View.GONE);
+    }
+
+    private void applyNotifIntervalEnabled(boolean enabled) {
+        notifIntervalRow.setEnabled(enabled);
+        notifIntervalGroup.setEnabled(enabled);
+        for (int i = 0; i < notifIntervalGroup.getChildCount(); i++) {
+            notifIntervalGroup.getChildAt(i).setEnabled(enabled);
+        }
     }
 
     private void applySwitchTint(Switch sw, boolean isChecked) {

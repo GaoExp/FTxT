@@ -64,6 +64,8 @@ public class BatteryMonitorTabController {
     private int currentSubTab = 0;
     private long lastEstimateTime = 0;
     private static final long ESTIMATE_THROTTLE_MS = 10_000L;
+    private long lastChartRefresh = 0L;
+    private static final long CHART_REFRESH_INTERVAL_MS = 5_000L;
 
     private final Runnable monitorRunnable = new Runnable() {
         @Override
@@ -320,10 +322,14 @@ public class BatteryMonitorTabController {
                 : condLevel < 0 ? R.color.bat_monitor_cold : R.color.bat_monitor_active);
         batMonitorConditionBadge.setTextColor(condColor);
 
-        if (charts != null) charts.refresh();
-        if (history != null) history.refresh();
-
         long now = System.currentTimeMillis();
+        // Info ringan diperbarui tiap detik; query DB grafik (charts/history) dibatasi
+        // 5 detik agar tidak membebani UI saat tab Monitor tampil.
+        if (now - lastChartRefresh >= CHART_REFRESH_INTERVAL_MS) {
+            lastChartRefresh = now;
+            if (charts != null) charts.refresh();
+            if (history != null) history.refresh();
+        }
         if (now - lastEstimateTime >= ESTIMATE_THROTTLE_MS) {
             lastEstimateTime = now;
             updateEstimateAndHealth(s);

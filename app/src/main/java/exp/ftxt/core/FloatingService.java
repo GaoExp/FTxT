@@ -408,6 +408,13 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void restartIconCycling() {
+        if (instance != null) {
+            NotificationHelper.stopIconCycling();
+            NotificationHelper.startIconCycling(instance);
+        }
+    }
+
     public static void stopAllModules() {
         if (instance == null) return;
         for (OverlayModule module : instance.allModules) {

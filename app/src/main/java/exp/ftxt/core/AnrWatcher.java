@@ -35,8 +35,12 @@ public final class AnrWatcher {
     private static final long CHECK_INTERVAL_MS = 1000L;
     private static final long ANR_THRESHOLD_MS = 5000L;
     private static final long COOLDOWN_MS = 30000L;
+    /** Nilai selisih beat di atas ini dianggap artifak (mis. device sleep, debugger
+     * menahan main thread) — bukan ANR sungguhan, jadi tidak ditulis ke log. */
+    private static final long MAX_REPORT_BLOCK_MS = 60_000L;
 
     private static volatile boolean started = false;
+    private static volatile boolean foreground = false;
     private static volatile long lastBeat = 0L;
     private static volatile long lastWrite = 0L;
 
@@ -46,9 +50,26 @@ public final class AnrWatcher {
         if (started) return;
         started = true;
         final Context app = context.getApplicationContext();
+        final android.app.Application application = (android.app.Application) app;
         final Looper mainLooper = Looper.getMainLooper();
         final Handler mainHandler = new Handler(mainLooper);
         final Thread mainThread = mainLooper.getThread();
+
+        application.registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityResumed(android.app.Activity activity) { foreground = true; }
+
+            @Override
+            public void onActivityPaused(android.app.Activity activity) { foreground = false; }
+
+            @Override public void onActivityStarted(android.app.Activity activity) {}
+            @Override public void onActivityStopped(android.app.Activity activity) {}
+            @Override public void onActivityCreated(android.app.Activity activity,
+                    android.os.Bundle savedInstanceState) {}
+            @Override public void onActivitySaveInstanceState(android.app.Activity activity,
+                    android.os.Bundle outState) {}
+            @Override public void onActivityDestroyed(android.app.Activity activity) {}
+        });
 
         final Runnable beat = new Runnable() {
             @Override
@@ -69,9 +90,11 @@ public final class AnrWatcher {
                     break;
                 }
                 long now = SystemClock.uptimeMillis();
-                if (now - lastBeat > ANR_THRESHOLD_MS && now - lastWrite >= COOLDOWN_MS) {
+                long blockedMs = now - lastBeat;
+                if (foreground && blockedMs > ANR_THRESHOLD_MS
+                        && blockedMs <= MAX_REPORT_BLOCK_MS && now - lastWrite >= COOLDOWN_MS) {
                     lastWrite = now;
-                    writeAnrLog(app, mainThread, now - lastBeat);
+                    writeAnrLog(app, mainThread, blockedMs);
                 }
             }
             started = false;

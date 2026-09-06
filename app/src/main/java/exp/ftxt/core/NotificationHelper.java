@@ -19,6 +19,7 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -52,6 +53,8 @@ public class NotificationHelper {
     public static final String PREF_STATUS_BAR_DATE_BOTTOM = "status_bar_date_bottom_size";
     public static final String PREF_STATUS_BAR_PERCENT_RING = "status_bar_percent_ring_size";
     public static final String PREF_STATUS_BAR_PERCENT_NUM = "status_bar_percent_num_size";
+    public static final String PREF_NOTIF_CUSTOM = "notif_custom";
+    public static final String PREF_NOTIF_CUSTOM_INTERVAL = "notif_custom_interval";
 
     private static Handler iconHandler;
     private static boolean iconCycling = false;
@@ -242,6 +245,18 @@ public class NotificationHelper {
         return "in".equals(lang) ? "in" : "eng";
     }
 
+    public static boolean isNotificationCustom(Context context) {
+        return context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
+                .getBoolean(PREF_NOTIF_CUSTOM, true);
+    }
+
+    public static long getNotificationTitleIntervalMs(Context context) {
+        long interval = context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
+                .getInt(PREF_NOTIF_CUSTOM_INTERVAL, 3000);
+        if (interval == 1000 || interval == 5000 || interval == 10000) return interval;
+        return 3000;
+    }
+
     private static String dateDayName(String lang, int dayOfWeek) {
         String[] en = {"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         String[] id = {"", "Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"};
@@ -315,7 +330,8 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        String title = getSessionTitle(context);
+        boolean custom = isNotificationCustom(context);
+        String title = custom ? getSessionTitle(context) : null;
         String activeModules = getActiveModulesText(context);
 
         Bitmap iconBitmap;
@@ -329,7 +345,11 @@ public class NotificationHelper {
         }
 
         String iconKey = iconLines[0] + "/" + (iconLines[1] == null ? "-" : iconLines[1]);
-        String signature = title + "|" + toggleIcon + "|" + activeModules + "|" + mode + "|" + iconKey
+        // Signature ikon terpisah dari judul: saat notifikasi kustom nonaktif judul tidak
+        // diikutkan, sehingga notify hanya terjadi kalau isi ikon benar-benar berubah
+        // (bukan tiap detik gara-gara nilai mA/Volt/V daya berfluktuasi).
+        String signature = (custom ? title + "|" : "")
+                + toggleIcon + "|" + activeModules + "|" + mode + "|" + iconKey
                 + "|" + scale + "|t" + getStatusBarScale(context, "date_top")
                 + "|b" + getStatusBarScale(context, "date_bottom")
                 + "|r" + getStatusBarScale(context, "percent_ring")
@@ -342,7 +362,7 @@ public class NotificationHelper {
         android.graphics.drawable.Icon smallIcon = android.graphics.drawable.Icon.createWithBitmap(iconBitmap);
         return new Notification.Builder(context, CHANNEL_ID)
                 .setSmallIcon(smallIcon)
-                .setContentTitle(title)
+                .setContentTitle(title == null ? "FTxT" : title)
                 .setContentText(activeModules)
                 .setCustomContentView(contentView)
                 .setStyle(new Notification.DecoratedCustomViewStyle())
@@ -414,7 +434,12 @@ public class NotificationHelper {
         ensureCachedViews(context);
         RemoteViews contentView = cachedContentView.clone();
         contentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
-        contentView.setTextViewText(R.id.noti_title, title);
+        if (title == null) {
+            contentView.setViewVisibility(R.id.noti_title, View.GONE);
+        } else {
+            contentView.setViewVisibility(R.id.noti_title, View.VISIBLE);
+            contentView.setTextViewText(R.id.noti_title, title);
+        }
         return contentView;
     }
 
@@ -423,6 +448,7 @@ public class NotificationHelper {
         iconCycling = true;
         lastSignature = null;
         iconHandler = new Handler(Looper.getMainLooper());
+        final long interval = getNotificationTitleIntervalMs(context);
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification first = buildNotificationDynamic(context);
@@ -435,9 +461,9 @@ public class NotificationHelper {
                 NotificationManager nm2 = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 Notification n = buildNotificationDynamic(context);
                 if (n != null) nm2.notify(NOTIFICATION_ID, n);
-                iconHandler.postDelayed(this, 1000);
+                iconHandler.postDelayed(this, interval);
             }
-        }, 1000);
+        }, interval);
     }
 
     public static void stopIconCycling() {
@@ -463,7 +489,8 @@ public class NotificationHelper {
         boolean allHidden = FloatingService.areAllOverlaysHidden();
         int toggleIcon = allHidden ? R.drawable.ic_notification_invisible : R.drawable.ic_notification_visible;
 
-        RemoteViews contentView = buildContentView(context, toggleIcon, getSessionTitle(context));
+        RemoteViews contentView = buildContentView(context, toggleIcon,
+                isNotificationCustom(context) ? getSessionTitle(context) : null);
 
         return new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_toggle)
@@ -474,6 +501,7 @@ public class NotificationHelper {
 
     public static void updateNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        lastSignature = null;
         if (iconCycling) {
             Notification n = buildNotificationDynamic(context);
             if (n != null) nm.notify(NOTIFICATION_ID, n);
