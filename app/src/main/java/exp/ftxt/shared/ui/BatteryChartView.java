@@ -466,8 +466,8 @@ public class BatteryChartView extends View {
 
     private void selectNearest(float touchX) {
         float x = Math.max(lastPadLeft, Math.min(lastPadLeft + lastPlotW, touchX));
-        long visibleStartT = lastBaseT + panOffsetMs;
-        long visibleWindowMs = (long) (windowMs / Math.max(1f, viewZoom));
+        long visibleStartT = getVisibleStartMs();
+        long visibleWindowMs = getVisibleWindowMs();
         long target = visibleStartT + (long) ((x - lastPadLeft) / lastPlotW * visibleWindowMs);
         int best = -1;
         long bestDiff = Long.MAX_VALUE;
@@ -557,7 +557,7 @@ public class BatteryChartView extends View {
             float range = max - min;
             if (seriesType == SERIES_TEMP) {
                 if (max < 40f) max = 40f;
-                if (min < 35f) min = 35f;
+                if (min > 35f) min = 35f;
                 if (min >= max) min = max - 1f;
             } else if (range < 1e-3f) {
                 min -= Math.max(1f, Math.abs(min) * 0.1f);
