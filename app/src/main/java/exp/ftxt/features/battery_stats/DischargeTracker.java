@@ -65,8 +65,8 @@ public class DischargeTracker {
             totalMs += deltaMs;
             if (deltaMs > 0 && isScreenOn()) screenOnMs += deltaMs;
             samples++;
-            if (deltaMs > 0 && s.currentMa > 0) {
-                useIntegral += s.currentMa * (deltaMs / 3600000.0);
+            if (deltaMs > 0 && Math.abs(s.currentMa) > 0) {
+                useIntegral += Math.abs(s.currentMa) * (deltaMs / 3600000.0);
             }
             if (s.tempC > 0f) {
                 tempSum += s.tempC;

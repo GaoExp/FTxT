@@ -1,3 +1,15 @@
+# [4.92.0] 2026/09/07 18:11 WITA 269 ***RELEASE***
+### 🔖 Deskripsi
+> Pemilih ikon launcher pada halaman Konfigurasi kini dilindungi Fitur Developer: saat fitur terkunci, pemilihan ikon ikut terkunci dan hanya bisa dibuka setelah Fitur Developer dibuka lewat password. Di sisi lain, estimasi kapasitas pengosongan pada Kesehatan Baterai yang sebelumnya tidak pernah menghasilkan nilai kini berfungsi normal.
+
+### ♻️ Perubahan Fitur
+- **Pemilih ikon launcher ikut terkunci Fitur Developer** — Baris pemilih ikon di halaman Konfigurasi kini hanya bisa dibuka saat Fitur Developer terbuka; saat fitur terkunci, baris ikon ikut di-disable sehingga pilihan ikon launcher hanya bisa diganti oleh pengguna yang membuka Fitur Developer.
+
+### 🐞 Bug Fixes
+- **Estimasi kapasitas pengosongan di Kesehatan Baterai kini menghasilkan nilai** — Nilai "Kapasitas Pengosongan" yang selama ini selalu tampil "—" padahal data tercatat berhari-hari kini terhitung: integral arus pengosongan (yang bernilai negatif saat baterai dipakai) dihitung memakai nilai mutlak sehingga sesi pengosongan tersimpan dengan mAh terpakai yang benar, dan rekonstruksi sesi dari riwayat database diperluas ke interval hingga 1 menit sehingga data yang sudah tercatat ikut diperhitungkan tanpa perlu menunggu sesi baru.
+
+---
+
 # [4.91.0] 2026/09/06 08:36 WITA 265 ***RELEASE***
 ### 🔖 Deskripsi
 > Notifikasi overlay kini jauh lebih ringan bagi panel notifikasi: mode kustom bisa dimatikan (judul disembunyikan, hanya tombol aksi yang tersisa) dan interval perbarui judul bisa diatur 1/3/5/10 detik. Di sisi lain, deteksi ANR tidak lagi menghasilkan log palsu saat aplikasi tidak berada di latar depan, dan tab Monitor lebih ringan karena query grafik dibatasi intervalnya.

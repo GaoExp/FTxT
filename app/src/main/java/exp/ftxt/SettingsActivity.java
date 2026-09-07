@@ -1,5 +1,6 @@
 package exp.ftxt;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -57,7 +58,11 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch overlaySwitch;
     private Switch notificationSwitch;
     private Switch batterySwitch;
-    private Switch iconSwitch;
+    private LinearLayout iconSelectorRow;
+    private ImageView iconSelectionPreview;
+    private TextView iconSelectionLabel;
+    private int iconSelectionIndex = 0;
+    private AlertDialog iconPickerDialog;
     private Switch debuggingSidebarSwitch;
     private EditText debuggingPasswordInput;
     private TextView developerStatusLabel;
@@ -97,6 +102,23 @@ public class SettingsActivity extends AppCompatActivity {
             "d/M + Hari", "dd/MM + Hari", "Hari + d/M", "Hari + dd/MM"
     };
 
+    private static final String[] ICON_KEYS = {"default", "alt", "a", "txt", "scorpion"};
+    private static final String[] ICON_NAMES = {"Default", "Alternatif", "Ornamen", "Logo TxT", "Kalajengking"};
+    private static final int[] ICON_RES = {
+            R.mipmap.ic_launcher,
+            R.mipmap.ic_launcher_alt,
+            R.mipmap.ic_launcher_a,
+            R.mipmap.ic_launcher_txt,
+            R.mipmap.ic_launcher_scorpion
+    };
+    private static final String[] ICON_COMPONENTS = {
+            "exp.ftxt.MainActivityDefault",
+            "exp.ftxt.MainActivityAlt",
+            "exp.ftxt.MainActivityAltA",
+            "exp.ftxt.MainActivityAltTxt",
+            "exp.ftxt.MainActivityAltScorpion"
+    };
+
     private static final String DEBUGGING_PASSWORD = "01000110 01010100 01111000 01010100";
     public static final String PREF_DEVELOPER_UNLOCKED = "developer_unlocked";
 
@@ -118,7 +140,9 @@ public class SettingsActivity extends AppCompatActivity {
         overlaySwitch = findViewById(R.id.overlayPermissionSwitch);
         notificationSwitch = findViewById(R.id.notificationPermissionSwitch);
         batterySwitch = findViewById(R.id.batteryPermissionSwitch);
-        iconSwitch = findViewById(R.id.iconSwitch);
+        iconSelectorRow = findViewById(R.id.iconSelectorRow);
+        iconSelectionPreview = findViewById(R.id.iconSelectionPreview);
+        iconSelectionLabel = findViewById(R.id.iconSelectionLabel);
 
         SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
 
@@ -154,14 +178,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        boolean useAltIcon = prefs.getBoolean("alt_icon", false);
-        iconSwitch.setChecked(useAltIcon);
-        applySwitchTint(iconSwitch, useAltIcon);
-
-        iconSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            applySwitchTint(iconSwitch, isChecked);
-            prefs.edit().putBoolean("alt_icon", isChecked).apply();
-            setIcon(isChecked);
+        String iconChoice = prefs.getString("icon_choice", null);
+        if (iconChoice == null) {
+            iconChoice = prefs.getBoolean("alt_icon", false) ? "alt" : "default";
+            prefs.edit().putString("icon_choice", iconChoice).apply();
+        }
+        iconSelectionIndex = indexOfIconKey(iconChoice);
+        updateIconSelectionUi(iconSelectionIndex);
+        iconSelectorRow.setOnClickListener(v -> {
+            if (!prefs.getBoolean(PREF_DEVELOPER_UNLOCKED, false)) return;
+            showIconPicker(prefs);
         });
 
         statusBarModeGroup = findViewById(R.id.statusBarModeGroup);
@@ -486,6 +512,8 @@ public class SettingsActivity extends AppCompatActivity {
         memorySidebarSwitch.setEnabled(unlocked);
         debuggingSidebarSwitch.setEnabled(unlocked);
         exportDbBtn.setEnabled(unlocked);
+        iconSelectorRow.setEnabled(unlocked);
+        iconSelectorRow.setAlpha(unlocked ? 1f : 0.5f);
     }
 
     private void turnOffMemoryPanel(SharedPreferences prefs) {
@@ -514,14 +542,81 @@ public class SettingsActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
-    private void setIcon(boolean useAlt) {
-        PackageManager pm = getPackageManager();
-        ComponentName def = new ComponentName(this, "exp.ftxt.MainActivityDefault");
-        ComponentName alt = new ComponentName(this, "exp.ftxt.MainActivityAlt");
-        int defState = useAlt ? PackageManager.COMPONENT_ENABLED_STATE_DISABLED : PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-        int altState = useAlt ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-        pm.setComponentEnabledSetting(def, defState, PackageManager.DONT_KILL_APP);
-        pm.setComponentEnabledSetting(alt, altState, PackageManager.DONT_KILL_APP);
+    private void setIcon(String key) {
+        for (int i = 0; i < ICON_COMPONENTS.length; i++) {
+            boolean enable = ICON_KEYS[i].equals(key);
+            getPackageManager().setComponentEnabledSetting(
+                    new ComponentName(this, ICON_COMPONENTS[i]),
+                    enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                            : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
+    }
+
+    private int indexOfIconKey(String key) {
+        for (int i = 0; i < ICON_KEYS.length; i++) {
+            if (ICON_KEYS[i].equals(key)) return i;
+        }
+        return 0;
+    }
+
+    private void updateIconSelectionUi(int index) {
+        if (iconSelectionPreview == null || iconSelectionLabel == null) return;
+        iconSelectionPreview.setImageResource(ICON_RES[index]);
+        iconSelectionLabel.setText(ICON_NAMES[index]);
+    }
+
+    private void showIconPicker(SharedPreferences prefs) {
+        LinearLayout list = new LinearLayout(this);
+        list.setOrientation(LinearLayout.VERTICAL);
+        list.setPadding(dp(12), dp(8), dp(12), dp(8));
+
+        for (int i = 0; i < ICON_KEYS.length; i++) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(dp(8), dp(8), dp(8), dp(8));
+
+            ImageView icon = new ImageView(this);
+            icon.setImageResource(ICON_RES[i]);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
+
+            TextView label = new TextView(this);
+            label.setText(ICON_NAMES[i]);
+            label.setTextSize(15);
+            label.setPadding(dp(14), 0, 0, 0);
+            label.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+
+            if (i == iconSelectionIndex) {
+                row.setBackgroundColor(0xFFE3F2FD);
+                label.setTextColor(0xFF1565C0);
+            }
+
+            row.addView(icon);
+            row.addView(label);
+
+            final int idx = i;
+            row.setOnClickListener(v -> {
+                iconSelectionIndex = idx;
+                prefs.edit().putString("icon_choice", ICON_KEYS[idx]).apply();
+                setIcon(ICON_KEYS[idx]);
+                updateIconSelectionUi(idx);
+                if (iconPickerDialog != null) iconPickerDialog.dismiss();
+            });
+
+            list.addView(row);
+        }
+
+        ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(list);
+
+        iconPickerDialog = new AlertDialog.Builder(this)
+                .setTitle("Pilih Ikon Aplikasi")
+                .setView(scrollView)
+                .setNegativeButton("Batal", null)
+                .create();
+        iconPickerDialog.show();
     }
 
     private void exportDatabases() {

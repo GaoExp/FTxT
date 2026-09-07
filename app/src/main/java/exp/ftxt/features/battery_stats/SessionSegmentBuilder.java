@@ -240,7 +240,7 @@ public final class SessionSegmentBuilder {
         long screenOn = 0;
         for (int k = oldest; k > newest; k--) {
             long dt = desc[k - 1].time - desc[k].time;
-            if (dt > 0 && dt < 5000) {
+            if (dt > 0 && dt < 60000) {
                 double mah = Math.abs(desc[k - 1].currentMa) * (dt / 3600000.0);
                 integral += mah;
                 if (oracle != null && oracle.isScreenOn(desc[k - 1].time)) screenOn += dt;

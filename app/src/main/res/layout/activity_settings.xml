@@ -36,20 +36,57 @@
             android:layout_marginBottom="8dp"/>
 
         <LinearLayout
+            android:id="@+id/iconSelectorRow"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
             android:layout_marginBottom="8dp">
 
-            <TextView
-                android:text="Ikon Alternatif"
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"/>
+                android:layout_weight="1">
 
-            <Switch
-                android:id="@+id/iconSwitch"
+                <TextView
+                    android:text="Ikon Launcher"
+                    android:textSize="14sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/iconSelectionLabel"
+                    android:text="Default"
+                    android:textSize="12sp"
+                    android:textColor="#757575"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+
+            <FrameLayout
+                android:background="#37474F"
+                android:padding="4dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp">
+
+                <ImageView
+                    android:id="@+id/iconSelectionPreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Pratinjau ikon aplikasi"/>
+
+            </FrameLayout>
+
+            <TextView
+                android:text="›"
+                android:textSize="24sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

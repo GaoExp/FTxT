@@ -230,6 +230,9 @@ FTxT/
     │       │   ├── ic_launcher_foreground.png   — Foreground launcher adaptive icon
     │       │   ├── ic_launcher_bg.png       — Background ikon aplikasi
     │       │   ├── ic_launcher_foreground_alt.png — Foreground ikon alternatif
+    │       │   ├── ic_launcher_fg_a.xml     — Foreground adaptive icon varian Ornamen
+    │       │   ├── ic_launcher_fg_scorpion.xml — Foreground adaptive icon varian Kalajengking
+    │       │   ├── ic_launcher_fg_txt.xml   — Foreground adaptive icon varian Logo TxT
     │       │   ├── bat_badge_active_bg.xml  — Badge status aktif sesi baterai
     │       │   ├── bat_badge_stopped_bg.xml — Badge status berhenti sesi baterai
     │       │   ├── bat_card_bg.xml          — Background card tab Monitor Battery Info
@@ -294,7 +297,10 @@ FTxT/
     │       │   └── menu_memory_bottom_nav.xml  — Navigasi bawah panel Memory Stats (Monitor/Overlay)
     │       ├── mipmap-anydpi-v26/
     │       │   ├── ic_launcher.xml           — Adaptive icon launcher (default)
-    │       │   └── ic_launcher_alt.xml       — Adaptive icon launcher (alternatif)
+    │       │   ├── ic_launcher_alt.xml       — Adaptive icon launcher (alternatif)
+    │       │   ├── ic_launcher_a.xml         — Adaptive icon launcher (varian Ornamen)
+    │       │   ├── ic_launcher_scorpion.xml  — Adaptive icon launcher (varian Kalajengking)
+    │       │   └── ic_launcher_txt.xml       — Adaptive icon launcher (varian Logo TxT)
     │       ├── values/
     │       │   ├── colors.xml        — Warna: primary, accent, drawer, bg
     │       │   ├── strings.xml       — Semua string UI Bahasa Indonesia
@@ -321,13 +327,13 @@ FTxT/
 |----------|-------:|
 | Java source | 104 |
 | Layout XML | 29 |
-| Drawable XML | 62 |
+| Drawable XML | 65 |
 | Drawable PNG | 3 |
 | Crosshair PNG (nodpi) | 44 |
 | Drawable-night XML | 5 |
 | Color XML | 3 |
 | Values XML | 7 |
-| Mipmap XML | 2 |
+| Mipmap XML | 5 |
 | Menu XML | 4 |
 | Anim XML | 4 |
 | XML lainnya (Manifest) | 1 |
@@ -338,5 +344,5 @@ FTxT/
 | Module build script | 2 |
 | Gradle & wrapper | 4 |
 | CI/CD | 1 |
-| **Total file** | **~321** |
+| **Total file** | **~327** |
 | **Total direktori** | **~48** |
