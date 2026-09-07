@@ -1,6 +1,8 @@
 # AGENTS.md — Aturan AI Project FTxT
 
-> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. JANGAN build — rule gradle di opencode diset `deny`, build tidak akan pernah bisa dijalankan. Gunakan bahasa Indonesia untuk thinking & respons.
+> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. JANGAN build — rule gradle di opencode diset `deny`, build tidak akan pernah bisa dijalankan.
+>
+> Aturan **perilaku kerja & komunikasi** (larangan tabel di chat, larangan laporan section, gaya bicara, dan cara kerja umum) ada di **`agent-rules.md`** — baca juga bersama file ini.
 
 ---
 
@@ -94,7 +96,7 @@ Perubahan pada file ini tidak boleh dicatat di entry manapun (tidak boleh muncul
 
 - **Build system:** `build.gradle` (root, `app/`, module `shared/*/build.gradle`), `settings.gradle`, `gradle.properties`, `gradle/wrapper/`, `gradlew`, `gradlew.bat`, `proguard-rules.pro`, folder `build/`.
 - **CI/CD & signing:** `.github/workflows/`, `keystore.properties`, folder `key/`.
-- **Dokumen root & kerja internal:** `AGENTS.md`, `README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md`, `_schedule/`, `_temp/`, `local.properties`.
+- **Dokumen root & kerja internal:** `AGENTS.md`, `agent-rules.md`, `README.md`, `CHANGELOG.md`, `PANDUAN.md`, `STRUKTUR.md`, `_schedule/`, `_temp/`, `local.properties`.
 
 Konsekuensi: topik yang lahir dari file tersebut (bukan build/CI/signing/rilis, bump version, restrukturisasi internal/ganti import) juga tidak diumbar.
 
@@ -104,20 +106,7 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 
 ---
 
-## 3. Aturan Kerja Universal
-
-1. **Kerjakan hanya setelah perintah eksplisit.**
-2. **Diskusi belum selesai = JANGAN mengerjakan.**
-3. **Jangan buat daftar "Next Steps" lalu mengeksekusinya sendiri** — rencana menunggu persetujuan user.
-4. **Tindakan destruktif/berisiko** (hapus, revert, pindah/potong isi, ubah banyak file sekaligus) **WAJIB konfirmasi eksplisit dulu**.
-5. **Tanya hanya jika tidak bisa ditebak & berdampak** — scope tidak jelas, keputusan destruktif, atau instruksi bertentangan dengan kode.
-6. **Hal kecil yang bisa ditafsirkan** (nama, warna, tata letak) → ambil yang paling konsisten dengan pola existing, kerjakan, sebutkan asumsinya.
-7. **Selesai sesuai perintah, berhenti.**
-8. **Self-check WAJIB** sebelum selesai: `git diff`/file — sesuai permintaan, tidak menyentuh file di luar scope, tidak ada yang terlewat.
-
----
-
-## 4. Workflow
+## 3. Workflow
 
 ### Edit Biasa
 1. Update kode — **tidak perlu mencatat per file**.
@@ -150,32 +139,3 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 ### Setelah status PUSH/RELEASE
 1. Buat entry CHANGELOG baru (teratas, `***ONGOING***`) di sesi kerja berikutnya; versionName disesuaikan setelah ada perubahan.
 2. Kembali ke Edit Biasa.
-
----
-
-## 5. Perilaku AI
-
-**Lakukan:**
-
-- Baca AGENTS dulu.
-- Cek git status/log.
-- Perubahan minimal & fokus.
-- Jawab singkat & actionable.
-- Bahasa Indonesia.
-- Self-check sebelum selesai.
-
-**JANGAN:**
-
-- Refactor tanpa diminta.
-- Ubah file di luar scope.
-- Audit project tanpa diminta.
-- Buat checklist panjang.
-- Build / revert tanpa konfirmasi — khusus build: rule gradle di opencode diset `ask`, sehingga perintah build apa pun pasti ditolak jika tidak diminta user secara eksplisit. Verifikasi kode cukup via inspeksi (grep/diff), bukan build.
-
----
-
-## 6. Catatan Komunikasi
-
-- JANGAN gunakan tabel markdown di chat.
-- DILARANG tulis laporan section (Accomplished, Next Steps, Ringkasan, dll) di chat — langsung ke inti.
-- Bicaralah yang jelas, manusiawi & praktis namun akurat (saya programmer, bukan AI yang hafal seluruh ekosistem Android).
