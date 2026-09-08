@@ -1,6 +1,6 @@
 # AGENTS.md — Aturan AI Project FTxT
 
-> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. JANGAN build — rule gradle di opencode diset `deny`, build tidak akan pernah bisa dijalankan.
+> **Penting:** Baca ulang file ini setiap mulai bekerja. JANGAN commit/tag/push tanpa perintah user. Eksekusi hanya setelah perintah eksplisit. Tindakan destruktif WAJIB konfirmasi. Build boleh dijalankan (rule gradle di opencode diset `allow`), tapi WAJIB konfirmasi dulu ke user karena memakan waktu.
 >
 > Aturan **perilaku kerja & komunikasi** (larangan tabel di chat, larangan laporan section, gaya bicara, dan cara kerja umum) ada di **`agent-rules.md`** — baca juga bersama file ini.
 
@@ -13,6 +13,12 @@ Semver `major.minor.patch`:
 - **major** — milestone besar / arsitektur / breaking change → `minor=0, patch=0`
 - **minor** — fitur baru / dihapus / dipulihkan → `patch=0`
 - **patch** — bugfix / optimasi / maintenance
+
+---
+
+## 1b. Environment Build
+
+Informasi mesin/dev-env (JDK, Gradle, Android SDK, NDK/CMake, dan aturan build) tercantum di **`agent-rules.md`** — tidak disalin di sini agar tidak dobel. Baca bersama file itu.
 
 ---
 

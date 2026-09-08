@@ -42,6 +42,8 @@ public class SessionDetailActivity extends AppCompatActivity {
     private static final String E_TEMP_MAX = "tempMax";
     private static final String E_TEMP_AVG = "tempAvg";
     private static final String E_SAMPLES = "sampleCount";
+    private static final String E_VALID = "valid";
+    private static final String E_INVALID_REASON = "invalidReason";
 
     private static final SimpleDateFormat FMT = new SimpleDateFormat("dd/MM/yy HH:mm:ss", Locale.US);
 
@@ -64,6 +66,8 @@ public class SessionDetailActivity extends AppCompatActivity {
         intent.putExtra(E_TEMP_MAX, e.tempMax);
         intent.putExtra(E_TEMP_AVG, e.tempAvg);
         intent.putExtra(E_SAMPLES, e.sampleCount);
+        intent.putExtra(E_VALID, e.valid);
+        intent.putExtra(E_INVALID_REASON, e.invalidReason);
         context.startActivity(intent);
     }
 
@@ -89,6 +93,8 @@ public class SessionDetailActivity extends AppCompatActivity {
         float tempMax = getIntent().getFloatExtra(E_TEMP_MAX, 0f);
         float tempAvg = getIntent().getFloatExtra(E_TEMP_AVG, 0f);
         int samples = getIntent().getIntExtra(E_SAMPLES, 0);
+        boolean valid = getIntent().getBooleanExtra(E_VALID, true);
+        String invalidReason = getIntent().getStringExtra(E_INVALID_REASON);
 
         int accent = getColor(isCharge ? R.color.bat_monitor_active : R.color.bat_chart_power);
         String statusWord = isCharge ? "PENGISIAN" : "PENGOSONGAN";
@@ -168,6 +174,28 @@ public class SessionDetailActivity extends AppCompatActivity {
         addValueRow(detailRows, "Kondisi layar",
                 screenOff ? "Layar mati dominan" : "Layar menyala");
         addValueRow(detailRows, "Sampel", samples > 0 ? String.valueOf(samples) : "—");
+
+        if (!valid) {
+            LinearLayout scrollContent = findViewById(R.id.sesDetailScrollContent);
+            TextView banner = new TextView(this);
+            banner.setText("Sesi Tidak Valid");
+            banner.setTextSize(13);
+            banner.setTypeface(Typeface.DEFAULT_BOLD);
+            banner.setTextColor(getColor(R.color.bat_monitor_label));
+            banner.setGravity(Gravity.CENTER);
+            banner.setBackgroundResource(R.drawable.bat_badge_stopped_bg);
+            banner.setPadding(dp(14), dp(12), dp(14), dp(12));
+            scrollContent.addView(banner, 0);
+
+            TextView reasonText = new TextView(this);
+            reasonText.setText(invalidReason != null && !invalidReason.isEmpty()
+                    ? "Keterangan: " + invalidReason
+                    : "Sesi berlangsung sangat singkat saat kabel dilepas/dicolok sebentar.");
+            reasonText.setTextSize(11);
+            reasonText.setTextColor(getColor(R.color.bat_monitor_label));
+            reasonText.setPadding(dp(14), dp(6), dp(14), dp(10));
+            scrollContent.addView(reasonText, 1);
+        }
 
         findViewById(R.id.sesDetailBack).setOnClickListener(v -> finish());
     }

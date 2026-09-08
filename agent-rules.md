@@ -17,7 +17,7 @@ Aturan ini mengatur **perilaku kerja** dan **cara komunikasi** agent di chat. Be
 - Refactor tanpa diminta.
 - Audit project tanpa diminta.
 - Buat daftar "Next Steps" lalu mengeksekusinya sendiri — rencana menunggu persetujuan user.
-- Build / revert tanpa konfirmasi — verifikasi kode cukup via inspeksi (grep/diff), bukan build.
+- Build / revert tanpa konfirmasi. Verifikasi cepat via inspeksi (grep/diff); build tersedia dan boleh dijalankan setelah konfirmasi.
 
 ---
 
@@ -32,7 +32,19 @@ Aturan ini mengatur **perilaku kerja** dan **cara komunikasi** agent di chat. Be
 
 ---
 
-## 3. Catatan Komunikasi
+## 3. Environment Build
+
+Informasi mesin/dev-env yang berlaku di environment ini:
+
+- **JDK:** satu-satunya JDK terpasang `JAVA_HOME=/opt/java/jdk-21.0.12.1+1` (Temurin JDK 21 LTS). JDK 8 sudah dihapus dari mesin ini.
+- **Gradle:** hanya lewat `./gradlew` (wrapper Gradle 8.13). JANGAN pakai perintah `gradle` global — Gradle 6.1.1 yang pernah ada di `/opt/gradle` sudah dihapus (tak kompatibel JDK 21) dan folder dist dihapus.
+- **Android SDK:** `ANDROID_HOME=/opt/android_sdk`. `aapt2` berada di `/usr/bin/aapt2` (override untuk aarch64 sudah diatur di `app/build.gradle`).
+- **NDK & CMake:** tersedia jika native build (`externalNativeBuild`) atau JNI kelak diperlukan — pakai yang terinstal, jangan sampai men-download versi yang lebih rendah: NDK `29.0.14206865` di `/opt/android_sdk/ndk/29.0.14206865`, CMake `4.1.2` di `/opt/android_sdk/cmake/4.1.2`.
+- Build project hanya dilakukan lewat `./gradlew` setelah konfirmasi user.
+
+---
+
+## 4. Catatan Komunikasi
 
 - JANGAN gunakan tabel markdown di chat.
 - DILARANG tulis laporan section (Accomplished, Next Steps, Ringkasan, dll) di chat — langsung ke inti.

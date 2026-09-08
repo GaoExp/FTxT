@@ -21,6 +21,9 @@ public class BatteryCapacityEstimator {
     private static final float MAX_ESTIMATE_MAH = 30000f;
     private static final long MIN_SEGMENT_MS = 60_000L;
 
+    /** Ambang minimal durasi sesi invalid agar layak direkam (≈1 sampel DB). */
+    private static final long INVALID_MIN_MS = 5_000L;
+
     public static class HealthResult {
         /** Median gabungan (pengisian + pengosongan) — sumber skor kesehatan. */
         public float medianMah = -1f;
@@ -60,6 +63,8 @@ public class BatteryCapacityEstimator {
     private static float segTempMax = Float.MIN_VALUE;
     private static double segTempSum;
     private static int segTempCount;
+    /** Bukti kabel benar-benar tercolok (plugged != 0) selama segmen berlangsung. */
+    private static boolean segmentAnyPlugged;
 
     private BatteryCapacityEstimator() {}
 
@@ -105,7 +110,9 @@ public class BatteryCapacityEstimator {
             segTempMax = s.tempC;
             segTempSum = 0;
             segTempCount = 0;
+            segmentAnyPlugged = s.pluggedInt != 0;
         } else {
+            if (s.pluggedInt != 0) segmentAnyPlugged = true;
             segmentTotalMs += deltaMs;
             if (deltaMs > 0 && isScreenOn()) segmentScreenOnMs += deltaMs;
             segmentSamples++;
@@ -263,6 +270,7 @@ public class BatteryCapacityEstimator {
         ArrayList<Float> dischargePool = new ArrayList<>();
         ArrayList<Float> offPool = new ArrayList<>();
         for (BatteryHistoryDb.SessionRow sn : sessionsCopy) {
+            if (!sn.valid) continue;
             if (sn.capacityMah <= 0f) continue;
             chargePool.add(sn.capacityMah);
             r.totalSamples += sn.sampleCount;
@@ -271,6 +279,7 @@ public class BatteryCapacityEstimator {
         try {
             BatteryHistoryDb db = BatteryHistoryDb.get(ctx);
             for (BatteryHistoryDb.DischargeSession d : db.queryDischargeSessions(0L, Long.MAX_VALUE)) {
+                if (!d.valid) continue;
                 float dPercent = d.startPercent - d.endPercent;
                 if (dPercent < MIN_DELTA_PERCENT) continue;
                 if (d.usedMahIntegral <= 0) continue;
@@ -317,15 +326,42 @@ public class BatteryCapacityEstimator {
         try {
             if (segmentStartPercent < 0 || endPercent < 0) return;
             float dPercent = endPercent - segmentStartPercent;
-            if (dPercent < MIN_DELTA_PERCENT) return;
-            if (segmentTotalMs < MIN_SEGMENT_MS) return;
-            if (accumulatedChargeMah <= 0) return;
-            float estimate = (float) (accumulatedChargeMah * 100.0 / dPercent);
-            if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) return;
-            boolean screenOffDominant = segmentScreenOnMs * 2 < segmentTotalMs;
-            int samples = Math.max(segmentSamples, 1);
-            long now = System.currentTimeMillis();
-            long endMs = lastSampleTime > 0 ? lastSampleTime : now;
+            long dur = segmentTotalMs;
+            boolean shortSess = dur < MIN_SEGMENT_MS;
+            boolean smallDelta = dPercent < MIN_DELTA_PERCENT;
+            boolean noCharge = accumulatedChargeMah <= 0;
+            boolean valid = !shortSess && !smallDelta && !noCharge;
+
+            if (valid) {
+                float estimate = (float) (accumulatedChargeMah * 100.0 / dPercent);
+                if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) return;
+                boolean screenOffDominant = segmentScreenOnMs * 2 < dur;
+                int samples = Math.max(segmentSamples, 1);
+                long now = System.currentTimeMillis();
+                long endMs = lastSampleTime > 0 ? lastSampleTime : now;
+                double deltaChargeMah = 0d;
+                if (segmentStartChargeMah > 0 && lastChargeMah > 0) {
+                    deltaChargeMah = (double) (lastChargeMah - segmentStartChargeMah);
+                }
+                double mAhCounter = Math.max(0d, deltaChargeMah);
+                float tempMin = segTempMin == Float.MAX_VALUE ? 0f : segTempMin;
+                float tempMax = segTempMax == Float.MIN_VALUE ? 0f : segTempMax;
+                float tempAvg = segTempCount > 0
+                        ? (float) (segTempSum / segTempCount) : 0f;
+                BatteryHistoryDb.SessionRow row = new BatteryHistoryDb.SessionRow(
+                        now, estimate, screenOffDominant, samples,
+                        segmentStartMs, endMs, segmentStartPercent, endPercent,
+                        mAhCounter, accumulatedChargeMah, deltaChargeMah,
+                        tempMin, tempMax, tempAvg,
+                        true, null);
+                BatteryHistoryDb.get(appContext).insertSessionFull(row);
+                sessions.add(row);
+                return;
+            }
+            /* Sesi lahir-invalid (colokan dilepas singkat): rekam bila benar-benar
+             * bukti kabel tercolok (plugged != 0) dan cukup panjang. */
+            if (dur < INVALID_MIN_MS) return;
+            if (!segmentAnyPlugged) return;
             double deltaChargeMah = 0d;
             if (segmentStartChargeMah > 0 && lastChargeMah > 0) {
                 deltaChargeMah = (double) (lastChargeMah - segmentStartChargeMah);
@@ -335,11 +371,17 @@ public class BatteryCapacityEstimator {
             float tempMax = segTempMax == Float.MIN_VALUE ? 0f : segTempMax;
             float tempAvg = segTempCount > 0
                     ? (float) (segTempSum / segTempCount) : 0f;
+            long now = System.currentTimeMillis();
+            long endMs = lastSampleTime > 0 ? lastSampleTime : now;
+            boolean screenOffDominant = segmentScreenOnMs * 2 < dur;
+            int samples = Math.max(segmentSamples, 1);
+            String reason = invalidReasonFor(smallDelta, shortSess, noCharge);
             BatteryHistoryDb.SessionRow row = new BatteryHistoryDb.SessionRow(
-                    now, estimate, screenOffDominant, samples,
+                    now, 0f, screenOffDominant, samples,
                     segmentStartMs, endMs, segmentStartPercent, endPercent,
                     mAhCounter, accumulatedChargeMah, deltaChargeMah,
-                    tempMin, tempMax, tempAvg);
+                    tempMin, tempMax, tempAvg,
+                    false, reason);
             BatteryHistoryDb.get(appContext).insertSessionFull(row);
             sessions.add(row);
         } finally {
@@ -354,7 +396,22 @@ public class BatteryCapacityEstimator {
             segTempMax = Float.MIN_VALUE;
             segTempSum = 0;
             segTempCount = 0;
+            segmentAnyPlugged = false;
         }
+    }
+
+    private static String invalidReasonFor(boolean smallDelta, boolean shortSess, boolean noCharge) {
+        StringBuilder sb = new StringBuilder();
+        if (shortSess) sb.append("durasi < 1 menit");
+        if (smallDelta) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("Δ% < ").append((int) MIN_DELTA_PERCENT).append("%");
+        }
+        if (noCharge) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("tidak ada arus masuk");
+        }
+        return sb.toString();
     }
 
     private static float median(ArrayList<Float> values) {
@@ -408,12 +465,20 @@ public class BatteryCapacityEstimator {
                 if (seg.direction != SessionSegmentBuilder.Direction.CHARGE) continue;
                 if (seg.endTime <= lastEnd) continue;
                 float dPercent = seg.endPercent - seg.startPercent;
-                if (dPercent < MIN_DELTA_PERCENT) continue;
-                if (seg.durationMs() < MIN_SEGMENT_MS) continue;
-                if (seg.mAhIntegral <= 0) continue;
-                float estimate = (float) (seg.mAhIntegral * 100.0 / dPercent);
-                if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) continue;
-                db.insertSessionFull(segmentToRow(seg, estimate));
+                long dur = seg.durationMs();
+                boolean shortSess = dur < MIN_SEGMENT_MS;
+                boolean smallDelta = dPercent < MIN_DELTA_PERCENT;
+                boolean noCharge = seg.mAhIntegral <= 0;
+                boolean valid = !shortSess && !smallDelta && !noCharge;
+                if (valid) {
+                    float estimate = (float) (seg.mAhIntegral * 100.0 / dPercent);
+                    if (estimate < MIN_ESTIMATE_MAH || estimate > MAX_ESTIMATE_MAH) continue;
+                    db.insertSessionFull(segmentToRow(seg, estimate, true, null));
+                } else if (dur >= INVALID_MIN_MS) {
+                    db.insertSessionFull(
+                            segmentToRow(seg, 0f, false,
+                                    invalidReasonFor(smallDelta, shortSess, noCharge)));
+                }
             }
         }
 
@@ -440,16 +505,19 @@ public class BatteryCapacityEstimator {
         lastPercent = seg.endPercent;
         lastSampleTime = -1L;
         lastCurrentMa = 0;
+        segmentAnyPlugged = true;
     }
 
     private static BatteryHistoryDb.SessionRow segmentToRow(
-            SessionSegmentBuilder.Segment seg, float estimate) {
+            SessionSegmentBuilder.Segment seg, float estimate,
+            boolean valid, String invalidReason) {
         boolean screenOffDominant = seg.screenOnMs * 2 < seg.durationMs();
         return new BatteryHistoryDb.SessionRow(System.currentTimeMillis(), estimate,
                 screenOffDominant, seg.sampleCount,
                 seg.startTime, seg.endTime, seg.startPercent, seg.endPercent,
                 Math.max(0d, seg.deltaChargeMah), seg.mAhIntegral, seg.deltaChargeMah,
-                seg.tempMin, seg.tempMax, seg.tempAvg);
+                seg.tempMin, seg.tempMax, seg.tempAvg,
+                valid, invalidReason);
     }
 
     /** Import sekali file JSON lama ke database lalu file dihapus. */

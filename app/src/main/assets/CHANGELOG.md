@@ -1,9 +1,23 @@
-# [4.92.0] 2026/09/07 17:50 WITA 268 ***ONGOING***
+# [4.92.1] 2026/09/07 22:36 WITA 272 ***ONGOING***
 ### 🔖 Deskripsi
-> Pemilih ikon launcher alternatif pada halaman Konfigurasi kini dilindungi Fitur Developer: saat fitur terkunci, pemilihan ikon ikut terkunci dan hanya bisa dibuka setelah Fitur Developer dibuka lewat password. Di sisi lain, estimasi kapasitas pengosongan pada Kesehatan Baterai yang sebelumnya tidak pernah menghasilkan nilai kini berfungsi normal.
+> Tracker pada halaman detail grafik kali ini dipastikan muncul tepat di posisi ketukan, termasuk saat grafik sedang diperbesar. Sebelumnya, begitu grafik di-zoom lalu jari mengetuk titik data, penanda crosshair bisa melesat ke tempat lain yang jauh dari jari. Kali ini juga dilakukan pembenahan pada grafik Suhu: penurunan suhu di bawah 35°C yang selama ini hanya mengubah angka tanpa menggerakkan garis kini benar-benar tergambar. Di sisi lain, ringkasan Sesi Berjalan yang mAh-nya selalu nol kini terhitung benar, dan colok/lepas kabel singkat yang sebelumnya hilang dari riwayat kini direkam sebagai sesi "Tidak Valid" yang dijelaskan lewat ikon ℹ️ tanpa mengotori estimasi kapasitas.
 
 ### ♻️ Perubahan Fitur
-- **Pemilih ikon launcher alternatif ikut terkunci Fitur Developer** — Baris pemilih ikon di halaman Konfigurasi kini hanya bisa dibuka saat Fitur Developer terbuka; saat fitur terkunci, baris ikon ikut di-disable sehingga pilihan ikon launcher hanya bisa diganti oleh pengguna yang membuka Fitur Developer.
+- **Sesi colok/lepas singkat kini direkam sebagai "Tidak Valid", bukan dibuang** — Saat kabel dicolok/dilepas dalam waktu sangat singkat, sesi singkat itu kini tetap tercatat di Riwayat Sesi (baik pengisian maupun pengosongan) dan ditandai label "Tidak Valid" dengan keterangan via ikon ℹ️ di daftar sesi serta banner di halaman detail. Sesi tidak valid tidak ikut dihitung dalam ringkasan periode, grafik batang, maupun estimasi kapasitas kesehatan; riwayat tetap jujur dan lengkap tanpa mengotori perhitungan.
+
+### 🐞 Bug Fixes
+- **Tracker grafik kini menempel tepat di posisi ketukan saat grafik di-zoom** — Saat grafik detail diperbesar dan jari mengetuk/menelusuri grafik untuk memilih titik data, penanda crosshair sempat muncul di posisi yang salah (bisa jauh dari jari) karena pergeseran jendela tampil saat zoom ikut dihitung dua kali; kini penanda selalu memilih titik data yang tepat di posisi yang diketuk, baik saat grafik baru di-zoom maupun setelah grafik digeser (pan).
+- **Garis grafik Suhu kini ikut turun saat suhu berada di bawah 35°C** — Saat suhu turun di bawah 35°C, garis grafik sempat tetap lurus di posisi yang sama padahal angka nilainya berubah, karena batas bawah skala dipaksa tetap 35°C sehingga seluruh titik di bawahnya menumpuk di satu baris datar; kini batas bawah skala ikut melebar mengikuti suhu terendah yang tercatat sehingga penurunan suhu benar-benar terlihat, sementara skala 35°C–40°C tetap dipertahankan untuk rentang suhu normal.
+- **mAh sesi berjalan tidak lagi selalu 0** — Ringkasan mAh di panel Sesi Berjalan semula selalu tampil 0/— karena integrasi menolak interval antar-sampel ≥ 5 detik (interval sampling database), padahal data arus sudah tercatat; kini interval hingga 1 menit diterima sehingga nilai mAh yang masuk/terpakai terhitung benar sesuai sampel nyata.
+
+---
+
+# [4.92.0] 2026/09/07 18:11 WITA 269 ***RELEASE***
+### 🔖 Deskripsi
+> Pemilih ikon launcher pada halaman Konfigurasi kini dilindungi Fitur Developer: saat fitur terkunci, pemilihan ikon ikut terkunci dan hanya bisa dibuka setelah Fitur Developer dibuka lewat password. Di sisi lain, estimasi kapasitas pengosongan pada Kesehatan Baterai yang sebelumnya tidak pernah menghasilkan nilai kini berfungsi normal.
+
+### ♻️ Perubahan Fitur
+- **Pemilih ikon launcher ikut terkunci Fitur Developer** — Baris pemilih ikon di halaman Konfigurasi kini hanya bisa dibuka saat Fitur Developer terbuka; saat fitur terkunci, baris ikon ikut di-disable sehingga pilihan ikon launcher hanya bisa diganti oleh pengguna yang membuka Fitur Developer.
 
 ### 🐞 Bug Fixes
 - **Estimasi kapasitas pengosongan di Kesehatan Baterai kini menghasilkan nilai** — Nilai "Kapasitas Pengosongan" yang selama ini selalu tampil "—" padahal data tercatat berhari-hari kini terhitung: integral arus pengosongan (yang bernilai negatif saat baterai dipakai) dihitung memakai nilai mutlak sehingga sesi pengosongan tersimpan dengan mAh terpakai yang benar, dan rekonstruksi sesi dari riwayat database diperluas ke interval hingga 1 menit sehingga data yang sudah tercatat ikut diperhitungkan tanpa perlu menunggu sesi baru.

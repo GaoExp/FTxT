@@ -212,7 +212,7 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 
 - **Izin Aplikasi** — Kelola izin overlay, notifikasi, dan optimasi baterai
 - **Konfigurasi** — Pengaturan tampilan aplikasi:
-  - **Ikon Aplikasi** — Ganti ikon launcher (varian default/alternatif)
+  - **Ikon Aplikasi** — Pemilih ikon launcher di halaman Konfigurasi terkunci Fitur Developer: baris ikon di-disable dan hanya bisa dibuka setelah Fitur Developer dibuka lewat password.
   - **Tampilkan panel Info Memori** — Toggle untuk menampilkan/menyembunyikan panel Info Memori dari Navigation Drawer (default OFF)
   - **Tampilkan panel Debugging** — Toggle untuk menampilkan/menyembunyikan panel Debugging dari Navigation Drawer (default OFF). Switch terkunci password: masukkan password lalu tap Unlock untuk membuka, tombol Relock untuk mengunci ulang. Status unlock tersimpan persisten.
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon

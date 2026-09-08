@@ -197,7 +197,7 @@ public class BatterySessionLiveController {
             }
             if (k > 0) {
                 long dt = desc[k - 1].time - desc[k].time;
-                if (dt > 0 && dt < 5000) {
+                if (dt > 0 && dt < 60000) {
                     double mah = Math.abs(desc[k].currentMa) * (dt / 3600000.0);
                     d.totalMah += mah;
                     if (oracle.isScreenOn(desc[k].time)) {

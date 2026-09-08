@@ -24,7 +24,7 @@ import java.util.Map;
 public class BatteryHistoryDb extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "battery_history.db";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     private static final String T_SAMPLES = "samples";
     private static final String T_SESSIONS = "sessions";
@@ -104,7 +104,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "delta_charge_mah REAL," +
                 "temp_min REAL," +
                 "temp_max REAL," +
-                "temp_avg REAL)");
+                "temp_avg REAL," +
+                "valid INTEGER DEFAULT 1," +
+                "invalid_reason TEXT)");
 
         db.execSQL("CREATE TABLE " + T_DISCHARGE + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -120,7 +122,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "temp_min REAL," +
                 "temp_max REAL," +
                 "temp_avg REAL," +
-                "sample_count INTEGER NOT NULL)");
+                "sample_count INTEGER NOT NULL," +
+                "valid INTEGER DEFAULT 1," +
+                "invalid_reason TEXT)");
         db.execSQL("CREATE INDEX idx_discharge_time ON " + T_DISCHARGE + "(start_time)");
 
         db.execSQL("CREATE TABLE " + T_ACTIVITY + " (" +
@@ -171,6 +175,18 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                     "sample_count INTEGER NOT NULL)");
             db.execSQL("CREATE INDEX idx_discharge_time ON " + T_DISCHARGE + "(start_time)");
         }
+        if (oldVersion < 4) {
+            try {
+                db.execSQL("ALTER TABLE " + T_SESSIONS
+                        + " ADD COLUMN valid INTEGER DEFAULT 1");
+                db.execSQL("ALTER TABLE " + T_SESSIONS
+                        + " ADD COLUMN invalid_reason TEXT");
+                db.execSQL("ALTER TABLE " + T_DISCHARGE
+                        + " ADD COLUMN valid INTEGER DEFAULT 1");
+                db.execSQL("ALTER TABLE " + T_DISCHARGE
+                        + " ADD COLUMN invalid_reason TEXT");
+            } catch (Exception ignored) {}
+        }
     }
 
     /** Baris sesi pengisian daya hasil estimasi (metadata lengkap). */
@@ -189,17 +205,31 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         public final float tempMin;
         public final float tempMax;
         public final float tempAvg;
+        public final boolean valid;
+        public final String invalidReason;
 
         /** Sesi tanpa metadata (mis. migrasi JSON lama atau data v2). */
         SessionRow(long time, float capacityMah, boolean mostlyScreenOff, int sampleCount) {
             this(time, capacityMah, mostlyScreenOff, sampleCount,
-                    time, time, -1, -1, 0d, 0d, 0d, 0f, 0f, 0f);
+                    time, time, -1, -1, 0d, 0d, 0d, 0f, 0f, 0f,
+                    true, null);
         }
 
         SessionRow(long time, float capacityMah, boolean mostlyScreenOff, int sampleCount,
                    long startTime, long endTime, int startPercent, int endPercent,
                    double mAhCounter, double mAhIntegral, double deltaChargeMah,
                    float tempMin, float tempMax, float tempAvg) {
+            this(time, capacityMah, mostlyScreenOff, sampleCount,
+                    startTime, endTime, startPercent, endPercent,
+                    mAhCounter, mAhIntegral, deltaChargeMah,
+                    tempMin, tempMax, tempAvg, true, null);
+        }
+
+        SessionRow(long time, float capacityMah, boolean mostlyScreenOff, int sampleCount,
+                   long startTime, long endTime, int startPercent, int endPercent,
+                   double mAhCounter, double mAhIntegral, double deltaChargeMah,
+                   float tempMin, float tempMax, float tempAvg,
+                   boolean valid, String invalidReason) {
             this.time = time;
             this.capacityMah = capacityMah;
             this.mostlyScreenOff = mostlyScreenOff;
@@ -214,6 +244,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
             this.tempMin = tempMin;
             this.tempMax = tempMax;
             this.tempAvg = tempAvg;
+            this.valid = valid;
+            this.invalidReason = invalidReason;
         }
     }
 
@@ -232,11 +264,24 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         public final float tempMax;
         public final float tempAvg;
         public final int sampleCount;
+        public final boolean valid;
+        public final String invalidReason;
 
         DischargeSession(long startTime, long endTime, int startPercent, int endPercent,
                          double usedMahCounter, double usedMahIntegral, float capacityMah,
                          float efficiencyPercent, boolean screenOffDominant,
                          float tempMin, float tempMax, float tempAvg, int sampleCount) {
+            this(startTime, endTime, startPercent, endPercent,
+                    usedMahCounter, usedMahIntegral, capacityMah,
+                    efficiencyPercent, screenOffDominant,
+                    tempMin, tempMax, tempAvg, sampleCount, true, null);
+        }
+
+        DischargeSession(long startTime, long endTime, int startPercent, int endPercent,
+                         double usedMahCounter, double usedMahIntegral, float capacityMah,
+                         float efficiencyPercent, boolean screenOffDominant,
+                         float tempMin, float tempMax, float tempAvg, int sampleCount,
+                         boolean valid, String invalidReason) {
             this.startTime = startTime;
             this.endTime = endTime;
             this.startPercent = startPercent;
@@ -250,6 +295,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
             this.tempMax = tempMax;
             this.tempAvg = tempAvg;
             this.sampleCount = sampleCount;
+            this.valid = valid;
+            this.invalidReason = invalidReason;
         }
     }
 
@@ -270,6 +317,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         public final float tempMax;
         public final float tempAvg;
         public final int sampleCount;
+        public final boolean valid;
+        public final String invalidReason;
 
         SessionEntry(SessionRow r) {
             this.isCharge = true;
@@ -287,6 +336,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
             this.tempMax = r.tempMax;
             this.tempAvg = r.tempAvg;
             this.sampleCount = r.sampleCount;
+            this.valid = r.valid;
+            this.invalidReason = r.invalidReason;
         }
 
         SessionEntry(DischargeSession d) {
@@ -305,6 +356,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
             this.tempMax = d.tempMax;
             this.tempAvg = d.tempAvg;
             this.sampleCount = d.sampleCount;
+            this.valid = d.valid;
+            this.invalidReason = d.invalidReason;
         }
 
         public long durationMs() {
@@ -619,6 +672,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         v.put("temp_min", r.tempMin);
         v.put("temp_max", r.tempMax);
         v.put("temp_avg", r.tempAvg);
+        v.put("valid", r.valid ? 1 : 0);
+        if (r.invalidReason != null) v.put("invalid_reason", r.invalidReason);
         getWritableDatabase().insert(T_SESSIONS, null, v);
     }
 
@@ -628,7 +683,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "SELECT time, capacity_mah, mostly_screen_off, sample_count,"
                         + " start_time, end_time, start_percent, end_percent,"
                         + " charge_mah_counter, charge_mah_integral, delta_charge_mah,"
-                        + " temp_min, temp_max, temp_avg"
+                        + " temp_min, temp_max, temp_avg, valid, invalid_reason"
                         + " FROM " + T_SESSIONS + " ORDER BY time ASC", null);
         try {
             while (c.moveToNext()) {
@@ -643,7 +698,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                         c.isNull(10) ? 0d : c.getDouble(10),
                         c.isNull(11) ? 0f : c.getFloat(11),
                         c.isNull(12) ? 0f : c.getFloat(12),
-                        c.isNull(13) ? 0f : c.getFloat(13)));
+                        c.isNull(13) ? 0f : c.getFloat(13),
+                        c.isNull(14) || c.getInt(14) == 1,
+                        c.isNull(15) ? null : c.getString(15)));
             }
         } finally {
             c.close();
@@ -678,7 +735,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "SELECT time, capacity_mah, mostly_screen_off, sample_count,"
                         + " start_time, end_time, start_percent, end_percent,"
                         + " charge_mah_counter, charge_mah_integral, delta_charge_mah,"
-                        + " temp_min, temp_max, temp_avg"
+                        + " temp_min, temp_max, temp_avg, valid, invalid_reason"
                         + " FROM " + T_SESSIONS
                         + " WHERE end_time >= ? AND start_time <= ?"
                         + " ORDER BY start_time ASC",
@@ -696,7 +753,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                         c.isNull(10) ? 0d : c.getDouble(10),
                         c.isNull(11) ? 0f : c.getFloat(11),
                         c.isNull(12) ? 0f : c.getFloat(12),
-                        c.isNull(13) ? 0f : c.getFloat(13)));
+                        c.isNull(13) ? 0f : c.getFloat(13),
+                        c.isNull(14) || c.getInt(14) == 1,
+                        c.isNull(15) ? null : c.getString(15)));
             }
         } finally {
             c.close();
@@ -721,6 +780,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         v.put("temp_max", s.tempMax);
         v.put("temp_avg", s.tempAvg);
         v.put("sample_count", s.sampleCount);
+        v.put("valid", s.valid ? 1 : 0);
+        if (s.invalidReason != null) v.put("invalid_reason", s.invalidReason);
         getWritableDatabase().insert(T_DISCHARGE, null, v);
     }
 
@@ -731,7 +792,8 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                 "SELECT start_time, end_time, start_percent, end_percent,"
                         + " used_mah_counter, used_mah_integral, capacity_mah,"
                         + " efficiency_discharge, screen_off_dominant,"
-                        + " temp_min, temp_max, temp_avg, sample_count"
+                        + " temp_min, temp_max, temp_avg, sample_count,"
+                        + " valid, invalid_reason"
                         + " FROM " + T_DISCHARGE
                         + " WHERE end_time >= ? AND start_time <= ?"
                         + " ORDER BY start_time ASC",
@@ -747,7 +809,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                         c.isNull(9) ? 0f : c.getFloat(9),
                         c.isNull(10) ? 0f : c.getFloat(10),
                         c.isNull(11) ? 0f : c.getFloat(11),
-                        c.getInt(12)));
+                        c.getInt(12),
+                        c.isNull(13) || c.getInt(13) == 1,
+                        c.isNull(14) ? null : c.getString(14)));
             }
         } finally {
             c.close();
@@ -781,6 +845,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
     public ArrayList<BarAggregate> queryBarAggregates(long fromMs, long toMs, int mode) {
         Map<Long, BarAggregate> map = new HashMap<>();
         for (SessionRow r : queryChargeSessions(fromMs, toMs)) {
+            if (!r.valid) continue;
             long bucket = bucketStart(r.endTime, mode);
             BarAggregate a = map.get(bucket);
             if (a == null) {
@@ -794,6 +859,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
                     a.chargeCount + 1, a.dischargeCount));
         }
         for (DischargeSession d : queryDischargeSessions(fromMs, toMs)) {
+            if (!d.valid) continue;
             long bucket = bucketStart(d.endTime, mode);
             BarAggregate a = map.get(bucket);
             if (a == null) {

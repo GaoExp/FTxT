@@ -323,6 +323,15 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"/>
 
+                            <ImageButton
+                                android:id="@+id/batHistFilterInfo"
+                                android:src="@drawable/ic_info"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:contentDescription="Info sesi tidak valid"
+                                android:padding="6dp"
+                                android:layout_width="28dp"
+                                android:layout_height="28dp"/>
+
                         </LinearLayout>
 
                     </LinearLayout>

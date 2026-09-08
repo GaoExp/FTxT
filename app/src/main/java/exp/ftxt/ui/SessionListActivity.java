@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -25,6 +26,7 @@ import java.util.concurrent.Executors;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
+import exp.ftxt.shared.ui.InfoTooltip;
 
 /**
  * Halaman daftar sesi (pengisian/pengosongan) untuk satu batang periode
@@ -176,6 +178,17 @@ public class SessionListActivity extends AppCompatActivity {
         typeTag.setBackgroundResource(e.isCharge
                 ? R.drawable.bat_badge_active_bg : R.drawable.bat_badge_stopped_bg);
 
+        if (!e.valid) {
+            typeTag.setText((e.isCharge ? "PENGISIAN" : "PENGOSONGAN") + " · INVALID");
+            typeTag.setTextColor(getColor(R.color.bat_monitor_label));
+            typeTag.setBackgroundResource(R.drawable.bat_badge_stopped_bg);
+            ImageButton invalidInfo = view.findViewById(R.id.itemSessionInvalidInfo);
+            invalidInfo.setVisibility(View.VISIBLE);
+            invalidInfo.setOnClickListener(v ->
+                    InfoTooltip.show(this, v, "Sesi Tidak Valid",
+                            invalidReasonText(e)));
+        }
+
         TextView timeText = view.findViewById(R.id.itemSessionTime);
         timeText.setText(FMT.format(new Date(e.startTime))
                 + " – " + FMT.format(new Date(e.endTime)));
@@ -224,6 +237,16 @@ public class SessionListActivity extends AppCompatActivity {
         long sisaMin = totalMin % 60;
         if (sisaMin == 0) return jam + " jam";
         return jam + "j " + sisaMin + "m";
+    }
+
+    private String invalidReasonText(BatteryHistoryDb.SessionEntry e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Sesi ini berlangsung sangat singkat saat kabel dilepas/dicolok sebentar.\n");
+        if (e.invalidReason != null && !e.invalidReason.isEmpty()) {
+            sb.append("\nKeterangan: ").append(e.invalidReason);
+        }
+        sb.append("\nData direkam agar riwayat lengkap, tetapi tidak dihitung dalam ringkasan & estimasi kapasitas.");
+        return sb.toString();
     }
 
     private int dp(float value) {

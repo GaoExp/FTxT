@@ -82,6 +82,14 @@ public class BatterySessionHistoryController {
                 rootView.findViewById(R.id.batHistFilterAll),
                 rootView.findViewById(R.id.batHistFilterCharge),
                 rootView.findViewById(R.id.batHistFilterDischarge)};
+        rootView.findViewById(R.id.batHistFilterInfo)
+                .setOnClickListener(v -> InfoTooltip.show(activity, v,
+                        "Sesi Tidak Valid",
+                        "Sesi pendek saat kabel dicolok/dilepas sebentar (di bawah "
+                                + "ambang minimal) direkam sebagai sesi TIDAK VALID — "
+                                + "bertanda Invalid di daftar sesi.\n\n"
+                                + "Sesi tersebut TIDAK dihitung dalam ringkasan periode, "
+                                + "grafik batang, maupun estimasi kapasitas baterai."));
     }
 
     private void bindTabs() {
@@ -233,6 +241,7 @@ public class BatterySessionHistoryController {
         double effSum = 0d;
         int effCount = 0;
         for (BatteryHistoryDb.SessionEntry e : entries) {
+            if (!e.valid) continue;
             if (e.isCharge) {
                 charges++;
                 chargeMah += e.mAhCounter > 0 ? e.mAhCounter : e.mAhIntegral;

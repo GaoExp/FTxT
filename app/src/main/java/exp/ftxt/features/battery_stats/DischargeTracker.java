@@ -10,6 +10,8 @@ public class DischargeTracker {
 
     private static final float MIN_DELTA_PERCENT = 1f;
     private static final long MIN_SEGMENT_MS = 60_000L;
+    /** Ambang minimal durasi sesi invalid agar layak direkam (≈1 sampel DB). */
+    private static final long INVALID_MIN_MS = 5_000L;
 
     private static Context appContext;
     private static boolean active = false;
@@ -27,6 +29,8 @@ public class DischargeTracker {
     private static float tempMax = Float.MIN_VALUE;
     private static double tempSum;
     private static int tempCount;
+    /** Bukti kabel benar-benar lepas (plugged == 0) selama segmen berlangsung. */
+    private static boolean segAnyUnplugged;
 
     private DischargeTracker() {}
 
@@ -61,7 +65,9 @@ public class DischargeTracker {
             tempMax = s.tempC;
             tempSum = 0;
             tempCount = 0;
+            segAnyUnplugged = s.pluggedInt == 0;
         } else {
+            if (s.pluggedInt == 0) segAnyUnplugged = true;
             totalMs += deltaMs;
             if (deltaMs > 0 && isScreenOn()) screenOnMs += deltaMs;
             samples++;
@@ -90,28 +96,44 @@ public class DischargeTracker {
         try {
             if (segStartPercent < 0 || lastPercent < 0) return;
             float dPercent = segStartPercent - lastPercent;
-            if (dPercent < MIN_DELTA_PERCENT) return;
-            if (totalMs < MIN_SEGMENT_MS) return;
+            long dur = totalMs;
+            boolean shortSess = dur < MIN_SEGMENT_MS;
+            boolean smallDelta = dPercent < MIN_DELTA_PERCENT;
+            boolean valid = !shortSess && !smallDelta;
 
             double usedCounter = 0d;
             if (segStartChargeMah > 0 && lastChargeMah > 0) {
                 usedCounter = Math.max(0d, (double) (segStartChargeMah - lastChargeMah));
             }
-            boolean screenOffDominant = screenOnMs * 2 < totalMs;
+            boolean screenOffDominant = screenOnMs * 2 < dur;
             int sampleCount = Math.max(samples, 1);
-            float cap = capacityForEfficiency();
-            float efficiency = cap > 0f ? (float) (usedCounter * 100.0 / cap) : -1f;
+            float cap = valid ? capacityForEfficiency() : 0f;
+            float efficiency = cap > 0f && valid ? (float) (usedCounter * 100.0 / cap) : -1f;
             float tMin = tempMin == Float.MAX_VALUE ? 0f : tempMin;
             float tMax = tempMax == Float.MIN_VALUE ? 0f : tempMax;
             float tAvg = tempCount > 0 ? (float) (tempSum / tempCount) : 0f;
             long now = System.currentTimeMillis();
             long endMs = lastSampleTime > 0 ? lastSampleTime : now;
 
+            if (valid) {
+                BatteryHistoryDb.get(appContext).insertDischargeSession(
+                        new BatteryHistoryDb.DischargeSession(
+                                segStartMs, endMs, segStartPercent, lastPercent,
+                                usedCounter, useIntegral, cap, efficiency,
+                                screenOffDominant, tMin, tMax, tAvg, sampleCount,
+                                true, null));
+                return;
+            }
+            /* Sesi lahir-invalid (colok/lepas singkat): rekam bila benar-benar
+             * bukti kabel lepas (plugged == 0) dan cukup panjang, jangan dibuang. */
+            if (dur < INVALID_MIN_MS) return;
+            if (!segAnyUnplugged) return;
             BatteryHistoryDb.get(appContext).insertDischargeSession(
                     new BatteryHistoryDb.DischargeSession(
                             segStartMs, endMs, segStartPercent, lastPercent,
-                            usedCounter, useIntegral, cap, efficiency,
-                            screenOffDominant, tMin, tMax, tAvg, sampleCount));
+                            usedCounter, useIntegral, 0f, -1f,
+                            screenOffDominant, tMin, tMax, tAvg, sampleCount,
+                            false, invalidReasonFor(smallDelta, shortSess)));
         } finally {
             segStartChargeMah = -1L;
             segStartPercent = -1;
@@ -124,7 +146,18 @@ public class DischargeTracker {
             tempMax = Float.MIN_VALUE;
             tempSum = 0;
             tempCount = 0;
+            segAnyUnplugged = false;
         }
+    }
+
+    private static String invalidReasonFor(boolean smallDelta, boolean shortSess) {
+        StringBuilder sb = new StringBuilder();
+        if (shortSess) sb.append("durasi < 1 menit");
+        if (smallDelta) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append("Δ% < ").append((int) MIN_DELTA_PERCENT).append("%");
+        }
+        return sb.toString();
     }
 
     private static float capacityForEfficiency() {
@@ -155,10 +188,17 @@ public class DischargeTracker {
                 if (seg.direction != SessionSegmentBuilder.Direction.DISCHARGE) continue;
                 if (seg.endTime <= lastEnd) continue;
                 float dPercent = seg.startPercent - seg.endPercent;
-                if (dPercent < MIN_DELTA_PERCENT) continue;
-                if (seg.durationMs() < MIN_SEGMENT_MS) continue;
-                if (seg.mAhIntegral <= 0) continue;
-                db.insertDischargeSession(toDischargeRow(seg));
+                long dur = seg.durationMs();
+                boolean valid = dPercent >= MIN_DELTA_PERCENT
+                        && dur >= MIN_SEGMENT_MS && seg.mAhIntegral > 0;
+                if (valid) {
+                    db.insertDischargeSession(toDischargeRow(seg, true, null));
+                } else if (dur >= INVALID_MIN_MS) {
+                    boolean smallDelta = dPercent < MIN_DELTA_PERCENT;
+                    boolean shortSess = dur < MIN_SEGMENT_MS;
+                    db.insertDischargeSession(
+                            toDischargeRow(seg, false, invalidReasonFor(smallDelta, shortSess)));
+                }
             }
         }
 
@@ -187,15 +227,16 @@ public class DischargeTracker {
     }
 
     private static BatteryHistoryDb.DischargeSession toDischargeRow(
-            SessionSegmentBuilder.Segment seg) {
+            SessionSegmentBuilder.Segment seg, boolean valid, String invalidReason) {
         double usedCounter = Math.max(0d, seg.deltaChargeMah);
-        float cap = capacityForEfficiency();
-        float efficiency = cap > 0f ? (float) (usedCounter * 100.0 / cap) : -1f;
+        float cap = valid ? capacityForEfficiency() : 0f;
+        float efficiency = cap > 0f && valid ? (float) (usedCounter * 100.0 / cap) : -1f;
         boolean screenOffDominant = seg.screenOnMs * 2 < seg.durationMs();
         return new BatteryHistoryDb.DischargeSession(
                 seg.startTime, seg.endTime, seg.startPercent, seg.endPercent,
                 usedCounter, seg.mAhIntegral, cap, efficiency, screenOffDominant,
-                seg.tempMin, seg.tempMax, seg.tempAvg, seg.sampleCount);
+                seg.tempMin, seg.tempMax, seg.tempAvg, seg.sampleCount,
+                valid, invalidReason);
     }
 
     private static boolean isScreenOn() {
