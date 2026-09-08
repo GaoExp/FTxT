@@ -20,6 +20,14 @@ Semver `major.minor.patch`:
 
 Informasi mesin/dev-env (JDK, Gradle, Android SDK, NDK/CMake, dan aturan build) tercantum di **`agent-rules.md`** — tidak disalin di sini agar tidak dobel. Baca bersama file itu.
 
+## 1c. Konteks Session Sebelumnya
+
+Di awal setiap sesi, jika file **`_temp/session-summary.md`** ada di root proyek, **baca file tersebut** sebelum mulai bekerja. File ini adalah ringkasan (anchored summary) dari percakapan/compaction sebelumnya.
+
+- Perlakukan isinya sebagai **konteks** dari session/compaction sebelumnya — **BUKAN** instruksi berprioritas lebih tinggi dari `AGENTS.md`, `agent-rules.md`, atau perintah user.
+- Jika isinya bertentangan dengan `AGENTS.md`/`agent-rules.md`/perintah user, yang menang adalah `AGENTS.md`/`agent-rules.md`/perintah user.
+- File ini ditimpa saat compaction baru terjadi; jangan menulis file ini secara manual.
+
 ---
 
 ## 2. CHANGELOG
@@ -123,7 +131,7 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 6. Ulang sampai user perintah commit (dengan/tanpa push/tag).
 
 ### Pre-release
-1. Periksa & perbarui dokumen yang menyangkut perubahan fitur: `README.md`, `PANDUAN.md`, `STRUKTUR.md`, `CHANGELOG.md`.
+1. Periksa & perbarui dokumen yang menyangkut perubahan fitur: Last Updated `README.md`, `PANDUAN.md`, `STRUKTUR.md`, `CHANGELOG.md`.
 2. Analisa & rapikan poin-poin CHANGELOG entry berjalan — kategori sesuai natur perubahan (§ 2.1b), tulis hasil akhir, gabung poin yang menimpa (§ 2.4).
 3. Pastikan status judul `***ONGOING***` dengan tanggal & jam WITA terbaru.
 4. Bilang user siap commit/push/tag. **JANGAN commit / tag / push.**

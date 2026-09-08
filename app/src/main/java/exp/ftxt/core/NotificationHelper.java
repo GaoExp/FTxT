@@ -247,14 +247,14 @@ public class NotificationHelper {
 
     public static boolean isNotificationCustom(Context context) {
         return context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
-                .getBoolean(PREF_NOTIF_CUSTOM, true);
+                .getBoolean(PREF_NOTIF_CUSTOM, false);
     }
 
     public static long getNotificationTitleIntervalMs(Context context) {
         long interval = context.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE)
-                .getInt(PREF_NOTIF_CUSTOM_INTERVAL, 3000);
+                .getInt(PREF_NOTIF_CUSTOM_INTERVAL, 5000);
         if (interval == 1000 || interval == 5000 || interval == 10000) return interval;
-        return 3000;
+        return 5000;
     }
 
     private static String dateDayName(String lang, int dayOfWeek) {

@@ -263,7 +263,7 @@ public class SettingsActivity extends AppCompatActivity {
         notifIntervalRow = findViewById(R.id.notifIntervalRow);
         notifIntervalGroup = findViewById(R.id.notifIntervalGroup);
 
-        boolean notifCustom = prefs.getBoolean(NotificationHelper.PREF_NOTIF_CUSTOM, true);
+        boolean notifCustom = prefs.getBoolean(NotificationHelper.PREF_NOTIF_CUSTOM, false);
         notifCustomSwitch.setChecked(notifCustom);
         applySwitchTint(notifCustomSwitch, notifCustom);
 
@@ -287,7 +287,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         notifIntervalGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            int ms = 3000;
+            int ms = 5000;
             if (checkedId == R.id.notifInterval1) ms = 1000;
             else if (checkedId == R.id.notifInterval5) ms = 5000;
             else if (checkedId == R.id.notifInterval10) ms = 10000;

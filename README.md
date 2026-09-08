@@ -36,6 +36,7 @@
 - **Collapsible Panel Sections** — Setiap panel overlay dikelompokkan dalam section collapsible: Tampilan, Posisi, Shadow, Background. Klik header ▾/▸ untuk toggle
 - **Overlay Toggle** — Auto-start, permission handling, WakeLock, foreground service
 - **Ikon Notifikasi Dinamis** — Ikon notifikasi status bar bisa menampilkan suhu baterai, persen baterai, atau tanggal + nama hari (bisa 2 baris), yang di-generate sebagai Bitmap dan diperbarui otomatis hanya saat nilainya berubah; pilihan isi bisa diatur di Konfigurasi
+- **Notifikasi Kustom** — Judul notifikasi overlay bisa menampilkan info baterai real-time (persen, status + arus, tegangan, daya, mAh, suhu) dan bisa dimatikan sehingga hanya tombol aksi yang tampil; interval perbarui judul bisa diatur 1/3/5/10 detik (default nonaktif, interval 5 detik)
 - **Android SplashScreen** — SplashScreen API resmi tanpa fake loading
 
 ---

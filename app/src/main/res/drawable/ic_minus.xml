@@ -2,9 +2,13 @@
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
-    android:viewportHeight="24"
-    android:tint="?android:attr/textColorPrimary">
+    android:viewportHeight="24">
     <path
-        android:fillColor="@android:color/white"
-        android:pathData="M5,11h14v2H5z"/>
+        android:fillColor="@color/ui_control_bg"
+        android:strokeColor="@color/bat_monitor_stroke"
+        android:strokeWidth="1"
+        android:pathData="M12,2a10,10 0 1,0 0.001,0z"/>
+    <path
+        android:fillColor="@color/sidebar_nav_text_default"
+        android:pathData="M7,11h10v2H7z"/>
 </vector>
