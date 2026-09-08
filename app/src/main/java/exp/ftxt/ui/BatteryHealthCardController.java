@@ -30,7 +30,7 @@ public class BatteryHealthCardController {
     private final ExecutorService healthExecutor = Executors.newSingleThreadExecutor();
 
     private TextView batHealthText;
-    private TextView batHealthDesignText;
+    private EditText batHealthDesignInput;
     private TextView batHealthSessionBadge;
     private View batHealthResetButton;
     private int monitorLabelColor;
@@ -38,7 +38,7 @@ public class BatteryHealthCardController {
     public BatteryHealthCardController(MainActivity activity, View pageView) {
         this.activity = activity;
         bindViews(pageView);
-        batHealthDesignText.setOnClickListener(v -> showDesignCapacityDialog());
+        batHealthDesignInput.setOnClickListener(v -> showDesignCapacityDialog());
         batHealthResetButton.setOnClickListener(v -> showResetConfirmDialog());
         pageView.findViewById(R.id.batHealthInfoButton)
                 .setOnClickListener(v -> InfoTooltip.show(activity, v,
@@ -55,7 +55,7 @@ public class BatteryHealthCardController {
 
     private void bindViews(View rootView) {
         batHealthText = rootView.findViewById(R.id.batHealthText);
-        batHealthDesignText = rootView.findViewById(R.id.batHealthDesignText);
+        batHealthDesignInput = rootView.findViewById(R.id.batHealthDesignInput);
         batHealthSessionBadge = rootView.findViewById(R.id.batHealthSessionBadge);
         batHealthResetButton = rootView.findViewById(R.id.batHealthResetButton);
         monitorLabelColor = activity.getColor(R.color.bat_monitor_label);
@@ -104,9 +104,7 @@ public class BatteryHealthCardController {
 
         batHealthText.setText(sb);
         batHealthSessionBadge.setText(r.sessionCount + " sesi valid");
-        batHealthDesignText.setText(r.designMah > 0
-                ? "Kapasitas Desain: " + r.designMah + " mAh · Ketuk untuk mengatur"
-                : "Kapasitas Desain: Belum diatur · Ketuk untuk mengatur");
+        batHealthDesignInput.setText(r.designMah > 0 ? String.valueOf(r.designMah) : "");
     }
 
     private void appendLineColored(SpannableStringBuilder sb, String label, String value, Integer valueColor) {
@@ -150,32 +148,37 @@ public class BatteryHealthCardController {
         input.setInputType(InputType.TYPE_CLASS_NUMBER);
         input.setText(current > 0 ? String.valueOf(current) : "");
         input.setHint("mis. 5000");
+        input.setSelectAllOnFocus(true);
 
-        new AlertDialog.Builder(activity)
+        AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle("Kapasitas Desain")
                 .setMessage("Masukkan kapasitas desain baterai (mAh) sesuai spesifikasi pabrik. "
                         + "Skor kesehatan hanya dihitung jika kolom ini terisi. Kosongkan untuk menghapus.")
                 .setView(input)
-                .setPositiveButton("Simpan", (dialog, which) -> {
-                    String txt = input.getText().toString().trim();
-                    int value = 0;
-                    if (!txt.isEmpty()) {
-                        try {
-                            value = Integer.parseInt(txt);
-                        } catch (NumberFormatException ignored) {}
-                    }
-                    if (value != 0 && (value < 500 || value > 30000)) {
-                        Toast.makeText(activity, "Kapasitas harus 500–30000 mAh", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    final int capacity = value;
-                    healthExecutor.execute(() -> {
-                        BatteryCapacityEstimator.setDesignCapacity(capacity);
-                        activity.runOnUiThread(() -> refresh());
-                    });
-                })
+                .setPositiveButton("Simpan", null)
                 .setNegativeButton("Batal", null)
-                .show();
+                .create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String txt = input.getText().toString().trim();
+            int value = 0;
+            if (!txt.isEmpty()) {
+                try {
+                    value = Integer.parseInt(txt);
+                } catch (NumberFormatException ignored) {}
+            }
+            if (value != 0 && (value < 500 || value > 30000)) {
+                Toast.makeText(activity, "Kapasitas harus 500–30000 mAh", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            dialog.dismiss();
+            batHealthDesignInput.setText(value > 0 ? String.valueOf(value) : "");
+            final int capacity = value;
+            healthExecutor.execute(() -> {
+                BatteryCapacityEstimator.setDesignCapacity(capacity);
+                activity.runOnUiThread(() -> refresh());
+            });
+        });
     }
 
     private void showResetConfirmDialog() {

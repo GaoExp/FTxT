@@ -310,6 +310,7 @@ public class BatteryCapacityEstimator {
         if (mah < 0) mah = 0;
         designMah = mah;
         BatteryHistoryDb.get(appContext).setMeta("design_mah", String.valueOf(designMah));
+        healthCache = null;
     }
 
     public static synchronized void resetEstimationData() {

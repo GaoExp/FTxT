@@ -186,14 +186,14 @@ public final class BatteryReading {
      */
     public static int readFullChargeDesignMah(Context ctx) {
         try {
-            int v = readSysfsValue("charge_full_design");
-            if (v <= 0) v = readSysfsValue("charge_full");
+            int v = toMah(readSysfsValue("charge_full_design"));
+            if (v <= 0) v = toMah(readSysfsValue("charge_full"));
             if (v <= 0) {
                 int energy = readSysfsValue("energy_full_design");
                 if (energy <= 0) energy = readSysfsValue("energy_full");
                 if (energy > 0) {
                     float voltMv = readSysfsVoltage();
-                    if (voltMv > 0f) v = Math.round(energy / voltMv);
+                    if (voltMv > 0f) v = toMah(Math.round(energy / voltMv));
                 }
             }
             if (v <= 0 && ctx != null) {
@@ -241,5 +241,13 @@ public final class BatteryReading {
     private static float readSysfsVoltage() {
         int mv = readSysfsValue("voltage_now");
         return mv > 0 ? mv / 1000f : 0f;
+    }
+
+    /** Konversi nilai mentah sysfs ke mAh: kernel umumnya memakai µAh, sebagian vendor mAh langsung. */
+    private static int toMah(int raw) {
+        if (raw <= 0) return 0;
+        if (raw >= 500 && raw <= 30000) return raw;
+        int div = raw / 1000;
+        return (div >= 500 && div <= 30000) ? div : 0;
     }
 }

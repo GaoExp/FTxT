@@ -76,15 +76,43 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"/>
 
-                            <TextView
-                                android:id="@+id/batHealthDesignText"
-                                android:text="Kapasitas Desain: Belum diatur · Ketuk untuk mengatur"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="@color/bat_monitor_header"
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"/>
+                                android:layout_marginTop="4dp">
+
+                                <TextView
+                                    android:text="Kapasitas Desain : "
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/bat_monitor_header"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                                <EditText
+                                    android:id="@+id/batHealthDesignInput"
+                                    android:focusable="false"
+                                    android:cursorVisible="false"
+                                    android:gravity="center"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:hint="5000"
+                                    android:minWidth="70dp"
+                                    android:paddingHorizontal="4dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                                <TextView
+                                    android:text=" mAh"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="@color/bat_monitor_header"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                            </LinearLayout>
 
                             <LinearLayout
                                 android:orientation="horizontal"
