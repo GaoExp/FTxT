@@ -23,3 +23,9 @@ opencode.jsonc
 # key/ — folder untuk keystore CI, file sensitif diabaikan
 /key/alias-key
 /key/*.jks
+
+# Dokumen di assets/ yang ditimpa syncDocs saat build (sumbernya di root)
+app/src/main/assets/CHANGELOG.md
+app/src/main/assets/README.md
+app/src/main/assets/PANDUAN.md
+app/src/main/assets/STRUKTUR.md

@@ -1,6 +1,6 @@
-# [4.92.1] 2026/09/09 04:59 WITA 277 ***ONGOING***
+# [4.92.1] 2026/09/09 05:59 WITA 278 ***RELEASE***
 ### 🔖 Deskripsi
-> Tracker pada halaman detail grafik kali ini dipastikan muncul tepat di posisi ketukan, termasuk saat grafik sedang diperbesar. Sebelumnya, begitu grafik di-zoom lalu jari mengetuk titik data, penanda crosshair bisa melesat ke tempat lain yang jauh dari jari. Kali ini juga dilakukan pembenahan pada grafik Suhu: penurunan suhu di bawah 35°C yang selama ini hanya mengubah angka tanpa menggerakkan garis kini benar-benar tergambar. Di sisi lain, ringkasan Sesi Berjalan yang mAh-nya selalu nol kini terhitung benar, dan colok/lepas kabel singkat yang sebelumnya hilang dari riwayat kini direkam sebagai sesi "Tidak Valid" yang dijelaskan lewat ikon ℹ️ tanpa mengotori estimasi kapasitas. Kapasitas desain pun ikut dipermudah: pengaturannya kini memakai kolom input di kartu Kesehatan ("Kapasitas Desain : [nilai] mAh") yang mengetuknya membuka dialog Simpan/Batal, dan nilai awal yang semula tidak pernah terisi otomatis karena salah satuan kini terdeteksi benar dari perangkat. Di sisi lain, Notifikasi Kustom kini hadir dengan kondisi awal mati dan interval judul 5 detik.
+> Rilis ini fokus pada akurasi data dan kenyamanan pemantauan baterai di tab Monitor, disertai beberapa penyesuaian perilaku dan pengaturan yang lebih praktis. Rincian tiap perubahan tersedia di masing-masing section di bawah.
 
 ### ♻️ Perubahan Fitur
 - **Notifikasi Kustom kini default nonaktif dengan interval judul 5 detik** — Pada kondisi awal (belum pernah diatur), saklar "Notifikasi Kustom" di halaman Konfigurasi dalam keadaan mati sehingga notifikasi hanya menampilkan tombol aksi tanpa judul info baterai, dan saat diaktifkan interval perbarui judul otomatis terpilih 5 detik; pengguna bisa mengubah keduanya seperti biasa.
@@ -9,7 +9,6 @@
 
 ### 🔧 Optimasi & Penyesuaian
 - **Urutan daftar sesi dibalik: sesi terbaru tampil di paling atas** — Daftar sesi di halaman daftar sesi periode kini menampilkan sesi terbaru terlebih dahulu di atas dan sesi lama di bawah (sebelumnya sesi lama yang tampil di atas), sehingga sesi yang baru terjadi mudah terlihat tanpa harus menggulir ke bawah.
-- **Tombol interval D-Pad jadi tombol bulat berisi agar ‑ dan + tidak lagi mirip** — Tombol pengurang (‑) dan penambah (+) jarak langkah D-Pad kini tampil sebagai tombol bulat berisi dengan simbol di dalamnya (lingkaran + garis untuk pengurang, lingkaran + tanda silang untuk penambah) sehingga keduanya mudah dibedakan sekilas dan tidak lagi tampak sebagai dua garis tipis yang menyerupai satu sama lain; berlaku untuk D-Pad seluruh modul overlay.
 
 ### 🐞 Bug Fixes
 - **Tracker grafik kini menempel tepat di posisi ketukan saat grafik di-zoom** — Saat grafik detail diperbesar dan jari mengetuk/menelusuri grafik untuk memilih titik data, penanda crosshair sempat muncul di posisi yang salah (bisa jauh dari jari) karena pergeseran jendela tampil saat zoom ikut dihitung dua kali; kini penanda selalu memilih titik data yang tepat di posisi yang diketuk, baik saat grafik baru di-zoom maupun setelah grafik digeser (pan).

@@ -87,6 +87,12 @@ Waktu yang dicatat di setiap entry adalah **waktu di judul entry**, yaitu waktu 
 
 ### 2.4 Isi entry (untuk pembaca user, bukan riwayat kerja)
 
+**Deskripsi (paragraf `🔖`) dibuat singkat sebagai pengantar versi:** beri tahu gambaran umum apa yang dibawa rilis ini (tema/intinya) dalam 1–2 kalimat.
+
+- JANGAN mencantumkan detail yang sudah dijelaskan di tiap section perubahan (✨/🚮/♻️/🔧/🐞). Deskripsi harus mendorong pembaca membaca section yang memuat poin perubahan sebagai penjelasan utama, bukan menggantikannya.
+- Boleh menyebut teknik/struktur (mis. "Pembaruan utama rilis ini berpusat pada pemantauan baterai dan overlay bidikan") untuk memberi arah, tanpa merinci isi fiturnya.
+- Satu kalimat inti + ajakan singkat agar section di bawah tetap terbaca adalah pola yang baik.
+
 - **Satu perubahan = satu poin, tulis hasil akhir.** Jika dirombak berkali-kali, catat kondisi final saja.
 - **Jangan menumpuk poin yang saling menimpa** — perbarui/tulis ulang poin yang sudah ada, jangan tambah poin baru yang berkonflik.
 - **Jangan catat detail internal** (nama helper, cara polling, key prefs, dll) kecuali memengaruhi perilaku user.
