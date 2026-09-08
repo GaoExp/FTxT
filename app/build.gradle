@@ -27,7 +27,7 @@ android {
         minSdk 26
         targetSdk 35
 
-        versionCode 272
+        versionCode 274
         versionName "4.92.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

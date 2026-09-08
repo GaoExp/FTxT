@@ -438,6 +438,13 @@ public class BatteryCapacityEstimator {
         } catch (NumberFormatException ignored) {
             designMah = 0;
         }
+        if (designMah <= 0) {
+            int detected = BatteryReading.readFullChargeDesignMah(appContext);
+            if (detected >= MIN_ESTIMATE_MAH && detected <= MAX_ESTIMATE_MAH) {
+                designMah = detected;
+                db.setMeta("design_mah", String.valueOf(designMah));
+            }
+        }
         sessions.clear();
         sessions.addAll(db.getSessions());
     }

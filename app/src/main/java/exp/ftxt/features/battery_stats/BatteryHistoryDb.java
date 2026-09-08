@@ -827,7 +827,7 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         Collections.sort(out, new Comparator<SessionEntry>() {
             @Override
             public int compare(SessionEntry a, SessionEntry b) {
-                return Long.compare(a.startTime, b.startTime);
+                return Long.compare(b.startTime, a.startTime);
             }
         });
         return out;

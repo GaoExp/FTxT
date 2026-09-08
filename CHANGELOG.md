@@ -1,9 +1,13 @@
-# [4.92.1] 2026/09/07 22:36 WITA 272 ***ONGOING***
+# [4.92.1] 2026/09/08 11:34 WITA 274 ***ONGOING***
 ### 🔖 Deskripsi
 > Tracker pada halaman detail grafik kali ini dipastikan muncul tepat di posisi ketukan, termasuk saat grafik sedang diperbesar. Sebelumnya, begitu grafik di-zoom lalu jari mengetuk titik data, penanda crosshair bisa melesat ke tempat lain yang jauh dari jari. Kali ini juga dilakukan pembenahan pada grafik Suhu: penurunan suhu di bawah 35°C yang selama ini hanya mengubah angka tanpa menggerakkan garis kini benar-benar tergambar. Di sisi lain, ringkasan Sesi Berjalan yang mAh-nya selalu nol kini terhitung benar, dan colok/lepas kabel singkat yang sebelumnya hilang dari riwayat kini direkam sebagai sesi "Tidak Valid" yang dijelaskan lewat ikon ℹ️ tanpa mengotori estimasi kapasitas.
 
 ### ♻️ Perubahan Fitur
+- **Kapasitas desain terisi otomatis dari deteksi perangkat** — Saat kapasitas desain belum pernah diatur, aplikasi kini membaca nilai kapasitas penuh baterai langsung dari kernel (`charge_full_design`/`charge_full`, dengan fallback nilai energi dan muatan saat penuh) dalam miliampere-jam dan mengisikannya sebagai default di kartu Kesehatan, sehingga skor kesehatan baterai langsung bisa dihitung berdasar kapasitas perangkat yang sebenarnya tanpa harus diinput manual; nilai tetap bisa diubah/dikosongkan user dan tidak menimpa yang sudah diatur.
 - **Sesi colok/lepas singkat kini direkam sebagai "Tidak Valid", bukan dibuang** — Saat kabel dicolok/dilepas dalam waktu sangat singkat, sesi singkat itu kini tetap tercatat di Riwayat Sesi (baik pengisian maupun pengosongan) dan ditandai label "Tidak Valid" dengan keterangan via ikon ℹ️ di daftar sesi serta banner di halaman detail. Sesi tidak valid tidak ikut dihitung dalam ringkasan periode, grafik batang, maupun estimasi kapasitas kesehatan; riwayat tetap jujur dan lengkap tanpa mengotori perhitungan.
+
+### 🔧 Optimasi & Penyesuaian
+- **Urutan daftar sesi dibalik: sesi terbaru tampil di paling atas** — Daftar sesi di halaman daftar sesi periode kini menampilkan sesi terbaru terlebih dahulu di atas dan sesi lama di bawah (sebelumnya sesi lama yang tampil di atas), sehingga sesi yang baru terjadi mudah terlihat tanpa harus menggulir ke bawah.
 
 ### 🐞 Bug Fixes
 - **Tracker grafik kini menempel tepat di posisi ketukan saat grafik di-zoom** — Saat grafik detail diperbesar dan jari mengetuk/menelusuri grafik untuk memilih titik data, penanda crosshair sempat muncul di posisi yang salah (bisa jauh dari jari) karena pergeseran jendela tampil saat zoom ikut dihitung dua kali; kini penanda selalu memilih titik data yang tepat di posisi yang diketuk, baik saat grafik baru di-zoom maupun setelah grafik digeser (pan).

@@ -173,4 +173,73 @@ public final class BatteryReading {
         } catch (Exception ignored) {}
         return 0;
     }
+
+    /**
+     * Deteksi kapasitas desain penuh baterai langsung dari kernel (sysfs).
+     * Mengembalikan nilai dalam mAh, atau 0 bila tidak tersedia di perangkat.
+     *
+     * Urutan sumber:
+     * 1. {@code charge_full_design} — kapasitas nominal pabrik (paling akurat).
+     * 2. {@code charge_full} — kapasitas penuh saat ini (sedikit lebih rendah bila terdegradasi).
+     * 3. {@code energy_full_design} / {@code energy_full} — dikonversi dari µWh ÷ voltase.
+     * 4. Fallback refleksi {@code CHARGE_COUNTER} saat status Penuh.
+     */
+    public static int readFullChargeDesignMah(Context ctx) {
+        try {
+            int v = readSysfsValue("charge_full_design");
+            if (v <= 0) v = readSysfsValue("charge_full");
+            if (v <= 0) {
+                int energy = readSysfsValue("energy_full_design");
+                if (energy <= 0) energy = readSysfsValue("energy_full");
+                if (energy > 0) {
+                    float voltMv = readSysfsVoltage();
+                    if (voltMv > 0f) v = Math.round(energy / voltMv);
+                }
+            }
+            if (v <= 0 && ctx != null) {
+                try {
+                    BatteryManager bm =
+                            (BatteryManager) ctx.getSystemService(Context.BATTERY_SERVICE);
+                    if (bm != null) {
+                        Intent i = ctx.registerReceiver(null, BATTERY_FILTER);
+                        int status = i != null
+                                ? i.getIntExtra(BatteryManager.EXTRA_STATUS, 0) : 0;
+                        if (status == BatteryManager.BATTERY_STATUS_FULL) {
+                            long c = bm.getLongProperty(
+                                    BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER);
+                            if (c > 0) v = (int) (c / 1000L);
+                        }
+                    }
+                } catch (Exception ignored) {}
+            }
+            return v;
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
+
+    private static int readSysfsValue(String file) {
+        try {
+            java.io.File dir = new java.io.File("/sys/class/power_supply");
+            java.io.File[] entries = dir.listFiles();
+            if (entries == null) return 0;
+            for (java.io.File entry : entries) {
+                java.io.File f = new java.io.File(entry, file);
+                if (!f.exists()) continue;
+                java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f));
+                String line = r.readLine();
+                r.close();
+                if (line != null) {
+                    int val = Integer.parseInt(line.trim());
+                    if (val > 0) return val;
+                }
+            }
+        } catch (Exception ignored) {}
+        return 0;
+    }
+
+    private static float readSysfsVoltage() {
+        int mv = readSysfsValue("voltage_now");
+        return mv > 0 ? mv / 1000f : 0f;
+    }
 }
