@@ -1,0 +1,32 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'exp.ftxt.core'
+    compileSdk 35
+
+    defaultConfig {
+        minSdk 26
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation project(':features:clock')
+    implementation project(':features:fps')
+    implementation project(':features:network')
+    implementation project(':features:floating-text')
+    implementation project(':features:memory')
+    implementation project(':features:crosshair')
+    implementation project(':features:battery')
+
+    implementation project(':shared:config')
+    implementation project(':shared:ui')
+
+    implementation 'androidx.core:core:1.15.0'
+}

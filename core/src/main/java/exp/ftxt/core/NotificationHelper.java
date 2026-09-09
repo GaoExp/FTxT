@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import exp.ftxt.R;
+import exp.ftxt.core.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;

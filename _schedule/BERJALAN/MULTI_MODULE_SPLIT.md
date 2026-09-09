@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1–5 selesai; Fase 6 (`:core:service`) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–6 selesai; Fase 7 (app cleanup) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -322,13 +322,15 @@ Urutan: **clock → fps → network → floating-text → memory → crosshair �
 
 **Risiko per fase:** Rendah–Sedang. Paket Java tidak berubah → sebagian besar tanpa edit import; `:app` cukup ditambah dependensi.
 
-### Fase 6: `:core:service`
+### Fase 6: `:core:service` — ✅ SELESAI
 
-- [ ] Buat `core/build.gradle` (namespace `exp.ftxt.core`, depend semua `:feature:*` + `:shared:ui`).
-- [ ] `include ':core'`; `:app` menambahkan dependensi.
-- [ ] Pindah 7 file core ke `core/src/main/java/exp/ftxt/core/`.
-- [ ] Pindah resource: `notification_custom.xml` + 5 drawable notifikasi.
-- [ ] Update import `exp.ftxt.R` → `exp.ftxt.core.R` di `NotificationHelper`; hapus import R tak terpakai di `FloatingService`. Build verifikasi.
+- [x] Buat `core/build.gradle` (namespace `exp.ftxt.core`, depend semua `:feature:*` + `:shared:config` + `:shared:ui` + `androidx.core:core:1.15.0` untuk `NotificationCompat`).
+- [x] `include ':core'` di `settings.gradle`; `:app` menambahkan dependensi.
+- [x] Pindah 7 file core (`FloatingService`, `NotificationHelper`, `BootReceiver`, `NotificationActionReceiver`, `WakeLockManager`, `CrashLogger`, `AnrWatcher`) via `git mv` ke `core/src/main/java/exp/ftxt/core/`. Folder `core/` di app kini kosong.
+- [x] Pindah resource: `notification_custom.xml` + 5 drawable (`ic_notification_invisible`, `ic_notification_open`, `ic_notification_toggle`, `ic_notification_visible`, `ic_close`).
+- [x] Update import `exp.ftxt.R` → `exp.ftxt.core.R` di `NotificationHelper`; hapus import R tak terpakai di `FloatingService`. Build verifikasi — `assembleDebug` sukses (`core-debug.aar` + APK terbaru).
+
+**Catatan dependensi:** `:core` men-deklarasikan `shared:config` + `shared:ui` secara eksplisit (selain lewat `:feature:*`) karena API publik class feature memakai tipe `BackgroundConfig`/`ShadowConfig`/`OverlayModule` dari shared — pola yang sama dengan "dependensi bocor" di Fase 5.
 
 **Risiko:** Tinggi. `FloatingService` depend ke semua feature — verifikasi semua referensi `features.*` tersedia di classpath.
 
@@ -395,7 +397,7 @@ Resource Pack System belum dibangun di kode (hanya dokumen `_schedule/PRIORITAS/
 | Fase 3: `:shared:color` | 30–60 mnt | 6 file + resource |
 | Fase 4: `:shared:preset` | 30–60 mnt | 4 file + resource + warna/style |
 | Fase 5: 7 feature modules | 3–5 jam | repetitive; battery paling besar (12 file) → selesai; 1 fix build (`api` di `:shared:ui`) |
-| Fase 6: `:core:service` | 45–60 mnt | paling tricky |
+| Fase 6: `:core:service` | 45–60 mnt | paling tricky → selesai; 0 error di build pertama |
 | Fase 7: app cleanup | 30–45 mnt | hapus sisa + resource mati |
 | Fase 8: optimasi | 30 mnt | common config + incremental check |
 | Fase 9: testing | 1–2 jam | menyeluruh |

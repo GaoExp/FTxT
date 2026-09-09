@@ -102,6 +102,7 @@ dependencies {
     implementation project(':shared:ui')
     implementation project(':shared:color')
     implementation project(':shared:preset')
+    implementation project(':core')
     implementation project(':features:clock')
     implementation project(':features:fps')
     implementation project(':features:network')

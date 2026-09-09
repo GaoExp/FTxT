@@ -1,4 +1,5 @@
 include ':app'
+include ':core'
 include ':shared:config'
 include ':shared:ui'
 include ':shared:color'

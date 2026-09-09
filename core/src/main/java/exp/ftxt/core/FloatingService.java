@@ -13,7 +13,6 @@ import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import exp.ftxt.R;
 import exp.ftxt.features.battery_bar.BatteryBarConfig;
 import exp.ftxt.features.battery_bar.BatteryBarModule;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
