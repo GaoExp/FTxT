@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1–6 selesai; Fase 7 (app cleanup) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–7 selesai; Fase 8 (optimasi build) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -334,12 +334,14 @@ Urutan: **clock → fps → network → floating-text → memory → crosshair �
 
 **Risiko:** Tinggi. `FloatingService` depend ke semua feature — verifikasi semua referensi `features.*` tersedia di classpath.
 
-### Fase 7: `:app` Cleanup
+### Fase 7: `:app` Cleanup — ✅ SELESAI
 
-- [ ] Pastikan `MainActivity`, `SettingsActivity`, `DocumentationActivity`, `PanelManager`, seluruh `ui/`, `utils/PermissionHelper`, `PresetExampleActivity`, `BatteryRingView` (+ view ekspor) berada di app.
-- [ ] Hapus file Java yang sudah kosong di `app/src/main/java/exp/ftxt/shared/` & `features/` (yang tidak dipindahkan).
-- [ ] Hapus resource mati yang tidak ikut pindah (`ic_notification_stop.xml`, `ic_notification_toggle_off.xml`, `preset_list_item.xml`) dan resource dialog yang sudah pindah.
-- [ ] Update `settings.gradle` final + cek semua dependensi. Build + test menyeluruh.
+- [x] Divverifikasi `MainActivity`, `SettingsActivity`, `DocumentationActivity`, `PresetExampleActivity`, `PanelManager`, seluruh `ui/` (35 file, termasuk `BatteryRingView` + view ekspor), 10 fragment di `ui/fragment/`, dan `utils/PermissionHelper` berada di app.
+- [x] Hapus folder kosong `app/src/main/java/exp/ftxt/shared/` (color/preset/ui) & `features/` — seluruh isinya sudah dipindah pada Fase 2–6.
+- [x] Hapus resource mati: `ic_notification_stop.xml`, `ic_notification_toggle_off.xml`, `preset_list_item.xml` (terverifikasi tidak dirujuk kode/layout mana pun; tak ada duplikat resource dialog yang sudah pindah).
+- [x] `settings.gradle` final: `:app`, `:core`, 4 `:shared:*`, 7 `:features:*` (13 module). Build verifikasi — `assembleDebug` sukses (APK `FTxT-v4.92.1-Beta.apk` terbaru).
+
+**Risiko:** Rendah. Tidak ada perubahan kode, hanya penghapusan sisa & resource mati.
 
 ### Fase 8: Optimasi Build
 
@@ -398,7 +400,7 @@ Resource Pack System belum dibangun di kode (hanya dokumen `_schedule/PRIORITAS/
 | Fase 4: `:shared:preset` | 30–60 mnt | 4 file + resource + warna/style |
 | Fase 5: 7 feature modules | 3–5 jam | repetitive; battery paling besar (12 file) → selesai; 1 fix build (`api` di `:shared:ui`) |
 | Fase 6: `:core:service` | 45–60 mnt | paling tricky → selesai; 0 error di build pertama |
-| Fase 7: app cleanup | 30–45 mnt | hapus sisa + resource mati |
+| Fase 7: app cleanup | 30–45 mnt | hapus sisa + resource mati → selesai; 0 error di build |
 | Fase 8: optimasi | 30 mnt | common config + incremental check |
 | Fase 9: testing | 1–2 jam | menyeluruh |
 | **Total** | **8–13 jam** | gampar: ±sepuluh jam |
