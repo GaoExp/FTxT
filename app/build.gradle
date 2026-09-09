@@ -101,6 +101,7 @@ dependencies {
     implementation project(':shared:config')
     implementation project(':shared:ui')
     implementation project(':shared:color')
+    implementation project(':shared:preset')
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'

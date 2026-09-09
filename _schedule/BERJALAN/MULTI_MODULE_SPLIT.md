@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1–3 selesai; Fase 4 (`:shared:preset`) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–4 selesai; Fase 5 (feature modules) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -137,7 +137,7 @@ Resource: tidak ada. Status: selesai (Fase 1).
 
 ### 4.4 `:shared:preset` — Sistem Preset
 
-**Dependency:** `:shared:config`
+**Dependency:** `:shared:config` + `androidx.appcompat:appcompat` + `androidx.recyclerview:recyclerview` + `com.google.android.material:material` + `com.google.code.gson:gson` (`PresetManager` memakai Gson; `PresetBrowserDialog` pakai AlertDialog/RecyclerView/TextInputEditText).
 
 | File | Keterangan |
 |------|-----------|
@@ -152,7 +152,7 @@ Resource: tidak ada. Status: selesai (Fase 1).
 - Layout: `dialog_preset_browser.xml`, `preset_browser_item.xml`
 - Drawable: `ic_star_filled.xml`, `ic_star_outline.xml`, `vertical_divider.xml`
 
-**Catatan build:** `dialog_preset_browser.xml` merefer `@color/colorAccent` → tambahkan definisi `colorAccent` di module (atau ubah ke `?attr/colorAccent`) + dependensi `com.google.android.material:material` (`Widget.MaterialComponents.*`). Namespace: `exp.ftxt.shared.preset`.
+**Catatan build:** `dialog_preset_browser.xml` merefer `@color/colorAccent` → dituntaskan dengan **definisi lokal** `colorAccent` (nilai app `#D81B60`) di `values/colors.xml` module + dependensi `com.google.android.material:material` (`Widget.MaterialComponents.*`). Namespace: `exp.ftxt.shared.preset`.
 
 ### 4.5 Feature Modules (semua `:feature:*`)
 
@@ -298,13 +298,13 @@ Tidak ada pekerjaan. Hanya verifikasi build/config.
 
 **Risiko:** Rendah.
 
-### Fase 4: `:shared:preset`
+### Fase 4: `:shared:preset` — ✅ SELESAI
 
-- [ ] Buat `shared/preset/build.gradle` (namespace `exp.ftxt.shared.preset`, depend `:shared:config` + material).
-- [ ] `include ':shared:preset'`; tambah dependensi dari `:app`.
-- [ ] Pindah 4 file (OverlayPreset, PresetManager, PresetHandler, PresetBrowserDialog) ke `shared/preset/src/main/java/exp/ftxt/shared/preset/`.
-- [ ] Pindah resource: `dialog_preset_browser.xml`, `preset_browser_item.xml`, `ic_star_filled.xml`, `ic_star_outline.xml`, `vertical_divider.xml`.
-- [ ] Update import `exp.ftxt.R` → `exp.ftxt.shared.preset.R`; selesaikan referensi `@color/colorAccent` (definisi lokal atau `?attr/colorAccent`). Build verifikasi.
+- [x] Buat `shared/preset/build.gradle` (namespace `exp.ftxt.shared.preset`, depend `:shared:config` + appcompat + recyclerview + material + gson).
+- [x] `include ':shared:preset'`; tambah dependensi dari `:app`.
+- [x] Pindah 4 file (OverlayPreset, PresetManager, PresetHandler, PresetBrowserDialog) ke `shared/preset/src/main/java/exp/ftxt/shared/preset/`.
+- [x] Pindah resource: `dialog_preset_browser.xml`, `preset_browser_item.xml`, `ic_star_filled.xml`, `ic_star_outline.xml`, `vertical_divider.xml`.
+- [x] Update import `exp.ftxt.R` → `exp.ftxt.shared.preset.R`; referensi `@color/colorAccent` dituntaskan definisi lokal (`#D81B60`) di `values/colors.xml`. Build verifikasi — `assembleDebug` sukses (`preset-debug.aar` + apk terbaru).
 
 **Risiko:** Sedang. Layout merefer warna & style dari app.
 

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import exp.ftxt.R;
+import exp.ftxt.shared.preset.R;
 
 public class PresetBrowserDialog extends DialogFragment {
 
