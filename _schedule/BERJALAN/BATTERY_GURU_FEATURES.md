@@ -286,9 +286,9 @@ Sistem     ███████████████████████
 
 ## 6. Status
 
-- [?] Riwayat sesi pengisian
-- [ ] Suhu min/max/avg per sesi
-- [?] Estimasi waktu pengisian & pengosongan
-- [?] Activity Timeline Bar
-- [ ] Battery Usage by App
-- [ ] Backup & Restore Database
+- [x] Riwayat sesi pengisian — selesai (v4.89.0: daftar sesi, ringkasan periode, detail sesi)
+- [x] Suhu min/max/avg per sesi — selesai (tersimpan di DB `sessions`/`discharge_sessions`, tampil di detail sesi)
+- [x] Estimasi waktu pengisian & pengosongan — selesai (v4.89.0, panel & halaman Sesi Berjalan)
+- [x] Activity Timeline Bar — selesai (v4.89.0, `ActivityBarView` di halaman detail grafik)
+- [ ] Battery Usage by App — **BELUM; diminta user untuk dikerjakan nanti** (dulu dikecualikan karena FTxT merekam data agregat perangkat via sysfs/broadcast, tidak punya data per aplikasi. Untuk diimplementasikan dengan benar perlu API sistem `BatteryUsageStats`/`BatteryStatsManager` + izin `PACKAGE_USAGE_STATS`/`BATTERY_STATS`. Lihat §3.5.)
+- [ ] Backup & Restore Database — belum dikerjakan (yang ada baru "Ekstrak Database" di Fitur Developer, v4.89.0)
