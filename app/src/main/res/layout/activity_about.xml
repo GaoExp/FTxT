@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#2196F3"
+        android:title="Tentang Aplikasi"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="always"
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <!-- Header -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="20dp">
+
+                <FrameLayout
+                    android:background="#37474F"
+                    android:padding="8dp"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp">
+
+                    <ImageView
+                        android:id="@+id/aboutAppIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Ikon aplikasi FTxT"/>
+
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/aboutAppName"
+                    android:text="FunText (FTxT)"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#2196F3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/aboutAppVersionLabel"
+                    android:text="v4.93.0 Beta"
+                    android:textSize="14sp"
+                    android:textColor="@color/about_card_text_secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+
+            <!-- Kartu Info Aplikasi -->
+            <TextView
+                android:text="Info Aplikasi"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/about_card_bg"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:text="Status rilis"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/aboutReleaseStatus"
+                        android:text="Beta"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:text="Versi terpasang"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/aboutVersionName"
+                        android:text="4.93.0"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Version code"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/aboutVersionCode"
+                        android:text="279"
+                        android:textStyle="bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Section Pembaruan -->
+            <TextView
+                android:text="Pembaruan"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/about_card_bg"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:text="Periksa otomatis"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <Switch
+                        android:id="@+id/updateAutoSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/updateIntervalRow"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingVertical="4dp">
+
+                    <TextView
+                        android:text="Frekuensi otomatis"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/updateIntervalValue"
+                        android:text="1 hari"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:background="#555555"
+                        android:textColor="#FFFFFF"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:minWidth="120dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/updateCheckNowBtn"
+                    android:text="Periksa Pembaruan Sekarang"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2196F3"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/updateStatusText"
+                    android:textSize="14sp"
+                    android:textColor="@color/about_card_text_secondary"
+                    android:paddingTop="8dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/updateReleasesBtn"
+                    android:text="Kunjungi Release"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2196F3"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"/>
+
+            </LinearLayout>
+
+            <!-- Section Tentang Pengembang + Tautan -->
+            <TextView
+                android:text="Tentang Pengembang"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/about_card_bg"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:text="Dikembangkan oleh GaoZhan. Sebagian besar pengembangan dibantu AI, sementara pengembang menangani pengujian, penyesuaian implementasi, revisi, dan debugging."
+                    android:textSize="13sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"/>
+
+                <TextView
+                    android:id="@+id/aboutReadmeBtn"
+                    android:text="Baca README"
+                    android:textSize="14sp"
+                    android:textColor="#2196F3"
+                    android:paddingVertical="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:id="@+id/aboutPanduanBtn"
+                    android:text="Baca PANDUAN"
+                    android:textSize="14sp"
+                    android:textColor="#2196F3"
+                    android:paddingVertical="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:id="@+id/aboutChangelogBtn"
+                    android:text="Lihat Riwayat Perubahan (CHANGELOG)"
+                    android:textSize="14sp"
+                    android:textColor="#2196F3"
+                    android:paddingVertical="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:id="@+id/aboutGithubBtn"
+                    android:text="Kunjungi GitHub"
+                    android:textSize="14sp"
+                    android:textColor="#2196F3"
+                    android:paddingVertical="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+                <TextView
+                    android:text="Belum ada lisensi resmi — boleh dipakai, dimodifikasi, di-fork."
+                    android:textSize="11sp"
+                    android:textColor="@color/about_card_text_secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:text="Laporan bug, issue, atau permintaan fitur — silakan buat issue atau hubungi pengembang."
+                    android:textSize="13sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
+
+                <TextView
+                    android:id="@+id/aboutIssueBtn"
+                    android:text="Buat Issue di GitHub"
+                    android:textSize="14sp"
+                    android:textColor="#2196F3"
+                    android:paddingVertical="8dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
+            </LinearLayout>
+
+            <!-- Footer -->
+            <TextView
+                android:text="Dibuat dengan eksperimen, suasana hati, dan secangkir kopi ☕"
+                android:textSize="12sp"
+                android:textColor="@color/about_card_text_secondary"
+                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

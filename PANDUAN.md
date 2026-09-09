@@ -10,6 +10,7 @@
 - [Toolbar](#toolbar)
 - [Fitur Overlay](#fitur-overlay)
 - [Pengaturan](#pengaturan)
+- [Tentang Aplikasi](#tentang-aplikasi)
 - [Izin](#izin)
 
 ---
@@ -219,6 +220,31 @@ Metadata: tags, favorite, timestamp, thumbnail warna. Version history hingga 10 
 - **Dokumentasi** — Baca dokumentasi in-app (README, CHANGELOG, PANDUAN) dengan render Markdown penuh via Markwon
 - **Crash Logger** — Saat force close, stack trace otomatis ditulis ke `FTxT_crash_*.txt` di Documents/FTxT/Log_Crash (plus cadangan prefs) agar bug mudah dilaporkan tanpa logcat/adb
 - **Log ANR** — Saat main thread macet ≥5 detik (ANR), trace seluruh thread otomatis ditulis ke `FTxT_anr_*.txt` di Documents/FTxT/Log_ANR (plus cadangan prefs) agar peristiwa ANR bisa dilaporkan tanpa logcat/adb
+
+---
+
+## Tentang Aplikasi
+
+Halaman **Tentang Aplikasi** bisa dibuka lewat dua pintu yang menuju halaman sama:
+- Ketuk ikon gear (⚙️) di toolbar → pilih **"Tentang Aplikasi"** (tepat di bawah *Dokumentasi*)
+- Ketuk header navigation drawer **"FunText vX Beta"** (sebelumnya hanya tulisan, kini bisa diketuk)
+
+Isi halaman:
+- **Identitas aplikasi** — ikon launcher, nama FunText (FTxT), dan label versi beta
+- **Info Aplikasi** — status rilis (Beta), versi terpasang, dan version code, dibaca langsung dari sistem (bukan hardcode)
+- **Pembaruan**:
+  - Toggle **Periksa otomatis** (default nonaktif) — saat aktif, aplikasi mengecek pembaruan saat dibuka
+  - **Frekuensi otomatis** — pilihan popup: setiap buka aplikasi, 12 jam, 1 hari (default), 3 hari, atau 7 hari; tersimpan otomatis
+  - Tombol **Periksa Pembaruan Sekarang** — mengecek rilis terbaru FTxT di GitHub (releases/latest) di thread latar, tanpa membekukan antarmuka
+  - Baris **status hasil**: "Pembaruan tersedia: FTxT vX Beta" (berwarna aksen dan bisa diketuk untuk membuka dialog lagi), "Sudah menggunakan versi terbaru", atau "Gagal memeriksa (periksa koneksi)" saat offline
+  - Tombol **Kunjungi Release** (di bawah baris status) — membuka daftar rilis GitHub untuk melihat/memeriksa rilis yang sudah tersedia
+- **Tentang Pengembang & Dukungan** — profil GaoZhan (klarifikasi santai: pengembangan dibantu AI, debugging diedit manual), tautan **Baca README**, **Baca PANDUAN**, **Lihat Riwayat Perubahan (CHANGELOG)** (langsung membuka dokumen di halaman Dokumentasi), **Kunjungi GitHub**, catatan lisensi, ajakan lapor bug/issue + tombol **Buat Issue di GitHub**
+- **Footer** — kalimat penutup ("Dibuat dengan eksperimen, suasana hati, dan secangkir kopi ☕")
+
+Saat terdeteksi versi baru, dialog **"Pembaruan tersedia"** menampilkan tiga pilihan:
+- **Lihat Informasi** (dengan sub-teks "Buka halaman rilis") — membuka halaman rilis di browser
+- **Unduh** — mengunduh APK rilis dengan dialog progress persen, lalu membuka prompt instalasi Android bawaan (sistem akan meminta izin "install unknown apps" bila belum ada)
+- **Nanti Saja** — menutup dialog; dialog versi itu tidak akan muncul otomatis lagi, tapi status tetap terlihat di halaman Tentang Aplikasi sampai pengguna memperbarui atau ada versi yang lebih baru lagi
 
 ---
 

@@ -1,3 +1,15 @@
+# [4.93.0] 2026/09/10 02:03 WITA 282 ***ONGOING***
+### 🔖 Deskripsi
+> Menambahkan halaman "Tentang Aplikasi" beserta sistem pembaruan aplikasi.
+
+### ✨ Fitur Baru
+- **Halaman "Tentang Aplikasi" — Halaman fullscreen baru yang dapat diakses dari popup ikon gear dan header sidebar. Menampilkan identitas aplikasi, status Beta, "versionName", dan "versionCode", serta section pengembang, tautan, dan lisensi.
+- **Cek pembaruan GitHub Releases — Pemeriksaan manual melalui tombol "Periksa Pembaruan Sekarang" dengan status pembaruan dan tombol "Kunjungi Release". Versi dibandingkan berdasarkan semver "major.minor.patch".
+- **Pemeriksaan otomatis — Toggle "Periksa otomatis" (default nonaktif) dengan pilihan jadwal: setiap buka aplikasi, 12 jam, 1 hari (default), 3 hari, atau 7 hari. Pemeriksaan dilakukan di latar belakang dan dialog pembaruan muncul jika tersedia versi baru.
+- **Dialog pembaruan — Menyediakan "Lihat Informasi", "Unduh", dan "Nanti Saja". Unduhan menggunakan APK universal dari GitHub Releases, menampilkan progress, lalu membuka prompt instalasi Android bawaan.
+
+---
+
 # [4.92.1] 2026/09/09 05:59 WITA 278 ***RELEASE***
 ### 🔖 Deskripsi
 > Rilis ini fokus pada akurasi data dan kenyamanan pemantauan baterai di tab Monitor, disertai beberapa penyesuaian perilaku dan pengaturan yang lebih praktis. Rincian tiap perubahan tersedia di masing-masing section di bawah.
@@ -19,28 +31,28 @@
 
 # [4.92.0] 2026/09/07 18:11 WITA 269 ***RELEASE***
 ### 🔖 Deskripsi
-> Pemilih ikon launcher pada halaman Konfigurasi kini dilindungi Fitur Developer: saat fitur terkunci, pemilihan ikon ikut terkunci dan hanya bisa dibuka setelah Fitur Developer dibuka lewat password. Di sisi lain, estimasi kapasitas pengosongan pada Kesehatan Baterai yang sebelumnya tidak pernah menghasilkan nilai kini berfungsi normal.
+> Mengunci pemilih ikon launcher dengan Fitur Developer serta memperbaiki estimasi kapasitas pengosongan pada Kesehatan Baterai.
 
 ### ♻️ Perubahan Fitur
-- **Pemilih ikon launcher ikut terkunci Fitur Developer** — Baris pemilih ikon di halaman Konfigurasi kini hanya bisa dibuka saat Fitur Developer terbuka; saat fitur terkunci, baris ikon ikut di-disable sehingga pilihan ikon launcher hanya bisa diganti oleh pengguna yang membuka Fitur Developer.
+- **Pemilih ikon launcher ikut terkunci Fitur Developer — Baris pemilih ikon di halaman Konfigurasi kini hanya dapat dibuka saat Fitur Developer terbuka. Saat terkunci, pemilih ikon ikut di-disable.
 
 ### 🐞 Bug Fixes
-- **Estimasi kapasitas pengosongan di Kesehatan Baterai kini menghasilkan nilai** — Nilai "Kapasitas Pengosongan" yang selama ini selalu tampil "—" padahal data tercatat berhari-hari kini terhitung: integral arus pengosongan (yang bernilai negatif saat baterai dipakai) dihitung memakai nilai mutlak sehingga sesi pengosongan tersimpan dengan mAh terpakai yang benar, dan rekonstruksi sesi dari riwayat database diperluas ke interval hingga 1 menit sehingga data yang sudah tercatat ikut diperhitungkan tanpa perlu menunggu sesi baru.
+- **Estimasi kapasitas pengosongan kini menghasilkan nilai — Nilai "Kapasitas Pengosongan" yang sebelumnya selalu tampil "—" kini dapat dihitung dari integral arus pengosongan menggunakan nilai mutlak. Rekonstruksi sesi dari riwayat database juga diperluas hingga interval 1 menit agar data yang sudah tercatat ikut diperhitungkan.
 
 ---
 
 # [4.91.0] 2026/09/06 08:36 WITA 265 ***RELEASE***
 ### 🔖 Deskripsi
-> Notifikasi overlay kini jauh lebih ringan bagi panel notifikasi: mode kustom bisa dimatikan (judul disembunyikan, hanya tombol aksi yang tersisa) dan interval perbarui judul bisa diatur 1/3/5/10 detik. Di sisi lain, deteksi ANR tidak lagi menghasilkan log palsu saat aplikasi tidak berada di latar depan, dan tab Monitor lebih ringan karena query grafik dibatasi intervalnya.
+> Menambahkan pengaturan Notifikasi Kustom dan mengoptimalkan Monitor, serta memperbaiki deteksi ANR palsu.
 
 ### ✨ Fitur Baru
-- **Notifikasi kustom bisa dimatikan & interval judul bisa diatur** — Halaman Konfigurasi kini menampung pengaturan ini di section "Notifikasi Kustom" tersendiri yang berada tepat di atas section Status Bar, berisi saklar "Notifikasi Kustom". Saat aktif (default), judul notifikasi menampilkan info baterai lengkap secara real-time; saat nonaktif, judul disembunyikan sehingga hanya tombol aksi (toggle/kill/open) yang tampil, sementara ikon status bar tetap dinamis mengikuti mode pilihan dan pembaruan notifikasi hanya dikirim saat isinya benar-benar berubah — bukan tiap hitungan detik. Interval perbarui judul dipilih lewat radio button 1/3/5/10 detik (default 3 detik); perubahan langsung diterapkan tanpa restart aplikasi.
+- **Notifikasi kustom bisa dimatikan & interval judul bisa diatur — Menambahkan section "Notifikasi Kustom" pada halaman Konfigurasi. Saklar dapat mematikan judul notifikasi sehingga hanya tombol aksi yang tampil. Interval pembaruan judul tersedia pada 1/3/5/10 detik (default 3 detik) dan perubahan langsung diterapkan tanpa restart.
 
 ### 🔧 Optimasi & Penyesuaian
-- **Grafik tab Monitor tidak lagi di-query tiap detik** — Query database untuk grafik riwayat dan riwayat sesi di tab Monitor dibatasi setiap 5 detik (sebelumnya tiap detik); info ringan lain (persen, suhu, arus, ring) tetap diperbarui setiap detik. Warna gradien garis grafik Suhu yang sebelumnya di-cache ulang tiap chart kini di-cache sekali per proses dan dipakai bersama semua chart sehingga muat chart lebih ringan.
+- **Query grafik tab Monitor dibatasi — Query database untuk grafik riwayat dan riwayat sesi dibatasi setiap 5 detik, sementara informasi ringan tetap diperbarui setiap detik. Cache warna gradien grafik Suhu juga digunakan bersama semua chart.
 
 ### 🐞 Bug Fixes
-- **Log ANR palsu tidak lagi membanjiri Documents/FTxT/Log_ANR** — AnrWatcher kini hanya mendeteksi saat aplikasi berada di latar depan dan mengabaikan selang detak di atas 60 detik (artefak seperti device sleep / main thread ditahan debugger), sehingga 17 dari 18 log ANR yang ternyata bukan ANR sungguhan tidak akan terulang.
+- **Log ANR palsu tidak lagi membanjiri Documents/FTxT/Log_ANR — AnrWatcher kini hanya mendeteksi saat aplikasi berada di latar depan dan mengabaikan selang detak di atas 60 detik untuk mencegah artefak seperti device sleep atau debugger dianggap sebagai ANR.
 
 ---
 
@@ -157,3 +169,5 @@
 
 ### 💡 Memo
 > Seluruh entry log lama telah dipindahkan ke old-changelod
+
+---

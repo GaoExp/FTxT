@@ -20,6 +20,9 @@ import io.noties.markwon.ext.tasklist.TaskListPlugin;
 
 public class DocumentationActivity extends AppCompatActivity {
 
+    /** Extra intent untuk membuka dokumen tertentu langsung (mis. "README", "PANDUAN", "CHANGELOG"). */
+    public static final String EXTRA_DOC = "extra_doc";
+
     private Markwon markwon;
     private LinearLayout docList;
     private LinearLayout docContent;
@@ -80,6 +83,11 @@ public class DocumentationActivity extends AppCompatActivity {
         findViewById(R.id.docOldChangelogButton).setOnClickListener(v -> showDoc("old-CHANGELOG"));
         findViewById(R.id.docPanduanButton).setOnClickListener(v -> showDoc("PANDUAN"));
         findViewById(R.id.docStrukturButton).setOnClickListener(v -> showDoc("STRUKTUR"));
+
+        String extraDoc = getIntent().getStringExtra(EXTRA_DOC);
+        if (extraDoc != null && !extraDoc.isEmpty()) {
+            showDoc(extraDoc);
+        }
     }
 
     private void showDoc(String name) {

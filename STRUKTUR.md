@@ -160,7 +160,8 @@ FTxT/
     │   ├── java/exp/ftxt/
     │   │   ├── MainActivity.java         — Activity utama: toolbar, nav drawer, panel system, theme toggle
     │   │   ├── SettingsActivity.java     — Manajemen izin: overlay, notifikasi, baterai
-    │   │   ├── DocumentationActivity.java— Baca dokumentasi in-app dari assets (.md) via Markwon
+    │   │   ├── DocumentationActivity.java— Baca dokumentasi in-app dari assets (.md) via Markwon (dukung ekstra dokumen langsung)
+    │   │   ├── AboutActivity.java        — Halaman "Tentang Aplikasi" fullscreen: info versi, cek pembaruan, pengembang & tautan
     │   │   ├── PresetExampleActivity.java— Contoh integrasi sistem preset (referensi dev)
     │   │   │
     │   │   ├── ui/
@@ -212,7 +213,9 @@ FTxT/
     │   │   │   │   └── DebugingPanelFragment.java          — Fragment panel Debugging (preview ikon rotasi)
     │   │   │
     │   │   └── utils/
-    │   │       └── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
+    │   │       ├── PermissionHelper.java    — Helper izin: overlay, notifikasi, optimasi baterai
+    │   │       ├── UpdateChecker.java       — Util cek pembaruan: fetch GitHub Releases API, banding versi, simpan prefs, cek otomatis, unduh APK
+    │   │       └── ApkDownloadHelper.java   — Helper alur unduh APK: dialog progress + prompt instalasi via FileProvider
     │   │
     │   └── res/
     │       ├── anim/
@@ -290,9 +293,10 @@ FTxT/
     │       ├── drawable-nodpi/
     │       │   └── crosshair_1..44.png      — 44 PNG gaya bidikan modul Crosshair
     │       ├── layout/
-    │       │   ├── activity_main.xml            — Layout utama dengan DrawerLayout + CoordinatorLayout
-    │       │   ├── activity_settings.xml        — Layout halaman pengaturan izin
-    │       │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
+│   │   ├── activity_main.xml            — Layout utama dengan DrawerLayout + CoordinatorLayout
+    │   │   ├── activity_settings.xml        — Layout halaman pengaturan izin
+    │   │   ├── activity_about.xml           — Layout halaman "Tentang Aplikasi" (info versi, pembaruan, pengembang, footer)
+    │   │   ├── activity_documentation.xml   — Layout halaman dokumentasi in-app
     │       │   ├── activity_battery_chart_detail.xml — Layout halaman detail grafik fullscreen
     │       │   ├── activity_session_list.xml    — Layout halaman daftar sesi periode
     │       │   ├── activity_session_detail.xml  — Layout halaman detail satu sesi
@@ -333,8 +337,10 @@ FTxT/
     │       │   └── ids.xml           — ID tetap `R.id.nav*` untuk drawer
     │       ├── values-night/
     │       │   └── colors.xml        — Warna mode gelap: drawer bg, drawer header
-    │       └── values-v31/
-    │           └── themes.xml        — SplashScreen theme untuk API 31+
+    │       ├── values-v31/
+    │       │   └── themes.xml        — SplashScreen theme untuk API 31+
+    │       └── xml/
+    │           └── file_paths.xml   — Path berbagi file FileProvider (APK pembaruan dari folder file aplikasi / cache)
     │
     ├── src/test/java/
     │   ├── exp/ftxt/ExampleUnitTest.java      — Contoh unit test (JVM)

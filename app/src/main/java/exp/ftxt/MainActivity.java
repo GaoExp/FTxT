@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.net.Uri;
 import android.util.TypedValue;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -53,7 +54,9 @@ import exp.ftxt.features.fps_display.FpsConfig;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.ui.PanelManager;
+import exp.ftxt.utils.ApkDownloadHelper;
 import exp.ftxt.utils.PermissionHelper;
+import exp.ftxt.utils.UpdateChecker;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -123,6 +126,12 @@ public class MainActivity extends AppCompatActivity {
             navTitle.setText("FunText Beta");
         }
 
+        findViewById(R.id.navHeaderLayout).setOnClickListener(v -> {
+            startActivity(new Intent(this, AboutActivity.class));
+            DrawerLayout drawer = findViewById(R.id.drawerLayout);
+            drawer.closeDrawers();
+        });
+
         navItemContainer = findViewById(R.id.navItemContainer);
 
         initSidebar();
@@ -155,6 +164,47 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(panelVisibilityReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         requestAllPermissionsOnFirstLaunch();
+
+        triggerAutoUpdateCheck();
+    }
+
+    private void triggerAutoUpdateCheck() {
+        String latest = getSharedPreferences("ftxt_prefs", MODE_PRIVATE)
+                .getString(UpdateChecker.PREF_LATEST_VERSION, null);
+        boolean alreadyAware = latest != null && !latest.isEmpty();
+        UpdateChecker.autoCheckIfNeeded(this, () -> {
+            if (!alreadyAware) {
+                showAutoUpdateDialog();
+            }
+        });
+    }
+
+    private void showAutoUpdateDialog() {
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        String latest = prefs.getString(UpdateChecker.PREF_LATEST_VERSION, null);
+        String url = prefs.getString(UpdateChecker.PREF_LATEST_URL, UpdateChecker.RELEASES_PAGE);
+        if (latest == null || latest.isEmpty()) return;
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Pembaruan tersedia")
+                .setMessage("FTxT v" + latest + " Beta tersedia untuk diunduh.")
+                .setPositiveButton("Lihat Informasi", (d, w) ->
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                android.net.Uri.parse(url == null ? UpdateChecker.RELEASES_PAGE : url))))
+                .setNegativeButton("Unduh", (d, w) -> startApkDownload())
+                .setNeutralButton("Nanti Saja", null)
+                .show();
+    }
+
+    private void startApkDownload() {
+        SharedPreferences prefs = getSharedPreferences("ftxt_prefs", MODE_PRIVATE);
+        String apkUrl = prefs.getString(UpdateChecker.PREF_LATEST_DOWNLOAD, null);
+        if (apkUrl == null || apkUrl.isEmpty()) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    android.net.Uri.parse(prefs.getString(UpdateChecker.PREF_LATEST_URL,
+                            UpdateChecker.RELEASES_PAGE))));
+            return;
+        }
+        ApkDownloadHelper.downloadAndInstall(this, apkUrl);
     }
 
     private void requestAllPermissionsOnFirstLaunch() {
@@ -335,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
         popup.getMenu().add("Muat Preset");
         popup.getMenu().add("Konfigurasi");
         popup.getMenu().add("Dokumentasi");
+        popup.getMenu().add("Tentang Aplikasi");
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
             if (title.equals("Muat Preset")) {
@@ -345,6 +396,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else if (title.equals("Dokumentasi")) {
                 startActivity(new Intent(this, DocumentationActivity.class));
+            } else if (title.equals("Tentang Aplikasi")) {
+                startActivity(new Intent(this, AboutActivity.class));
             }
             return true;
         });

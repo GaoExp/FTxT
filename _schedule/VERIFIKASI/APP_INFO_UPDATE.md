@@ -51,6 +51,7 @@ Keduanya → halaman baru fullscreen (Activity) yang sama, dengan toolbar + tomb
   - Ada pembaruan → teks menonjol **"Pembaruan tersedia: FTxT v4.93.0 Beta"** — **bisa diketuk** → memunculkan kembali dialog pembaruan (Lihat Informasi / Unduh / Nanti Saja) kapan pun, tidak harus menunggu dialog otomatis.
   - Tidak ada pembaruan / sudah terbaru → teks **"Sudah menggunakan versi terbaru"**.
   - Belum pernah dicek → kondisi awal, hanya tampil tombol periksa.
+- **Tombol "Kunjungi Release"** (di bawah baris status) → membuka daftar rilis GitHub `https://github.com/GaoExp/FTxT/releases` untuk melihat/memeriksa rilis yang sudah tersedia.
 
 ### 4.3b Cek Otomatis Saat Buka Aplikasi
 - Saat `update_check_auto = ON` dan frekuensi sudah lewat sejak `update_last_checked_at` → cek diam-diam di latar saat aplikasi dibuka.
@@ -61,23 +62,22 @@ Keduanya → halaman baru fullscreen (Activity) yang sama, dengan toolbar + tomb
 - Dialog hanya muncul saat hasilnya benar-benar versi baru (bukan saat "Terkini" / gagal).
 - Hasil disimpan ke prefs; status tampil saat halaman About dibuka.
 
-### 4.4 Section Tentang Pengembang + Tautan & Akses
-Pendamping section pembaruan, berisi dua blok dalam satu section:
-- **Tentang pengembang:** Author **GaoZhan** + satu kalimat klarifikasi santai (pengembangan dibantu AI, developer menangani testing/manual/debug sambil ngopi — ala README).
+### 4.4 Section Tentang Pengembang & Dukungan (digabung — hasil revisi user)
+Pendamping section pembaruan, satu kartu berisi:
+- **Tentang pengembang:** Author **GaoZhan** + klarifikasi santai (pengembangan dibantu AI, developer menangani pengujian/penyesuaian/revisi/debugging — **tanpa** "ngopi", cukup profil di sini).
 - **Tautan & akses:**
   - **"Baca README"** (baris terpisah) → buka halaman Dokumentasi pada entri README.
   - **"Baca PANDUAN"** (baris terpisah) → buka halaman Dokumentasi pada entri PANDUAN.
   - **"Kunjungi GitHub"** → buka repo `GaoExp/FTxT`.
   - **"Lihat Riwayat Perubahan (CHANGELOG)"** → buka halaman Dokumentasi pada entri CHANGELOG.
   - Catatan **lisensi**: "Belum ada lisensi resmi — boleh dipakai, dimodifikasi, di-fork".
+- **Dukungan:** ajakan "Laporan bug, issue, atau permintaan fitur — silakan buat issue atau hubungi pengembang." + tombol/baris **"Buat Issue di GitHub"** → buka halaman *Issues* repo `GaoExp/FTxT`.
 
-### 4.5 Section Support
-- Memuat isi section **📧 Support** dari README: "Laporan bug, issue, atau permintaan fitur — silakan buat issue atau hubungi pengembang."
-- Tombol/baris **"Buat Issue di GitHub"** → buka halaman *Issues* repo `GaoExp/FTxT`.
-- Catatan kecil ala README: "Respons tidak dijamin cepat, karena project ini berkembang mengikuti eksperimen, suasana hati, dan secangkir kopi."
+### 4.5 — (digabung ke 4.4; tidak ada lagi section Support terpisah)
+- Catatan "Respons tidak dijamin cepat… secangkir kopi" **tidak dipakai**; penyebutan "kopi" cukup sekali di footer (4.6).
 
 ### 4.6 Section Footer
-- Kalimat kecil: "Dibuat dengan eksperimen, suasana hati, dan secangkir kopi ☕".
+- Kalimat kecil: "Dibuat dengan eksperimen, suasana hati, dan secangkir kopi ☕" — satu-satunya penyebutan "kopi".
 
 ### 4.7 Desain Visual
 - **Gaya:** konsisten dengan tema FTxT — biru aksen `#2196F3` (seperti toolbar) dan kartu abu gelap `#37474F` (seperti preview ikon launcher); menyesuaikan mode gelap/terang.
