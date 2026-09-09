@@ -24,7 +24,7 @@
         android:layout_height="220dp"
         android:layout_marginBottom="8dp">
 
-        <exp.ftxt.features.color_picker.TriangleColorPickerView
+        <exp.ftxt.shared.color.TriangleColorPickerView
             android:id="@+id/cp_colorWheel"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

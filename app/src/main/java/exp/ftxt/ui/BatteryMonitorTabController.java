@@ -28,7 +28,7 @@ import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryMonitor;
 import exp.ftxt.features.battery_stats.BatteryReading;
-import exp.ftxt.features.battery_stats.BatteryRingView;
+import exp.ftxt.ui.BatteryRingView;
 
 public class BatteryMonitorTabController {
 

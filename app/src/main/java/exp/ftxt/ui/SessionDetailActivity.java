@@ -120,7 +120,7 @@ public class SessionDetailActivity extends AppCompatActivity {
                 ? startPct + "% → " + endPct + "%" : pctNone();
         rangeBadge.setText(pct);
 
-        exp.ftxt.features.battery_stats.BatteryRingView ring =
+        exp.ftxt.ui.BatteryRingView ring =
                 findViewById(R.id.sesDetailRing);
         ring.setSessionData(
                 endPct >= 0 ? endPct : 0,

@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryCapacityEstimator;
-import exp.ftxt.shared.ui.InfoTooltip;
+import exp.ftxt.ui.InfoTooltip;
 
 public class BatteryHealthCardController {
 

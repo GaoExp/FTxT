@@ -171,13 +171,13 @@
             android:splitTrack="false"/>
     </FrameLayout>
 
-    <exp.ftxt.shared.ui.BatteryChartView
+    <exp.ftxt.ui.BatteryChartView
         android:id="@+id/chartDetailView"
         android:layout_width="match_parent"
         android:layout_height="220dp"
         android:layout_marginTop="8dp"/>
 
-    <exp.ftxt.shared.ui.ActivityBarView
+    <exp.ftxt.ui.ActivityBarView
         android:id="@+id/chartActivityBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

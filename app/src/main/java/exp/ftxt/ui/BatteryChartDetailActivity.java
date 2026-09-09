@@ -24,8 +24,8 @@ import java.util.concurrent.Executors;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryReading;
-import exp.ftxt.shared.ui.ActivityBarView;
-import exp.ftxt.shared.ui.BatteryChartView;
+import exp.ftxt.ui.ActivityBarView;
+import exp.ftxt.ui.BatteryChartView;
 
 /**
  * Halaman detail satu grafik baterai: chart besar interaktif (crosshair),

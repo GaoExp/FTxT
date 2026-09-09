@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
-import exp.ftxt.shared.ui.InfoTooltip;
+import exp.ftxt.ui.InfoTooltip;
 
 /**
  * Halaman daftar sesi (pengisian/pengosongan) untuk satu batang periode

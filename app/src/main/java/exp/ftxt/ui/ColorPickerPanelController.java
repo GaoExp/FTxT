@@ -29,8 +29,8 @@ import androidx.appcompat.app.AlertDialog;
 
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
-import exp.ftxt.features.color_picker.TriangleColorPickerView;
 import exp.ftxt.shared.color.ColorNameResolver;
+import exp.ftxt.shared.color.TriangleColorPickerView;
 
 public class ColorPickerPanelController {
 

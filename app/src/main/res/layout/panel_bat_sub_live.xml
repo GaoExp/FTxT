@@ -61,7 +61,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp">
 
-                            <exp.ftxt.features.battery_stats.BatteryRingView
+                            <exp.ftxt.ui.BatteryRingView
                                 android:id="@+id/batLiveRing"
                                 android:layout_width="100dp"
                                 android:layout_height="100dp"/>

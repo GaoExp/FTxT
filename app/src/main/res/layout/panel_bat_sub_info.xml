@@ -66,12 +66,12 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content">
 
-                                <exp.ftxt.features.battery_stats.BatteryRingView
+                                <exp.ftxt.ui.BatteryRingView
                                     android:id="@+id/batMonitorRing"
                                     android:layout_width="130dp"
                                     android:layout_height="130dp"/>
 
-                                <exp.ftxt.shared.ui.BatteryChartView
+                                <exp.ftxt.ui.BatteryChartView
                                     android:id="@+id/batChartPercentView"
                                     android:layout_width="0dp"
                                     android:layout_height="130dp"
@@ -325,7 +325,7 @@
 
                                     </LinearLayout>
 
-                                    <exp.ftxt.shared.ui.BatteryChartView
+                                    <exp.ftxt.ui.BatteryChartView
                                         android:id="@+id/batChartTempView"
                                         android:layout_width="match_parent"
                                         android:layout_height="130dp"
@@ -362,7 +362,7 @@
 
                                     </LinearLayout>
 
-                                    <exp.ftxt.shared.ui.BatteryChartView
+                                    <exp.ftxt.ui.BatteryChartView
                                         android:id="@+id/batChartPowerView"
                                         android:layout_width="match_parent"
                                         android:layout_height="130dp"
@@ -406,7 +406,7 @@
 
                                     </LinearLayout>
 
-                                    <exp.ftxt.shared.ui.BatteryChartView
+                                    <exp.ftxt.ui.BatteryChartView
                                         android:id="@+id/batChartVoltageView"
                                         android:layout_width="match_parent"
                                         android:layout_height="130dp"
@@ -443,7 +443,7 @@
 
                                     </LinearLayout>
 
-                                    <exp.ftxt.shared.ui.BatteryChartView
+                                    <exp.ftxt.ui.BatteryChartView
                                         android:id="@+id/batChartCurrentView"
                                         android:layout_width="match_parent"
                                         android:layout_height="130dp"

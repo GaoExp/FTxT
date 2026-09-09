@@ -13,7 +13,7 @@ import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.crosshair.CrosshairConfig;
-import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.color.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;

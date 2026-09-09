@@ -1,4 +1,4 @@
-package exp.ftxt.shared.ui;
+package exp.ftxt.shared.color;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exp.ftxt.R;
-import exp.ftxt.features.color_picker.TriangleColorPickerView;
-import exp.ftxt.shared.color.ColorNameResolver;
 
 public class ColorPickerDialog {
 

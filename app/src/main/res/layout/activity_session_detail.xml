@@ -114,7 +114,7 @@
                     android:gravity="center"
                     android:layout_marginTop="8dp">
 
-                    <exp.ftxt.features.battery_stats.BatteryRingView
+                    <exp.ftxt.ui.BatteryRingView
                         android:id="@+id/sesDetailRing"
                         android:layout_width="100dp"
                         android:layout_height="100dp"/>

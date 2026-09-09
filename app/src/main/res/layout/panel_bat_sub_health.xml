@@ -262,7 +262,7 @@
 
                         </LinearLayout>
 
-                        <exp.ftxt.shared.ui.BatterySessionBarChartView
+                        <exp.ftxt.ui.BatterySessionBarChartView
                             android:id="@+id/batSessionBarChart"
                             android:layout_width="match_parent"
                             android:layout_height="140dp"

@@ -1,4 +1,4 @@
-package exp.ftxt.features.color_picker;
+package exp.ftxt.shared.color;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -10,8 +10,6 @@ import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-import exp.ftxt.shared.color.ColorMath;
 
 public class TriangleColorPickerView extends View {
 

@@ -1,4 +1,4 @@
-package exp.ftxt.features.battery_stats;
+package exp.ftxt.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -49,7 +49,7 @@ import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.memory_stats.MemoryMonitor;
-import exp.ftxt.shared.ui.ColorPickerDialog;
+import exp.ftxt.shared.color.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.shared.ui.SliderLabelEditor;
 import exp.ftxt.utils.PermissionHelper;

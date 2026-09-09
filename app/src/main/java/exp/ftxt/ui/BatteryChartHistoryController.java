@@ -14,7 +14,7 @@ import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryReading;
-import exp.ftxt.shared.ui.BatteryChartView;
+import exp.ftxt.ui.BatteryChartView;
 
 public class BatteryChartHistoryController {
 

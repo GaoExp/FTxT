@@ -18,8 +18,8 @@ import java.util.concurrent.Executors;
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.features.battery_stats.BatteryHistoryDb;
-import exp.ftxt.shared.ui.BatterySessionBarChartView;
-import exp.ftxt.shared.ui.InfoTooltip;
+import exp.ftxt.ui.BatterySessionBarChartView;
+import exp.ftxt.ui.InfoTooltip;
 
 /** Kontrol panel "Riwayat Sesi": grafik batang per hari/bulan + ringkasan + daftar. */
 public class BatterySessionHistoryController {

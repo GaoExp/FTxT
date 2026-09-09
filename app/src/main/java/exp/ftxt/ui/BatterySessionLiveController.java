@@ -42,7 +42,7 @@ public class BatterySessionLiveController {
     private TextView statusText;
     private TextView statusSub;
     private TextView statusDetail;
-    private exp.ftxt.features.battery_stats.BatteryRingView ring;
+    private exp.ftxt.ui.BatteryRingView ring;
     private View estSection;
     private TextView estOn;
     private TextView estOff;

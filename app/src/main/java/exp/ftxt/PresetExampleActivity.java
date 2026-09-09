@@ -1,4 +1,4 @@
-package exp.ftxt.shared.preset;
+package exp.ftxt;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -12,6 +12,8 @@ import androidx.appcompat.app.AlertDialog;
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.shared.config.ShadowConfig;
+import exp.ftxt.shared.preset.OverlayPreset;
+import exp.ftxt.shared.preset.PresetManager;
 
 public class PresetExampleActivity {
 
