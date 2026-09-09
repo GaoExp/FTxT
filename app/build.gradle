@@ -13,13 +13,13 @@ if (keystorePropertiesFile.exists()) {
 android {
 
     namespace = "exp.ftxt"
-    compileSdk 35
+    compileSdk rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "exp.ftxt"
 
-        minSdk 26
-        targetSdk 35
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
 
         versionCode 278
         versionName "4.92.1"

@@ -22,6 +22,33 @@ allprojects {
 
 }
 
+// Versi SDK & Java terpusat — satu sumber kebenaran untuk semua module.
+ext {
+    compileSdk = 35
+    minSdk = 26
+    targetSdk = 35
+    javaVersion = JavaVersion.VERSION_17
+}
+
+// Module library (shared/*, features/*, core) memakai config umum otomatis.
+// Module app memakai ext secara eksplisit (membaca rootProject.ext.di build.gradle-nya).
+subprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('com.android.library')) {
+            android {
+                compileSdk rootProject.ext.compileSdk
+                defaultConfig {
+                    minSdk rootProject.ext.minSdk
+                }
+                compileOptions {
+                    sourceCompatibility rootProject.ext.javaVersion
+                    targetCompatibility rootProject.ext.javaVersion
+                }
+            }
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.layout.buildDirectory
 }

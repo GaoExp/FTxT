@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1–7 selesai; Fase 8 (optimasi build) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–8 selesai; Fase 9 (testing akhir) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -343,10 +343,13 @@ Urutan: **clock → fps → network → floating-text → memory → crosshair �
 
 **Risiko:** Rendah. Tidak ada perubahan kode, hanya penghapusan sisa & resource mati.
 
-### Fase 8: Optimasi Build
+### Fase 8: Optimasi Build — ✅ SELESAI
 
-- [ ] Setup common config (ext block) untuk `compileSdk`/`minSdk`/Java version di root `build.gradle`.
-- [ ] Cek incremental build (edit satu module → module lain tidak compile ulang).
+- [x] Setup common config di root `build.gradle`: `ext` block (`compileSdk=35`, `minSdk=26`, `targetSdk=35`, `javaVersion=17`) + `subprojects { afterEvaluate }` menerapkan secara otomatis ke semua module `com.android.library` (12 module: 7 feature, 4 shared, core). Blok `compileSdk`/`minSdk`/`compileOptions` yang berulang dihapus dari tiap module — sekarang satu sumber kebenaran. `:app` memakai `rootProject.ext.*` secara eksplisit.
+- [x] Cek incremental build: menyentuh 1 file di `:features:memory` (tambah komentar), build ulang → hanya `:features:memory:compileDebugJavaWithJavac` yang dieksekusi, seluruh module lain `UP-TO-DATE` (termasuk `:core` yang bergantung memory — output class identik sehingga gradle skip lewat konten-hash). Isolasi `implementation` + `configureondemand` terbukti bekerja.
+- [x] Build verifikasi — `assembleDebug` sukses (exit 0), APK `FTxT-v4.92.1-Beta.apk` terbaru.
+
+**Catatan:** `gradle.properties` men-set `org.gradle.logging.level=warn` sehingga output normal tidak memperlihatkan baris `> Task :…`; untuk mengamati task yang jalan gunakan `-i`/`--info`.
 
 ### Fase 9: Testing Akhir
 
@@ -401,7 +404,7 @@ Resource Pack System belum dibangun di kode (hanya dokumen `_schedule/PRIORITAS/
 | Fase 5: 7 feature modules | 3–5 jam | repetitive; battery paling besar (12 file) → selesai; 1 fix build (`api` di `:shared:ui`) |
 | Fase 6: `:core:service` | 45–60 mnt | paling tricky → selesai; 0 error di build pertama |
 | Fase 7: app cleanup | 30–45 mnt | hapus sisa + resource mati → selesai; 0 error di build |
-| Fase 8: optimasi | 30 mnt | common config + incremental check |
+| Fase 8: optimasi | 30 mnt | common config + incremental check → selesai; incremental terbukti |
 | Fase 9: testing | 1–2 jam | menyeluruh |
 | **Total** | **8–13 jam** | gampar: ±sepuluh jam |
 
