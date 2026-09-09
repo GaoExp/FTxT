@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1 & Fase 2 selesai; Fase 3 (`:shared:color`) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–3 selesai; Fase 4 (`:shared:preset`) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -118,7 +118,7 @@ Resource: tidak ada. Status: selesai (Fase 1).
 
 ### 4.3 `:shared:color` — Color Picker + Math
 
-**Dependency:** 0 (leaf)
+**Dependency:** `androidx.appcompat:appcompat` (`ColorPickerDialog` memakai `AlertDialog`).
 
 | File | Asal |
 |------|------|
@@ -287,14 +287,14 @@ Tidak ada pekerjaan. Hanya verifikasi build/config.
 
 **Risiko:** Rendah. Import antar file dalam paket sama → nyaris tanpa edit.
 
-### Fase 3: `:shared:color`
+### Fase 3: `:shared:color` — ✅ SELESAI
 
-- [ ] Buat `shared/color/build.gradle` (namespace `exp.ftxt.shared.color`).
-- [ ] `include ':shared:color'`; tambah dependensi dari `:app` (dan `:feature:battery`).
-- [ ] Pindah 6 file (ColorMath, ColorNameResolver, HSVColorPickerView, BatteryColors, TriangleColorPickerView, ColorPickerDialog) ke `shared/color/src/main/java/exp/ftxt/shared/color/`.
-- [ ] Pindah resource: `dialog_color_picker.xml`, `ic_edit.xml`, `seekbar_thumb.xml`.
-- [ ] Update import `exp.ftxt.R` → `exp.ftxt.shared.color.R` di `ColorPickerDialog`.
-- [ ] Hapus folder `features/color_picker/` (kosong). Build verifikasi.
+- [x] Buat `shared/color/build.gradle` (namespace `exp.ftxt.shared.color`, minSdk 26, Java 17, depend `androidx.appcompat:appcompat`).
+- [x] `include ':shared:color'` di `settings.gradle`; `:app` menambahkan dependensi `project(':shared:color')`.
+- [x] Pindah 6 file (ColorMath, ColorNameResolver, HSVColorPickerView, BatteryColors, TriangleColorPickerView, ColorPickerDialog) ke `shared/color/src/main/java/exp/ftxt/shared/color/`.
+- [x] Pindah resource: `dialog_color_picker.xml`, `ic_edit.xml`, `seekbar_thumb.xml`.
+- [x] Update import `exp.ftxt.R` → `exp.ftxt.shared.color.R` di `ColorPickerDialog`.
+- [x] Hapus folder `features/color_picker/` (kosong). Build verifikasi — `assembleDebug` sukses (`color-debug.aar` + apk terbaru).
 
 **Risiko:** Rendah.
 

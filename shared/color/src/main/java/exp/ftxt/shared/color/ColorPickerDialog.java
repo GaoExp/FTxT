@@ -35,7 +35,7 @@ import androidx.appcompat.app.AlertDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import exp.ftxt.R;
+import exp.ftxt.shared.color.R;
 
 public class ColorPickerDialog {
 
