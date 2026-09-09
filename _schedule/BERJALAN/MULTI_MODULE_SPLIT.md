@@ -3,7 +3,7 @@
 > **Tanggal:** 2026-09-09 (revisi penuh)
 > **Revisi sebelumnya:** 2026-08-23 — target v4.88.1 → **usang** (asumsi `BatteryMonitorService` & struktur `features/` salah)
 > **Versi baseline:** v4.92.1 (versionCode 278)
-> **Status:** Rencana aktif — P0, Fase 1–4 selesai; Fase 5 (feature modules) berikutnya
+> **Status:** Rencana aktif — P0, Fase 1–5 selesai; Fase 6 (`:core:service`) berikutnya
 > **Pilihan jalur:** **Jalur Y** (pragmatis) — feature module murni Java (tanpa resource & tampilan)
 
 ---
@@ -308,15 +308,17 @@ Tidak ada pekerjaan. Hanya verifikasi build/config.
 
 **Risiko:** Sedang. Layout merefer warna & style dari app.
 
-### Fase 5: Feature Modules (satu per satu, dari yang paling simpel)
+### Fase 5: Feature Modules — ✅ SELESAI
 
 Urutan: **clock → fps → network → floating-text → memory → crosshair → battery.**
 
-Per modul:
-- [ ] Buat `features/<name>/build.gradle` (namespace `exp.ftxt.features.<name>`, depend `:shared:config`, `:shared:ui`; battery tambah `:shared:color`).
-- [ ] `include ':features:<name>'` di `settings.gradle`; `:app` & `:core:service` menambahkan dependensi.
-- [ ] Pindah file Config/Module (dan DB/monitor/estimator untuk battery) dari `app/src/main/java/exp/ftxt/features/...` → `features/<name>/src/main/java/exp/ftxt/features/...`.
-- [ ] Build verifikasi (app masih compile karena import paket sama).
+- [x] `:feature:clock`, `:feature:fps`, `:feature:network`, `:feature:floating-text`, `:feature:memory`, `:feature:crosshair` — masing-masing `build.gradle` (namespace `exp.ftxt.features.<name>`, depend `:shared:config` + `:shared:ui`) + 2–3 file Config/Module dipindah.
+- [x] `:feature:battery` — gabungan `battery_bar` (3 file: Config, Module, BarView) + `battery_stats` (9 file: Config, Module, Reading, HistoryDb, Monitor, CapacityEstimator, DischargeTracker, SessionRebuild, SessionSegmentBuilder); depend tambah `:shared:color` (untuk `BatteryColors`).
+- [x] `include ':features:<name>'` (7 module) di `settings.gradle`; `:app` menambahkan dependensi ke 7 module feature (`:core:service` belum ada — dependensi core ditambahkan di Fase 6).
+- [x] 25 file Java dipindah via `git mv` dari `app/src/main/java/exp/ftxt/features/...` → `features/<name>/src/main/java/exp/ftxt/features/...`; paket Java tidak berubah. Folder `app/.../features/` kini kosong.
+- [x] Build verifikasi — `assembleDebug` sukses: 7 AAR feature (`*-debug.aar`) + APK `FTxT-v4.92.1-Beta.apk`. 0 error.
+
+**Catatan fix build (dependensi bocor):** Langkah pertama build gagal (35 error: `ShadowImageView cannot be converted to View` / `cannot access AppCompatImageView`) di `:feature:crosshair` karena `:shared:ui` mendeklarasikan `androidx.appcompat` sebagai `implementation`, padahal kelas publiknya (`ShadowTextView`, `ShadowImageView`, dll.) mengekspos tipe AppCompat ke consumer. Diperbaiki `:shared/ui/build.gradle` menjadi `api` untuk `:shared:config` + appcompat (API leaking). Consumer feature mana pun yang memakai `ShadowTextView`/`ShadowImageView` kini mendapat appcompat di compile classpath.
 
 **Risiko per fase:** Rendah–Sedang. Paket Java tidak berubah → sebagian besar tanpa edit import; `:app` cukup ditambah dependensi.
 
@@ -392,7 +394,7 @@ Resource Pack System belum dibangun di kode (hanya dokumen `_schedule/PRIORITAS/
 | Fase 2: `:shared:ui` | 30–45 mnt | 10 file, tanpa edit import antar-paket |
 | Fase 3: `:shared:color` | 30–60 mnt | 6 file + resource |
 | Fase 4: `:shared:preset` | 30–60 mnt | 4 file + resource + warna/style |
-| Fase 5: 7 feature modules | 3–5 jam | repetitive; battery paling besar (12 file) |
+| Fase 5: 7 feature modules | 3–5 jam | repetitive; battery paling besar (12 file) → selesai; 1 fix build (`api` di `:shared:ui`) |
 | Fase 6: `:core:service` | 45–60 mnt | paling tricky |
 | Fase 7: app cleanup | 30–45 mnt | hapus sisa + resource mati |
 | Fase 8: optimasi | 30 mnt | common config + incremental check |

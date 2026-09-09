@@ -102,6 +102,13 @@ dependencies {
     implementation project(':shared:ui')
     implementation project(':shared:color')
     implementation project(':shared:preset')
+    implementation project(':features:clock')
+    implementation project(':features:fps')
+    implementation project(':features:network')
+    implementation project(':features:floating-text')
+    implementation project(':features:memory')
+    implementation project(':features:crosshair')
+    implementation project(':features:battery')
 
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'com.google.android.material:material:1.12.0'

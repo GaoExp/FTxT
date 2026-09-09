@@ -19,6 +19,8 @@ talkhere.txt
 /_temp2/
 /_temp3/
 shared/*/build/
+features/*/build/
+core/*/build/
 opencode.jsonc
 # key/ — folder untuk keystore CI, file sensitif diabaikan
 /key/alias-key

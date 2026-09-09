@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'exp.ftxt.shared.ui'
+    namespace 'exp.ftxt.features.clock'
     compileSdk 35
 
     defaultConfig {
@@ -17,6 +17,6 @@ android {
 }
 
 dependencies {
-    api project(':shared:config')
-    api 'androidx.appcompat:appcompat:1.7.1'
+    implementation project(':shared:config')
+    implementation project(':shared:ui')
 }
