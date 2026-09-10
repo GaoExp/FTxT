@@ -32,6 +32,7 @@ import exp.ftxt.features.memory_stats.MemoryMonitor;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.features.floating_text.TextModule;
 import exp.ftxt.shared.ui.OverlayModule;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
 public class FloatingService extends Service {
 
@@ -49,6 +50,7 @@ public class FloatingService extends Service {
     private BatteryBarModule batteryBarModule;
     private MemoryModule memoryModule;
     private CrosshairModule crosshairModule;
+    private SmartPanelModule smartPanelModule;
     private final List<OverlayModule> allModules = new ArrayList<>();
     private BroadcastReceiver configChangeReceiver;
 
@@ -90,6 +92,11 @@ public class FloatingService extends Service {
     public static CrosshairModule crosshairModule() {
         if (instance != null) instance.ensureCrosshairModule();
         return instance != null ? instance.crosshairModule : null;
+    }
+
+    public static SmartPanelModule smartPanelModule() {
+        if (instance != null) instance.ensureSmartPanelModule();
+        return instance != null ? instance.smartPanelModule : null;
     }
 
     private void ensureTextModule() {
@@ -154,6 +161,89 @@ public class FloatingService extends Service {
             allModules.add(crosshairModule);
             crosshairModule.init(windowManager, this, prefs);
         }
+    }
+
+    private void ensureSmartPanelModule() {
+        if (smartPanelModule == null) {
+            smartPanelModule = new SmartPanelModule();
+            allModules.add(smartPanelModule);
+            smartPanelModule.init(windowManager, this, prefs);
+        }
+    }
+
+    private void registerSmartPanelTargets() {
+        SmartPanelRegistry.clear();
+
+        registerCrosshairTarget();
+        registerFpsTarget();
+        registerClockTarget();
+        registerBatteryStatsTarget();
+        registerNetworkTarget();
+        registerMemoryTarget();
+        registerBatteryBarTarget();
+    }
+
+    private void registerCrosshairTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "crosshair", "Crosshair",
+                () -> (SmartPanelTarget) crosshairModule,
+                () -> { CrosshairConfig.enabled = true; ensureCrosshairModule(); startModule(crosshairModule); },
+                () -> { CrosshairConfig.enabled = false; stopModule(crosshairModule); if (crosshairModule != null) crosshairModule.stop(); }
+        ));
+    }
+
+    private void registerFpsTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "fps", "FPS Display",
+                () -> (SmartPanelTarget) fpsModule,
+                () -> { FpsConfig.enabled = true; ensureFpsModule(); startModule(fpsModule); },
+                () -> { FpsConfig.enabled = false; stopModule(fpsModule); if (fpsModule != null) fpsModule.stop(); }
+        ));
+    }
+
+    private void registerClockTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "clock", "Jam Digital",
+                () -> (SmartPanelTarget) clockModule,
+                () -> { ClockConfig.enabled = true; ensureClockModule(); startModule(clockModule); },
+                () -> { ClockConfig.enabled = false; stopModule(clockModule); if (clockModule != null) clockModule.stop(); }
+        ));
+    }
+
+    private void registerBatteryStatsTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "battery", "Battery Info",
+                () -> (SmartPanelTarget) batteryStatsModule,
+                () -> { BatteryStatsConfig.enabled = true; ensureBatteryStatsModule(); startModule(batteryStatsModule); },
+                () -> { BatteryStatsConfig.enabled = false; stopModule(batteryStatsModule); if (batteryStatsModule != null) batteryStatsModule.stop(); }
+        ));
+    }
+
+    private void registerNetworkTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "network", "Network Speed",
+                () -> (SmartPanelTarget) networkModule,
+                () -> { NetworkConfig.enabled = true; ensureNetworkModule(); startModule(networkModule); },
+                () -> { NetworkConfig.enabled = false; stopModule(networkModule); if (networkModule != null) networkModule.stop(); }
+        ));
+    }
+
+    private void registerMemoryTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "memory", "Memory Stats",
+                () -> (SmartPanelTarget) memoryModule,
+                () -> { MemoryConfig.enabled = true; ensureMemoryModule(); startModule(memoryModule); },
+                () -> { MemoryConfig.enabled = false; stopModule(memoryModule); if (memoryModule != null) memoryModule.stop(); }
+        ));
+    }
+
+    private void registerBatteryBarTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "batterybar", "Battery Strip",
+                () -> (SmartPanelTarget) batteryBarModule,
+                () -> { BatteryBarConfig.enabled = true; ensureBatteryBarModule(); startModule(batteryBarModule); },
+                () -> { BatteryBarConfig.enabled = false; stopModule(batteryBarModule); if (batteryBarModule != null) batteryBarModule.stop(); }
+        ));
     }
 
     private boolean isAnyModuleActive() {
@@ -240,6 +330,14 @@ public class FloatingService extends Service {
             if (CrosshairConfig.enabled) { ensureCrosshairModule(); crosshairModule.start(windowManager, this); }
             if (MemoryConfig.backgroundMonitor) {
                 MemoryMonitor.start(this);
+            }
+
+            registerSmartPanelTargets();
+
+            if (prefs.getBoolean("smart_panel_enabled", false)) {
+                SmartPanelConfig.enabled = true;
+                ensureSmartPanelModule();
+                smartPanelModule.start(windowManager, this);
             }
 
             acquireWakeLockIfNeeded();
@@ -423,6 +521,24 @@ public class FloatingService extends Service {
         instance.releaseWakeLockIfEmpty();
         instance.unregisterConfigReceiver();
         instance.stopSelfIfEmpty();
+    }
+
+    public static void setSmartPanelEnabled(boolean enabled) {
+        if (instance == null) return;
+        if (enabled) {
+            SmartPanelConfig.enabled = true;
+            instance.ensureSmartPanelModule();
+            instance.smartPanelModule.start(instance.windowManager, instance);
+            instance.acquireWakeLockIfNeeded();
+            instance.registerConfigReceiver();
+        } else {
+            SmartPanelConfig.enabled = false;
+            if (instance.smartPanelModule != null) {
+                instance.smartPanelModule.stop();
+            }
+            instance.releaseWakeLockIfEmpty();
+            instance.stopSelfIfEmpty();
+        }
     }
 
     public static void hideAllOverlays() {

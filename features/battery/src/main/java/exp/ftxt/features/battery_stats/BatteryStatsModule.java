@@ -16,8 +16,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class BatteryStatsModule implements OverlayModule {
+public class BatteryStatsModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -192,6 +193,68 @@ public class BatteryStatsModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Battery Info";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return BatteryStatsConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return BatteryStatsConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        BatteryStatsConfig.posX = Math.max(0, Math.min(1, BatteryStatsConfig.posX + dxNorm));
+        BatteryStatsConfig.posY = Math.max(0, Math.min(1, BatteryStatsConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        BatteryStatsConfig.posX = 0.5f;
+        BatteryStatsConfig.posY = 0.5f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return BatteryStatsConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        BatteryStatsConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return BatteryStatsConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

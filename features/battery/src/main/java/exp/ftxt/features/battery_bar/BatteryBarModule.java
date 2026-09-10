@@ -16,7 +16,9 @@ import android.view.WindowManager;
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 
-public class BatteryBarModule implements OverlayModule {
+import exp.ftxt.shared.ui.SmartPanelTarget;
+
+public class BatteryBarModule implements OverlayModule, SmartPanelTarget {
 
     private BatteryBarView view;
     private WindowManager.LayoutParams params;
@@ -137,6 +139,56 @@ public class BatteryBarModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Battery Strip";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return BatteryBarConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return BatteryBarConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        if (BatteryBarConfig.quickMode) return;
+        BatteryBarConfig.posX = Math.max(0, Math.min(1, BatteryBarConfig.posX + dxNorm));
+        BatteryBarConfig.posY = Math.max(0, Math.min(1, BatteryBarConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        if (BatteryBarConfig.quickMode) return;
+        BatteryBarConfig.posX = 0.5f;
+        BatteryBarConfig.posY = 0.5f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return BatteryBarConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        if (BatteryBarConfig.quickMode) return;
+        BatteryBarConfig.touchPassthrough = locked;
+        updateTouchFlags();
     }
 
     @Override

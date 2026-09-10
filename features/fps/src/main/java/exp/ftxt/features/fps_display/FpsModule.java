@@ -15,8 +15,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class FpsModule implements OverlayModule {
+public class FpsModule implements OverlayModule, SmartPanelTarget {
 
     private static final int FRAME_WINDOW_SIZE = 60;
 
@@ -261,6 +262,68 @@ public class FpsModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "FPS Display";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return FpsConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return FpsConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        FpsConfig.posX = Math.max(0, Math.min(1, FpsConfig.posX + dxNorm));
+        FpsConfig.posY = Math.max(0, Math.min(1, FpsConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        FpsConfig.posX = 0.5f;
+        FpsConfig.posY = 0.5f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return FpsConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        FpsConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return FpsConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

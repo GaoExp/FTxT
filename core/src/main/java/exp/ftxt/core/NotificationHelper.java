@@ -427,6 +427,12 @@ public class NotificationHelper {
                 context, 2, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 
+        Intent smartIntent = new Intent(context, NotificationActionReceiver.class);
+        smartIntent.setAction(NotificationActionReceiver.ACTION_SMART_PANEL_TOGGLE);
+        contentView.setOnClickPendingIntent(R.id.noti_smart_btn, PendingIntent.getBroadcast(
+                context, 3, smartIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
+
         cachedContentView = contentView;
     }
 
@@ -434,6 +440,13 @@ public class NotificationHelper {
         ensureCachedViews(context);
         RemoteViews contentView = cachedContentView.clone();
         contentView.setImageViewResource(R.id.noti_toggle_btn, toggleIcon);
+        if (SmartPanelConfig.enabled) {
+            contentView.setViewVisibility(R.id.noti_smart_btn, View.VISIBLE);
+            contentView.setImageViewResource(R.id.noti_smart_btn,
+                    SmartPanelConfig.iconVisible ? R.drawable.ic_smart_panel_on : R.drawable.ic_smart_panel_off);
+        } else {
+            contentView.setViewVisibility(R.id.noti_smart_btn, View.GONE);
+        }
         if (title == null) {
             contentView.setViewVisibility(R.id.noti_title, View.GONE);
         } else {

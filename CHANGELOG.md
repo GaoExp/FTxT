@@ -1,4 +1,13 @@
-# [4.93.0] 2026/09/10 02:03 WITA 283 ***ONGOING***
+"# [4.94.0] 2026/09/10 09:03 WITA 286 ***ONGOING***
+### 🔖 Deskripsi
+> Membangun fondasi Smart Panel — panel kontrol mengambang untuk mengatur posisi & pengaturan modul overlay tanpa membuka aplikasi.
+
+### ✨ Fitur Baru
+- **Smart Panel — kontrol overlay tanpa buka aplikasi** — Dibangun kontrak `SmartPanelTarget` (posisi, lock, dan kontrol spesifik per modul) yang diimplementasikan oleh 7 modul overlay (Crosshair, FPS Display, Jam Digital, Battery Info, Network Speed, Memory Stats, Battery Strip) dan diregistrasi terpusat di `SmartPanelRegistry` (core). Ditambah `SmartPanelModule`: ikon bulat mengambang (efek "bernapas" saat idle, membesar saat disentuh, bisa di-drag & snap ke sisi layar) yang saat diketuk menampilkan panel kontrol di samping ikon pada sisi yang masih tersedia — panel muncul di kiri ikon ketika ikon berada di kanan layar dan sebaliknya, tanpa menggeser ikon dari tempatnya, dengan animasi membuka (scale + fade, 200ms) dan menutup (fade + bounce ikon). Panel berisi: label modul — ketuk membuka dropdown daftar modul di dalam panel (bukan popup terpisah) untuk berganti modul; D-Pad 4 arah dengan repeat & tombol Reset posisi ke tengah; tombol **Aktifkan/Nonaktifkan** dan **Kunci Posisi/Buka Kunci**; serta kontrol spesifik dinamis per modul (slider Opacity/Size dan tombol Reset sesuai kemampuan tiap modul). Panel tertutup otomatis saat mengetuk di luar panel. Ikon bisa disembunyikan dengan double-tap dan dimunculkan kembali lewat tombol Smart Panel di notifikasi foreground (tombol tampil saat fitur aktif, ikon menandakan status tampil/sembunyi). Fitur dinyalakan/dimatikan lewat toggle **"Smart Panel"** di halaman Konfigurasi, posisi ikon tersimpan persisten; ikon hanya muncul saat overlay aktif.
+
+---
+
+# [4.93.0] 2026/09/10 03:24 WITA 284 ***RELEASE***
 ### 🔖 Deskripsi
 > Menambahkan halaman "Tentang Aplikasi" beserta sistem pembaruan aplikasi.
 

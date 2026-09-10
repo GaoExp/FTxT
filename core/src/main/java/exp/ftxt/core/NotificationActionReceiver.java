@@ -9,6 +9,7 @@ public class NotificationActionReceiver extends BroadcastReceiver {
     public static final String ACTION_TOGGLE_OVERLAY = "exp.ftxt.ACTION_TOGGLE_OVERLAY";
     public static final String ACTION_KILL_SERVICE = "exp.ftxt.ACTION_KILL_SERVICE";
     public static final String ACTION_OPEN_APP = "exp.ftxt.ACTION_OPEN_APP";
+    public static final String ACTION_SMART_PANEL_TOGGLE = "exp.ftxt.ACTION_SMART_PANEL_TOGGLE";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -23,6 +24,9 @@ public class NotificationActionReceiver extends BroadcastReceiver {
                 break;
             case ACTION_OPEN_APP:
                 handleOpenApp(context);
+                break;
+            case ACTION_SMART_PANEL_TOGGLE:
+                handleSmartPanelToggle(context);
                 break;
         }
     }
@@ -45,6 +49,15 @@ public class NotificationActionReceiver extends BroadcastReceiver {
         // Hentikan seluruh overlay; pemantau baterai tetap berjalan, jadi
         // service tidak di-stop paksa (stopSelfIfEmpty mengaturnya).
         FloatingService.stopAllModules();
+    }
+
+    private void handleSmartPanelToggle(Context context) {
+        if (FloatingService.instance == null) return;
+        SmartPanelModule spm = FloatingService.smartPanelModule();
+        if (spm != null) {
+            spm.toggleIconVisibility();
+            FloatingService.updateNotification();
+        }
     }
 
     private void handleOpenApp(Context context) {

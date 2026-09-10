@@ -20,8 +20,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class ClockModule implements OverlayModule {
+public class ClockModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -184,6 +185,68 @@ public class ClockModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Jam Digital";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return ClockConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return ClockConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        ClockConfig.posX = Math.max(0, Math.min(1, ClockConfig.posX + dxNorm));
+        ClockConfig.posY = Math.max(0, Math.min(1, ClockConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        ClockConfig.posX = 0.5f;
+        ClockConfig.posY = 0.05f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return ClockConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        ClockConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return ClockConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

@@ -49,6 +49,7 @@ import java.io.OutputStream;
 
 import exp.ftxt.core.FloatingService;
 import exp.ftxt.core.NotificationHelper;
+import exp.ftxt.core.SmartPanelConfig;
 import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.memory_stats.MemoryMonitor;
 import exp.ftxt.features.memory_stats.MemoryModule;
@@ -96,6 +97,8 @@ public class SettingsActivity extends AppCompatActivity {
     private Switch notifCustomSwitch;
     private LinearLayout notifIntervalRow;
     private RadioGroup notifIntervalGroup;
+    private Switch smartPanelSwitch;
+    private TextView smartPanelStatus;
 
     private static final String[] DATE_FORMATS = {
             "d + Hari", "dd + Hari", "d + Bulan", "dd + Bulan",
@@ -176,6 +179,22 @@ public class SettingsActivity extends AppCompatActivity {
                             Uri.parse("package:" + getPackageName())));
                 }
             }
+        });
+
+        smartPanelSwitch = findViewById(R.id.smartPanelSwitch);
+        smartPanelStatus = findViewById(R.id.smartPanelStatus);
+
+        boolean smartPanelEnabled = prefs.getBoolean("smart_panel_enabled", false);
+        smartPanelSwitch.setChecked(smartPanelEnabled);
+        applySwitchTint(smartPanelSwitch, smartPanelEnabled);
+        updateSmartPanelStatus(smartPanelEnabled);
+        smartPanelSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            applySwitchTint(smartPanelSwitch, isChecked);
+            prefs.edit().putBoolean("smart_panel_enabled", isChecked).apply();
+            SmartPanelConfig.enabled = isChecked;
+            FloatingService.setSmartPanelEnabled(isChecked);
+            updateSmartPanelStatus(isChecked);
+            FloatingService.updateNotification();
         });
 
         String iconChoice = prefs.getString("icon_choice", null);
@@ -497,6 +516,14 @@ public class SettingsActivity extends AppCompatActivity {
             sw.setThumbTintList(ColorStateList.valueOf(Color.parseColor("#E53935")));
             sw.setTrackTintList(ColorStateList.valueOf(Color.parseColor("#EF9A9A")));
         }
+    }
+
+    private void updateSmartPanelStatus(boolean enabled) {
+        if (smartPanelStatus == null) return;
+        smartPanelStatus.setText(enabled
+                ? "Aktif — ikon kontrol mengambang muncul di atas overlay."
+                : "Nonaktif");
+        smartPanelStatus.setTextColor(enabled ? Color.GREEN : Color.GRAY);
     }
 
     private void applyDeveloperState(boolean unlocked) {

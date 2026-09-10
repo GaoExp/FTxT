@@ -1,6 +1,6 @@
 # FTxT (FunText) — Floating Text Overlay
 
->**Current Release:** `4.93.0` **Beta** 
+>**Current Release:** `4.94.0` **Beta** 
 **Last Updated:** `2026-09-10`
 
 >>FTxT (FunText) adalah aplikasi Android overlay yang memungkinkan Anda menampilkan teks floating di atas aplikasi lain dengan fitur kustomisasi lengkap untuk ukuran, warna, transparansi, posisi, dan kontrol sentuhan.
@@ -37,6 +37,7 @@
 - **Overlay Toggle** — Auto-start, permission handling, WakeLock, foreground service
 - **Ikon Notifikasi Dinamis** — Ikon notifikasi status bar bisa menampilkan suhu baterai, persen baterai, atau tanggal + nama hari (bisa 2 baris), yang di-generate sebagai Bitmap dan diperbarui otomatis hanya saat nilainya berubah; pilihan isi bisa diatur di Konfigurasi
 - **Notifikasi Kustom** — Judul notifikasi overlay bisa menampilkan info baterai real-time (persen, status + arus, tegangan, daya, mAh, suhu) dan bisa dimatikan sehingga hanya tombol aksi yang tampil; interval perbarui judul bisa diatur 1/3/5/10 detik (default nonaktif, interval 5 detik)
+- **Smart Panel** — Ikon kontrol mengambang untuk mengatur modul overlay tanpa buka aplikasi: drag icon, D-Pad geser posisi, reset ke tengah, toggle On/Off & Lock, ganti modul aktif, dan kontrol spesifik dinamis (slider Opacity/Size + tombol Reset) sesuai kemampuan tiap modul
 - **Halaman Tentang Aplikasi & Cek Pembaruan** — Halaman "Tentang Aplikasi" fullscreen (diakses dari popup ikon gear dan header sidebar yang bisa diketuk) berisi identitas aplikasi dan info versi (versionName/versionCode dari sistem), pemeriksaan pembaruan ke GitHub Releases secara manual (tombol "Periksa Pembaruan Sekarang") maupun otomatis sesuai jadwal (setiap buka aplikasi / 12 jam / 1–7 hari, default nonaktif), baris status hasil yang bisa diketuk untuk memunculkan dialog kembali, serta alur unduh APK (progress persen) dan prompt instalasi Android bawaan; dilengkapi section tentang pengembang, tautan dokumen & GitHub, catatan lisensi, dan footer
 - **Android SplashScreen** — SplashScreen API resmi tanpa fake loading
 

@@ -16,8 +16,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class NetworkModule implements OverlayModule {
+public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -183,6 +184,68 @@ public class NetworkModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Network Speed";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return NetworkConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return NetworkConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        NetworkConfig.posX = Math.max(0, Math.min(1, NetworkConfig.posX + dxNorm));
+        NetworkConfig.posY = Math.max(0, Math.min(1, NetworkConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        NetworkConfig.posX = 0.5f;
+        NetworkConfig.posY = 0.05f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return NetworkConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        NetworkConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return NetworkConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

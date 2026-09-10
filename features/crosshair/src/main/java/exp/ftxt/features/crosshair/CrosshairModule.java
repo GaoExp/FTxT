@@ -13,8 +13,9 @@ import exp.ftxt.shared.config.BackgroundConfig;
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.ShadowImageView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class CrosshairModule implements OverlayModule {
+public class CrosshairModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowImageView view;
     private WindowManager.LayoutParams params;
@@ -226,6 +227,101 @@ public class CrosshairModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Crosshair";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return CrosshairConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return CrosshairConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        CrosshairConfig.posX = Math.max(0, Math.min(1, CrosshairConfig.posX + dxNorm));
+        CrosshairConfig.posY = Math.max(0, Math.min(1, CrosshairConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        CrosshairConfig.posX = 0.5f;
+        CrosshairConfig.posY = 0.5f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return CrosshairConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        CrosshairConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetOpacity() {
+        return true;
+    }
+
+    @Override
+    public int getOpacity() {
+        return CrosshairConfig.opacity;
+    }
+
+    @Override
+    public void setOpacity(int percent) {
+        CrosshairConfig.opacity = Math.max(0, Math.min(100, percent));
+        applyOpacity();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return CrosshairConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
+    }
+
+    @Override
+    public boolean canResetConfig() {
+        return true;
+    }
+
+    @Override
+    public void resetConfig() {
+        CrosshairConfig.size = 32f;
+        CrosshairConfig.opacity = 100;
+        CrosshairConfig.color = android.graphics.Color.WHITE;
+        CrosshairConfig.rotation = 0f;
+        updateSize(CrosshairConfig.size);
+        applyOpacity();
+        applyColor();
+        applyRotation();
     }
 
     @Override

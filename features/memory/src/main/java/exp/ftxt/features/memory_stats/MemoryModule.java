@@ -16,8 +16,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class MemoryModule implements OverlayModule {
+public class MemoryModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowTextView view;
     private WindowManager.LayoutParams params;
@@ -186,6 +187,68 @@ public class MemoryModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Memory Stats";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return running;
+    }
+
+    @Override
+    public float getPosX() {
+        return MemoryConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return MemoryConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        MemoryConfig.posX = Math.max(0, Math.min(1, MemoryConfig.posX + dxNorm));
+        MemoryConfig.posY = Math.max(0, Math.min(1, MemoryConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        MemoryConfig.posX = 0.5f;
+        MemoryConfig.posY = 0.5f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return MemoryConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        MemoryConfig.touchPassthrough = locked;
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return MemoryConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

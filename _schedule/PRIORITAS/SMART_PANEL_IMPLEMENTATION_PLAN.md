@@ -1,9 +1,9 @@
 # Rencana Implementasi — Smart Panel (Overlay Control)
 
-> **Status:** Rencana — belum dieksekusi
+> **Status:** Sedang dikerjakan — Fase 1–4 selesai + penyelarasan perilaku ikon/panel dengan `SMART_PANEL_CROSSHAIR.md` (panel di samping ikon, ketuk luar menutup panel, animasi breathing & scale ikon, tombol berlabel jelas)
 > **Dasar fitur:** `_schedule/PRIORITAS/SMART_PANEL_CROSSHAIR.md`
 > **Referensi arsitektur:** `_schedule/RENCANA/MULTI_MODULE_SPLIT.md`
-> **Revisi:** 2026-09-07 — dibuat dengan prinsip "siap split multi-module sejak awal"
+> **Revisi:** 2026-09-10 — penyelarasan perilaku UI dengan spesifikasi fitur
 
 ---
 

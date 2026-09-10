@@ -1,6 +1,6 @@
 # Smart Panel — Overlay Control
 
-**Status:** Rencana — belum dikerjakan
+**Status:** Sedang dikerjakan — Fase 1–4 implementasi inti sudah berjalan (kontrak modul, ikon+panel, kontrol, toggle di Konfigurasi). **Belum** sesuai penuh dengan spesifikasi di bawah (animasi, dismiss ketuk luar, posisi panel di samping ikon, double-tap hide icon, notifikasi persistent). Rincian arsitektur & progres: `SMART_PANEL_IMPLEMENTATION_PLAN.md`.
 **Tujuan:** Membuat panel mengambang (floating) untuk mengontrol posisi dan pengaturan semua modul overlay (Crosshair, FPS, Suhu, Baterai, CPU/RAM) secara real-time.
 
 ---
