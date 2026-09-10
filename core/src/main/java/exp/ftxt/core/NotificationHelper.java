@@ -408,6 +408,8 @@ public class NotificationHelper {
 
         contentView.setImageViewResource(R.id.noti_close_btn, R.drawable.ic_close);
         contentView.setImageViewResource(R.id.noti_open_btn, R.drawable.ic_notification_open);
+        contentView.setImageViewResource(R.id.noti_smart_btn,
+                SmartPanelConfig.iconVisible ? R.drawable.ic_smart_panel_on : R.drawable.ic_smart_panel_off);
 
         Intent toggleIntent = new Intent(context, NotificationActionReceiver.class);
         toggleIntent.setAction(NotificationActionReceiver.ACTION_TOGGLE_OVERLAY);

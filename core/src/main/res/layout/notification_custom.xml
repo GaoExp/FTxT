@@ -45,7 +45,7 @@
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:contentDescription="Smart Panel"
             android:padding="8dp"
-            android:src="@drawable/ic_smart_panel_on" />
+            android:tint="@android:color/white" />
 
         <ImageButton
             android:id="@+id/noti_close_btn"

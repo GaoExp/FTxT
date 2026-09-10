@@ -45,6 +45,7 @@ public class SmartPanelModule implements OverlayModule {
     private LinearLayout specificsContainer;
     private boolean panelExpanded = false;
     private boolean pickerOpened = false;
+    private boolean collapseAnimRunning = false;
 
     private SmartPanelTarget activeTarget;
     private SmartPanelRegistry.Entry activeEntry;
@@ -56,7 +57,9 @@ public class SmartPanelModule implements OverlayModule {
     private static final int PANEL_WIDTH_DP = 220;
     private static final int PICKER_ITEM_HEIGHT_DP = 40;
     private static final int PICKER_MAX_VISIBLE = 5;
-    private static final int DPAD_STEP_DP = 10;
+    private static final int DPAD_TAP_PX = 1;
+    private static final int DPAD_HOLD_PX = 10;
+    private static final long DPAD_HOLD_DELAY_MS = 400;
     private static final long DPAD_REPEAT_MS = 60;
     private static final long ANIM_EXPAND_MS = 200;
     private static final long ANIM_COLLAPSE_MS = 150;
@@ -305,10 +308,18 @@ public class SmartPanelModule implements OverlayModule {
 
     private View.OnTouchListener createRepeatTouch(int dirX, int dirY) {
         return new View.OnTouchListener() {
+            private final Runnable holdTrigger = new Runnable() {
+                @Override
+                public void run() {
+                    moveActive(dirX, dirY, DPAD_HOLD_PX);
+                    repeatHandler.postDelayed(repeat, DPAD_REPEAT_MS);
+                }
+            };
+
             private final Runnable repeat = new Runnable() {
                 @Override
                 public void run() {
-                    moveActive(dirX, dirY);
+                    moveActive(dirX, dirY, DPAD_HOLD_PX);
                     repeatHandler.postDelayed(this, DPAD_REPEAT_MS);
                 }
             };
@@ -317,12 +328,13 @@ public class SmartPanelModule implements OverlayModule {
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        moveActive(dirX, dirY);
-                        repeatHandler.postDelayed(repeat, DPAD_REPEAT_MS);
+                        moveActive(dirX, dirY, DPAD_TAP_PX);
+                        repeatHandler.postDelayed(holdTrigger, DPAD_HOLD_DELAY_MS);
                         setButtonHighlight(v, true);
                         return true;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
+                        repeatHandler.removeCallbacks(holdTrigger);
                         repeatHandler.removeCallbacks(repeat);
                         setButtonHighlight(v, false);
                         return true;
@@ -332,11 +344,10 @@ public class SmartPanelModule implements OverlayModule {
         };
     }
 
-    private void moveActive(int dirX, int dirY) {
+    private void moveActive(int dirX, int dirY, int stepPx) {
         if (activeTarget == null) return;
         int screenW = screenWidth();
         int screenH = screenHeight();
-        int stepPx = dp(DPAD_STEP_DP);
         activeTarget.moveBy((dirX * stepPx) / (float) screenW, (dirY * stepPx) / (float) screenH);
     }
 
@@ -550,7 +561,16 @@ public class SmartPanelModule implements OverlayModule {
     // ── Pilih modul: dropdown di dalam window yang sama ──
 
     private void showModulePicker() {
-        if (activeTarget == null || pickerOpened) return;
+        if (collapseAnimRunning) {
+            panelView.animate().cancel();
+            collapseAnimRunning = false;
+            panelExpanded = false;
+            panelView.setAlpha(1f);
+            panelView.setScaleX(1f);
+            panelView.setScaleY(1f);
+            panelView.setVisibility(View.GONE);
+        }
+        if (pickerOpened) return;
         List<SmartPanelRegistry.Entry> entries = SmartPanelRegistry.getEntries();
         if (entries.isEmpty()) return;
 
@@ -633,6 +653,15 @@ public class SmartPanelModule implements OverlayModule {
 
     private void expandPanel() {
         if (!running || view == null || wm == null) return;
+        if (panelExpanded && collapseAnimRunning) {
+            panelView.animate().cancel();
+            collapseAnimRunning = false;
+            panelExpanded = false;
+            panelView.setAlpha(1f);
+            panelView.setScaleX(1f);
+            panelView.setScaleY(1f);
+            panelView.setVisibility(View.GONE);
+        }
         if (panelExpanded) return;
         panelExpanded = true;
         pickerOpened = false;
@@ -648,11 +677,13 @@ public class SmartPanelModule implements OverlayModule {
             closeModulePicker();
         }
         if (!panelExpanded) return;
+        collapseAnimRunning = true;
         panelView.animate().cancel();
         panelView.animate().alpha(0f).scaleX(0.85f).scaleY(0.85f)
                 .setDuration(ANIM_COLLAPSE_MS)
                 .setInterpolator(new AccelerateInterpolator())
                 .withEndAction(() -> {
+                    collapseAnimRunning = false;
                     panelExpanded = false;
                     if (panelView != null) panelView.setVisibility(View.GONE);
                     relayoutRoot();
@@ -910,6 +941,7 @@ public class SmartPanelModule implements OverlayModule {
         repeatHandler.removeCallbacksAndMessages(null);
         tapHandler.removeCallbacksAndMessages(null);
         stopBreathing();
+        collapseAnimRunning = false;
         panelExpanded = false;
         pickerOpened = false;
         if (panelView != null) {

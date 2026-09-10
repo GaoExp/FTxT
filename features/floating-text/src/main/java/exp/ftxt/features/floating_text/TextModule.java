@@ -16,8 +16,9 @@ import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
 import exp.ftxt.shared.ui.ShadowTextView;
+import exp.ftxt.shared.ui.SmartPanelTarget;
 
-public class TextModule implements OverlayModule {
+public class TextModule implements OverlayModule, SmartPanelTarget {
 
     private ShadowTextView view;
     private SealPatternView sealView;
@@ -171,6 +172,7 @@ public class TextModule implements OverlayModule {
 
     @Override
     public void updateSize(float size) {
+        TextConfig.size = size;
         if (view != null) view.setTextSize(size);
         if (sealView != null) sealView.invalidate();
     }
@@ -346,6 +348,74 @@ public class TextModule implements OverlayModule {
     @Override
     public boolean isRunning() {
         return view != null;
+    }
+
+    // ── SmartPanelTarget ──
+
+    @Override
+    public String getTitle() {
+        return "Floating Text";
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return view != null || sealView != null;
+    }
+
+    @Override
+    public float getPosX() {
+        return TextConfig.posX;
+    }
+
+    @Override
+    public float getPosY() {
+        return TextConfig.posY;
+    }
+
+    @Override
+    public void moveBy(float dxNorm, float dyNorm) {
+        if (TextConfig.patternEnabled) return;
+        TextConfig.posX = Math.max(0, Math.min(1, TextConfig.posX + dxNorm));
+        TextConfig.posY = Math.max(0, Math.min(1, TextConfig.posY + dyNorm));
+        updatePosition();
+    }
+
+    @Override
+    public void resetPosition() {
+        if (TextConfig.patternEnabled) return;
+        TextConfig.posX = 0.5f;
+        TextConfig.posY = 0.8f;
+        updatePosition();
+    }
+
+    @Override
+    public boolean isPositionLocked() {
+        return TextConfig.touchPassthrough;
+    }
+
+    @Override
+    public void setPositionLocked(boolean locked) {
+        if (TextConfig.patternEnabled) return;
+        TextConfig.touchPassthrough = locked;
+        if (prefs != null) {
+            prefs.edit().putBoolean("text_lock", locked).apply();
+        }
+        updateTouchFlags();
+    }
+
+    @Override
+    public boolean canSetSize() {
+        return true;
+    }
+
+    @Override
+    public float getSize() {
+        return TextConfig.size;
+    }
+
+    @Override
+    public void setSize(float size) {
+        updateSize(size);
     }
 
     @Override

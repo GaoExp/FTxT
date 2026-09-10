@@ -181,12 +181,13 @@ public class FloatingService extends Service {
         registerNetworkTarget();
         registerMemoryTarget();
         registerBatteryBarTarget();
+        registerTextTarget();
     }
 
     private void registerCrosshairTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "crosshair", "Crosshair",
-                () -> (SmartPanelTarget) crosshairModule,
+                () -> { ensureCrosshairModule(); return (SmartPanelTarget) crosshairModule; },
                 () -> { CrosshairConfig.enabled = true; ensureCrosshairModule(); startModule(crosshairModule); },
                 () -> { CrosshairConfig.enabled = false; stopModule(crosshairModule); if (crosshairModule != null) crosshairModule.stop(); }
         ));
@@ -195,7 +196,7 @@ public class FloatingService extends Service {
     private void registerFpsTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "fps", "FPS Display",
-                () -> (SmartPanelTarget) fpsModule,
+                () -> { ensureFpsModule(); return (SmartPanelTarget) fpsModule; },
                 () -> { FpsConfig.enabled = true; ensureFpsModule(); startModule(fpsModule); },
                 () -> { FpsConfig.enabled = false; stopModule(fpsModule); if (fpsModule != null) fpsModule.stop(); }
         ));
@@ -204,7 +205,7 @@ public class FloatingService extends Service {
     private void registerClockTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "clock", "Jam Digital",
-                () -> (SmartPanelTarget) clockModule,
+                () -> { ensureClockModule(); return (SmartPanelTarget) clockModule; },
                 () -> { ClockConfig.enabled = true; ensureClockModule(); startModule(clockModule); },
                 () -> { ClockConfig.enabled = false; stopModule(clockModule); if (clockModule != null) clockModule.stop(); }
         ));
@@ -213,7 +214,7 @@ public class FloatingService extends Service {
     private void registerBatteryStatsTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "battery", "Battery Info",
-                () -> (SmartPanelTarget) batteryStatsModule,
+                () -> { ensureBatteryStatsModule(); return (SmartPanelTarget) batteryStatsModule; },
                 () -> { BatteryStatsConfig.enabled = true; ensureBatteryStatsModule(); startModule(batteryStatsModule); },
                 () -> { BatteryStatsConfig.enabled = false; stopModule(batteryStatsModule); if (batteryStatsModule != null) batteryStatsModule.stop(); }
         ));
@@ -222,7 +223,7 @@ public class FloatingService extends Service {
     private void registerNetworkTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "network", "Network Speed",
-                () -> (SmartPanelTarget) networkModule,
+                () -> { ensureNetworkModule(); return (SmartPanelTarget) networkModule; },
                 () -> { NetworkConfig.enabled = true; ensureNetworkModule(); startModule(networkModule); },
                 () -> { NetworkConfig.enabled = false; stopModule(networkModule); if (networkModule != null) networkModule.stop(); }
         ));
@@ -231,7 +232,7 @@ public class FloatingService extends Service {
     private void registerMemoryTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "memory", "Memory Stats",
-                () -> (SmartPanelTarget) memoryModule,
+                () -> { ensureMemoryModule(); return (SmartPanelTarget) memoryModule; },
                 () -> { MemoryConfig.enabled = true; ensureMemoryModule(); startModule(memoryModule); },
                 () -> { MemoryConfig.enabled = false; stopModule(memoryModule); if (memoryModule != null) memoryModule.stop(); }
         ));
@@ -240,9 +241,18 @@ public class FloatingService extends Service {
     private void registerBatteryBarTarget() {
         SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
                 "batterybar", "Battery Strip",
-                () -> (SmartPanelTarget) batteryBarModule,
+                () -> { ensureBatteryBarModule(); return (SmartPanelTarget) batteryBarModule; },
                 () -> { BatteryBarConfig.enabled = true; ensureBatteryBarModule(); startModule(batteryBarModule); },
                 () -> { BatteryBarConfig.enabled = false; stopModule(batteryBarModule); if (batteryBarModule != null) batteryBarModule.stop(); }
+        ));
+    }
+
+    private void registerTextTarget() {
+        SmartPanelRegistry.register(new SmartPanelRegistry.Entry(
+                "text", "Floating Text",
+                () -> { ensureTextModule(); return (SmartPanelTarget) textModule; },
+                () -> { prefs.edit().putBoolean("text_overlay_on", true).apply(); ensureTextModule(); startModule(textModule); },
+                () -> { prefs.edit().putBoolean("text_overlay_on", false).apply(); stopModule(textModule); if (textModule != null) textModule.stop(); }
         ));
     }
 
