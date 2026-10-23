@@ -124,6 +124,30 @@
 
 ---
 
+### 9. APP_RUNNER
+**Status:** Rencana — belum dikerjakan
+**Dampak:** Fitur baru (app lain bisa dijaga tetap hidup di latar)
+**Kompleksitas:**
+- Picker aplikasi (butuh `<queries>` di manifest agar daftar tidak kosong di Android 11+)
+- Supervisor: cek proses berkala, relaunch kalau mati, plus batas restart per jam
+- Deteksi proses tanpa Shizuku via `UsageStatsManager` (sudah ada izinya)
+- Shizuku opsional (Tier B) untuk `deviceidle whitelist` / `set-inactive` / `pidof`
+- Modular Virtual Display (Tier C) masih hold
+- Detail: `_schedule/RENCANA/APP_RUNNER.md`
+
+---
+
+### 10. DATA_USAGE_HARI_INI
+**Status:** Rencana siap dikerjakan — belum ada implementasi
+**Dampak:** Rekap konsumsi data harian (tambahan, tanpa izin & dependency baru)
+**Konsep:**
+- Akumulasi delta dari `TrafficStats` (counter global device, sudah dipakai modul Network)
+- Kartu baru di panel Network: total hari ini, rata-rata/jam, puncak, grafik batang 7 hari
+- Opsi overlay dua baris (default OFF, perilaku lama tidak berubah)
+- Detail: `_schedule/BERJALAN/DATA_USAGE_HARI_INI.md`
+
+---
+
 ## Ringkasan Eksekusi
 
 **Tahap 1: Stabilitas**
@@ -135,6 +159,7 @@
 
 **Tahap 3: Fitur Baru**
 - [✓] Notification Actions (tombol aksi di notifikasi)
+- [ ] Data Usage Hari Ini (rekap konsumsi data harian)
 
 **Tahap 4: Refactor Lanjutan**
 - [✓] Panel Navigation Fragment (jika diperlukan)
@@ -143,3 +168,4 @@
 - [ ] Grouped Overlay Position
 - [ ] Shizuku FPS Reader (eksperimental)
 - [ ] Deteksi Bypass Charging via Shizuku (BYPASS_CHARGING_SHIZUKU)
+- [ ] App Runner (APP_RUNNER)
