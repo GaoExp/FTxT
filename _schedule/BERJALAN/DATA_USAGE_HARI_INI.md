@@ -144,7 +144,7 @@ Puncak          ↓ 3.2 MB/s   ↑ 210 KB/s   (sampling 1s)
 
 - Formatter total harian **terpisah** dari formatter kecepatan: KB/MB/GB tanpa `/s` (formatter `formatUnit` yang ada selalu menambah `/s` dan belum punya GB).
 - Panel diperbarui **live** saat terlihat: `DataUsageTracker` menyediakan listener; `NetworkPanelController` mendaftar di `onPanelShown()` dan melepas di `onPanelHidden()`. Karena `NetworkPanelFragment` belum punya `onPanelHidden()`, tambahkan override tersebut (dipanggil `PanelManager`).
-- Jika `TrafficStats` tidak didukung: tampilkan pesan "Tidak didukung perangkat ini", sembunyikan kartu angka, nonaktifkan checkbox overlay.
+- Jika `TrafficStats` tidak didukung: tampilkan pesan "Tidak didukung perangkat ini", sembunyikan kartu angka & tombol reset; overlay (bila opsi aktif) menampilkan "Hari ini —".
 - Grafik batang **7 hari terakhir** (termasuk hari ini, rx & tx side-by-side) memakai custom view baru. Hari tanpa data ditampilkan sebagai batang kosong/0.
 
 ### 5.2 Overlay (opsional, default OFF)

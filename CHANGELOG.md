@@ -1,3 +1,16 @@
+# [4.95.0] 2026/10/23 11:00 WITA 298 ***ONGOING***
+### 🔖 Deskripsi
+> Menambahkan sub-tab Data Usage di panel Network dan opsi ringkasan di overlay, memanfaatkan counter lalu lintas yang sudah dipakai modul Network.
+
+### ✨ Fitur Baru
+- **Data Usage di tab Monitor panel Network** — Panel Network kini memiliki tab Monitor dan Overlay seperti modul Battery/Memory. Tab Monitor menampilkan total unduh/unggah hari ini (total seluruh aplikasi di perangkat), rata-rata per jam, kecepatan puncak, dan grafik batang 7 hari terakhir, lengkap dengan tombol Reset Hari Ini. Angka dihitung dari selisih counter `TrafficStats` sehingga pemakaian yang terlewat tetap tercatat saat aplikasi dibuka atau saat modul Network kembali aktif; counter di-reset otomatis mengikuti tanggal perangkat dan aman terhadap reboot (total hari berjalan tidak ikut hilang). Data diperbarui langsung selama panel terbuka.
+- **Ringkasan usage di overlay (opsional, default nonaktif)** — Saat opsi "Tampilkan Usage Harian di Overlay" diaktifkan, overlay Network menampilkan baris kedua `Hari ini ↓… ↑…` tanpa mengubah baris kecepatan. Opsi "Sembunyikan Label" hanya berlaku pada baris kecepatan.
+
+### 💡 Memo
+- Angka bersifat total perangkat (semua aplikasi), bukan per aplikasi atau per jenis jaringan; hari yang terlewat tanpa observasi bisa bolong, dan traffic sejak observasi terakhir sampai reboot tidak dapat dipulihkan.
+
+---
+
 "# [4.94.0] 2026/09/10 17:33 WITA 290 ***RELEASE***
 ### 🔖 Deskripsi
 > Membangun fondasi Smart Panel — panel kontrol mengambang untuk mengatur posisi & pengaturan modul overlay tanpa membuka aplikasi.

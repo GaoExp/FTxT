@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.util.TypedValue;
 import android.graphics.Color;
@@ -51,6 +52,7 @@ import exp.ftxt.features.clock_module.ClockConfig;
 import exp.ftxt.features.crosshair.CrosshairConfig;
 import exp.ftxt.features.memory_stats.MemoryConfig;
 import exp.ftxt.features.fps_display.FpsConfig;
+import exp.ftxt.features.network_stats.DataUsageTracker;
 import exp.ftxt.features.network_stats.NetworkConfig;
 import exp.ftxt.features.floating_text.TextConfig;
 import exp.ftxt.ui.PanelManager;
@@ -232,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        DataUsageTracker.get(this).observe(
+                TrafficStats.getTotalRxBytes(), TrafficStats.getTotalTxBytes());
         refreshSidebar();
         if (panelManager != null) {
             panelManager.onPanelShown();
@@ -253,6 +257,12 @@ public class MainActivity extends AppCompatActivity {
         autoRequestAndStart();
         requestRemainingPermissions();
         FloatingService.updatePositionForModule(FloatingService.textModule());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        DataUsageTracker.get(this).flush();
     }
 
     private void requestRemainingPermissions() {
@@ -503,6 +513,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkConfig.bg.color = prefs.getInt("network_bg_color", 0xCC000000);
         NetworkConfig.bg.padding = prefs.getInt("network_bg_padding", 8);
         NetworkConfig.updateInterval = readFloatPref(prefs, "network_update_interval", 1f);
+        NetworkConfig.showUsageInOverlay = prefs.getBoolean("network_show_usage_in_overlay", false);
 
         BatteryStatsConfig.enabled = prefs.getBoolean("battery_enabled", false);
         BatteryStatsConfig.size = prefs.getFloat("battery_size", 12f);

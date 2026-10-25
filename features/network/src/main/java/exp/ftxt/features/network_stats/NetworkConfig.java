@@ -15,6 +15,7 @@ public class NetworkConfig {
     public static boolean touchPassthrough = true;
     public static boolean safeArea = true;
     public static boolean showOnlyValue = false;
+    public static boolean showUsageInOverlay = false;
     public static float posX = 0.75f;
     public static float posY = 0.05f;
     public static float updateInterval = 1f;

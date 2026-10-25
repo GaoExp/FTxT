@@ -2,22 +2,28 @@
             <!-- Network Panel -->
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/panel_network"
                 android:orientation="vertical"
-                android:padding="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            <androidx.core.widget.NestedScrollView
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/networkSubSpeedPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:overScrollMode="always"
                 android:scrollbars="vertical"
                 android:fillViewport="true">
 
             <LinearLayout
                 android:orientation="vertical"
+                android:padding="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -646,5 +652,117 @@
             </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/networkSubUsagePage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:overScrollMode="always"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <CheckBox
+                        android:id="@+id/networkUsageOverlayCheck"
+                        android:text="Tampilkan Usage Harian di Overlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="Total seluruh aplikasi di perangkat"
+                        android:textSize="12sp"
+                        android:textColor="#888888"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/networkUsageUnsupported"
+                        android:text="Tidak didukung perangkat ini"
+                        android:textSize="13sp"
+                        android:visibility="gone"
+                        android:layout_marginTop="4dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <LinearLayout
+                        android:id="@+id/networkUsageContent"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/networkUsageToday"
+                            android:text="Hari ini   ↓ 0B   ↑ 0B"
+                            android:textSize="14sp"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/networkUsageAverage"
+                            android:text="Rata-rata   —"
+                            android:textSize="14sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:id="@+id/networkUsagePeak"
+                            android:text="Puncak   —"
+                            android:textSize="14sp"
+                            android:layout_marginTop="2dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <TextView
+                            android:text="Hijau: unduh   Biru: unggah   7 hari terakhir"
+                            android:textSize="11sp"
+                            android:textColor="#888888"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                        <exp.ftxt.features.network_stats.UsageBarsView
+                            android:id="@+id/networkUsageBars"
+                            android:layout_marginTop="4dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="140dp"/>
+
+                        <Button
+                            android:id="@+id/networkUsageReset"
+                            android:text="Reset Hari Ini"
+                            android:layout_marginTop="8dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            </FrameLayout>
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/netBottomNav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="45dp"
+                app:menu="@menu/menu_network_bottom_nav"
+                app:labelVisibilityMode="labeled"
+                app:itemIconSize="18dp"
+                app:itemTextAppearance="@style/NetNavTextAppearance"
+                app:itemTextColor="@color/net_nav_item_color"
+                app:itemIconTint="@color/net_nav_item_color"
+                app:itemPaddingTop="1dp"
+                app:itemPaddingBottom="2dp"
+                app:itemActiveIndicatorStyle="@style/NetNavActiveIndicator"/>
 
             </LinearLayout>

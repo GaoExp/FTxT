@@ -38,5 +38,13 @@
         <item name="android:textSize">10sp</item>
     </style>
 
+    <style name="NetNavActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
+    </style>
+
+    <style name="NetNavTextAppearance" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">10sp</item>
+    </style>
+
 </resources>
 

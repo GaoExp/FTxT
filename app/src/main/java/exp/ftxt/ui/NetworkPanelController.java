@@ -13,10 +13,14 @@ import android.widget.SeekBar;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import exp.ftxt.MainActivity;
 import exp.ftxt.R;
 import exp.ftxt.core.FloatingService;
+import exp.ftxt.features.network_stats.DataUsageTracker;
 import exp.ftxt.features.network_stats.NetworkConfig;
+import exp.ftxt.features.network_stats.UsageBarsView;
 import exp.ftxt.shared.color.ColorPickerDialog;
 import exp.ftxt.shared.ui.SectionHelper;
 import exp.ftxt.shared.ui.SliderLabelEditor;
@@ -54,18 +58,40 @@ public class NetworkPanelController {
     private TextView networkIntervalValue;
     private PopupWindow intervalPopup;
 
+    private CheckBox networkUsageOverlayCheck;
+    private TextView networkUsageToday;
+    private TextView networkUsageAverage;
+    private TextView networkUsagePeak;
+    private TextView networkUsageUnsupported;
+    private LinearLayout networkUsageContent;
+    private Button networkUsageReset;
+    private UsageBarsView networkUsageBars;
+    private BottomNavigationView netBottomNav;
+    private View networkSubSpeedPage;
+    private View networkSubUsagePage;
+
+    private final DataUsageTracker.Listener usageListener;
+
     public NetworkPanelController(MainActivity activity, View rootView) {
         this.activity = activity;
+        this.usageListener = () -> activity.runOnUiThread(this::refreshUsage);
         bindViews(rootView);
+        setupSubTabs();
         loadConfig();
         setupListeners();
         networkPositionController = new NetworkPositionController(activity, rootView);
     }
 
     public void onPanelShown() {
+        DataUsageTracker.get(activity).addListener(usageListener);
+        refreshUsage();
         if (networkPositionController != null) {
             networkPositionController.refresh();
         }
+    }
+
+    public void onPanelHidden() {
+        DataUsageTracker.get(activity).removeListener(usageListener);
     }
 
     public void showLoadPresetDialog() {
@@ -75,6 +101,7 @@ public class NetworkPanelController {
     }
 
     public void cleanup() {
+        DataUsageTracker.get(activity).removeListener(usageListener);
         if (networkPositionController != null) {
             networkPositionController.cleanup();
             networkPositionController = null;
@@ -113,6 +140,17 @@ public class NetworkPanelController {
         networkShadowOffsetXLabel = rootView.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = rootView.findViewById(R.id.networkShadowOffsetYLabel);
         networkIntervalValue = rootView.findViewById(R.id.networkIntervalValue);
+        networkUsageOverlayCheck = rootView.findViewById(R.id.networkUsageOverlayCheck);
+        networkUsageToday = rootView.findViewById(R.id.networkUsageToday);
+        networkUsageAverage = rootView.findViewById(R.id.networkUsageAverage);
+        networkUsagePeak = rootView.findViewById(R.id.networkUsagePeak);
+        networkUsageUnsupported = rootView.findViewById(R.id.networkUsageUnsupported);
+        networkUsageContent = rootView.findViewById(R.id.networkUsageContent);
+        networkUsageReset = rootView.findViewById(R.id.networkUsageReset);
+        networkUsageBars = rootView.findViewById(R.id.networkUsageBars);
+        netBottomNav = rootView.findViewById(R.id.netBottomNav);
+        networkSubSpeedPage = rootView.findViewById(R.id.networkSubSpeedPage);
+        networkSubUsagePage = rootView.findViewById(R.id.networkSubUsagePage);
 
         View sectionDisplay = rootView.findViewById(R.id.network_sectionDisplay);
         TextView sectionDisplayHeader = rootView.findViewById(R.id.network_sectionDisplayHeader);
@@ -129,6 +167,21 @@ public class NetworkPanelController {
         View sectionBackground = rootView.findViewById(R.id.network_sectionBackground);
         TextView sectionBackgroundHeader = rootView.findViewById(R.id.network_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
+    }
+
+    private void setupSubTabs() {
+        netBottomNav.setOnItemSelectedListener(item -> {
+            selectSubTab(item.getItemId() == R.id.netTabNavOverlay ? 1 : 0);
+            return true;
+        });
+        selectSubTab(0);
+    }
+
+    private void selectSubTab(int index) {
+        boolean usage = index == 0;
+        networkSubSpeedPage.setVisibility(usage ? View.GONE : View.VISIBLE);
+        networkSubUsagePage.setVisibility(usage ? View.VISIBLE : View.GONE);
+        if (usage) refreshUsage();
     }
 
     private void loadConfig() {
@@ -154,6 +207,8 @@ public class NetworkPanelController {
         networkLockSwitch.setChecked(NetworkConfig.touchPassthrough);
         activity.applyCheckboxTint(networkLockSwitch, NetworkConfig.touchPassthrough);
         networkValueOnlyCheck.setChecked(NetworkConfig.showOnlyValue);
+        networkUsageOverlayCheck.setChecked(NetworkConfig.showUsageInOverlay);
+        activity.applyCheckboxTint(networkUsageOverlayCheck, NetworkConfig.showUsageInOverlay);
         networkSafeArea.setChecked(NetworkConfig.safeArea);
         networkSizeLabel.setText("Ukuran Teks: " + (int) NetworkConfig.size);
         networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bg.padding);
@@ -388,6 +443,19 @@ public class NetworkPanelController {
             FloatingService.updateColorForModule(FloatingService.networkModule(), NetworkConfig.color);
         });
 
+        networkUsageOverlayCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.showUsageInOverlay = isChecked;
+            activity.applyCheckboxTint(networkUsageOverlayCheck, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_show_usage_in_overlay", isChecked).apply();
+            FloatingService.restartModule(FloatingService.networkModule());
+        });
+
+        networkUsageReset.setOnClickListener(v -> {
+            DataUsageTracker.get(activity).resetToday();
+            refreshUsage();
+        });
+
         networkSafeArea.setOnCheckedChangeListener((buttonView, isChecked) -> {
             NetworkConfig.safeArea = isChecked;
             activity.applyCheckboxTint(networkSafeArea, isChecked);
@@ -415,6 +483,36 @@ public class NetworkPanelController {
                 SliderLabelEditor.showOffsetEditor(activity, "Shadow Y", networkShadowOffsetYSeekBar, networkShadowOffsetYLabel, "Shadow Y: "));
 
         setupIntervalListeners();
+    }
+
+    private void refreshUsage() {
+        if (networkUsageToday == null) return;
+
+        DataUsageTracker tracker = DataUsageTracker.get(activity);
+        boolean unsupported = tracker.isUnsupported();
+        networkUsageUnsupported.setVisibility(unsupported ? View.VISIBLE : View.GONE);
+        networkUsageContent.setVisibility(unsupported ? View.GONE : View.VISIBLE);
+        if (unsupported) return;
+
+        networkUsageToday.setText("Hari ini   ↓ " + DataUsageTracker.formatBytes(tracker.getDayRx())
+                + "   ↑ " + DataUsageTracker.formatBytes(tracker.getDayTx()));
+
+        long avgRx = tracker.getAverageRxPerHour();
+        long avgTx = tracker.getAverageTxPerHour();
+        if (avgRx < 0 && avgTx < 0) {
+            networkUsageAverage.setText("Rata-rata   —");
+        } else {
+            String rx = avgRx < 0 ? "—" : DataUsageTracker.formatBytes(avgRx) + "/jam";
+            String tx = avgTx < 0 ? "—" : DataUsageTracker.formatBytes(avgTx) + "/jam";
+            networkUsageAverage.setText("Rata-rata   ↓ " + rx + "   ↑ " + tx);
+        }
+
+        String sampling = formatIntervalValue(NetworkConfig.updateInterval) + "s";
+        networkUsagePeak.setText("Puncak (sampling " + sampling + ")   ↓ "
+                + DataUsageTracker.formatSpeed(tracker.getPeakRx())
+                + "   ↑ " + DataUsageTracker.formatSpeed(tracker.getPeakTx()));
+
+        networkUsageBars.setData(tracker.getDays(7));
     }
 
     private void saveNetworkShadowPrefs() {

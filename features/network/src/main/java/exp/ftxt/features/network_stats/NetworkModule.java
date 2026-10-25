@@ -102,6 +102,9 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
     public void stop() {
         running = false;
         handler.removeCallbacks(tickRunnable);
+        if (context != null) {
+            DataUsageTracker.get(context).flush();
+        }
         if (view != null && wm != null) {
             try {
                 wm.removeView(view);
@@ -327,21 +330,59 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
     private void updateDisplay() {
         if (view == null) return;
-        String text = getCurrentSpeedText();
         view.setTextColor(NetworkConfig.color);
-        if (NetworkConfig.showOnlyValue) {
-            view.setText(text.replace("↓", "").replace("↑", "").replace("MB/s", "").replace("KB/s", ""));
-        } else {
-            SpannableString spannable = new SpannableString(text);
-            for (int i = 0; i < text.length(); i++) {
-                char c = text.charAt(i);
-                if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
-                    spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
-                            i, i + 1, 0);
-                }
+
+        String speedText = getCurrentSpeedText();
+        String speedLine = NetworkConfig.showOnlyValue
+                ? speedText.replace("↓", "").replace("↑", "").replace("MB/s", "").replace("KB/s", "")
+                : speedText;
+
+        if (!NetworkConfig.showUsageInOverlay || context == null) {
+            if (NetworkConfig.showOnlyValue) {
+                view.setText(speedLine);
+            } else {
+                SpannableString spannable = new SpannableString(speedLine);
+                applyLabelSpans(spannable, 0, speedLine.length());
+                view.setText(spannable);
             }
-            view.setText(spannable);
+            return;
         }
+
+        String usageLine = getUsageText();
+        String text = speedLine + "\n" + usageLine;
+        SpannableString spannable = new SpannableString(text);
+
+        if (!NetworkConfig.showOnlyValue) {
+            applyLabelSpans(spannable, 0, speedLine.length());
+        }
+        int usageStart = text.length() - usageLine.length();
+        applyUsageLabelSpans(spannable, usageStart, text.length());
+        view.setText(spannable);
+    }
+
+    private String getUsageText() {
+        DataUsageTracker tracker = DataUsageTracker.get(context);
+        if (tracker.isUnsupported()) {
+            return "Hari ini —";
+        }
+        return "Hari ini ↓" + DataUsageTracker.formatBytes(tracker.getDayRx())
+                + " ↑" + DataUsageTracker.formatBytes(tracker.getDayTx());
+    }
+
+    private void applyLabelSpans(SpannableString spannable, int start, int end) {
+        for (int i = start; i < end; i++) {
+            char c = spannable.charAt(i);
+            if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
+                spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
+                        i, i + 1, 0);
+            }
+        }
+    }
+
+    private void applyUsageLabelSpans(SpannableString spannable, int start, int end) {
+        int prefixEnd = Math.min(start + "Hari ini".length(), end);
+        spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor), start, prefixEnd, 0);
+        applyLabelSpans(spannable, prefixEnd, end);
     }
 
     private final Runnable tickRunnable = new Runnable() {
@@ -352,12 +393,16 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
             long rxBytes = TrafficStats.getTotalRxBytes();
             long txBytes = TrafficStats.getTotalTxBytes();
 
+            DataUsageTracker tracker = DataUsageTracker.get(context);
+            tracker.observe(rxBytes, txBytes);
+
             long elapsed = now - lastTimestamp;
             if (elapsed > 0) {
                 long rxSpeed = ((rxBytes - lastRxBytes) * 1000) / elapsed;
                 long txSpeed = ((txBytes - lastTxBytes) * 1000) / elapsed;
                 lastRxSpeed = rxSpeed;
                 lastTxSpeed = txSpeed;
+                tracker.noteSpeed(rxSpeed, txSpeed);
                 updateDisplay();
             }
 

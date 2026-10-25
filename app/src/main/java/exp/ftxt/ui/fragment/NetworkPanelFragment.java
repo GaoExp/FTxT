@@ -36,6 +36,11 @@ public class NetworkPanelFragment extends BasePanelFragment {
     }
 
     @Override
+    public void onPanelHidden() {
+        if (controller != null) controller.onPanelHidden();
+    }
+
+    @Override
     public void showLoadPresetDialog() {
         if (controller != null) controller.showLoadPresetDialog();
     }
