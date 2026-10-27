@@ -1,6 +1,7 @@
 package exp.ftxt.ui;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
@@ -32,9 +33,15 @@ public class NetworkPanelController {
 
     private CheckBox networkSwitch;
     private CheckBox networkValueOnlyCheck;
+    private CheckBox networkVerticalCheck;
+    private CheckBox networkBarCheck;
+    private CheckBox networkBarInvertCheck;
     private SeekBar networkSizeSeekBar;
+    private SeekBar networkWidthSeekBar;
     private View networkColorPreview;
     private View networkLabelColorPreview;
+    private View networkBarDownColorPreview;
+    private View networkBarUpColorPreview;
     private CheckBox networkShadowSwitch;
     private LinearLayout networkShadowConfigContainer;
     private View networkShadowColorPreview;
@@ -51,14 +58,13 @@ public class NetworkPanelController {
     private SeekBar networkBgOffsetYSeekBar;
     private SeekBar networkBgMarginSeekBar;
     private SeekBar networkBgRadiusSeekBar;
-    private TextView networkSizeLabel, networkBgPaddingLabel, networkBgOffsetXLabel, networkBgOffsetYLabel;
+    private TextView networkSizeLabel, networkWidthLabel, networkBgPaddingLabel, networkBgOffsetXLabel, networkBgOffsetYLabel;
     private TextView networkBgMarginLabel, networkBgRadiusLabel;
     private TextView networkShadowBlurLabel, networkShadowOffsetXLabel, networkShadowOffsetYLabel;
     private NetworkPositionController networkPositionController;
     private TextView networkIntervalValue;
     private PopupWindow intervalPopup;
 
-    private CheckBox networkUsageOverlayCheck;
     private TextView networkUsageToday;
     private TextView networkUsageAverage;
     private TextView networkUsagePeak;
@@ -69,6 +75,11 @@ public class NetworkPanelController {
     private BottomNavigationView netBottomNav;
     private View networkSubSpeedPage;
     private View networkSubUsagePage;
+    private TextView networkSubTabUsage, networkSubTabApps, networkSubTabTools;
+    private View networkUsageTabUsage, networkUsageTabApps, networkUsageTabTools;
+
+    private static final int USAGE_TAB_ACTIVE_COLOR = 0xFF2196F3;
+    private static final int USAGE_TAB_INACTIVE_COLOR = 0xFF9E9E9E;
 
     private final DataUsageTracker.Listener usageListener;
 
@@ -76,6 +87,7 @@ public class NetworkPanelController {
         this.activity = activity;
         this.usageListener = () -> activity.runOnUiThread(this::refreshUsage);
         bindViews(rootView);
+        setupUsageTabs();
         setupSubTabs();
         loadConfig();
         setupListeners();
@@ -111,9 +123,15 @@ public class NetworkPanelController {
     private void bindViews(View rootView) {
         networkSwitch = rootView.findViewById(R.id.networkSwitch);
         networkValueOnlyCheck = rootView.findViewById(R.id.networkValueOnlyCheck);
+        networkVerticalCheck = rootView.findViewById(R.id.networkVerticalCheck);
+        networkBarCheck = rootView.findViewById(R.id.networkBarCheck);
+        networkBarInvertCheck = rootView.findViewById(R.id.networkBarInvertCheck);
         networkSizeSeekBar = rootView.findViewById(R.id.networkSizeSeekBar);
+        networkWidthSeekBar = rootView.findViewById(R.id.networkWidthSeekBar);
         networkColorPreview = rootView.findViewById(R.id.networkColorPreview);
         networkLabelColorPreview = rootView.findViewById(R.id.networkLabelColorPreview);
+        networkBarDownColorPreview = rootView.findViewById(R.id.networkBarDownColorPreview);
+        networkBarUpColorPreview = rootView.findViewById(R.id.networkBarUpColorPreview);
         networkShadowSwitch = rootView.findViewById(R.id.networkShadowSwitch);
         networkShadowConfigContainer = rootView.findViewById(R.id.shadowConfigNetwork);
         networkShadowColorPreview = rootView.findViewById(R.id.networkShadowColorPreview);
@@ -131,6 +149,7 @@ public class NetworkPanelController {
         networkBgMarginSeekBar = rootView.findViewById(R.id.networkBgMarginSeekBar);
         networkBgRadiusSeekBar = rootView.findViewById(R.id.networkBgRadiusSeekBar);
         networkSizeLabel = rootView.findViewById(R.id.networkSizeLabel);
+        networkWidthLabel = rootView.findViewById(R.id.networkWidthLabel);
         networkBgPaddingLabel = rootView.findViewById(R.id.networkBgPaddingLabel);
         networkBgOffsetXLabel = rootView.findViewById(R.id.networkBgOffsetXLabel);
         networkBgOffsetYLabel = rootView.findViewById(R.id.networkBgOffsetYLabel);
@@ -140,7 +159,6 @@ public class NetworkPanelController {
         networkShadowOffsetXLabel = rootView.findViewById(R.id.networkShadowOffsetXLabel);
         networkShadowOffsetYLabel = rootView.findViewById(R.id.networkShadowOffsetYLabel);
         networkIntervalValue = rootView.findViewById(R.id.networkIntervalValue);
-        networkUsageOverlayCheck = rootView.findViewById(R.id.networkUsageOverlayCheck);
         networkUsageToday = rootView.findViewById(R.id.networkUsageToday);
         networkUsageAverage = rootView.findViewById(R.id.networkUsageAverage);
         networkUsagePeak = rootView.findViewById(R.id.networkUsagePeak);
@@ -151,6 +169,12 @@ public class NetworkPanelController {
         netBottomNav = rootView.findViewById(R.id.netBottomNav);
         networkSubSpeedPage = rootView.findViewById(R.id.networkSubSpeedPage);
         networkSubUsagePage = rootView.findViewById(R.id.networkSubUsagePage);
+        networkSubTabUsage = rootView.findViewById(R.id.networkSubTabUsage);
+        networkSubTabApps = rootView.findViewById(R.id.networkSubTabApps);
+        networkSubTabTools = rootView.findViewById(R.id.networkSubTabTools);
+        networkUsageTabUsage = rootView.findViewById(R.id.networkUsageTabUsage);
+        networkUsageTabApps = rootView.findViewById(R.id.networkUsageTabApps);
+        networkUsageTabTools = rootView.findViewById(R.id.networkUsageTabTools);
 
         View sectionDisplay = rootView.findViewById(R.id.network_sectionDisplay);
         TextView sectionDisplayHeader = rootView.findViewById(R.id.network_sectionDisplayHeader);
@@ -167,6 +191,28 @@ public class NetworkPanelController {
         View sectionBackground = rootView.findViewById(R.id.network_sectionBackground);
         TextView sectionBackgroundHeader = rootView.findViewById(R.id.network_sectionBackgroundHeader);
         SectionHelper.setupCollapsible(sectionBackgroundHeader, sectionBackground);
+    }
+
+    private void setupUsageTabs() {
+        networkSubTabUsage.setOnClickListener(v -> selectUsageTab(0));
+        networkSubTabApps.setOnClickListener(v -> selectUsageTab(1));
+        networkSubTabTools.setOnClickListener(v -> selectUsageTab(2));
+        selectUsageTab(0);
+    }
+
+    private void selectUsageTab(int index) {
+        networkUsageTabUsage.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
+        networkUsageTabApps.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
+        networkUsageTabTools.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
+        applyUsageTabState(networkSubTabUsage, index == 0);
+        applyUsageTabState(networkSubTabApps, index == 1);
+        applyUsageTabState(networkSubTabTools, index == 2);
+        if (index == 0) refreshUsage();
+    }
+
+    private void applyUsageTabState(TextView tv, boolean active) {
+        tv.setTextColor(active ? USAGE_TAB_ACTIVE_COLOR : USAGE_TAB_INACTIVE_COLOR);
+        tv.setTypeface(active ? Typeface.DEFAULT_BOLD : Typeface.DEFAULT);
     }
 
     private void setupSubTabs() {
@@ -188,8 +234,21 @@ public class NetworkPanelController {
         networkSwitch.setChecked(NetworkConfig.enabled);
         activity.applyCheckboxTint(networkSwitch, NetworkConfig.enabled);
         networkSizeSeekBar.setProgress((int) NetworkConfig.size);
+        networkWidthSeekBar.setProgress(clampWidth(NetworkConfig.displayWidthDp));
+        networkVerticalCheck.setChecked(NetworkConfig.verticalLayout);
+        activity.applyCheckboxTint(networkVerticalCheck, NetworkConfig.verticalLayout);
+        NetworkConfig.barEnabled = true;
+        networkBarCheck.setChecked(true);
+        activity.applyCheckboxTint(networkBarCheck, true);
+        networkBarCheck.setEnabled(false);
+        networkBarCheck.setAlpha(0.5f);
+        networkBarInvertCheck.setChecked(NetworkConfig.barInverted);
+        activity.applyCheckboxTint(networkBarInvertCheck, NetworkConfig.barInverted);
+        FloatingService.updateLayoutForModule(FloatingService.networkModule());
         networkColorPreview.setBackgroundColor(NetworkConfig.color);
         networkLabelColorPreview.setBackgroundColor(NetworkConfig.labelColor);
+        networkBarDownColorPreview.setBackgroundColor(NetworkConfig.barColorDown);
+        networkBarUpColorPreview.setBackgroundColor(NetworkConfig.barColorUp);
         networkBgSwitch.setChecked(NetworkConfig.bg.enabled);
         activity.applyCheckboxTint(networkBgSwitch, NetworkConfig.bg.enabled);
         networkBgConfigContainer.setVisibility(NetworkConfig.bg.enabled ? View.VISIBLE : View.GONE);
@@ -207,10 +266,9 @@ public class NetworkPanelController {
         networkLockSwitch.setChecked(NetworkConfig.touchPassthrough);
         activity.applyCheckboxTint(networkLockSwitch, NetworkConfig.touchPassthrough);
         networkValueOnlyCheck.setChecked(NetworkConfig.showOnlyValue);
-        networkUsageOverlayCheck.setChecked(NetworkConfig.showUsageInOverlay);
-        activity.applyCheckboxTint(networkUsageOverlayCheck, NetworkConfig.showUsageInOverlay);
         networkSafeArea.setChecked(NetworkConfig.safeArea);
         networkSizeLabel.setText("Ukuran Teks: " + (int) NetworkConfig.size);
+        networkWidthLabel.setText("Panjang Badge: " + clampWidth(NetworkConfig.displayWidthDp) + "dp");
         networkBgPaddingLabel.setText("Ukuran Background: " + NetworkConfig.bg.padding);
         networkBgOffsetXLabel.setText("Offset X: " + NetworkConfig.bg.offsetX);
         networkBgOffsetYLabel.setText("Offset Y: " + NetworkConfig.bg.offsetY);
@@ -228,6 +286,11 @@ public class NetworkPanelController {
         if (v == (long) v) return String.valueOf((long) v);
         String s = String.format("%.2f", v).replaceAll("0$", "").replaceAll("\\.$", "");
         return s;
+    }
+
+    private int clampWidth(int width) {
+        return Math.max(NetworkConfig.MIN_WIDTH_DP,
+                Math.min(NetworkConfig.MAX_WIDTH_DP, width));
     }
 
     private void setupListeners() {
@@ -262,10 +325,62 @@ public class NetworkPanelController {
                 if (progress > 100) { progress = 100; sb.setProgress(progress); }
                 NetworkConfig.size = progress;
                 networkSizeLabel.setText("Ukuran Teks: " + progress);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putFloat("network_size", (float) progress).apply();
                 FloatingService.updateSizeForModule(FloatingService.networkModule(), NetworkConfig.size);
             }
             @Override public void onStartTrackingTouch(SeekBar sb) {}
             @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        networkWidthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                int width = clampWidth(progress);
+                if (progress != width) sb.setProgress(width);
+                NetworkConfig.displayWidthDp = width;
+                networkWidthLabel.setText("Panjang Badge: " + width + "dp");
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("network_display_width_dp", width).apply();
+                FloatingService.updateLayoutForModule(FloatingService.networkModule());
+            }
+            @Override public void onStartTrackingTouch(SeekBar sb) {}
+            @Override public void onStopTrackingTouch(SeekBar sb) {}
+        });
+
+        networkVerticalCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.verticalLayout = isChecked;
+            activity.applyCheckboxTint(networkVerticalCheck, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_vertical_layout", isChecked).apply();
+            FloatingService.updateLayoutForModule(FloatingService.networkModule());
+        });
+
+        networkBarInvertCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.barInverted = isChecked;
+            activity.applyCheckboxTint(networkBarInvertCheck, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_bar_inverted", isChecked).apply();
+            FloatingService.updateLayoutForModule(FloatingService.networkModule());
+        });
+
+        networkBarDownColorPreview.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Bar Unduh", NetworkConfig.barColorDown, color -> {
+                NetworkConfig.barColorDown = color;
+                networkBarDownColorPreview.setBackgroundColor(color);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("network_bar_color_down", color).apply();
+                FloatingService.updateLayoutForModule(FloatingService.networkModule());
+            });
+        });
+
+        networkBarUpColorPreview.setOnClickListener(v -> {
+            ColorPickerDialog.show(activity, "Warna Bar Unggah", NetworkConfig.barColorUp, color -> {
+                NetworkConfig.barColorUp = color;
+                networkBarUpColorPreview.setBackgroundColor(color);
+                activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                        .edit().putInt("network_bar_color_up", color).apply();
+                FloatingService.updateLayoutForModule(FloatingService.networkModule());
+            });
         });
 
         networkColorPreview.setOnClickListener(v -> {
@@ -443,14 +558,6 @@ public class NetworkPanelController {
             FloatingService.updateColorForModule(FloatingService.networkModule(), NetworkConfig.color);
         });
 
-        networkUsageOverlayCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            NetworkConfig.showUsageInOverlay = isChecked;
-            activity.applyCheckboxTint(networkUsageOverlayCheck, isChecked);
-            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
-                    .edit().putBoolean("network_show_usage_in_overlay", isChecked).apply();
-            FloatingService.restartModule(FloatingService.networkModule());
-        });
-
         networkUsageReset.setOnClickListener(v -> {
             DataUsageTracker.get(activity).resetToday();
             refreshUsage();
@@ -465,6 +572,10 @@ public class NetworkPanelController {
 
         networkSizeLabel.setOnClickListener(v ->
                 SliderLabelEditor.showSliderEditor(activity, "Ukuran Teks", networkSizeSeekBar, 100, networkSizeLabel, "Ukuran Teks: "));
+        networkWidthLabel.setOnClickListener(v ->
+                SliderLabelEditor.showSliderEditor(activity, "Panjang Badge", networkWidthSeekBar,
+                        NetworkConfig.MIN_WIDTH_DP, NetworkConfig.MAX_WIDTH_DP, 0,
+                        networkWidthLabel, "Panjang Badge: ", "dp", null));
         networkBgPaddingLabel.setOnClickListener(v ->
                 SliderLabelEditor.showSliderEditor(activity, "Ukuran Background", networkBgPaddingSeekBar, 80, networkBgPaddingLabel, "Ukuran Background: "));
         networkBgOffsetXLabel.setOnClickListener(v ->

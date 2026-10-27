@@ -1,7 +1,7 @@
 # Data Usage & Alat Jaringan — Hasil Kajian Data Monitor
 
 **Status:** Rencana — belum dikerjakan
-**Tujuan:** Menerapkan fitur pemakaian data dan alat jaringan yang terbukti berguna dari `anomali.datamonitor` (Data Monitor) dan `com.andcreate.app.trafficmonitor` (Data Usage Monitor), tanpa meniru iklan/premium dan tanpa menambah beban overlay.
+**Tujuan:** Menerapkan fitur pemakaian data dan alat jaringan yang terbukti berguna dari `anomali.datamonitor` (Data Monitor) dan `com.andcreate.app.internetspeedmonitor` (Internet Speed Monitor), tanpa meniru iklan/premium dan tanpa menambah beban overlay.
 
 ---
 
@@ -12,7 +12,7 @@
 - Sumber data masih `TrafficStats.getTotalRxBytes()/getTotalTxBytes()`, yaitu **total perangkat** (WiFi + seluler digabung), disimpan di `SharedPreferences` (`usage_*`) via `DataUsageTracker`.
 - Belum ada rincian per aplikasi, pemisahan WiFi/seluler, kuota, notifikasi, widget, atau alat jaringan.
 - `PACKAGE_USAGE_STATS` sudah dideklarasikan, tetapi belum dipakai. `POST_NOTIFICATIONS` juga sudah ada.
-- APK hasil dekompilasi tersedia di `_temp/f/jadx-out/` (`data_monitor`, `data_monitor_res`, `traffic_monitor`, `traffic_monitor_res`).
+- APK hasil dekompilasi tersedia di `_temp/apk1/`: `DataMonitor_1.0.223/` (`anomali.datamonitor` v1.0.223) dan `base2/` (`com.andcreate.app.internetspeedmonitor` v1.2.1), masing-masing berisi dump `smali`, manifest, dan badging.
 
 ---
 

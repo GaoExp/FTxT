@@ -436,6 +436,12 @@ public class FloatingService extends Service {
         }
     }
 
+    public static void updateLayoutForModule(OverlayModule module) {
+        if (instance != null && module != null && module.isRunning()) {
+            module.updateLayout();
+        }
+    }
+
     public static void updatePositionForModule(OverlayModule module) {
         if (instance != null && module != null && module.isRunning()) {
             module.updatePosition();

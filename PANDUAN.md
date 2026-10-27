@@ -145,10 +145,20 @@ Panel Battery Info memiliki **3 tab** di bagian bawah: **Monitor**, **Overlay**,
 - Pengaturan lain: ketebalan, radius sudut, strip kosong, shadow, kunci posisi, area aman.
 
 ### Network Speed
-- Kecepatan internet real-time format `↓128KB/s ↑128KB/s`
-- **Warna Label Terpisah** — Tombol "Warna Label" untuk warna indikator ↓↑ dan satuan KB/MB/s terpisah dari nilai angka
-- Otomatis berubah ke MB/s saat >1024 KB/s
-- Polling via TrafficStats, interval update bisa diatur 0.2–10 detik (default 1d)
+Panel Network memiliki **2 tab**: **Monitor** dan **Overlay**.
+
+**Tab Monitor** — Memiliki header **Pemakaian**, **Aplikasi**, dan **Alat**; tab Pemakaian memuat rekap pemakaian data seluruh perangkat:
+- Total unduh/unggah hari ini, rata-rata per jam, kecepatan puncak, dan grafik batang 7 hari terakhir
+- Tombol Reset Hari Ini
+- Angka dihitung dari selisih counter `TrafficStats`; pemakaian yang terlewat tetap tercatat saat aplikasi dibuka atau modul kembali aktif
+
+**Tab Overlay** — Dua badge kecepatan terpisah:
+- Badge unduh dan unggah masing-masing menampilkan kecepatan real-time; otomatis memakai MB/s di atas 1024 KB/s
+- **Color bar** mengisi tinggi penuh badge; hanya lapisan isian yang digambar tanpa track latar, panjangnya mengikuti kecepatan (skala logaritmik, penuh di 10 MB/s); selalu aktif, toggle ditampilkan tercentang namun nonaktif; **Balik Arah Bar** membalik isian dari kanan ke kiri
+- **Panjang Badge** diatur 10–160 dp per badge; **Susunan Vertikal** mengubah dua badge menjadi atas-bawah tanpa mengubah panjang pilihan
+- **Warna Bar Unduh/Unggah** dapat diatur terpisah dengan color picker (termasuk alpha)
+- Opsi **Sembunyikan Label** membuang panah dan satuan; warna nilai dan label tetap terpisah
+- Polling via `TrafficStats`, interval update bisa diatur 0.2–10 detik (default 1 detik)
 
 ### Memory Stats
 Panel Memory Stats memiliki **2 tab**: **Monitor** dan **Overlay**.

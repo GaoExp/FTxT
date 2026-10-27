@@ -1,12 +1,12 @@
 # Analisis Cara Reference App Menangani Data Baterai
 
-**Tanggal:** 2026/09/04
+**Tanggal:** 2026/09/04 (diperbarui 2026/10/26)
 **Metode:** Ekstraksi & dekompilasi statis APK dengan `jadx` (Java). Output dianalisis dari skema SQL (Room / SQLite) dan struktur service/receiver di manifest serta source dekompilasi.
-**Sumber:**
-- `_temp/sample_apk/Battery/AccuBattery [2.1.8].apk` (`com.digibites.accubattery`)
-- `_temp/sample_apk/Battery/Battery Guru.apk` (`com.paget96.batteryguru`, v2.5.0.7)
+**Sumber acuan:** `_temp/sample_apk/Battery/` — **sudah tidak tersedia**, dan tidak ada penggantinya di `_temp/apk1/`.
+- `AccuBattery [2.1.8].apk` (`com.digibites.accubattery`)
+- `Battery Guru.apk` (`com.paget96.batteryguru`, v2.5.0.7)
 
-> Catatan: kedua APK dipakai R8 + obfuscation (nama class/field banyak diganti, mis. `IconCompatParcelizer`). Detail nilai numerik (interval sampling, ambang prune) tidak selalu utuh, tetapi pola arsitektur & skema database jelas terbaca. Dokumen ini fokus pada **strategi penanganan data**, bukan nilai nominal.
+> Catatan: analisis di bawah ditulis dari kedua APK tersebut saat masih tersedia, sehingga rincian teknis tidak dapat diverifikasi ulang. Kedua APK memakai R8 + obfuscation (nama class/field banyak diganti, mis. `IconCompatParcelizer`), sehingga detail nilai numerik (interval sampling, ambang prune) tidak selalu utuh, tetapi pola arsitektur & skema database terbaca jelas. Dokumen ini fokus pada **strategi penanganan data**, bukan nilai nominal.
 
 ---
 

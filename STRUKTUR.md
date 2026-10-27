@@ -89,7 +89,10 @@ FTxT/
 │   │   ├── build.gradle          — Library: namespace exp.ftxt.features.network, depend :shared:config, :shared:ui
 │   │   └── src/main/java/exp/ftxt/features/network_stats/
 │   │       ├── NetworkConfig.java — Konfigurasi statis Network overlay
-│   │       └── NetworkModule.java — Kecepatan internet ↓↑ via TrafficStats, 1 detik
+│   │       ├── NetworkModule.java — Kecepatan internet ↓↑ via TrafficStats, 1 detik
+│   │       ├── NetworkOverlayView.java — Dua badge + color bar overlay
+│   │       ├── DataUsageTracker.java — Pencatat usage harian untuk tab Monitor
+│   │       └── UsageBarsView.java — Grafik batang usage 7 hari
 │   │
 │   ├── floating-text/            — Fitur Floating Text
 │   │   ├── build.gradle          — Library: namespace exp.ftxt.features.floating_text, depend :shared:config, :shared:ui

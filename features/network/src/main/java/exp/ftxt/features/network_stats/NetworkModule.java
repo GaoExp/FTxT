@@ -7,20 +7,17 @@ import android.graphics.PixelFormat;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
 import android.view.WindowManager;
 
 import exp.ftxt.shared.ui.OverlayDragHandler;
 import exp.ftxt.shared.ui.OverlayModule;
 import exp.ftxt.shared.ui.OverlayShadow;
-import exp.ftxt.shared.ui.ShadowTextView;
 import exp.ftxt.shared.ui.SmartPanelTarget;
 
 public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
-    private ShadowTextView view;
+    private NetworkOverlayView view;
     private WindowManager.LayoutParams params;
     private WindowManager wm;
     private Context context;
@@ -55,17 +52,25 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
         wm = windowManager;
         context = ctx;
         prefs = ctx.getSharedPreferences("ftxt_prefs", Context.MODE_PRIVATE);
+        NetworkConfig.barEnabled = true;
 
-        view = new ShadowTextView(ctx);
+        view = new NetworkOverlayView(ctx);
         view.setShadowConfig(NetworkConfig.shadow);
+        view.setOverlayTextSize(NetworkConfig.size);
+        view.setTextColors(NetworkConfig.color, NetworkConfig.labelColor);
+        view.setBadgeWidthDp(NetworkConfig.displayWidthDp);
+        view.setVerticalLayout(NetworkConfig.verticalLayout);
+        view.setBarColors(NetworkConfig.barColorDown, NetworkConfig.barColorUp);
+        view.setBarEnabled(NetworkConfig.barEnabled);
+        view.setBarInverted(NetworkConfig.barInverted);
+        applyBackground();
 
         lastRxBytes = TrafficStats.getTotalRxBytes();
         lastTxBytes = TrafficStats.getTotalTxBytes();
         lastTimestamp = System.currentTimeMillis();
+        lastRxSpeed = 0;
+        lastTxSpeed = 0;
 
-        view.setTextSize(NetworkConfig.size);
-        view.setGravity(Gravity.CENTER_HORIZONTAL);
-        applyBackground();
         updateDisplay();
 
         params = new WindowManager.LayoutParams(
@@ -119,7 +124,10 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
     @Override
     public void updateSize(float size) {
         NetworkConfig.size = size;
-        if (view != null) view.setTextSize(size);
+        if (view != null) {
+            view.setOverlayTextSize(size);
+            view.post(this::updatePosition);
+        }
     }
 
     @Override
@@ -143,6 +151,20 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
     @Override
     public void updateBackground() {
         applyBackground();
+        if (view != null) view.post(this::updatePosition);
+    }
+
+    @Override
+    public void updateLayout() {
+        if (view == null) return;
+        view.setBadgeWidthDp(NetworkConfig.displayWidthDp);
+        view.setVerticalLayout(NetworkConfig.verticalLayout);
+        view.setBarColors(NetworkConfig.barColorDown, NetworkConfig.barColorUp);
+        view.setBarEnabled(NetworkConfig.barEnabled);
+        view.setBarInverted(NetworkConfig.barInverted);
+        view.setTextColors(NetworkConfig.color, NetworkConfig.labelColor);
+        updateDisplay();
+        view.post(this::updatePosition);
     }
 
     private String posSuffix() {
@@ -302,18 +324,7 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
     private void applyBackground() {
         if (view == null) return;
-        if (NetworkConfig.bg.enabled) {
-            int pad = NetworkConfig.bg.padding;
-            view.setPadding(pad, pad, pad, pad);
-        } else {
-            view.setPadding(0, 0, 0, 0);
-        }
-        view.setBgEnabled(NetworkConfig.bg.enabled);
-        view.setBgColor(NetworkConfig.bg.color);
-        view.setBgOffsetX(NetworkConfig.bg.offsetX);
-        view.setBgOffsetY(NetworkConfig.bg.offsetY);
-        view.setBgMargin(NetworkConfig.bg.margin);
-        view.setBgRadius(NetworkConfig.bg.radius);
+        view.setBackgroundConfig(NetworkConfig.bg);
     }
 
     private int getScreenWidth() {
@@ -330,59 +341,8 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
     private void updateDisplay() {
         if (view == null) return;
-        view.setTextColor(NetworkConfig.color);
-
-        String speedText = getCurrentSpeedText();
-        String speedLine = NetworkConfig.showOnlyValue
-                ? speedText.replace("↓", "").replace("↑", "").replace("MB/s", "").replace("KB/s", "")
-                : speedText;
-
-        if (!NetworkConfig.showUsageInOverlay || context == null) {
-            if (NetworkConfig.showOnlyValue) {
-                view.setText(speedLine);
-            } else {
-                SpannableString spannable = new SpannableString(speedLine);
-                applyLabelSpans(spannable, 0, speedLine.length());
-                view.setText(spannable);
-            }
-            return;
-        }
-
-        String usageLine = getUsageText();
-        String text = speedLine + "\n" + usageLine;
-        SpannableString spannable = new SpannableString(text);
-
-        if (!NetworkConfig.showOnlyValue) {
-            applyLabelSpans(spannable, 0, speedLine.length());
-        }
-        int usageStart = text.length() - usageLine.length();
-        applyUsageLabelSpans(spannable, usageStart, text.length());
-        view.setText(spannable);
-    }
-
-    private String getUsageText() {
-        DataUsageTracker tracker = DataUsageTracker.get(context);
-        if (tracker.isUnsupported()) {
-            return "Hari ini —";
-        }
-        return "Hari ini ↓" + DataUsageTracker.formatBytes(tracker.getDayRx())
-                + " ↑" + DataUsageTracker.formatBytes(tracker.getDayTx());
-    }
-
-    private void applyLabelSpans(SpannableString spannable, int start, int end) {
-        for (int i = start; i < end; i++) {
-            char c = spannable.charAt(i);
-            if (c == '↓' || c == '↑' || c == 'M' || c == 'B' || c == 'K' || c == '/' || c == 's') {
-                spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor),
-                        i, i + 1, 0);
-            }
-        }
-    }
-
-    private void applyUsageLabelSpans(SpannableString spannable, int start, int end) {
-        int prefixEnd = Math.min(start + "Hari ini".length(), end);
-        spannable.setSpan(new ForegroundColorSpan(NetworkConfig.labelColor), start, prefixEnd, 0);
-        applyLabelSpans(spannable, prefixEnd, end);
+        view.setTextColors(NetworkConfig.color, NetworkConfig.labelColor);
+        view.updateSpeeds(lastRxSpeed, lastTxSpeed, NetworkConfig.showOnlyValue);
     }
 
     private final Runnable tickRunnable = new Runnable() {
@@ -416,19 +376,4 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
 
     private long lastRxSpeed;
     private long lastTxSpeed;
-
-    private String getCurrentSpeedText() {
-        return formatSpeed(lastRxSpeed, lastTxSpeed);
-    }
-
-    private String formatSpeed(long rxBytesPerSec, long txBytesPerSec) {
-        return "↓" + formatUnit(rxBytesPerSec) + " ↑" + formatUnit(txBytesPerSec);
-    }
-
-    private String formatUnit(long bytesPerSec) {
-        if (bytesPerSec >= 1048576) {
-            return String.format(java.util.Locale.US, "%.2fMB/s", bytesPerSec / 1048576.0);
-        }
-        return (bytesPerSec / 1024) + "KB/s";
-    }
 }

@@ -53,6 +53,7 @@
     <color name="bat_chart_voltage">#5C6BC0</color>
     <color name="bat_chart_current">#00897B</color>
     <color name="bat_chart_grid">#228A8A8E</color>
+    <color name="bat_chart_gap">#148A8A8E</color>
 
     <!-- Slider zoom halaman detail grafik -->
     <color name="bat_slider_thumb">#1A1A1A</color>

@@ -157,5 +157,5 @@ Perubahan pada dokumen **hanya dilakukan di file root** (`README.md`, `CHANGELOG
 3. `***RELEASE***` bisa berawal dari `***PUSH***` lalu di-upgrade saat tag ditambahkan.
 
 ### Setelah status PUSH/RELEASE
-1. Buat entry CHANGELOG baru (teratas, `***ONGOING***`) di sesi kerja berikutnya; versionName disesuaikan setelah ada perubahan.
+1. **Segera** buat entry CHANGELOG baru (teratas, `***ONGOING***`) setelah selesai push/tag. Ikuti format judul entry yang ada di `CHANGELOG.md` (`# [major.minor.patch] yyyy/MM/dd HH:mm WITA versionCode ***ONGOING***`). Untuk **versionName** cukup isi `[x.xx.x]` saat entry baru dibuat; versionName akan disesuaikan saat sudah ada perubahan yang dilakukan.
 2. Kembali ke Edit Biasa.

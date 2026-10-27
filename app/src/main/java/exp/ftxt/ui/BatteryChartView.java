@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import exp.ftxt.R;
+import exp.ftxt.features.battery_stats.BatteryHistoryDb;
 import exp.ftxt.features.battery_stats.BatteryReading;
 
 /**
@@ -27,9 +28,6 @@ import exp.ftxt.features.battery_stats.BatteryReading;
  * nilai terkini di ujung garis, sumbu waktu di bawah.
  */
 public class BatteryChartView extends View {
-
-    /** Threshold gap waktu (ms) untuk memutus garis grafik. Gap > 5 menit dianggap putus. */
-    private static final long GAP_THRESHOLD_MS = 5L * 60_000L;
 
     public static final long WINDOW_5M = 5L * 60_000L;
     public static final long WINDOW_10M = 10L * 60_000L;
@@ -57,6 +55,8 @@ public class BatteryChartView extends View {
     private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint emptyPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint gapFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint gapTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final SimpleDateFormat timeLabelFormat = new SimpleDateFormat("MM/dd HH:mm", Locale.US);
     private final SimpleDateFormat timeCrosshairFormat = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.US);
@@ -148,6 +148,11 @@ public class BatteryChartView extends View {
         emptyPaint.setColor(getResources().getColor(R.color.bat_monitor_label));
         emptyPaint.setTextSize(sp(12));
         emptyPaint.setTextAlign(Paint.Align.CENTER);
+
+        gapFillPaint.setColor(getResources().getColor(R.color.bat_chart_gap));
+        gapTextPaint.setColor(getResources().getColor(R.color.bat_monitor_label));
+        gapTextPaint.setTextSize(sp(9));
+        gapTextPaint.setTextAlign(Paint.Align.CENTER);
 
         crosshairPaint.setStyle(Paint.Style.STROKE);
         crosshairPaint.setStrokeWidth(dp(1));
@@ -495,6 +500,20 @@ public class BatteryChartView extends View {
         linePaint.setColor(getResources().getColor(seriesColorRes(seriesType)));
     }
 
+    /**
+     * Menandai periode tanpa data (mis. aplikasi mati atau perangkat nonaktif)
+     * dengan bidang samar dan label agar celah pada garis mudah dikenali.
+     */
+    private void drawGapMarker(Canvas canvas, float x1, float x2, float padTop, float plotH) {
+        float left = Math.min(x1, x2);
+        float right = Math.max(x1, x2);
+        if (right - left < dp(1)) return;
+        canvas.drawRect(left, padTop, right, padTop + plotH, gapFillPaint);
+        if (right - left >= dp(44)) {
+            canvas.drawText("Tanpa data", (left + right) / 2f, padTop + dp(14), gapTextPaint);
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -597,7 +616,7 @@ public class BatteryChartView extends View {
         if (seriesType == SERIES_TEMP) {
             // Garis Suhu: warna tiap segmen mengikuti nilai suhu titik datanya
             // (putih dingin ekstrem → ice blue → hijau → oranye → merah panas).
-            // Putuskan garis saat gap waktu > GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
+            // Putuskan garis saat gap waktu > BatteryHistoryDb.GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
             path.rewind();
             float prevX = padLeft + plotW * ((samples[first].time - baseT) / spanMs);
             float prevY = pointY(first, min, vRange, padTop, plotH);
@@ -607,7 +626,8 @@ public class BatteryChartView extends View {
                 float y = pointY(idx, min, vRange, padTop, plotH);
                 // Cek gap waktu antara titik sekarang dan sebelumnya
                 long gapMs = samples[idx].time - samples[idx - 1].time;
-                if (gapMs > GAP_THRESHOLD_MS) {
+                if (gapMs > BatteryHistoryDb.GAP_THRESHOLD_MS) {
+                    drawGapMarker(canvas, prevX, x, padTop, plotH);
                     // Putus garis: mulai path baru dari titik ini
                     prevX = x;
                     prevY = y;
@@ -624,30 +644,33 @@ public class BatteryChartView extends View {
         } else if (isStatusColored()) {
             // Garis Persentase/Tegangan/Arus diwarnai per segmen sesuai status baterai
             // titik data: hijau saat mengisi, merah saat tidak. Segmen transisi ikut run sebelumnya.
-            // Putuskan garis saat gap waktu > GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
+            // Putuskan garis saat gap waktu > BatteryHistoryDb.GAP_THRESHOLD_MS (ponsel mati/lama tidak aktif).
             boolean charging = samples[first].isCharging();
             linePaint.setColor(lineColor(charging));
             path.rewind();
-            path.moveTo(padLeft + plotW * ((samples[first].time - baseT) / spanMs),
-                    pointY(first, min, vRange, padTop, plotH));
+            float prevX = padLeft + plotW * ((samples[first].time - baseT) / spanMs);
+            path.moveTo(prevX, pointY(first, min, vRange, padTop, plotH));
             for (int k = 1; k < count; k++) {
                 int idx = first + k;
                 float x = padLeft + plotW * ((samples[idx].time - baseT) / spanMs);
                 float y = pointY(idx, min, vRange, padTop, plotH);
                 // Cek gap waktu antara titik sekarang dan sebelumnya
                 long gapMs = samples[idx].time - samples[idx - 1].time;
-                if (gapMs > GAP_THRESHOLD_MS) {
+                if (gapMs > BatteryHistoryDb.GAP_THRESHOLD_MS) {
                     // Putus garis: gambar path saat ini lalu mulai baru
                     canvas.drawPath(path, linePaint);
+                    drawGapMarker(canvas, prevX, x, padTop, plotH);
                     path.rewind();
                     path.moveTo(x, y);
                     charging = samples[idx].isCharging();
                     linePaint.setColor(lineColor(charging));
+                    prevX = x;
                     lastX = x;
                     lastY = y;
                     continue;
                 }
                 path.lineTo(x, y);
+                prevX = x;
                 lastX = x;
                 lastY = y;
                 boolean c = samples[idx].isCharging();
@@ -660,7 +683,7 @@ public class BatteryChartView extends View {
                 }
             }
         } else {
-            // Garis default (Daya): putuskan saat gap waktu > GAP_THRESHOLD_MS
+            // Garis default (Daya): putuskan saat gap waktu > BatteryHistoryDb.GAP_THRESHOLD_MS
             path.rewind();
             boolean started = false;
             for (int k = 0; k < count; k++) {
@@ -670,7 +693,10 @@ public class BatteryChartView extends View {
                 // Cek gap waktu antara titik sekarang dan sebelumnya
                 if (k > 0) {
                     long gapMs = samples[idx].time - samples[idx - 1].time;
-                    if (gapMs > GAP_THRESHOLD_MS) {
+                    if (gapMs > BatteryHistoryDb.GAP_THRESHOLD_MS) {
+                        float prevX = padLeft + plotW
+                                * ((samples[idx - 1].time - baseT) / spanMs);
+                        drawGapMarker(canvas, prevX, x, padTop, plotH);
                         // Putus garis: tutup path lalu mulai baru
                         started = false;
                     }

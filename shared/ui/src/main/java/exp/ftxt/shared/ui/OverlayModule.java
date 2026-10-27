@@ -15,6 +15,7 @@ public interface OverlayModule {
     default void updateSeparatorColor(int color) {}
     void updateShadow();
     void updateBackground();
+    default void updateLayout() {}
     void updatePosition();
     void updateTouchFlags();
     void setOrientationSuffix(String suffix);

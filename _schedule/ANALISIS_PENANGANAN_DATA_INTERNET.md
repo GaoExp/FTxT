@@ -1,12 +1,12 @@
 # Analisis Cara Reference App (Internet) Menangani Data
 
-**Tanggal:** 2026/09/04
+**Tanggal:** 2026/09/04 (diperbarui 2026/10/26)
 **Metode:** Ekstraksi & dekompilasi statis APK dengan `jadx` (Java), dianalisis dari skema SQL (Room) dan struktur WorkManager/service/receiver di manifest serta source dekompilasi.
-**Sumber:**
-- `_temp/sample_apk/Internet/Data Usage Monitor.apk` (`com.andcreate.app.trafficmonitor`, v1.23.3054)
-- `_temp/sample_apk/Internet/Internet Speed Monitor.apk` (`com.andcreate.app.internetspeedmonitor`, v1.1.7.2)
+**Sumber acuan saat ini:** `_temp/apk1/`
+- `Data Monitor [1.0.223].apk` (`anomali.datamonitor`, versionCode 222, versionName 1.0.223)
+- `base2.apk` (`com.andcreate.app.internetspeedmonitor`, versionCode 1201, versionName 1.2.1)
 
-> Catatan: kedua APK dipakai R8 + obfuscation (nama class/field banyak yang diganti). Nilai numerik (interval, ambang retensi) terbaca sebagian; pola arsitektur & skema database terbaca jelas. Dokumen ini fokus pada **strategi penanganan data**, bukan nilai nominal.
+> Catatan: analisis di bawah ditulis dari APK acuan lama (`_temp/sample_apk/...`) yang sudah tidak tersedia. Penggantinya kini ada di `_temp/apk1/` dan belum diverifikasi ulang; perbedaan yang diketahui: Data Usage Monitor lama (`com.andcreate.app.trafficmonitor`) digantikan **Data Monitor** (`anomali.datamonitor`) — aplikasi berbeda — sedangkan Internet Speed Monitor naik dari v1.1.7.2 ke v1.2.1. Kedua APK acuan memakai R8 + obfuscation, sehingga nilai numerik (interval, ambang retensi) hanya terbaca sebagian; dokumen ini fokus pada **strategi penanganan data**, bukan nilai nominal.
 
 ---
 

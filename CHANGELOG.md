@@ -1,17 +1,25 @@
-# [4.95.0] 2026/10/23 11:00 WITA 298 ***ONGOING***
+# [4.95.0] 2026/10/27 14:10 WITA 308 ***ONGOING***
 ### 🔖 Deskripsi
-> Menambahkan sub-tab Data Usage di panel Network dan opsi ringkasan di overlay, memanfaatkan counter lalu lintas yang sudah dipakai modul Network.
+> Memperluas panel Network dengan header tab di Monitor serta merombak tampilan overlay Network menjadi dua badge kecepatan dengan color bar. Rincian tiap perubahan tersedia di section di bawah.
 
 ### ✨ Fitur Baru
+- **Header tab di Monitor panel Network** — Tab Monitor kini memiliki tiga header: Pemakaian, Aplikasi, dan Alat. Tab Pemakaian memuat rekap usage yang sudah ada, sedangkan tab Aplikasi dan Alat masih berupa halaman "Sedang dikerjakan" dengan keterangan fitur yang akan menyusul. Navigasi footer Monitor/Overlay tidak berubah.
 - **Data Usage di tab Monitor panel Network** — Panel Network kini memiliki tab Monitor dan Overlay seperti modul Battery/Memory. Tab Monitor menampilkan total unduh/unggah hari ini (total seluruh aplikasi di perangkat), rata-rata per jam, kecepatan puncak, dan grafik batang 7 hari terakhir, lengkap dengan tombol Reset Hari Ini. Angka dihitung dari selisih counter `TrafficStats` sehingga pemakaian yang terlewat tetap tercatat saat aplikasi dibuka atau saat modul Network kembali aktif; counter di-reset otomatis mengikuti tanggal perangkat dan aman terhadap reboot (total hari berjalan tidak ikut hilang). Data diperbarui langsung selama panel terbuka.
-- **Ringkasan usage di overlay (opsional, default nonaktif)** — Saat opsi "Tampilkan Usage Harian di Overlay" diaktifkan, overlay Network menampilkan baris kedua `Hari ini ↓… ↑…` tanpa mengubah baris kecepatan. Opsi "Sembunyikan Label" hanya berlaku pada baris kecepatan.
+
+### ♻️ Perubahan Fitur
+- **Overlay Network memakai dua badge dengan color bar** — Baris kecepatan tunggal diganti badge unduh dan unggah terpisah. Tiap badge memiliki color bar setinggi badge yang panjangnya mengikuti kecepatan (skala logaritmik, penuh di 10 MB/s) tanpa lapisan track latar; color bar selalu aktif dan toggle "Tampilkan Color Bar" ditampilkan tercentang namun diburamkan/nonaktif. Susunan Horizontal/Vertikal, panjang tiap badge (10–160 dp), ukuran teks, warna bar unduh/unggah, serta arah isian bar (kiri ke kanan atau kanan ke kiri) dapat diatur di panel. Susunan dan panjang badge bersifat tetap, sedangkan posisi overlay tetap tersimpan terpisah per orientasi perangkat.
+
+### 🐞 Bug Fixes
+- **Color bar overlay Network tidak terlihat** — Color bar kini digambar langsung oleh lapisan induk overlay di belakang teks badge, dan lapisan track latar dihapus sehingga hanya isian proporsional yang tampil.
+- **Konfigurasi overlay dipertahankan setelah reboot** — Saat perangkat dinyalakan ulang, seluruh pengaturan overlay kini dimuat dari penyimpanan sebelum layanan overlay berjalan, sehingga tampilan tidak lagi kembali ke kondisi default sampai aplikasi dan pengaturan modul dibuka.
+- **Periode tanpa data pada grafik tab Monitor terlihat jelas** — Garis grafik tidak lagi menyambung melewati jeda panjang saat aplikasi mati atau perangkat nonaktif; jeda di atas 5 menit diputus dan ditandai bidang samar dengan label "Tanpa data" sehingga periode kosong mudah dikenali.
 
 ### 💡 Memo
 - Angka bersifat total perangkat (semua aplikasi), bukan per aplikasi atau per jenis jaringan; hari yang terlewat tanpa observasi bisa bolong, dan traffic sejak observasi terakhir sampai reboot tidak dapat dipulihkan.
 
 ---
 
-"# [4.94.0] 2026/09/10 17:33 WITA 290 ***RELEASE***
+# [4.94.0] 2026/09/10 17:33 WITA 290 ***RELEASE***
 ### 🔖 Deskripsi
 > Membangun fondasi Smart Panel — panel kontrol mengambang untuk mengatur posisi & pengaturan modul overlay tanpa membuka aplikasi.
 

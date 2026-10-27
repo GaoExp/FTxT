@@ -465,6 +465,9 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
         return out.toArray(new BatteryReading.Snapshot[0]);
     }
 
+    /** Ambang gap waktu antar sampel; jeda lebih panjang dianggap periode tanpa data. */
+    public static final long GAP_THRESHOLD_MS = 5L * 60_000L;
+
     /** Interpolasi linear ke titik-titik berjarak waktu sama (maks. targetPoints). */
     private static BatteryReading.Snapshot[] resampleUniform(
             BatteryReading.Snapshot[] raw, long fromMs, long toMs, int targetPoints) {
@@ -482,6 +485,19 @@ public class BatteryHistoryDb extends SQLiteOpenHelper {
             BatteryReading.Snapshot b = raw[k];
             if (b.time <= a.time) {
                 out.add(a);
+                continue;
+            }
+            if (b.time - a.time > GAP_THRESHOLD_MS && t > a.time) {
+                // Jangan interpolasi melewati periode tanpa data: potong grid tepat
+                // di sampel terakhir sebelum gap, lalu mulai grid baru di sampel
+                // pertama sesudah gap agar garis grafik terputus.
+                while (!out.isEmpty() && out.get(out.size() - 1).time > a.time) {
+                    out.remove(out.size() - 1);
+                }
+                if ((out.isEmpty() || out.get(out.size() - 1).time < a.time) && a.time >= start) {
+                    out.add(a);
+                }
+                t = b.time - step;
                 continue;
             }
             float frac = (t - a.time) / (float) (b.time - a.time);
