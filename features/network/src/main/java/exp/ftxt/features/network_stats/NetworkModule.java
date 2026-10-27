@@ -58,6 +58,7 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
         view.setShadowConfig(NetworkConfig.shadow);
         view.setOverlayTextSize(NetworkConfig.size);
         view.setTextColors(NetworkConfig.color, NetworkConfig.labelColor);
+        view.setTextStyleConfig(NetworkConfig.textBold, NetworkConfig.textItalic);
         view.setBadgeWidthDp(NetworkConfig.displayWidthDp);
         view.setVerticalLayout(NetworkConfig.verticalLayout);
         view.setBarColors(NetworkConfig.barColorDown, NetworkConfig.barColorUp);
@@ -163,6 +164,7 @@ public class NetworkModule implements OverlayModule, SmartPanelTarget {
         view.setBarEnabled(NetworkConfig.barEnabled);
         view.setBarInverted(NetworkConfig.barInverted);
         view.setTextColors(NetworkConfig.color, NetworkConfig.labelColor);
+        view.setTextStyleConfig(NetworkConfig.textBold, NetworkConfig.textItalic);
         updateDisplay();
         view.post(this::updatePosition);
     }

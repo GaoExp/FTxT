@@ -16,6 +16,8 @@ public class NetworkConfig {
     public static float size = 12f;
     public static int color = Color.GREEN;
     public static int labelColor = Color.CYAN;
+    public static boolean textBold = false;
+    public static boolean textItalic = false;
     public static int barColorDown = DEFAULT_BAR_COLOR_DOWN;
     public static int barColorUp = DEFAULT_BAR_COLOR_UP;
     public static boolean barEnabled = true;

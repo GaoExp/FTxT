@@ -100,6 +100,8 @@ public final class ConfigLoader {
         NetworkConfig.bg.offsetY = prefs.getInt("network_bg_offset_y", 0);
         NetworkConfig.bg.margin = prefs.getInt("network_bg_margin", 0);
         NetworkConfig.bg.radius = prefs.getInt("network_bg_radius", 0);
+        NetworkConfig.textBold = prefs.getBoolean("network_text_bold", false);
+        NetworkConfig.textItalic = prefs.getBoolean("network_text_italic", false);
         NetworkConfig.barColorDown = prefs.getInt("network_bar_color_down", NetworkConfig.DEFAULT_BAR_COLOR_DOWN);
         NetworkConfig.barColorUp = prefs.getInt("network_bar_color_up", NetworkConfig.DEFAULT_BAR_COLOR_UP);
         NetworkConfig.barEnabled = true;

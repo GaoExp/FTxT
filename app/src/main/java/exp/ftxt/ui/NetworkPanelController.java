@@ -36,6 +36,8 @@ public class NetworkPanelController {
     private CheckBox networkVerticalCheck;
     private CheckBox networkBarCheck;
     private CheckBox networkBarInvertCheck;
+    private CheckBox networkBoldCheck;
+    private CheckBox networkItalicCheck;
     private SeekBar networkSizeSeekBar;
     private SeekBar networkWidthSeekBar;
     private View networkColorPreview;
@@ -126,6 +128,8 @@ public class NetworkPanelController {
         networkVerticalCheck = rootView.findViewById(R.id.networkVerticalCheck);
         networkBarCheck = rootView.findViewById(R.id.networkBarCheck);
         networkBarInvertCheck = rootView.findViewById(R.id.networkBarInvertCheck);
+        networkBoldCheck = rootView.findViewById(R.id.networkBoldCheck);
+        networkItalicCheck = rootView.findViewById(R.id.networkItalicCheck);
         networkSizeSeekBar = rootView.findViewById(R.id.networkSizeSeekBar);
         networkWidthSeekBar = rootView.findViewById(R.id.networkWidthSeekBar);
         networkColorPreview = rootView.findViewById(R.id.networkColorPreview);
@@ -244,6 +248,10 @@ public class NetworkPanelController {
         networkBarCheck.setAlpha(0.5f);
         networkBarInvertCheck.setChecked(NetworkConfig.barInverted);
         activity.applyCheckboxTint(networkBarInvertCheck, NetworkConfig.barInverted);
+        networkBoldCheck.setChecked(NetworkConfig.textBold);
+        activity.applyCheckboxTint(networkBoldCheck, NetworkConfig.textBold);
+        networkItalicCheck.setChecked(NetworkConfig.textItalic);
+        activity.applyCheckboxTint(networkItalicCheck, NetworkConfig.textItalic);
         FloatingService.updateLayoutForModule(FloatingService.networkModule());
         networkColorPreview.setBackgroundColor(NetworkConfig.color);
         networkLabelColorPreview.setBackgroundColor(NetworkConfig.labelColor);
@@ -360,6 +368,22 @@ public class NetworkPanelController {
             activity.applyCheckboxTint(networkBarInvertCheck, isChecked);
             activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
                     .edit().putBoolean("network_bar_inverted", isChecked).apply();
+            FloatingService.updateLayoutForModule(FloatingService.networkModule());
+        });
+
+        networkBoldCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.textBold = isChecked;
+            activity.applyCheckboxTint(networkBoldCheck, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_text_bold", isChecked).apply();
+            FloatingService.updateLayoutForModule(FloatingService.networkModule());
+        });
+
+        networkItalicCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            NetworkConfig.textItalic = isChecked;
+            activity.applyCheckboxTint(networkItalicCheck, isChecked);
+            activity.getSharedPreferences("ftxt_prefs", MainActivity.MODE_PRIVATE)
+                    .edit().putBoolean("network_text_italic", isChecked).apply();
             FloatingService.updateLayoutForModule(FloatingService.networkModule());
         });
 

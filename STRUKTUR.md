@@ -90,7 +90,7 @@ FTxT/
 │   │   └── src/main/java/exp/ftxt/features/network_stats/
 │   │       ├── NetworkConfig.java — Konfigurasi statis Network overlay
 │   │       ├── NetworkModule.java — Kecepatan internet ↓↑ via TrafficStats, 1 detik
-│   │       ├── NetworkOverlayView.java — Dua badge + color bar overlay
+│   │       ├── NetworkOverlayView.java — Dua badge + color bar (arah & gaya teks)
 │   │       ├── DataUsageTracker.java — Pencatat usage harian untuk tab Monitor
 │   │       └── UsageBarsView.java — Grafik batang usage 7 hari
 │   │
@@ -197,7 +197,7 @@ FTxT/
     │   │   │   ├── MemoryPanelController.java          — UI panel Memory Stats (tab Monitor + Overlay): OrderZones, export/copy
     │   │   │   ├── MemoryPositionController.java       — Kontrol posisi Memory Stats + preset
     │   │   │   ├── MemoryOrderZonesView.java           — Custom view zona drag chip dua zona untuk urutan item Memory Stats
-    │   │   │   ├── NetworkPanelController.java         — UI panel Network: switch, size, color, shadow
+    │   │   │   ├── NetworkPanelController.java         — UI panel Network: tab Monitor/Overlay, teks, panjang/arah bar, warna, background
     │   │   │   ├── NetworkPositionController.java      — Kontrol posisi Network
     │   │   │   ├── ColorPickerPanelController.java     — UI panel Color Picker: wheel, sliders, saved colors
     │   │   │   ├── CrosshairPanelController.java       — UI panel Crosshair: galeri 44 gaya, size/opacity/rotasi, lock/safe area

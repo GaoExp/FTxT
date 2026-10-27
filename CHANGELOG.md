@@ -1,4 +1,4 @@
-# [4.95.0] 2026/10/27 14:10 WITA 308 ***ONGOING***
+# [4.95.0] 2026/10/27 14:39 WITA 310 ***PUSH***
 ### 🔖 Deskripsi
 > Memperluas panel Network dengan header tab di Monitor serta merombak tampilan overlay Network menjadi dua badge kecepatan dengan color bar. Rincian tiap perubahan tersedia di section di bawah.
 
@@ -7,7 +7,7 @@
 - **Data Usage di tab Monitor panel Network** — Panel Network kini memiliki tab Monitor dan Overlay seperti modul Battery/Memory. Tab Monitor menampilkan total unduh/unggah hari ini (total seluruh aplikasi di perangkat), rata-rata per jam, kecepatan puncak, dan grafik batang 7 hari terakhir, lengkap dengan tombol Reset Hari Ini. Angka dihitung dari selisih counter `TrafficStats` sehingga pemakaian yang terlewat tetap tercatat saat aplikasi dibuka atau saat modul Network kembali aktif; counter di-reset otomatis mengikuti tanggal perangkat dan aman terhadap reboot (total hari berjalan tidak ikut hilang). Data diperbarui langsung selama panel terbuka.
 
 ### ♻️ Perubahan Fitur
-- **Overlay Network memakai dua badge dengan color bar** — Baris kecepatan tunggal diganti badge unduh dan unggah terpisah. Tiap badge memiliki color bar setinggi badge yang panjangnya mengikuti kecepatan (skala logaritmik, penuh di 10 MB/s) tanpa lapisan track latar; color bar selalu aktif dan toggle "Tampilkan Color Bar" ditampilkan tercentang namun diburamkan/nonaktif. Susunan Horizontal/Vertikal, panjang tiap badge (10–160 dp), ukuran teks, warna bar unduh/unggah, serta arah isian bar (kiri ke kanan atau kanan ke kiri) dapat diatur di panel. Susunan dan panjang badge bersifat tetap, sedangkan posisi overlay tetap tersimpan terpisah per orientasi perangkat.
+- **Overlay Network memakai dua badge dengan color bar** — Baris kecepatan tunggal diganti badge unduh dan unggah terpisah. Tiap badge memiliki color bar setinggi badge yang panjangnya mengikuti kecepatan (skala logaritmik, penuh di 10 MB/s) tanpa lapisan track latar; color bar selalu aktif dan toggle "Tampilkan Color Bar" ditampilkan tercentang namun diburamkan/nonaktif. Susunan Horizontal/Vertikal, panjang tiap badge (10–160 dp), ukuran dan gaya teks (Bold, Italic, atau keduanya), warna bar unduh/unggah, serta arah isian bar (kiri ke kanan atau kanan ke kiri) dapat diatur di panel. Susunan dan panjang badge bersifat tetap, sedangkan posisi overlay tetap tersimpan terpisah per orientasi perangkat.
 
 ### 🐞 Bug Fixes
 - **Color bar overlay Network tidak terlihat** — Color bar kini digambar langsung oleh lapisan induk overlay di belakang teks badge, dan lapisan track latar dihapus sehingga hanya isian proporsional yang tampil.

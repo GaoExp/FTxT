@@ -137,6 +137,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
 
+                <CheckBox
+                    android:id="@+id/networkBoldCheck"
+                    android:text="Teks Bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <CheckBox
+                    android:id="@+id/networkItalicCheck"
+                    android:text="Teks Italic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
                 <TextView
                     android:id="@+id/networkWidthLabel"
                     android:text="Panjang Badge: 120dp"

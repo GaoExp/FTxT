@@ -157,6 +157,7 @@ Panel Network memiliki **2 tab**: **Monitor** dan **Overlay**.
 - **Color bar** mengisi tinggi penuh badge; hanya lapisan isian yang digambar tanpa track latar, panjangnya mengikuti kecepatan (skala logaritmik, penuh di 10 MB/s); selalu aktif, toggle ditampilkan tercentang namun nonaktif; **Balik Arah Bar** membalik isian dari kanan ke kiri
 - **Panjang Badge** diatur 10–160 dp per badge; **Susunan Vertikal** mengubah dua badge menjadi atas-bawah tanpa mengubah panjang pilihan
 - **Warna Bar Unduh/Unggah** dapat diatur terpisah dengan color picker (termasuk alpha)
+- **Gaya teks** dapat dibuat Bold, Italic, atau keduanya sekaligus
 - Opsi **Sembunyikan Label** membuang panah dan satuan; warna nilai dan label tetap terpisah
 - Polling via `TrafficStats`, interval update bisa diatur 0.2–10 detik (default 1 detik)
 

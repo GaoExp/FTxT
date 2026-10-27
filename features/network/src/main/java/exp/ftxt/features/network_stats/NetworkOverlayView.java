@@ -3,6 +3,7 @@ package exp.ftxt.features.network_stats;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.Gravity;
@@ -28,6 +29,8 @@ public class NetworkOverlayView extends LinearLayout {
 
     private int textColor = NetworkConfig.color;
     private int labelColor = NetworkConfig.labelColor;
+    private boolean textBold = NetworkConfig.textBold;
+    private boolean textItalic = NetworkConfig.textItalic;
     private int barColorDown = NetworkConfig.barColorDown;
     private int barColorUp = NetworkConfig.barColorUp;
     private boolean barEnabled = NetworkConfig.barEnabled;
@@ -58,6 +61,7 @@ public class NetworkOverlayView extends LinearLayout {
 
         setBarColors(barColorDown, barColorUp);
         setBarEnabled(barEnabled);
+        setTextStyleConfig(textBold, textItalic);
         applyBadgeLayout();
     }
 
@@ -72,6 +76,14 @@ public class NetworkOverlayView extends LinearLayout {
         this.labelColor = labelColor;
         downBadge.setTextColor(color);
         upBadge.setTextColor(color);
+    }
+
+    public void setTextStyleConfig(boolean bold, boolean italic) {
+        textBold = bold;
+        textItalic = italic;
+        downBadge.setTextStyle(bold, italic);
+        upBadge.setTextStyle(bold, italic);
+        requestLayout();
     }
 
     public void setShadowConfig(ShadowConfig config) {
@@ -253,11 +265,26 @@ public class NetworkOverlayView extends LinearLayout {
 
     private static class BadgeView extends ShadowTextView {
 
+        private final Typeface baseTypeface;
+
         BadgeView(Context context) {
             super(context);
+            baseTypeface = getTypeface();
             setGravity(Gravity.CENTER);
             setSingleLine(true);
             setIncludeFontPadding(false);
+        }
+
+        void setTextStyle(boolean bold, boolean italic) {
+            int style = Typeface.NORMAL;
+            if (bold && italic) {
+                style = Typeface.BOLD_ITALIC;
+            } else if (bold) {
+                style = Typeface.BOLD;
+            } else if (italic) {
+                style = Typeface.ITALIC;
+            }
+            setTypeface(baseTypeface, style);
         }
     }
 }
